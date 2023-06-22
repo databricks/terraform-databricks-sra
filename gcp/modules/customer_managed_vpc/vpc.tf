@@ -42,7 +42,7 @@ depends_on =[google_compute_address.frontend_pe_ip_address, google_compute_addre
  vpc_endpoint_name   = "vpce-backend-rest-${random_string.suffix.result}"
  gcp_vpc_endpoint_info {
    project_id        = var.google_project
-   psc_endpoint_name = var.relay_pe
+   psc_endpoint_name = var.workspace_pe
    endpoint_region   = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
  }
 }
@@ -54,7 +54,7 @@ resource "databricks_mws_vpc_endpoint" "relay_vpce" {
  vpc_endpoint_name   = "vpce-relay-${random_string.suffix.result}"
  gcp_vpc_endpoint_info {
    project_id        = var.google_project
-   psc_endpoint_name = var.workspace_pe
+   psc_endpoint_name = var.relay_pe
    endpoint_region   = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
  }
 }
@@ -73,6 +73,7 @@ resource "databricks_mws_networks" "this" {
     service_ip_range_name = "svc"
   }
   vpc_endpoints {
+    
    dataplane_relay = [databricks_mws_vpc_endpoint.relay_vpce.vpc_endpoint_id]
    rest_api        = [databricks_mws_vpc_endpoint.backend_rest_vpce.vpc_endpoint_id]
   }
