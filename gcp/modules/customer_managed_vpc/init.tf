@@ -6,6 +6,8 @@ variable "google_zone" {}
 variable "backend_rest_psce" {}
 variable "relay_psce" {}
 
+variable "initial_databricks_worskpace_user_email" {}
+
 variable "workspace_pe" {}
 variable "relay_pe" {}
 
@@ -107,7 +109,7 @@ resource "databricks_user" "me" {
 
 
  provider  = databricks.workspace
- user_name = data.google_client_openid_userinfo.me.email
+ user_name = var.initial_databricks_worskpace_user_email
 }
 
 
