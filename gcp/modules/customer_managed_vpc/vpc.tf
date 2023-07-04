@@ -35,7 +35,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 resource "databricks_mws_vpc_endpoint" "backend_rest_vpce" {
-depends_on =[google_compute_forwarding_rule.backend_psc_ep]
+depends_on =[google_compute_address.frontend_pe_ip_address, google_compute_address.backend_pe_ip_address]
  provider     = databricks.accounts
 
  account_id          = var.databricks_account_id
@@ -48,7 +48,6 @@ depends_on =[google_compute_forwarding_rule.backend_psc_ep]
 }
 
 resource "databricks_mws_vpc_endpoint" "relay_vpce" {
-depends_on = [google_compute_forwarding_rule.frontend_psc_ep ]
  provider     = databricks.accounts
 
  account_id          = var.databricks_account_id

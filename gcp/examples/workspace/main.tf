@@ -3,7 +3,6 @@ module "customer_managed_vpc" {
   source                      = "../../modules/customer_managed_vpc/"
   google_project = var.google_project
   google_region = var.google_region
-  initial_databricks_worskpace_user_email=var.initial_databricks_worskpace_user_email
   databricks_account_id = var.databricks_account_id
   google_zone = var.google_zone
   databricks_google_service_account = var.databricks_google_service_account
