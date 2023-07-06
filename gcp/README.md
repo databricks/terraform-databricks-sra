@@ -42,7 +42,7 @@ technology, a VPC endpoint is a service that connections a customer's VPC endpoi
 
 8. Run `terraform apply -var-file ../example.tfvars`
 
-Note: If you are running workspace module,please set DATABRICKS_GOOGLE_SERVICE_ACCOUNT environment variable with the Service Account email.Example :
+Note: If you are running the workspace module, please set DATABRICKS_GOOGLE_SERVICE_ACCOUNT environment variable with the Service Account email. Example :
 ```
 export DATABRICKS_GOOGLE_SERVICE_ACCOUNT=<<Your GCP Service Account email>>
 ```
