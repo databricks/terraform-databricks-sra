@@ -1,3 +1,0 @@
-# vnet
-# subnets
-# adb workspace
