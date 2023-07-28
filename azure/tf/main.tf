@@ -1,13 +1,5 @@
-resource "azurerm_resource_group" "this" {
-  name     = var.hub_resource_group_name
-  location = var.location
-}
+module "hub" {
 
-resource "azurerm_virtual_network" "this" {
-  name                = var.hub_vnet_name
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  address_space       = [var.hub_vnet_address_space]
 }
 
 module "spoke_vnet" {
@@ -46,3 +38,4 @@ module "unity_catalog" {
   resource_group_id       = azurerm_resource_group.this.id
   workspaces_to_associate = [module.spoke_databricks_workspace.databricks_workspace_id]
 }
+

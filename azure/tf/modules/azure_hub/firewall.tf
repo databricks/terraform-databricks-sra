@@ -3,11 +3,7 @@ resource "azurerm_subnet" "firewall" {
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
 
-  address_prefixes = [var.firewall_subnet_address_prefixes]
-  service_endpoints = [
-    "Microsoft.Storage",
-    "Microsoft.AzureActiveDirectory"
-  ]
+  address_prefixes = [cidrsubnet(var.hub_cidr, 3, 0)]
 }
 
 resource "azurerm_public_ip" "this" {
@@ -89,5 +85,29 @@ resource "azurerm_firewall" "this" {
   depends_on = [
     resource.azurerm_firewall_policy_rule_collection_group.this
   ]
-
 }
+
+# if routing adb services through firewall
+# resource "azurerm_firewall_application_rule_collection" "adbservices" {
+#   name                = "adbcontrolplane"
+#   azure_firewall_name = azurerm_firewall.this.name
+#   resource_group_name = azurerm_resource_group.this.name
+#   priority            = 200
+#   action              = "Allow"
+
+#   rule {
+#     name = "databricks-control-plane-services"
+
+#     source_addresses = [
+#       join(", ", azurerm_subnet.public.address_prefixes),
+#       join(", ", azurerm_subnet.private.address_prefixes),
+#     ]
+
+#     target_fqdns = var.firewallfqdn
+
+#     protocol {
+#       port = "443"
+#       type = "Https"
+#     }
+#   }
+# }

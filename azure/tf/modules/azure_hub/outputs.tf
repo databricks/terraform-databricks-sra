@@ -10,6 +10,11 @@ output "firewall_name" {
   value = azurerm_firewall.this.name
 }
 
-output "workspace_url" {
-  value = module.spoke_databricks_workspace.workspace_url
+output "firewall_public_ip_address" {
+  value = azurerm_public_ip.this.ip_address
 }
+
+output "route_table_id" {
+  value = azurerm_route_table.this.id
+}
+  
