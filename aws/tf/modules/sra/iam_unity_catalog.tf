@@ -1,5 +1,5 @@
 
-// Unity Catalog Role
+// Unity Catalog Trust Policy
 data "aws_iam_policy_document" "passrole_for_unity_catalog" {
   statement {
     effect  = "Allow"
@@ -18,30 +18,35 @@ data "aws_iam_policy_document" "passrole_for_unity_catalog" {
     sid     = "ExplicitSelfRoleAssumption"
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = ["arn:aws:iam::${var.aws_account_id}:root"]
     }
-
     condition {
       test     = "ArnLike"
       variable = "aws:PrincipalArn"
-      values   = ["arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-unitycatalog"]
+      values   = ["arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-unity-catalog"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "sts:ExternalId"
+      values   = [var.databricks_account_id]
     }
   }
 }
 
+// Unity Catalog Role
 resource "aws_iam_role" "unity_catalog_role" {
-  name  = "${var.resource_prefix}-unitycatalog"
+  name  = "${var.resource_prefix}-unity-catalog"
   assume_role_policy = data.aws_iam_policy_document.passrole_for_unity_catalog.json
   tags = {
     Name = "${var.resource_prefix}-unity_catalog_role"
   }
 }
 
+// Unity Catalog Policy
 resource "aws_iam_role_policy" "unity_catalog" {
-  name   = "${var.resource_prefix}-unitycatalog-policy"
+  name   = "${var.resource_prefix}-unity-catalog-policy"
   role   = aws_iam_role.unity_catalog_role.id
   policy = jsonencode({Version: "2012-10-17",
             Statement: [
@@ -66,7 +71,7 @@ resource "aws_iam_role_policy" "unity_catalog" {
                             "sts:AssumeRole"
                         ],
                         "Resource": [
-                            "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-unitycatalog"
+                            "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-unity-catalog"
                         ],
                         "Effect": "Allow"
                     }

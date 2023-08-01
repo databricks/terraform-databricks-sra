@@ -1,18 +1,17 @@
 module "SRA" {
     source = "./modules/sra"
     providers = {
-      databricks.mws                = databricks.mws
-      aws                           = aws
+      databricks.mws            = databricks.mws
+      aws                       = aws
     }
   
    resource_prefix              = var.resource_prefix
    resource_owner               = var.resource_owner
    databricks_account_id        = var.databricks_account_id
-   databricks_account_username  = var.databricks_account_username
-   databricks_account_password  = var.databricks_account_password
+   client_id                    = var.client_id
+   client_secret                = var.client_secret
    aws_account_id               = var.aws_account_id
    region                       = var.region
-
    vpc_cidr_range               = "10.0.0.0/18"
 
    // Initial two private subnets are for workspace subnets, latter two are for VPC Interface Endpoints (Databricks (SCC + Relay), Kinesis, and STS)
@@ -27,8 +26,16 @@ module "SRA" {
    sg_ingress_protocol          = ["tcp", "udp"]
    sg_egress_protocol           = ["tcp", "udp"]
 
-   // Create an example storage credential and IAM role with read only access to this bucket 
-   data_bucket                  = "delta-lake-oss-emr-demo"
-   dbfsname                     = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"]) 
+   //Corporate IP addresses for workspace access - disabled by default. Please uncomment IP access list module in databricks.tf to enable.
+   ip_addresses = ["1.1.1.1", "1.2.3.0/24", "1.2.5.0/24"]
+
+  // Unity Catalog & DBFS Root Bucket Names
+  dbfsname                      = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"]) 
    ucname                       = join("", [var.resource_prefix, "-", var.region, "-", "uc"]) 
+
+   // Create an example AM role, storage credential, and external with read only access to a bucket for Unity Catalog. 
+   data_bucket                  = "<bucket_name>"
+
+   // Group or user that would like access to the external location created above.
+   data_access                  = "<user or group name>"
 }

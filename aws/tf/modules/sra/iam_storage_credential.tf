@@ -1,4 +1,4 @@
-// Storage Credential
+// Storage Credential Trust Policy
 data "aws_iam_policy_document" "passrole_for_storage_credential" {
   statement {
     effect  = "Allow"
@@ -17,31 +17,36 @@ data "aws_iam_policy_document" "passrole_for_storage_credential" {
     sid     = "ExplicitSelfRoleAssumption"
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = ["arn:aws:iam::${var.aws_account_id}:root"]
     }
-
     condition {
       test     = "ArnLike"
       variable = "aws:PrincipalArn"
-      values   = ["arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-storagecredential"]
+      values   = ["arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-storage-credential"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "sts:ExternalId"
+      values   = [var.databricks_account_id]
     }
   }
 }
 
+// Storage Credential Role
 resource "aws_iam_role" "storage_credential_role" {
-  name  = "${var.resource_prefix}-storagecredential"
-  assume_role_policy = data.aws_iam_policy_document.passrole_for_unity_catalog.json
+  name  = "${var.resource_prefix}-storage-credential"
+  assume_role_policy = data.aws_iam_policy_document.passrole_for_storage_credential.json
   tags = {
     Name = "${var.resource_prefix}-storage_credential_role"
   }
 }
 
 
+// Storage Credential Policy
 resource "aws_iam_role_policy" "storage_credential_policy" {
-  name   = "${var.resource_prefix}-storagecredential-policy"
+  name   = "${var.resource_prefix}-storage-credential-policy"
   role   = aws_iam_role.storage_credential_role.id
   policy = jsonencode({Version: "2012-10-17",
             Statement: [
@@ -63,7 +68,7 @@ resource "aws_iam_role_policy" "storage_credential_policy" {
                             "sts:AssumeRole"
                         ],
                         "Resource": [
-                            "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-storagecredential"
+                            "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-storage-credential"
                         ],
                         "Effect": "Allow"
                     }

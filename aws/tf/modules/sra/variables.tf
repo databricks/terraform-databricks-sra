@@ -3,12 +3,12 @@ variable "databricks_account_id" {
   sensitive = true
 }
 
-variable "databricks_account_password" {
+variable "client_id" {
   type = string
   sensitive = true
 }
 
-variable "databricks_account_username" {
+variable "client_secret" {
   type = string
   sensitive = true
 }
@@ -40,6 +40,10 @@ variable "ucname" {
 }
 
 variable "data_bucket" {
+  type = string
+}
+
+variable "data_access" {
   type = string
 }
 
@@ -78,4 +82,9 @@ variable "workspace_vpce_service" {
 variable "relay_vpce_service" {
   type = string
 }
+
+variable "ip_addresses" {
+  type = list(string)
+}
+
 
