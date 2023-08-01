@@ -22,6 +22,10 @@ variable "data_bucket" {
   type = string
 }
 
+variable "data_access" {
+  type = string
+}
+
 variable "storage_credential_role_name" {
   type = string
 }

@@ -45,6 +45,7 @@ module "databricks_uc" {
   uc_iam_arn                      = aws_iam_role.unity_catalog_role.arn
   uc_iam_name                     = aws_iam_role.unity_catalog_role.name
   data_bucket                     = var.data_bucket
+  data_access                     = var.data_access
   storage_credential_role_name    = aws_iam_role.storage_credential_role.name
   storage_credential_role_arn     = aws_iam_role.storage_credential_role.arn
   depends_on = [
@@ -99,6 +100,20 @@ module "secret_management" {
     module.databricks_mws_workspace
     ]
 }
+
+// IP Access Lists
+# module "ip_access_list" {
+#     source = "./databricks/ip_access_list"
+#     providers = {
+#       databricks = databricks.created_workspace
+#     }
+
+#   ip_addresses = var.ip_addresses
+  
+#   depends_on = [
+#     module.databricks_mws_workspace
+#     ]
+# }
 
 // SAT Implementation - Optional
 # module "security_analysis_tool" {

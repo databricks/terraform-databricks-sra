@@ -1,24 +1,14 @@
-variable "databricks_account_username" {
+variable "client_id" {
   type = string
   sensitive = true
 }
 
-variable "databricks_account_password" {
+variable "client_secret" {
   type = string
   sensitive = true
 }
 
 variable "databricks_account_id" {
-  type = string
-  sensitive = true
-}
-
-variable "aws_access_key" {
-  type = string
-  sensitive = true
-}
-
-variable "aws_secret_key" {
   type = string
   sensitive = true
 }
