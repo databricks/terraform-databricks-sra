@@ -1,6 +1,6 @@
 variable "is_storage_private_endpoint_enabled" {
   type        = bool
-  description = "(Optional - default to false) Enable private endpoint for storage account"
+  description = "(Optional - default to false) Enable private endpoint for dbfs"
   default     = false
 }
 
@@ -18,6 +18,25 @@ variable "spoke_vnet_cidr" {
   type        = string
   description = "(Required) The CIDR block for the spoke Virtual Network"
   # default     = "10.2.1.0/24"
+}
+
+variable "route_table_id" {
+  type        = string
+  description = "(Required) The ID of the route table to associate with the Databricks subnets"
+}
+
+variable "hub_peering_info" {
+  type = object({
+    rg_name   = string
+    vnet_name = string
+    vnet_id   = string
+  })
+  description = "(Required) Hub VNet information required for peering"
+}
+
+variable "naming_prefix" {
+  type        = string
+  description = "(Required) Naming prefix for resources"
 }
 
 variable "tags" {
