@@ -5,7 +5,7 @@
 # route table
 # security group
 locals {
-  prefix               = "${var.project_name}-${var.environment}"
+  prefix               = "${var.project_name}-${var.location}"
   title_cased_location = title(var.location)
   service_tags = {
     "databricks" : "AzureDatabricks",

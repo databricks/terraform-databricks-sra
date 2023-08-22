@@ -60,10 +60,3 @@ resource "databricks_metastore_data_access" "first" {
 
   is_default = true
 }
-
-# resource "databricks_metastore_assignment" "this" {
-#   count = length(var.workspaces_to_associate)
-
-#   workspace_id = var.workspaces_to_associate[count.index]
-#   metastore_id = databricks_metastore.this.id
-# }

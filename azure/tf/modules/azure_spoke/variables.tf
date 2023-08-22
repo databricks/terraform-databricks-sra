@@ -1,6 +1,6 @@
 variable "is_storage_private_endpoint_enabled" {
   type        = bool
-  description = "(Optional - default to false) Enable private endpoint for dbfs"
+  description = "(Optional - default to false) Enable private endpoints for dbfs"
   default     = false
 }
 
@@ -23,6 +23,11 @@ variable "spoke_vnet_cidr" {
 variable "route_table_id" {
   type        = string
   description = "(Required) The ID of the route table to associate with the Databricks subnets"
+}
+
+variable "metastore_id" {
+  type        = string
+  description = "(Required) The ID of the metastore to associate with the Databricks workspace"
 }
 
 variable "hub_peering_info" {

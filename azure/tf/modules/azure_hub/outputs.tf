@@ -10,6 +10,10 @@ output "route_table_id" {
   value = azurerm_route_table.this.id
 }
 
+output "key_vault_id" {
+  value = azurerm_key_vault.this.id
+}
+
 output "hub_info" {
   value = {
     rg_name   = azurerm_resource_group.this.name

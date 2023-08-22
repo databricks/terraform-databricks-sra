@@ -1,11 +1,3 @@
-resource "azurerm_subnet" "plsubnet" {
-  name                                      = "${local.prefix}-privatelink"
-  resource_group_name                       = azurerm_resource_group.this.name
-  virtual_network_name                      = azurerm_virtual_network.this.name
-  address_prefixes                          = [cidrsubnet(local.cidr, 3, 2)]
-  private_endpoint_network_policies_enabled = true // set to true to disable subnet policy
-}
-
 //dbfs pvt endpoint - dfs
 resource "azurerm_private_endpoint" "dbfspe_dfs" {
   name                = "dbfspvtendpoint-dfs"
