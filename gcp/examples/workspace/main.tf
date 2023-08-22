@@ -15,4 +15,6 @@ module "customer_managed_vpc" {
   workspace_pe_ip_name = var.workspace_pe_ip_name
   relay_service_attachment = var.relay_service_attachment
   workspace_service_attachment = var.workspace_service_attachment
+  ip_addresses=var.ip_addresses
+  account_console_url = var.account_console_url
 }
