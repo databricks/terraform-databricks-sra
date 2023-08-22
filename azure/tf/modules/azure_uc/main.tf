@@ -1,4 +1,5 @@
 locals {
+  # these probably need to change
   resource_regex  = "/subscriptions/(.+)/resourceGroups/(.+)"
   subscription_id = regex(local.resource_regex, var.resource_group_id)[0]
   resource_group  = regex(local.resource_regex, var.resource_group_id)[1]
@@ -8,8 +9,8 @@ locals {
 
 resource "random_string" "naming" {
   special = false
-  upper = false
-  length = 6
+  upper   = false
+  length  = 6
 }
 
 data "azurerm_resource_group" "this" {
@@ -68,9 +69,3 @@ resource "databricks_metastore_data_access" "first" {
   is_default = true
 }
 
-resource "databricks_metastore_assignment" "this" {
-  count = length(var.workspaces_to_associate)
-
-  workspace_id = var.workspaces_to_associate[count.index]
-  metastore_id = databricks_metastore.this.id
-}
