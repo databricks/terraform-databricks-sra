@@ -99,7 +99,7 @@ resource "azurerm_management_lock" "webauth" {
   name       = "webauth-do-not-delete"
   scope      = azurerm_databricks_workspace.webauth.id
   lock_level = "CanNotDelete"
-  notes = "This lock is to prevent accidental deletion of the webauth workspace."
+  notes      = "This lock is to prevent accidental deletion of the webauth workspace."
 }
 
 resource "azurerm_private_dns_zone" "webauth" {
