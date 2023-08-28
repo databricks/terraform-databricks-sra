@@ -23,3 +23,8 @@ variable "project" {
   type    = string
   default = "<my-project-id>"
 }
+
+variable "databricks_google_service_account" {}
+variable "account_console_url" {}
+variable "databricks_account_id" {}
+

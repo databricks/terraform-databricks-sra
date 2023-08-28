@@ -9,6 +9,8 @@ variable "relay_psce" {}
 variable "workspace_pe" {}
 variable "relay_pe" {}
 
+variable "account_console_url" {}
+
 # primary subnet providing ip addresses to PSC endpoints
 variable "google_pe_subnet" {}
 
@@ -39,6 +41,14 @@ variable "mws_workspace_gke_master_ip_range" {
   default = "10.3.0.0/28"
 }
 
+//Users can connect to workspace only thes list of IP's
+variable "ip_addresses" {
+  type = list(string)
+}
+
+
+
+
 /*
 Databricks PSC service attachments
 https://docs.gcp.databricks.com/resources/supported-regions.html#psc
@@ -51,10 +61,10 @@ terraform {
   required_providers {
     databricks = {
       source = "databricks/databricks"
+      version = ">=1.23.0"
     }
     google = {
       source  = "hashicorp/google"
-      version = "4.47.0"
     }
   }
 }
@@ -66,10 +76,9 @@ provider "google" {
 }
 
 // initialize provider in "accounts" mode to provision new workspace
-
 provider "databricks" {
   alias                  = "accounts"
-  host                   = "https://accounts.staging.gcp.databricks.com/"
+  host                   = var.account_console_url
   google_service_account = var.databricks_google_service_account
   account_id             = var.databricks_account_id
 }

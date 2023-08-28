@@ -32,3 +32,9 @@ variable "workspace_pe_ip_name" {}
 
 variable "relay_service_attachment" {}
 variable "workspace_service_attachment" {}
+
+variable "account_console_url" {}
+//Users can connect to workspace only thes list of IP's
+variable "ip_addresses" {
+  type = list(string)
+}
