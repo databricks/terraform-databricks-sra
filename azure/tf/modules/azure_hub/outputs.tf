@@ -6,6 +6,10 @@ output "firewall_public_ip_address" {
   value = azurerm_public_ip.this.ip_address
 }
 
+output "ipgroup_id" {
+  value = azurerm_ip_group.this.id
+}
+
 output "route_table_id" {
   value = azurerm_route_table.this.id
 }

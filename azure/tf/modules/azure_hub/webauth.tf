@@ -9,15 +9,15 @@ resource "azurerm_virtual_network" "webauth" {
   address_space       = [var.webauth_cidr] # /24
 }
 
-resource "azurerm_subnet" "private" {
-  name                 = "webauth-private"
+resource "azurerm_subnet" "host" {
+  name                 = "webauth-host"
   resource_group_name  = azurerm_resource_group.webauth.name
   virtual_network_name = azurerm_virtual_network.webauth.name
 
   address_prefixes = [cidrsubnet(var.webauth_cidr, 2, 0)] # /26
 
   delegation {
-    name = "databricks-private-subnet-delegation"
+    name = "databricks-host-subnet-delegation"
 
     service_delegation {
       name = "Microsoft.Databricks/workspaces"
@@ -30,15 +30,15 @@ resource "azurerm_subnet" "private" {
   }
 }
 
-resource "azurerm_subnet" "public" {
-  name                 = "webauth-public"
+resource "azurerm_subnet" "container" {
+  name                 = "webauth-container"
   resource_group_name  = azurerm_resource_group.webauth.name
   virtual_network_name = azurerm_virtual_network.webauth.name
 
   address_prefixes = [cidrsubnet(var.webauth_cidr, 2, 1)] # /26
 
   delegation {
-    name = "databricks-public-subnet-delegation"
+    name = "databricks-container-subnet-delegation"
 
     service_delegation {
       name = "Microsoft.Databricks/workspaces"
@@ -52,11 +52,11 @@ resource "azurerm_subnet" "public" {
 }
 
 resource "azurerm_subnet" "privatelink" {
-  name                 = "webauth-privatelink"
+  name                 = "hub-privatelink"
   resource_group_name  = azurerm_resource_group.webauth.name
   virtual_network_name = azurerm_virtual_network.webauth.name
 
-  address_prefixes = [cidrsubnet(var.webauth_cidr, 2, 2)] # /26
+  address_prefixes = [cidrsubnet(var.webauth_cidr, 3, 0)] # /27
 }
 
 resource "azurerm_network_security_group" "webauth" {
@@ -65,13 +65,13 @@ resource "azurerm_network_security_group" "webauth" {
   resource_group_name = azurerm_resource_group.webauth.name
 }
 
-resource "azurerm_subnet_network_security_group_association" "private" {
-  subnet_id                 = azurerm_subnet.private.id
+resource "azurerm_subnet_network_security_group_association" "container" {
+  subnet_id                 = azurerm_subnet.container.id
   network_security_group_id = azurerm_network_security_group.webauth.id
 }
 
-resource "azurerm_subnet_network_security_group_association" "public" {
-  subnet_id                 = azurerm_subnet.public.id
+resource "azurerm_subnet_network_security_group_association" "host" {
+  subnet_id                 = azurerm_subnet.host.id
   network_security_group_id = azurerm_network_security_group.webauth.id
 }
 
@@ -86,10 +86,10 @@ resource "azurerm_databricks_workspace" "webauth" {
   custom_parameters {
     no_public_ip                                         = true
     virtual_network_id                                   = azurerm_virtual_network.webauth.id
-    private_subnet_name                                  = azurerm_subnet.private.name
-    public_subnet_name                                   = azurerm_subnet.public.name
-    private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.private.id
-    public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.public.id
+    private_subnet_name                                  = azurerm_subnet.container.name
+    public_subnet_name                                   = azurerm_subnet.host.name
+    private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.container.id
+    public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.host.id
   }
 
   tags = var.tags
@@ -111,7 +111,7 @@ resource "azurerm_private_endpoint" "webauth" {
   name                = "webauth-private-endpoint"
   location            = azurerm_resource_group.webauth.location
   resource_group_name = azurerm_resource_group.webauth.name
-  subnet_id           = azurerm_subnet.privatelink.id //private link subnet, in databricks spoke vnet
+  subnet_id           = azurerm_subnet.privatelink.id
 
   private_service_connection {
     name                           = "pl-webauth"

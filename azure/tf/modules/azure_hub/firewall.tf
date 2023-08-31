@@ -20,18 +20,54 @@ resource "azurerm_firewall_policy" "this" {
   location            = azurerm_resource_group.this.location
 }
 
+resource "azurerm_ip_group" "this" {
+  name                = "databricks-subnets"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+}
+
 resource "azurerm_firewall_policy_rule_collection_group" "this" {
-  name               = "databricks-fwpolicy-rcg"
+  name               = "databricks"
   firewall_policy_id = azurerm_firewall_policy.this.id
   priority           = 200
+  network_rule_collection {
+    name     = databricks-network-rc
+    priority = 100
+    action   = "Allow"
+
+    rule {
+      name                  = "adb-storage"
+      protocols             = ["TCP, UDP"]
+      source_ip_groups      = azurerm_ip_group.this
+      destination_addresses = [lookup(local.service_tags, "storage", "Storage")]
+      destination_ports     = ["443"]
+    }
+
+    rule {
+      name                  = "adb-sql"
+      protocols             = ["TCP"]
+      source_ip_groups      = azurerm_ip_group.this
+      destination_addresses = [lookup(local.service_tags, "sql", "Sql")]
+      destination_ports     = ["3306"]
+    }
+
+    rule {
+      name                  = "adb-eventhub"
+      protocols             = ["TCP"]
+      source_ip_groups      = azurerm_ip_group.this
+      destination_addresses = [lookup(local.service_tags, "eventhub", "EventHub")]
+      destination_ports     = ["9093"]
+    }
+  }
+
   application_rule_collection {
     name     = "databricks-app-rc"
-    priority = 200
+    priority = 101
     action   = "Allow"
 
     rule {
       name              = "public-repos"
-      source_addresses  = ["*"]
+      source_ip_groups  = azurerm_ip_group.this
       destination_fqdns = var.public_repos
       protocols {
         port = "443"
@@ -45,7 +81,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
     rule {
       name              = "IPinfo"
-      source_addresses  = ["*"]
+      source_ip_groups  = azurerm_ip_group.this
       destination_fqdns = ["*.ipinfo.io", "ipinfo.io"]
       protocols {
         port = "443"
@@ -59,13 +95,18 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
         port = "80"
         type = "Http"
       }
+
+      rule {
+        name              = "ganglia"
+        source_ip_groups  = azurerm_ip_group.this
+        destination_fqdns = ["cdnjs.cloudflare.com"]
+        protocols {
+          port = "443"
+          type = "Https"
+        }
+      }
     }
   }
-
-  depends_on = [
-    resource.azurerm_firewall_policy.this
-  ]
-
 }
 
 resource "azurerm_firewall" "this" {
@@ -86,28 +127,3 @@ resource "azurerm_firewall" "this" {
     resource.azurerm_firewall_policy_rule_collection_group.this
   ]
 }
-
-# if routing adb services through firewall
-# resource "azurerm_firewall_application_rule_collection" "adbservices" {
-#   name                = "adbcontrolplane"
-#   azure_firewall_name = azurerm_firewall.this.name
-#   resource_group_name = azurerm_resource_group.this.name
-#   priority            = 200
-#   action              = "Allow"
-
-#   rule {
-#     name = "databricks-control-plane-services"
-
-#     source_addresses = [
-#       join(", ", azurerm_subnet.public.address_prefixes),
-#       join(", ", azurerm_subnet.private.address_prefixes),
-#     ]
-
-#     target_fqdns = var.firewallfqdn
-
-#     protocol {
-#       port = "443"
-#       type = "Https"
-#     }
-#   }
-# }

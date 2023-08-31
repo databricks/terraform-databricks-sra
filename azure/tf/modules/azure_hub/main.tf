@@ -1,9 +1,8 @@
 locals {
   title_cased_location = title(var.location)
   service_tags = {
-    "databricks" : "AzureDatabricks",
     "sql" : "Sql.${local.title_cased_location}",
-    "storage" : "Storage.${local.title_cased_location}", # will this mess with the private link dbfs?
+    "storage" : "Storage.${local.title_cased_location}",
     "eventhub" : "EventHub.${local.title_cased_location}"
   }
 }
