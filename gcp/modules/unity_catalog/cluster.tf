@@ -5,9 +5,9 @@ data "databricks_node_type" "smallest" {
 }
 
 // Cluster Version
-data "databricks_spark_version" "latest_lts" {
-  long_term_support = true
-}
+# data "databricks_spark_version" "latest_lts" {
+#   long_term_support = true
+# }
 
 // Example Cluster Policy
 locals {
@@ -37,7 +37,8 @@ resource "databricks_cluster_policy" "example" {
 resource "databricks_cluster" "unity_sql" {
   provider = databricks.workspace
   cluster_name            = "Unity SQL"
-  spark_version           = data.databricks_spark_version.latest_lts.id
+  //spark_version           = data.databricks_spark_version.latest_lts.id
+  spark_version = "11.3.x-scala2.12"
   node_type_id            = data.databricks_node_type.smallest.id
   autotermination_minutes = 60
   enable_elastic_disk     = false
