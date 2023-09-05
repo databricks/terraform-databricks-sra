@@ -1,15 +1,15 @@
 resource "azurerm_subnet" "firewall" {
   name                 = "AzureFirewallSubnet"
-  resource_group_name  = azurerm_resource_group.this.name
+  resource_group_name  = azurerm_resource_group.hub.name
   virtual_network_name = azurerm_virtual_network.this.name
 
-  address_prefixes = [cidrsubnet(var.hub_cidr, 3, 0)]
+  address_prefixes = [local.subnets["firewall"]]
 }
 
 resource "azurerm_public_ip" "this" {
   name                = "firewall-public-ip"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.hub.location
+  resource_group_name = azurerm_resource_group.hub.name
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -17,13 +17,13 @@ resource "azurerm_public_ip" "this" {
 resource "azurerm_firewall_policy" "this" {
   name                = "databricks-fwpolicy"
   resource_group_name = var.hub_resource_group_name
-  location            = azurerm_resource_group.this.location
+  location            = azurerm_resource_group.hub.location
 }
 
 resource "azurerm_ip_group" "this" {
   name                = "databricks-subnets"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.hub.name
+  location            = azurerm_resource_group.hub.location
 }
 
 resource "azurerm_firewall_policy_rule_collection_group" "this" {
@@ -31,7 +31,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
   firewall_policy_id = azurerm_firewall_policy.this.id
   priority           = 200
   network_rule_collection {
-    name     = databricks-network-rc
+    name     = "databricks-network-rc"
     priority = 100
     action   = "Allow"
 
@@ -95,15 +95,15 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
         port = "80"
         type = "Http"
       }
+    }
 
-      rule {
-        name              = "ganglia"
-        source_ip_groups  = azurerm_ip_group.this
-        destination_fqdns = ["cdnjs.cloudflare.com"]
-        protocols {
-          port = "443"
-          type = "Https"
-        }
+    rule {
+      name              = "ganglia"
+      source_ip_groups  = azurerm_ip_group.this
+      destination_fqdns = ["cdnjs.cloudflare.com"]
+      protocols {
+        port = "443"
+        type = "Https"
       }
     }
   }
@@ -111,8 +111,8 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
 resource "azurerm_firewall" "this" {
   name                = "${azurerm_virtual_network.this.name}-firewall"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.hub.location
+  resource_group_name = azurerm_resource_group.hub.name
   sku_name            = "AZFW_VNet"
   sku_tier            = "Standard"
   firewall_policy_id  = azurerm_firewall_policy.this.id

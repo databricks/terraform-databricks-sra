@@ -1,16 +1,15 @@
 resource "azurerm_databricks_workspace" "this" {
-  name                = var.workspace_name
-  resource_group_name = var.databricks_resource_group_name
-  location            = var.location
-  sku                 = "premium"
-  # need to get the below AKV ids from hub outputs
-  # managed_disk_cmk_key_vault_key_id = 
-  # managed_services_cmk_key_vault_key_id = 
-  # managed_disk_cmk_rotation_to_latest_version_enabled = true
-  customer_managed_key_enabled          = true
-  infrastructure_encryption_enabled     = true
-  public_network_access_enabled         = false
-  network_security_group_rules_required = "NoAzureDatabricksRules"
+  name                                                = "${var.prefix}-adb-workspace"
+  resource_group_name                                 = azurerm_resource_group.this.name
+  location                                            = var.location
+  sku                                                 = "premium"
+  managed_disk_cmk_key_vault_key_id                   = var.managed_disk_key_id
+  managed_services_cmk_key_vault_key_id               = var.managed_services_key_id
+  managed_disk_cmk_rotation_to_latest_version_enabled = true
+  customer_managed_key_enabled                        = true
+  infrastructure_encryption_enabled                   = true
+  public_network_access_enabled                       = false
+  network_security_group_rules_required               = "NoAzureDatabricksRules"
 
   custom_parameters {
     no_public_ip                                         = true
@@ -24,9 +23,37 @@ resource "azurerm_databricks_workspace" "this" {
   tags = var.tags
 }
 
+resource "azurerm_key_vault_access_policy" "databricks" {
+  depends_on = [azurerm_databricks_workspace.this]
+
+  key_vault_id = var.key_vault_id
+  tenant_id    = azurerm_databricks_workspace.this.storage_account_identity.0.tenant_id
+  object_id    = azurerm_databricks_workspace.this.storage_account_identity.0.principal_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "managed" {
+  depends_on = [azurerm_databricks_workspace.this]
+
+  key_vault_id = var.key_vault_id
+  tenant_id    = azurerm_databricks_workspace.this.managed_disk_identity.0.tenant_id
+  object_id    = azurerm_databricks_workspace.this.managed_disk_identity.0.principal_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
 resource "databricks_metastore_assignment" "this" {
-  provider = databricks.workspace
   # may need to use an explicit workspace-authenticated provider here
+  # provider = databricks.workspace
   workspace_id = azurerm_databricks_workspace.this.id
   metastore_id = var.metastore_id
 }

@@ -1,21 +1,7 @@
-locals {
-  resource_regex  = "/subscriptions/(.+)/resourceGroups/(.+)"
-  subscription_id = regex(local.resource_regex, var.resource_group_id)[0]
-  resource_group  = regex(local.resource_regex, var.resource_group_id)[1]
-  tenant_id       = data.azurerm_client_config.current.tenant_id
-  prefix          = replace(replace(lower("${data.azurerm_resource_group.this.name}${random_string.naming.result}"), "rg", ""), "-", "")
-}
-
-resource "random_string" "naming" {
-  special = false
-  upper   = false
-  length  = 6
-}
-
-resource "azurerm_databricks_access_connector" "unity" {
+resource "azurerm_databricks_access_connector" "unity_catalog" {
   name                = "${local.prefix}-databricks-mi"
-  resource_group_name = data.azurerm_resource_group.this.name
-  location            = data.azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.hub.name
+  location            = azurerm_resource_group.hub.location
   identity {
     type = "SystemAssigned"
   }
@@ -23,9 +9,9 @@ resource "azurerm_databricks_access_connector" "unity" {
 
 resource "azurerm_storage_account" "unity_catalog" {
   name                     = "${local.prefix}unity"
-  resource_group_name      = data.azurerm_resource_group.this.name
-  location                 = data.azurerm_resource_group.this.location
-  tags                     = data.azurerm_resource_group.this.tags
+  resource_group_name      = azurerm_resource_group.hub.name
+  location                 = azurerm_resource_group.hub.location
+  tags                     = azurerm_resource_group.hub.tags
   account_tier             = "Standard"
   account_replication_type = "GRS"
   is_hns_enabled           = true
@@ -37,10 +23,10 @@ resource "azurerm_storage_container" "unity_catalog" {
   container_access_type = "private"
 }
 
-resource "azurerm_role_assignment" "example" {
+resource "azurerm_role_assignment" "this" {
   scope                = azurerm_storage_account.unity_catalog.id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_databricks_access_connector.unity.identity[0].principal_id
+  principal_id         = azurerm_databricks_access_connector.unity_catalog.identity[0].principal_id
 }
 
 resource "databricks_metastore" "this" {
@@ -48,12 +34,14 @@ resource "databricks_metastore" "this" {
   storage_root = format("abfss://%s@%s.dfs.core.windows.net/",
     azurerm_storage_container.unity_catalog.name,
   azurerm_storage_account.unity_catalog.name)
+  owner         = "uc admins"
+  region        = azurerm.resource_group.this.location
   force_destroy = true
 }
 
-resource "databricks_metastore_data_access" "first" {
+resource "databricks_metastore_data_access" "this" {
   metastore_id = databricks_metastore.this.id
-  name         = "the-keys"
+  name         = "mi_dac"
   azure_managed_identity {
     access_connector_id = azurerm_databricks_access_connector.unity.id
   }

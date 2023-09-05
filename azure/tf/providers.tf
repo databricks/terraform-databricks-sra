@@ -3,5 +3,5 @@ provider "azurerm" {
 }
 
 provider "databricks" {
-  host = module.spoke_databricks_workspace.workspace_url
+  host = module.spoke.workspace_url
 }

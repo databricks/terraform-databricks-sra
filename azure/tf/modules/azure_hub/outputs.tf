@@ -2,10 +2,6 @@ output "firewall_name" {
   value = azurerm_firewall.this.name
 }
 
-output "firewall_public_ip_address" {
-  value = azurerm_public_ip.this.ip_address
-}
-
 output "ipgroup_id" {
   value = azurerm_ip_group.this.id
 }
@@ -18,11 +14,18 @@ output "key_vault_id" {
   value = azurerm_key_vault.this.id
 }
 
-output "hub_info" {
-  value = {
-    rg_name   = azurerm_resource_group.this.name
-    vnet_name = azurerm_virtual_network.this.name
-    vnet_id   = azurerm_virtual_network.this.id
-  }
+output "managed_disk_key_id" {
+  value = azurerm_key_vault_key.managed_disk.id
 }
 
+output "managed_services_key_id" {
+  value = azurerm_key_vault_key.managed_services.id
+}
+
+output "vnet_name" {
+  value = azurerm_virtual_network.this.name
+}
+
+output "resource_group_name" {
+  value = azurerm_resource_group.hub.name
+}

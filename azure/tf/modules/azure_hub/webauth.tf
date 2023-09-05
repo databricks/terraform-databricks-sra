@@ -1,20 +1,9 @@
-resource "azurerm_resource_group" "webauth" {
-  name     = "webauthrg"
-  location = var.location
-}
-resource "azurerm_virtual_network" "webauth" {
-  name                = "webauthvnet"
-  location            = azurerm_resource_group.webauth.location
-  resource_group_name = azurerm_resource_group.webauth.name
-  address_space       = [var.webauth_cidr] # /24
-}
-
 resource "azurerm_subnet" "host" {
   name                 = "webauth-host"
   resource_group_name  = azurerm_resource_group.webauth.name
-  virtual_network_name = azurerm_virtual_network.webauth.name
+  virtual_network_name = azurerm_virtual_network.this.name
 
-  address_prefixes = [cidrsubnet(var.webauth_cidr, 2, 0)] # /26
+  address_prefixes = [local.subnets["webauth-host"]]
 
   delegation {
     name = "databricks-host-subnet-delegation"
@@ -33,9 +22,9 @@ resource "azurerm_subnet" "host" {
 resource "azurerm_subnet" "container" {
   name                 = "webauth-container"
   resource_group_name  = azurerm_resource_group.webauth.name
-  virtual_network_name = azurerm_virtual_network.webauth.name
+  virtual_network_name = azurerm_virtual_network.this.name
 
-  address_prefixes = [cidrsubnet(var.webauth_cidr, 2, 1)] # /26
+  address_prefixes = [local.subnets["webauth-container"]]
 
   delegation {
     name = "databricks-container-subnet-delegation"
@@ -51,13 +40,6 @@ resource "azurerm_subnet" "container" {
   }
 }
 
-resource "azurerm_subnet" "privatelink" {
-  name                 = "hub-privatelink"
-  resource_group_name  = azurerm_resource_group.webauth.name
-  virtual_network_name = azurerm_virtual_network.webauth.name
-
-  address_prefixes = [cidrsubnet(var.webauth_cidr, 3, 0)] # /27
-}
 
 resource "azurerm_network_security_group" "webauth" {
   name                = "webauth-nsg"
@@ -85,7 +67,7 @@ resource "azurerm_databricks_workspace" "webauth" {
 
   custom_parameters {
     no_public_ip                                         = true
-    virtual_network_id                                   = azurerm_virtual_network.webauth.id
+    virtual_network_id                                   = azurerm_virtual_network.this.id
     private_subnet_name                                  = azurerm_subnet.container.name
     public_subnet_name                                   = azurerm_subnet.host.name
     private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.container.id

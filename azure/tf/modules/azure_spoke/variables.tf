@@ -9,14 +9,8 @@ variable "location" {
   description = "(Required) The location for the spoke deployment"
 }
 
-variable "resource_group_name" {
-  type        = string
-  description = "(Required) The name of the spoke Resource Group to create"
-}
-
 variable "vnet_cidr" {
-  # Note: following chart assumes a Vnet between /16 and /24, inclusive, with only 2 subnets (ADB workers)
-  # todo: size for private link subnet in spoke (for dbfs) - will need to be able to have 3 subnets.
+  # Note: following chart assumes a Vnet between /16 and /24, inclusive
 
   # | Subnet Size (CIDR) | Maximum ADB Cluster Nodes |
   # | /17	| 32763 |
@@ -34,11 +28,16 @@ variable "vnet_cidr" {
   description = "(Required) The CIDR block for the spoke Virtual Network"
   # default     = "10.2.1.0/24"
   validation {
-    condition     = tonumber(substr(var.vnet_cidr, -2, -1)) > 15 && tonumber(substr(var.vnet_cidr, -2, -1)) < 25
+    condition     = tonumber(split("/", var.vnet_cidr)[1]) > 15 && tonumber(split("/", var.vnet_cidr)[1]) < 25
     error_message = "CIDR block must be between /16 and /24, inclusive"
   }
 }
 
+variable "key_vault_id" {
+  type        = string
+  description = "(Required) ID of the Azure Key Vault containing the keys for CMK"
+
+}
 variable "route_table_id" {
   type        = string
   description = "(Required) The ID of the route table to associate with the Databricks subnets"
@@ -49,13 +48,34 @@ variable "metastore_id" {
   description = "(Required) The ID of the metastore to associate with the Databricks workspace"
 }
 
-variable "hub_peering_info" {
-  type = object({
-    rg_name   = string
-    vnet_name = string
-    vnet_id   = string
-  })
-  description = "(Required) Hub VNet information required for peering"
+variable "ipgroup_id" {
+  type        = string
+  description = "(Required) The ID of the IP Group used for firewall egress rules"
+}
+
+variable "hub_vnet_name" {
+  type        = string
+  description = "(Required) The name of the hub VNet to peer"
+}
+
+variable "hub_resource_group_name" {
+  type        = string
+  description = "(Required) The name of the hub Resource Group to peer"
+}
+
+variable "hub_vnet_id" {
+  type        = string
+  description = "(Required) The ID of the hub VNet to peer"
+}
+
+variable "managed_disk_key_id" {
+  type    = string
+  default = "(Required) The key for managed disk encryption"
+}
+
+variable "managed_services_key_id" {
+  type    = string
+  default = "(Required) The key for the managed services encryption"
 }
 
 variable "prefix" {
