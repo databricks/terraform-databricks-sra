@@ -32,7 +32,6 @@ resource "databricks_metastore" "this" {
 
 resource "databricks_metastore_data_access" "first" {
   provider = databricks.workspace
-  #metastore_id         = "b798b08a-1f9d-42f0-b3a8-7c70347401e2"
   metastore_id = databricks_metastore.this.id
   databricks_gcp_service_account {}
   name       = "the-keys"
@@ -66,7 +65,7 @@ resource "databricks_metastore_assignment" "this" {
   default_catalog_name = "hive_metastore"
 }
 
-resource "databricks_metastore_assignment" "this" {
+resource "databricks_metastore_assignment" "external" {
   provider = databricks.workspace
   count                = length(var.databricks_workspace_ids_for_existing_metastore)
   workspace_id         = var.databricks_workspace_ids_for_existing_metastore[count.index]
