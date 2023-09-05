@@ -61,6 +61,7 @@ terraform {
   required_providers {
     databricks = {
       source = "databricks/databricks"
+      version = ">=1.23.0"
     }
     google = {
       source  = "hashicorp/google"
@@ -77,14 +78,11 @@ provider "google" {
 // initialize provider in "accounts" mode to provision new workspace
 provider "databricks" {
   alias                  = "accounts"
-  host                   = "https://accounts.staging.gcp.databricks.com"
+  host                   = var.account_console_url
   google_service_account = var.databricks_google_service_account
   account_id             = var.databricks_account_id
 }
 
-output "account_console_url_output" {
-  value = var.account_console_url
-}
 
 
 data "google_client_openid_userinfo" "me" {
