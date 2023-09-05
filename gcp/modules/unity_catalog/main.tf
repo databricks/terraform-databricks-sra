@@ -66,6 +66,7 @@ resource "databricks_metastore_assignment" "this" {
 }
 
 resource "databricks_metastore_assignment" "external" {
+  depends_on = [ databricks_metastore.this ]
   provider = databricks.workspace
   count                = length(var.databricks_workspace_ids_for_existing_metastore)
   workspace_id         = var.databricks_workspace_ids_for_existing_metastore[count.index]
@@ -98,7 +99,7 @@ resource "google_storage_bucket_iam_member" "ext_reader" {
 
 // External Location
 resource "databricks_external_location" "some" {
-  depends_on = [ databricks_storage_credential.ext,google_storage_bucket_iam_member.ext_admin ]
+  depends_on = [ databricks_storage_credential.ext,google_storage_bucket_iam_member.ext_admin,google_storage_bucket.ext_bucket,google_storage_bucket_iam_member.ext_reader ]
   provider = databricks.workspace
   name = "the-ext-location"
   url  = "gs://${google_storage_bucket.ext_bucket.name}"
@@ -109,6 +110,7 @@ resource "databricks_external_location" "some" {
 
 // External Location Grant
 resource "databricks_grants" "data_example" {
+  depends_on = [ databricks_external_location.some ]
   provider = databricks.workspace
   external_location = databricks_external_location.some.id
   grant {
