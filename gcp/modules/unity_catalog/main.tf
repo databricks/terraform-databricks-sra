@@ -66,7 +66,7 @@ resource "databricks_metastore_assignment" "this" {
   default_catalog_name = "hive_metastore"
 }
 
-resource "databricks_metastore_assignment" "this" {
+resource "databricks_metastore_assignment" "existing" {
   provider = databricks.workspace
   count                = length(var.databricks_workspace_ids_for_existing_metastore)
   workspace_id         = var.databricks_workspace_ids_for_existing_metastore[count.index]

@@ -38,7 +38,7 @@ resource "databricks_mws_workspaces" "this" {
 resource "databricks_workspace_conf" "this" {
   provider = databricks.workspace
   custom_config = {
-    "maxTokenLifetimeDays" = "30",
+   # "maxTokenLifetimeDays" = "30",
     "enableIpAccessLists" = true
   }
   depends_on = [ databricks_mws_workspaces.this ]
