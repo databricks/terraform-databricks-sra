@@ -3,5 +3,5 @@ provider "azurerm" {
 }
 
 provider "databricks" {
-  host = module.spoke.workspace_url
+  host = "https://accounts.azuredatabricks.net"
 }
