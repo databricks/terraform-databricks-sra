@@ -12,7 +12,7 @@ In this section, we break down each of the components that we've included in thi
 
 In various `.tf` scripts, we have included direct links to the Databricks Terraform documentation. The [official documentation](https://registry.terraform.io/providers/databricks/databricks/latest/docs) can be found here.
 
-## Infrastructure Deployment
+### Infrastructure Deployment
 
 - **Customer-managed VPC**: A [customer-managed VPC](https://docs.databricks.com/administration-guide/cloud-configurations/aws/customer-managed-vpc.html) allows Databricks customers to exercise more control over network configuration to comply with specific cloud security and governance standards that a customer's organization may require.
 
@@ -26,7 +26,7 @@ In various `.tf` scripts, we have included direct links to the Databricks Terraf
 
 - **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/data-governance/unity-catalog/index.html) is a unified governance solution for all data and AI assets including files, tables, and machine learning models. Unity Catalog provides a modern approach to granular access controls with centralized policy, auditing, and lineage tracking - all integrated into your Databricks workflow.
 
-## Post Workspace Deployment
+### Post Workspace Deployment
 
 - **Audit and Billing Log Delivery**: Databricks delivers logs to your S3 buckets. [Audit logs](https://docs.databricks.com/administration-guide/account-settings/audit-logs.html) contain two levels of events: workspace-level audit logs with workspace-level events and account-level audit logs with account-level events. In addition to these logs, you can generate additional events by enabling verbose audit logs. [Billable usage logs](https://docs.databricks.com/administration-guide/account-settings/billable-usage-delivery.html) are delivered daily to an AWS S3 storage bucket. There will be a separate CSV file for each workspace. This file contains historical data about the workspace's cluster usage in Databricks Units (DBUs).
 
@@ -68,5 +68,3 @@ In this section, we break down additional security recommendations and opportuni
 1. Run `terraform apply -var-file ../example.tfvars`
 
 ## Network Diagram
-
-![Architecture Diagram](./img/Standard%20-%20Network%20Topology.png)
