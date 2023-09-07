@@ -1,0 +1,2137 @@
+module.hub.data.http.my_public_ip: Reading...
+module.hub.data.http.my_public_ip: Read complete after 1s [id=https://ifconfig.co/json]
+module.hub.data.azurerm_client_config.current: Reading...
+module.hub.data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD0wNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDY7b2JqZWN0SWQ9ZDc0ODYwYTYtN2Y0Ny00NjhiLWE1OWUtN2QyNTVhOWY4YjdlO3N1YnNjcmlwdGlvbklkPTNmMmU0ZDMyLThlOGQtNDZkNi04MmJjLTViYjhkOTYyMzI4Yjt0ZW5hbnRJZD05ZjM3YTM5Mi1mMGFlLTQyODAtOTc5Ni1mMTg2NGExMGVmZmM=]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # module.hub.azurerm_databricks_access_connector.unity_catalog will be created
+  + resource "azurerm_databricks_access_connector" "unity_catalog" {
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = (known after apply)
+      + resource_group_name = "knox-sra-dev-hub"
+
+      + identity {
+          + principal_id = (known after apply)
+          + tenant_id    = (known after apply)
+          + type         = "SystemAssigned"
+        }
+    }
+
+  # module.hub.azurerm_databricks_workspace.webauth will be created
+  + resource "azurerm_databricks_workspace" "webauth" {
+      + customer_managed_key_enabled          = false
+      + disk_encryption_set_id                = (known after apply)
+      + id                                    = (known after apply)
+      + infrastructure_encryption_enabled     = false
+      + location                              = "westus3"
+      + managed_disk_identity                 = (known after apply)
+      + managed_resource_group_id             = (known after apply)
+      + managed_resource_group_name           = (known after apply)
+      + name                                  = "WEB_AUTH_DO_NOT_DELETE_WESTUS3"
+      + network_security_group_rules_required = "NoAzureDatabricksRules"
+      + public_network_access_enabled         = false
+      + resource_group_name                   = "westus3-webauthrg"
+      + sku                                   = "premium"
+      + storage_account_identity              = (known after apply)
+      + tags                                  = {
+          + "Environment" = "dev"
+          + "Owner"       = "nathan.knox@databricks.com"
+          + "Project"     = "knox-sra-dev"
+        }
+      + workspace_id                          = (known after apply)
+      + workspace_url                         = (known after apply)
+
+      + custom_parameters {
+          + nat_gateway_name                                     = (known after apply)
+          + no_public_ip                                         = true
+          + private_subnet_name                                  = "webauth-container"
+          + private_subnet_network_security_group_association_id = (known after apply)
+          + public_ip_name                                       = (known after apply)
+          + public_subnet_name                                   = "webauth-host"
+          + public_subnet_network_security_group_association_id  = (known after apply)
+          + storage_account_name                                 = (known after apply)
+          + storage_account_sku_name                             = (known after apply)
+          + virtual_network_id                                   = (known after apply)
+          + vnet_address_prefix                                  = (known after apply)
+        }
+    }
+
+  # module.hub.azurerm_firewall.this will be created
+  + resource "azurerm_firewall" "this" {
+      + firewall_policy_id  = (known after apply)
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "knox-sra-dev-hub-vnet-firewall"
+      + resource_group_name = "knox-sra-dev-hub"
+      + sku_name            = "AZFW_VNet"
+      + sku_tier            = "Standard"
+      + threat_intel_mode   = (known after apply)
+
+      + ip_configuration {
+          + name                 = "firewall-public-ip-config"
+          + private_ip_address   = (known after apply)
+          + public_ip_address_id = (known after apply)
+          + subnet_id            = (known after apply)
+        }
+    }
+
+  # module.hub.azurerm_firewall_policy.this will be created
+  + resource "azurerm_firewall_policy" "this" {
+      + child_policies           = (known after apply)
+      + firewalls                = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "databricks-fwpolicy"
+      + resource_group_name      = "knox-sra-dev-hub"
+      + rule_collection_groups   = (known after apply)
+      + sku                      = (known after apply)
+      + threat_intelligence_mode = "Alert"
+    }
+
+  # module.hub.azurerm_firewall_policy_rule_collection_group.this will be created
+  + resource "azurerm_firewall_policy_rule_collection_group" "this" {
+      + firewall_policy_id = (known after apply)
+      + id                 = (known after apply)
+      + name               = "databricks"
+      + priority           = 200
+
+      + application_rule_collection {
+          + action   = "Allow"
+          + name     = "databricks-app-rc"
+          + priority = 101
+
+          + rule {
+              + destination_fqdns = [
+                  + "python.org",
+                  + "*.python.org",
+                  + "pypi.org",
+                  + "*.pypi.org",
+                  + "pythonhosted.org",
+                  + "*.pythonhosted.org",
+                  + "cran.r-project.org",
+                  + "*.cran.r-project.org",
+                  + "r-project.org",
+                ]
+              + name              = "public-repos"
+              + source_ip_groups  = (known after apply)
+
+              + protocols {
+                  + port = 443
+                  + type = "Https"
+                }
+              + protocols {
+                  + port = 80
+                  + type = "Http"
+                }
+            }
+          + rule {
+              + destination_fqdns = [
+                  + "*.ipinfo.io",
+                  + "ipinfo.io",
+                ]
+              + name              = "IPinfo"
+              + source_ip_groups  = (known after apply)
+
+              + protocols {
+                  + port = 443
+                  + type = "Https"
+                }
+              + protocols {
+                  + port = 8080
+                  + type = "Http"
+                }
+              + protocols {
+                  + port = 80
+                  + type = "Http"
+                }
+            }
+          + rule {
+              + destination_fqdns = [
+                  + "cdnjs.cloudflare.com",
+                ]
+              + name              = "ganglia"
+              + source_ip_groups  = (known after apply)
+
+              + protocols {
+                  + port = 443
+                  + type = "Https"
+                }
+            }
+        }
+
+      + network_rule_collection {
+          + action   = "Allow"
+          + name     = "databricks-network-rc"
+          + priority = 100
+
+          + rule {
+              + destination_addresses = [
+                  + "Storage.Westus3",
+                ]
+              + destination_ports     = [
+                  + "443",
+                ]
+              + name                  = "adb-storage"
+              + protocols             = [
+                  + "TCP, UDP",
+                ]
+              + source_ip_groups      = (known after apply)
+            }
+          + rule {
+              + destination_addresses = [
+                  + "Sql.Westus3",
+                ]
+              + destination_ports     = [
+                  + "3306",
+                ]
+              + name                  = "adb-sql"
+              + protocols             = [
+                  + "TCP",
+                ]
+              + source_ip_groups      = (known after apply)
+            }
+          + rule {
+              + destination_addresses = [
+                  + "EventHub.Westus3",
+                ]
+              + destination_ports     = [
+                  + "9093",
+                ]
+              + name                  = "adb-eventhub"
+              + protocols             = [
+                  + "TCP",
+                ]
+              + source_ip_groups      = (known after apply)
+            }
+        }
+    }
+
+  # module.hub.azurerm_ip_group.this will be created
+  + resource "azurerm_ip_group" "this" {
+      + firewall_ids        = (known after apply)
+      + firewall_policy_ids = (known after apply)
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "databricks-subnets"
+      + resource_group_name = "knox-sra-dev-hub"
+    }
+
+  # module.hub.azurerm_key_vault.this will be created
+  + resource "azurerm_key_vault" "this" {
+      + access_policy                 = (known after apply)
+      + id                            = (known after apply)
+      + location                      = "westus3"
+      + name                          = (known after apply)
+      + public_network_access_enabled = true
+      + resource_group_name           = "knox-sra-dev-hub"
+      + sku_name                      = "premium"
+      + soft_delete_retention_days    = 7
+      + tenant_id                     = "9f37a392-f0ae-4280-9796-f1864a10effc"
+      + vault_uri                     = (known after apply)
+    }
+
+  # module.hub.azurerm_key_vault_access_policy.terraform will be created
+  + resource "azurerm_key_vault_access_policy" "terraform" {
+      + id              = (known after apply)
+      + key_permissions = [
+          + "Get",
+          + "List",
+          + "Create",
+          + "Decrypt",
+          + "Encrypt",
+          + "Sign",
+          + "UnwrapKey",
+          + "Verify",
+          + "WrapKey",
+          + "Delete",
+          + "Restore",
+          + "Recover",
+          + "Update",
+          + "Purge",
+        ]
+      + key_vault_id    = (known after apply)
+      + object_id       = "d74860a6-7f47-468b-a59e-7d255a9f8b7e"
+      + tenant_id       = "9f37a392-f0ae-4280-9796-f1864a10effc"
+    }
+
+  # module.hub.azurerm_key_vault_key.managed_disk will be created
+  + resource "azurerm_key_vault_key" "managed_disk" {
+      + curve                   = (known after apply)
+      + e                       = (known after apply)
+      + id                      = (known after apply)
+      + key_opts                = [
+          + "decrypt",
+          + "encrypt",
+          + "sign",
+          + "unwrapKey",
+          + "verify",
+          + "wrapKey",
+        ]
+      + key_size                = 2048
+      + key_type                = "RSA"
+      + key_vault_id            = (known after apply)
+      + n                       = (known after apply)
+      + name                    = (known after apply)
+      + public_key_openssh      = (known after apply)
+      + public_key_pem          = (known after apply)
+      + resource_id             = (known after apply)
+      + resource_versionless_id = (known after apply)
+      + version                 = (known after apply)
+      + versionless_id          = (known after apply)
+      + x                       = (known after apply)
+      + y                       = (known after apply)
+    }
+
+  # module.hub.azurerm_key_vault_key.managed_services will be created
+  + resource "azurerm_key_vault_key" "managed_services" {
+      + curve                   = (known after apply)
+      + e                       = (known after apply)
+      + id                      = (known after apply)
+      + key_opts                = [
+          + "decrypt",
+          + "encrypt",
+          + "sign",
+          + "unwrapKey",
+          + "verify",
+          + "wrapKey",
+        ]
+      + key_size                = 2048
+      + key_type                = "RSA"
+      + key_vault_id            = (known after apply)
+      + n                       = (known after apply)
+      + name                    = (known after apply)
+      + public_key_openssh      = (known after apply)
+      + public_key_pem          = (known after apply)
+      + resource_id             = (known after apply)
+      + resource_versionless_id = (known after apply)
+      + version                 = (known after apply)
+      + versionless_id          = (known after apply)
+      + x                       = (known after apply)
+      + y                       = (known after apply)
+    }
+
+  # module.hub.azurerm_management_lock.webauth will be created
+  + resource "azurerm_management_lock" "webauth" {
+      + id         = (known after apply)
+      + lock_level = "CanNotDelete"
+      + name       = "webauth-do-not-delete"
+      + notes      = "This lock is to prevent accidental deletion of the webauth workspace."
+      + scope      = (known after apply)
+    }
+
+  # module.hub.azurerm_network_interface.testvmnic will be created
+  + resource "azurerm_network_interface" "testvmnic" {
+      + applied_dns_servers           = (known after apply)
+      + dns_servers                   = (known after apply)
+      + enable_accelerated_networking = false
+      + enable_ip_forwarding          = false
+      + id                            = (known after apply)
+      + internal_dns_name_label       = (known after apply)
+      + internal_domain_name_suffix   = (known after apply)
+      + location                      = "westus3"
+      + mac_address                   = (known after apply)
+      + name                          = (known after apply)
+      + private_ip_address            = (known after apply)
+      + private_ip_addresses          = (known after apply)
+      + resource_group_name           = "knox-sra-dev-hub"
+      + virtual_machine_id            = (known after apply)
+
+      + ip_configuration {
+          + gateway_load_balancer_frontend_ip_configuration_id = (known after apply)
+          + name                                               = "testvmip"
+          + primary                                            = (known after apply)
+          + private_ip_address                                 = (known after apply)
+          + private_ip_address_allocation                      = "Dynamic"
+          + private_ip_address_version                         = "IPv4"
+          + public_ip_address_id                               = (known after apply)
+          + subnet_id                                          = (known after apply)
+        }
+    }
+
+  # module.hub.azurerm_network_interface_security_group_association.testvmnsgassoc will be created
+  + resource "azurerm_network_interface_security_group_association" "testvmnsgassoc" {
+      + id                        = (known after apply)
+      + network_interface_id      = (known after apply)
+      + network_security_group_id = (known after apply)
+    }
+
+  # module.hub.azurerm_network_security_group.testvm-nsg will be created
+  + resource "azurerm_network_security_group" "testvm-nsg" {
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = (known after apply)
+      + resource_group_name = "knox-sra-dev-hub"
+      + security_rule       = (known after apply)
+      + tags                = {
+          + "Environment" = "dev"
+          + "Owner"       = "nathan.knox@databricks.com"
+          + "Project"     = "knox-sra-dev"
+        }
+    }
+
+  # module.hub.azurerm_network_security_group.webauth will be created
+  + resource "azurerm_network_security_group" "webauth" {
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "webauth-nsg"
+      + resource_group_name = "westus3-webauthrg"
+      + security_rule       = (known after apply)
+    }
+
+  # module.hub.azurerm_network_security_rule.this will be created
+  + resource "azurerm_network_security_rule" "this" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "VirtualNetwork"
+      + destination_port_range      = "3389"
+      + direction                   = "Inbound"
+      + id                          = (known after apply)
+      + name                        = "RDP"
+      + network_security_group_name = (known after apply)
+      + priority                    = 200
+      + protocol                    = "Tcp"
+      + resource_group_name         = "knox-sra-dev-hub"
+      + source_address_prefixes     = [
+          + "76.198.157.71",
+        ]
+      + source_port_range           = "*"
+    }
+
+  # module.hub.azurerm_private_dns_zone.webauth will be created
+  + resource "azurerm_private_dns_zone" "webauth" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.azuredatabricks.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "westus3-webauthrg"
+    }
+
+  # module.hub.azurerm_private_endpoint.webauth will be created
+  + resource "azurerm_private_endpoint" "webauth" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "webauth-private-endpoint"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "westus3-webauthrg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-webauth"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "pl-webauth"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "browser_authentication",
+            ]
+        }
+    }
+
+  # module.hub.azurerm_public_ip.testvmpublicip will be created
+  + resource "azurerm_public_ip" "testvmpublicip" {
+      + allocation_method       = "Static"
+      + ddos_protection_mode    = "VirtualNetworkInherited"
+      + fqdn                    = (known after apply)
+      + id                      = (known after apply)
+      + idle_timeout_in_minutes = 4
+      + ip_address              = (known after apply)
+      + ip_version              = "IPv4"
+      + location                = "westus3"
+      + name                    = (known after apply)
+      + resource_group_name     = "knox-sra-dev-hub"
+      + sku                     = "Standard"
+      + sku_tier                = "Regional"
+    }
+
+  # module.hub.azurerm_public_ip.this will be created
+  + resource "azurerm_public_ip" "this" {
+      + allocation_method       = "Static"
+      + ddos_protection_mode    = "VirtualNetworkInherited"
+      + fqdn                    = (known after apply)
+      + id                      = (known after apply)
+      + idle_timeout_in_minutes = 4
+      + ip_address              = (known after apply)
+      + ip_version              = "IPv4"
+      + location                = "westus3"
+      + name                    = "firewall-public-ip"
+      + resource_group_name     = "knox-sra-dev-hub"
+      + sku                     = "Standard"
+      + sku_tier                = "Regional"
+    }
+
+  # module.hub.azurerm_resource_group.hub will be created
+  + resource "azurerm_resource_group" "hub" {
+      + id       = (known after apply)
+      + location = "westus3"
+      + name     = "knox-sra-dev-hub"
+    }
+
+  # module.hub.azurerm_resource_group.webauth will be created
+  + resource "azurerm_resource_group" "webauth" {
+      + id       = (known after apply)
+      + location = "westus3"
+      + name     = "westus3-webauthrg"
+    }
+
+  # module.hub.azurerm_role_assignment.this will be created
+  + resource "azurerm_role_assignment" "this" {
+      + id                               = (known after apply)
+      + name                             = (known after apply)
+      + principal_id                     = (known after apply)
+      + principal_type                   = (known after apply)
+      + role_definition_id               = (known after apply)
+      + role_definition_name             = "Storage Blob Data Contributor"
+      + scope                            = (known after apply)
+      + skip_service_principal_aad_check = (known after apply)
+    }
+
+  # module.hub.azurerm_route.firewall_route will be created
+  + resource "azurerm_route" "firewall_route" {
+      + address_prefix         = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + name                   = "to-firewall"
+      + next_hop_in_ip_address = (known after apply)
+      + next_hop_type          = "VirtualAppliance"
+      + resource_group_name    = "knox-sra-dev-hub"
+      + route_table_name       = (known after apply)
+    }
+
+  # module.hub.azurerm_route_table.this will be created
+  + resource "azurerm_route_table" "this" {
+      + disable_bgp_route_propagation = false
+      + id                            = (known after apply)
+      + location                      = "westus3"
+      + name                          = (known after apply)
+      + resource_group_name           = "knox-sra-dev-hub"
+      + route                         = (known after apply)
+      + subnets                       = (known after apply)
+    }
+
+  # module.hub.azurerm_storage_account.unity_catalog will be created
+  + resource "azurerm_storage_account" "unity_catalog" {
+      + access_tier                       = (known after apply)
+      + account_kind                      = "StorageV2"
+      + account_replication_type          = "GRS"
+      + account_tier                      = "Standard"
+      + allow_nested_items_to_be_public   = true
+      + cross_tenant_replication_enabled  = true
+      + default_to_oauth_authentication   = false
+      + enable_https_traffic_only         = true
+      + id                                = (known after apply)
+      + infrastructure_encryption_enabled = false
+      + is_hns_enabled                    = true
+      + large_file_share_enabled          = (known after apply)
+      + location                          = "westus3"
+      + min_tls_version                   = "TLS1_2"
+      + name                              = (known after apply)
+      + nfsv3_enabled                     = false
+      + primary_access_key                = (sensitive value)
+      + primary_blob_connection_string    = (sensitive value)
+      + primary_blob_endpoint             = (known after apply)
+      + primary_blob_host                 = (known after apply)
+      + primary_connection_string         = (sensitive value)
+      + primary_dfs_endpoint              = (known after apply)
+      + primary_dfs_host                  = (known after apply)
+      + primary_file_endpoint             = (known after apply)
+      + primary_file_host                 = (known after apply)
+      + primary_location                  = (known after apply)
+      + primary_queue_endpoint            = (known after apply)
+      + primary_queue_host                = (known after apply)
+      + primary_table_endpoint            = (known after apply)
+      + primary_table_host                = (known after apply)
+      + primary_web_endpoint              = (known after apply)
+      + primary_web_host                  = (known after apply)
+      + public_network_access_enabled     = false
+      + queue_encryption_key_type         = "Service"
+      + resource_group_name               = "knox-sra-dev-hub"
+      + secondary_access_key              = (sensitive value)
+      + secondary_blob_connection_string  = (sensitive value)
+      + secondary_blob_endpoint           = (known after apply)
+      + secondary_blob_host               = (known after apply)
+      + secondary_connection_string       = (sensitive value)
+      + secondary_dfs_endpoint            = (known after apply)
+      + secondary_dfs_host                = (known after apply)
+      + secondary_file_endpoint           = (known after apply)
+      + secondary_file_host               = (known after apply)
+      + secondary_location                = (known after apply)
+      + secondary_queue_endpoint          = (known after apply)
+      + secondary_queue_host              = (known after apply)
+      + secondary_table_endpoint          = (known after apply)
+      + secondary_table_host              = (known after apply)
+      + secondary_web_endpoint            = (known after apply)
+      + secondary_web_host                = (known after apply)
+      + sftp_enabled                      = false
+      + shared_access_key_enabled         = true
+      + table_encryption_key_type         = "Service"
+    }
+
+  # module.hub.azurerm_storage_container.unity_catalog will be created
+  + resource "azurerm_storage_container" "unity_catalog" {
+      + container_access_type   = "private"
+      + has_immutability_policy = (known after apply)
+      + has_legal_hold          = (known after apply)
+      + id                      = (known after apply)
+      + metadata                = (known after apply)
+      + name                    = (known after apply)
+      + resource_manager_id     = (known after apply)
+      + storage_account_name    = (known after apply)
+    }
+
+  # module.hub.azurerm_subnet.container will be created
+  + resource "azurerm_subnet" "container" {
+      + address_prefixes                               = [
+          + "10.0.0.128/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "webauth-container"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "westus3-webauthrg"
+      + virtual_network_name                           = "knox-sra-dev-hub-vnet"
+
+      + delegation {
+          + name = "databricks-container-subnet-delegation"
+
+          + service_delegation {
+              + actions = [
+                  + "Microsoft.Network/virtualNetworks/subnets/join/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+                ]
+              + name    = "Microsoft.Databricks/workspaces"
+            }
+        }
+    }
+
+  # module.hub.azurerm_subnet.firewall will be created
+  + resource "azurerm_subnet" "firewall" {
+      + address_prefixes                               = [
+          + "10.0.0.0/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "AzureFirewallSubnet"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "knox-sra-dev-hub"
+      + virtual_network_name                           = "knox-sra-dev-hub-vnet"
+    }
+
+  # module.hub.azurerm_subnet.host will be created
+  + resource "azurerm_subnet" "host" {
+      + address_prefixes                               = [
+          + "10.0.0.64/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "webauth-host"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "westus3-webauthrg"
+      + virtual_network_name                           = "knox-sra-dev-hub-vnet"
+
+      + delegation {
+          + name = "databricks-host-subnet-delegation"
+
+          + service_delegation {
+              + actions = [
+                  + "Microsoft.Network/virtualNetworks/subnets/join/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+                ]
+              + name    = "Microsoft.Databricks/workspaces"
+            }
+        }
+    }
+
+  # module.hub.azurerm_subnet.privatelink will be created
+  + resource "azurerm_subnet" "privatelink" {
+      + address_prefixes                               = [
+          + "10.0.0.0/24",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "hub-privatelink"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "knox-sra-dev-hub"
+      + virtual_network_name                           = "knox-sra-dev-hub-vnet"
+    }
+
+  # module.hub.azurerm_subnet.testvmsubnet will be created
+  + resource "azurerm_subnet" "testvmsubnet" {
+      + address_prefixes                               = [
+          + "10.0.0.0/30",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = (known after apply)
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "knox-sra-dev-hub"
+      + virtual_network_name                           = "knox-sra-dev-hub-vnet"
+    }
+
+  # module.hub.azurerm_subnet_network_security_group_association.container will be created
+  + resource "azurerm_subnet_network_security_group_association" "container" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.hub.azurerm_subnet_network_security_group_association.host will be created
+  + resource "azurerm_subnet_network_security_group_association" "host" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.hub.azurerm_virtual_network.this will be created
+  + resource "azurerm_virtual_network" "this" {
+      + address_space       = [
+          + "10.0.0.0/20",
+        ]
+      + dns_servers         = (known after apply)
+      + guid                = (known after apply)
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "knox-sra-dev-hub-vnet"
+      + resource_group_name = "knox-sra-dev-hub"
+      + subnet              = (known after apply)
+    }
+
+  # module.hub.azurerm_windows_virtual_machine.testvm will be created
+  + resource "azurerm_windows_virtual_machine" "testvm" {
+      + admin_password             = (sensitive value)
+      + admin_username             = "azureuser"
+      + allow_extension_operations = true
+      + computer_name              = (known after apply)
+      + enable_automatic_updates   = true
+      + extensions_time_budget     = "PT1H30M"
+      + hotpatching_enabled        = false
+      + id                         = (known after apply)
+      + location                   = "westus3"
+      + max_bid_price              = -1
+      + name                       = (known after apply)
+      + network_interface_ids      = (known after apply)
+      + patch_assessment_mode      = "ImageDefault"
+      + patch_mode                 = "AutomaticByOS"
+      + platform_fault_domain      = -1
+      + priority                   = "Regular"
+      + private_ip_address         = (known after apply)
+      + private_ip_addresses       = (known after apply)
+      + provision_vm_agent         = true
+      + public_ip_address          = (known after apply)
+      + public_ip_addresses        = (known after apply)
+      + resource_group_name        = "knox-sra-dev-hub"
+      + size                       = "Standard_F4s_v2"
+      + virtual_machine_id         = (known after apply)
+
+      + os_disk {
+          + caching                   = "ReadWrite"
+          + disk_size_gb              = (known after apply)
+          + name                      = (known after apply)
+          + storage_account_type      = "Standard_LRS"
+          + write_accelerator_enabled = false
+        }
+
+      + source_image_reference {
+          + offer     = "windows-10"
+          + publisher = "MicrosoftWindowsDesktop"
+          + sku       = "19h2-pro-g2"
+          + version   = "latest"
+        }
+    }
+
+  # module.hub.databricks_metastore.this will be created
+  + resource "databricks_metastore" "this" {
+      + cloud               = (known after apply)
+      + created_at          = (known after apply)
+      + created_by          = (known after apply)
+      + force_destroy       = true
+      + global_metastore_id = (known after apply)
+      + id                  = (known after apply)
+      + metastore_id        = (known after apply)
+      + name                = "primary"
+      + owner               = "uc admins"
+      + region              = "westus3"
+      + storage_root        = (known after apply)
+      + updated_at          = (known after apply)
+      + updated_by          = (known after apply)
+    }
+
+  # module.hub.databricks_metastore_data_access.this will be created
+  + resource "databricks_metastore_data_access" "this" {
+      + configuration_type = (known after apply)
+      + id                 = (known after apply)
+      + is_default         = true
+      + metastore_id       = (known after apply)
+      + name               = "mi_dac"
+
+      + azure_managed_identity {
+          + access_connector_id = (known after apply)
+        }
+    }
+
+  # module.hub.random_string.naming will be created
+  + resource "random_string" "naming" {
+      + id          = (known after apply)
+      + length      = 6
+      + lower       = true
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
+      + number      = true
+      + numeric     = true
+      + result      = (known after apply)
+      + special     = false
+      + upper       = false
+    }
+
+  # module.spoke["spoke1"].azurerm_databricks_workspace.this will be created
+  + resource "azurerm_databricks_workspace" "this" {
+      + customer_managed_key_enabled                        = true
+      + disk_encryption_set_id                              = (known after apply)
+      + id                                                  = (known after apply)
+      + infrastructure_encryption_enabled                   = true
+      + location                                            = "westus3"
+      + managed_disk_cmk_key_vault_key_id                   = (known after apply)
+      + managed_disk_cmk_rotation_to_latest_version_enabled = true
+      + managed_disk_identity                               = (known after apply)
+      + managed_resource_group_id                           = (known after apply)
+      + managed_resource_group_name                         = (known after apply)
+      + managed_services_cmk_key_vault_key_id               = (known after apply)
+      + name                                                = "spoke1-adb-workspace"
+      + network_security_group_rules_required               = "NoAzureDatabricksRules"
+      + public_network_access_enabled                       = false
+      + resource_group_name                                 = "spoke1-rg"
+      + sku                                                 = "premium"
+      + storage_account_identity                            = (known after apply)
+      + tags                                                = {
+          + "Environment" = "dev"
+          + "Owner"       = "nathan.knox@databricks.com"
+          + "Project"     = "knox-sra-dev-spoke1"
+        }
+      + workspace_id                                        = (known after apply)
+      + workspace_url                                       = (known after apply)
+
+      + custom_parameters {
+          + nat_gateway_name                                     = (known after apply)
+          + no_public_ip                                         = true
+          + private_subnet_name                                  = "spoke1-container"
+          + private_subnet_network_security_group_association_id = (known after apply)
+          + public_ip_name                                       = (known after apply)
+          + public_subnet_name                                   = "spoke1-host"
+          + public_subnet_network_security_group_association_id  = (known after apply)
+          + storage_account_name                                 = (known after apply)
+          + storage_account_sku_name                             = (known after apply)
+          + virtual_network_id                                   = (known after apply)
+          + vnet_address_prefix                                  = (known after apply)
+        }
+    }
+
+  # module.spoke["spoke1"].azurerm_ip_group_cidr.container will be created
+  + resource "azurerm_ip_group_cidr" "container" {
+      + cidr        = "10.2.1.64/26"
+      + id          = (known after apply)
+      + ip_group_id = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_ip_group_cidr.host will be created
+  + resource "azurerm_ip_group_cidr" "host" {
+      + cidr        = "10.2.1.0/26"
+      + id          = (known after apply)
+      + ip_group_id = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_key_vault_access_policy.databricks will be created
+  + resource "azurerm_key_vault_access_policy" "databricks" {
+      + id              = (known after apply)
+      + key_permissions = [
+          + "Get",
+          + "UnwrapKey",
+          + "WrapKey",
+        ]
+      + key_vault_id    = (known after apply)
+      + object_id       = (known after apply)
+      + tenant_id       = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_key_vault_access_policy.managed will be created
+  + resource "azurerm_key_vault_access_policy" "managed" {
+      + id              = (known after apply)
+      + key_permissions = [
+          + "Get",
+          + "UnwrapKey",
+          + "WrapKey",
+        ]
+      + key_vault_id    = (known after apply)
+      + object_id       = (known after apply)
+      + tenant_id       = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_network_security_group.this will be created
+  + resource "azurerm_network_security_group" "this" {
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "spoke1-databricks-nsg"
+      + resource_group_name = "spoke1-rg"
+      + security_rule       = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_network_security_rule.aad will be created
+  + resource "azurerm_network_security_rule" "aad" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "AzureActiveDirectory"
+      + destination_port_range      = "443"
+      + direction                   = "Outbound"
+      + id                          = (known after apply)
+      + name                        = "AllowAAD"
+      + network_security_group_name = "spoke1-databricks-nsg"
+      + priority                    = 200
+      + protocol                    = "Tcp"
+      + resource_group_name         = "spoke1-rg"
+      + source_address_prefix       = "VirtualNetwork"
+      + source_port_range           = "*"
+    }
+
+  # module.spoke["spoke1"].azurerm_network_security_rule.azfrontdoor will be created
+  + resource "azurerm_network_security_rule" "azfrontdoor" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "AzureFrontDoor.Frontend"
+      + destination_port_range      = "443"
+      + direction                   = "Outbound"
+      + id                          = (known after apply)
+      + name                        = "AllowAzureFrontDoor"
+      + network_security_group_name = "spoke1-databricks-nsg"
+      + priority                    = 201
+      + protocol                    = "Tcp"
+      + resource_group_name         = "spoke1-rg"
+      + source_address_prefix       = "VirtualNetwork"
+      + source_port_range           = "*"
+    }
+
+  # module.spoke["spoke1"].azurerm_private_dns_zone.backend will be created
+  + resource "azurerm_private_dns_zone" "backend" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.azuredatabricks.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke1-rg"
+    }
+
+  # module.spoke["spoke1"].azurerm_private_dns_zone.dbfs_blob will be created
+  + resource "azurerm_private_dns_zone" "dbfs_blob" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.blob.core.windows.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke1-rg"
+    }
+
+  # module.spoke["spoke1"].azurerm_private_dns_zone.dbfs_dfs will be created
+  + resource "azurerm_private_dns_zone" "dbfs_dfs" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.dfs.core.windows.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke1-rg"
+    }
+
+  # module.spoke["spoke1"].azurerm_private_dns_zone_virtual_network_link.backend will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "backend" {
+      + id                    = (known after apply)
+      + name                  = "databricks-vnetlink-backend"
+      + private_dns_zone_name = "privatelink.azuredatabricks.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke1-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_private_dns_zone_virtual_network_link.dbfs_blob will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_blob" {
+      + id                    = (known after apply)
+      + name                  = "dbfs-blob"
+      + private_dns_zone_name = "privatelink.blob.core.windows.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke1-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_private_dns_zone_virtual_network_link.dbfs_dfs will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_dfs" {
+      + id                    = (known after apply)
+      + name                  = "dbfs-dfs"
+      + private_dns_zone_name = "privatelink.dfs.core.windows.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke1-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_private_endpoint.backend will be created
+  + resource "azurerm_private_endpoint" "backend" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "databricks-pe-backend"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke1-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-backend"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke1-backend"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "databricks_ui_api",
+            ]
+        }
+    }
+
+  # module.spoke["spoke1"].azurerm_private_endpoint.dbfs_dfs will be created
+  + resource "azurerm_private_endpoint" "dbfs_dfs" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "dbfspe-dfs"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke1-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-dbfs"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke1-dbfs-dfs"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "dfs",
+            ]
+        }
+    }
+
+  # module.spoke["spoke1"].azurerm_private_endpoint.dbfspe_blob will be created
+  + resource "azurerm_private_endpoint" "dbfspe_blob" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "dbfs-blob"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke1-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-dbfs"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke1-dbfs-blob"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "blob",
+            ]
+        }
+    }
+
+  # module.spoke["spoke1"].azurerm_resource_group.this will be created
+  + resource "azurerm_resource_group" "this" {
+      + id       = (known after apply)
+      + location = "westus3"
+      + name     = "spoke1-rg"
+    }
+
+  # module.spoke["spoke1"].azurerm_subnet.container will be created
+  + resource "azurerm_subnet" "container" {
+      + address_prefixes                               = [
+          + "10.2.1.64/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke1-container"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke1-rg"
+      + virtual_network_name                           = "spoke1-vnet"
+
+      + delegation {
+          + name = "databricks-container-subnet-delegation"
+
+          + service_delegation {
+              + actions = [
+                  + "Microsoft.Network/virtualNetworks/subnets/join/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+                ]
+              + name    = "Microsoft.Databricks/workspaces"
+            }
+        }
+    }
+
+  # module.spoke["spoke1"].azurerm_subnet.host will be created
+  + resource "azurerm_subnet" "host" {
+      + address_prefixes                               = [
+          + "10.2.1.0/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke1-host"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke1-rg"
+      + virtual_network_name                           = "spoke1-vnet"
+
+      + delegation {
+          + name = "databricks-host-subnet-delegation"
+
+          + service_delegation {
+              + actions = [
+                  + "Microsoft.Network/virtualNetworks/subnets/join/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+                ]
+              + name    = "Microsoft.Databricks/workspaces"
+            }
+        }
+    }
+
+  # module.spoke["spoke1"].azurerm_subnet.privatelink will be created
+  + resource "azurerm_subnet" "privatelink" {
+      + address_prefixes                               = [
+          + "10.2.1.128/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke1-privatelink"
+      + private_endpoint_network_policies_enabled      = false
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke1-rg"
+      + virtual_network_name                           = "spoke1-vnet"
+    }
+
+  # module.spoke["spoke1"].azurerm_subnet_network_security_group_association.container will be created
+  + resource "azurerm_subnet_network_security_group_association" "container" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_subnet_network_security_group_association.host will be created
+  + resource "azurerm_subnet_network_security_group_association" "host" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_subnet_route_table_association.container will be created
+  + resource "azurerm_subnet_route_table_association" "container" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_subnet_route_table_association.host will be created
+  + resource "azurerm_subnet_route_table_association" "host" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_virtual_network.this will be created
+  + resource "azurerm_virtual_network" "this" {
+      + address_space       = [
+          + "10.2.1.0/24",
+        ]
+      + dns_servers         = (known after apply)
+      + guid                = (known after apply)
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "spoke1-vnet"
+      + resource_group_name = "spoke1-rg"
+      + subnet              = (known after apply)
+    }
+
+  # module.spoke["spoke1"].azurerm_virtual_network_peering.hub_to_spoke will be created
+  + resource "azurerm_virtual_network_peering" "hub_to_spoke" {
+      + allow_forwarded_traffic      = false
+      + allow_gateway_transit        = false
+      + allow_virtual_network_access = true
+      + id                           = (known after apply)
+      + name                         = "from-knox-sra-dev-hub-vnet-to-spoke1-vnet-peer"
+      + remote_virtual_network_id    = (known after apply)
+      + resource_group_name          = "knox-sra-dev-hub"
+      + use_remote_gateways          = false
+      + virtual_network_name         = "knox-sra-dev-hub-vnet"
+    }
+
+  # module.spoke["spoke1"].azurerm_virtual_network_peering.spoke_to_hub will be created
+  + resource "azurerm_virtual_network_peering" "spoke_to_hub" {
+      + allow_forwarded_traffic      = false
+      + allow_gateway_transit        = false
+      + allow_virtual_network_access = true
+      + id                           = (known after apply)
+      + name                         = "from-spoke1-vnet-to-knox-sra-dev-hub-vnet-peer"
+      + remote_virtual_network_id    = (known after apply)
+      + resource_group_name          = "spoke1-rg"
+      + use_remote_gateways          = false
+      + virtual_network_name         = "spoke1-vnet"
+    }
+
+  # module.spoke["spoke1"].databricks_metastore_assignment.this will be created
+  + resource "databricks_metastore_assignment" "this" {
+      + default_catalog_name = "hive_metastore"
+      + id                   = (known after apply)
+      + metastore_id         = (known after apply)
+      + workspace_id         = (known after apply)
+    }
+
+  # module.spoke["spoke1"].random_string.dbfsnaming will be created
+  + resource "random_string" "dbfsnaming" {
+      + id          = (known after apply)
+      + length      = 13
+      + lower       = true
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
+      + number      = true
+      + numeric     = true
+      + result      = (known after apply)
+      + special     = false
+      + upper       = false
+    }
+
+  # module.spoke["spoke2"].azurerm_databricks_workspace.this will be created
+  + resource "azurerm_databricks_workspace" "this" {
+      + customer_managed_key_enabled                        = true
+      + disk_encryption_set_id                              = (known after apply)
+      + id                                                  = (known after apply)
+      + infrastructure_encryption_enabled                   = true
+      + location                                            = "westus3"
+      + managed_disk_cmk_key_vault_key_id                   = (known after apply)
+      + managed_disk_cmk_rotation_to_latest_version_enabled = true
+      + managed_disk_identity                               = (known after apply)
+      + managed_resource_group_id                           = (known after apply)
+      + managed_resource_group_name                         = (known after apply)
+      + managed_services_cmk_key_vault_key_id               = (known after apply)
+      + name                                                = "spoke2-adb-workspace"
+      + network_security_group_rules_required               = "NoAzureDatabricksRules"
+      + public_network_access_enabled                       = false
+      + resource_group_name                                 = "spoke2-rg"
+      + sku                                                 = "premium"
+      + storage_account_identity                            = (known after apply)
+      + tags                                                = {
+          + "Environment" = "dev"
+          + "Owner"       = "nathan.knox@databricks.com"
+          + "Project"     = "knox-sra-dev-spoke2"
+        }
+      + workspace_id                                        = (known after apply)
+      + workspace_url                                       = (known after apply)
+
+      + custom_parameters {
+          + nat_gateway_name                                     = (known after apply)
+          + no_public_ip                                         = true
+          + private_subnet_name                                  = "spoke2-container"
+          + private_subnet_network_security_group_association_id = (known after apply)
+          + public_ip_name                                       = (known after apply)
+          + public_subnet_name                                   = "spoke2-host"
+          + public_subnet_network_security_group_association_id  = (known after apply)
+          + storage_account_name                                 = (known after apply)
+          + storage_account_sku_name                             = (known after apply)
+          + virtual_network_id                                   = (known after apply)
+          + vnet_address_prefix                                  = (known after apply)
+        }
+    }
+
+  # module.spoke["spoke2"].azurerm_ip_group_cidr.container will be created
+  + resource "azurerm_ip_group_cidr" "container" {
+      + cidr        = "10.2.2.64/26"
+      + id          = (known after apply)
+      + ip_group_id = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_ip_group_cidr.host will be created
+  + resource "azurerm_ip_group_cidr" "host" {
+      + cidr        = "10.2.2.0/26"
+      + id          = (known after apply)
+      + ip_group_id = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_key_vault_access_policy.databricks will be created
+  + resource "azurerm_key_vault_access_policy" "databricks" {
+      + id              = (known after apply)
+      + key_permissions = [
+          + "Get",
+          + "UnwrapKey",
+          + "WrapKey",
+        ]
+      + key_vault_id    = (known after apply)
+      + object_id       = (known after apply)
+      + tenant_id       = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_key_vault_access_policy.managed will be created
+  + resource "azurerm_key_vault_access_policy" "managed" {
+      + id              = (known after apply)
+      + key_permissions = [
+          + "Get",
+          + "UnwrapKey",
+          + "WrapKey",
+        ]
+      + key_vault_id    = (known after apply)
+      + object_id       = (known after apply)
+      + tenant_id       = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_network_security_group.this will be created
+  + resource "azurerm_network_security_group" "this" {
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "spoke2-databricks-nsg"
+      + resource_group_name = "spoke2-rg"
+      + security_rule       = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_network_security_rule.aad will be created
+  + resource "azurerm_network_security_rule" "aad" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "AzureActiveDirectory"
+      + destination_port_range      = "443"
+      + direction                   = "Outbound"
+      + id                          = (known after apply)
+      + name                        = "AllowAAD"
+      + network_security_group_name = "spoke2-databricks-nsg"
+      + priority                    = 200
+      + protocol                    = "Tcp"
+      + resource_group_name         = "spoke2-rg"
+      + source_address_prefix       = "VirtualNetwork"
+      + source_port_range           = "*"
+    }
+
+  # module.spoke["spoke2"].azurerm_network_security_rule.azfrontdoor will be created
+  + resource "azurerm_network_security_rule" "azfrontdoor" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "AzureFrontDoor.Frontend"
+      + destination_port_range      = "443"
+      + direction                   = "Outbound"
+      + id                          = (known after apply)
+      + name                        = "AllowAzureFrontDoor"
+      + network_security_group_name = "spoke2-databricks-nsg"
+      + priority                    = 201
+      + protocol                    = "Tcp"
+      + resource_group_name         = "spoke2-rg"
+      + source_address_prefix       = "VirtualNetwork"
+      + source_port_range           = "*"
+    }
+
+  # module.spoke["spoke2"].azurerm_private_dns_zone.backend will be created
+  + resource "azurerm_private_dns_zone" "backend" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.azuredatabricks.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke2-rg"
+    }
+
+  # module.spoke["spoke2"].azurerm_private_dns_zone.dbfs_blob will be created
+  + resource "azurerm_private_dns_zone" "dbfs_blob" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.blob.core.windows.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke2-rg"
+    }
+
+  # module.spoke["spoke2"].azurerm_private_dns_zone.dbfs_dfs will be created
+  + resource "azurerm_private_dns_zone" "dbfs_dfs" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.dfs.core.windows.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke2-rg"
+    }
+
+  # module.spoke["spoke2"].azurerm_private_dns_zone_virtual_network_link.backend will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "backend" {
+      + id                    = (known after apply)
+      + name                  = "databricks-vnetlink-backend"
+      + private_dns_zone_name = "privatelink.azuredatabricks.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke2-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_private_dns_zone_virtual_network_link.dbfs_blob will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_blob" {
+      + id                    = (known after apply)
+      + name                  = "dbfs-blob"
+      + private_dns_zone_name = "privatelink.blob.core.windows.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke2-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_private_dns_zone_virtual_network_link.dbfs_dfs will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_dfs" {
+      + id                    = (known after apply)
+      + name                  = "dbfs-dfs"
+      + private_dns_zone_name = "privatelink.dfs.core.windows.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke2-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_private_endpoint.backend will be created
+  + resource "azurerm_private_endpoint" "backend" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "databricks-pe-backend"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke2-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-backend"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke2-backend"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "databricks_ui_api",
+            ]
+        }
+    }
+
+  # module.spoke["spoke2"].azurerm_private_endpoint.dbfs_dfs will be created
+  + resource "azurerm_private_endpoint" "dbfs_dfs" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "dbfspe-dfs"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke2-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-dbfs"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke2-dbfs-dfs"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "dfs",
+            ]
+        }
+    }
+
+  # module.spoke["spoke2"].azurerm_private_endpoint.dbfspe_blob will be created
+  + resource "azurerm_private_endpoint" "dbfspe_blob" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "dbfs-blob"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke2-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-dbfs"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke2-dbfs-blob"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "blob",
+            ]
+        }
+    }
+
+  # module.spoke["spoke2"].azurerm_resource_group.this will be created
+  + resource "azurerm_resource_group" "this" {
+      + id       = (known after apply)
+      + location = "westus3"
+      + name     = "spoke2-rg"
+    }
+
+  # module.spoke["spoke2"].azurerm_subnet.container will be created
+  + resource "azurerm_subnet" "container" {
+      + address_prefixes                               = [
+          + "10.2.2.64/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke2-container"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke2-rg"
+      + virtual_network_name                           = "spoke2-vnet"
+
+      + delegation {
+          + name = "databricks-container-subnet-delegation"
+
+          + service_delegation {
+              + actions = [
+                  + "Microsoft.Network/virtualNetworks/subnets/join/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+                ]
+              + name    = "Microsoft.Databricks/workspaces"
+            }
+        }
+    }
+
+  # module.spoke["spoke2"].azurerm_subnet.host will be created
+  + resource "azurerm_subnet" "host" {
+      + address_prefixes                               = [
+          + "10.2.2.0/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke2-host"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke2-rg"
+      + virtual_network_name                           = "spoke2-vnet"
+
+      + delegation {
+          + name = "databricks-host-subnet-delegation"
+
+          + service_delegation {
+              + actions = [
+                  + "Microsoft.Network/virtualNetworks/subnets/join/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+                ]
+              + name    = "Microsoft.Databricks/workspaces"
+            }
+        }
+    }
+
+  # module.spoke["spoke2"].azurerm_subnet.privatelink will be created
+  + resource "azurerm_subnet" "privatelink" {
+      + address_prefixes                               = [
+          + "10.2.2.128/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke2-privatelink"
+      + private_endpoint_network_policies_enabled      = false
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke2-rg"
+      + virtual_network_name                           = "spoke2-vnet"
+    }
+
+  # module.spoke["spoke2"].azurerm_subnet_network_security_group_association.container will be created
+  + resource "azurerm_subnet_network_security_group_association" "container" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_subnet_network_security_group_association.host will be created
+  + resource "azurerm_subnet_network_security_group_association" "host" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_subnet_route_table_association.container will be created
+  + resource "azurerm_subnet_route_table_association" "container" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_subnet_route_table_association.host will be created
+  + resource "azurerm_subnet_route_table_association" "host" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_virtual_network.this will be created
+  + resource "azurerm_virtual_network" "this" {
+      + address_space       = [
+          + "10.2.2.0/24",
+        ]
+      + dns_servers         = (known after apply)
+      + guid                = (known after apply)
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "spoke2-vnet"
+      + resource_group_name = "spoke2-rg"
+      + subnet              = (known after apply)
+    }
+
+  # module.spoke["spoke2"].azurerm_virtual_network_peering.hub_to_spoke will be created
+  + resource "azurerm_virtual_network_peering" "hub_to_spoke" {
+      + allow_forwarded_traffic      = false
+      + allow_gateway_transit        = false
+      + allow_virtual_network_access = true
+      + id                           = (known after apply)
+      + name                         = "from-knox-sra-dev-hub-vnet-to-spoke2-vnet-peer"
+      + remote_virtual_network_id    = (known after apply)
+      + resource_group_name          = "knox-sra-dev-hub"
+      + use_remote_gateways          = false
+      + virtual_network_name         = "knox-sra-dev-hub-vnet"
+    }
+
+  # module.spoke["spoke2"].azurerm_virtual_network_peering.spoke_to_hub will be created
+  + resource "azurerm_virtual_network_peering" "spoke_to_hub" {
+      + allow_forwarded_traffic      = false
+      + allow_gateway_transit        = false
+      + allow_virtual_network_access = true
+      + id                           = (known after apply)
+      + name                         = "from-spoke2-vnet-to-knox-sra-dev-hub-vnet-peer"
+      + remote_virtual_network_id    = (known after apply)
+      + resource_group_name          = "spoke2-rg"
+      + use_remote_gateways          = false
+      + virtual_network_name         = "spoke2-vnet"
+    }
+
+  # module.spoke["spoke2"].databricks_metastore_assignment.this will be created
+  + resource "databricks_metastore_assignment" "this" {
+      + default_catalog_name = "hive_metastore"
+      + id                   = (known after apply)
+      + metastore_id         = (known after apply)
+      + workspace_id         = (known after apply)
+    }
+
+  # module.spoke["spoke2"].random_string.dbfsnaming will be created
+  + resource "random_string" "dbfsnaming" {
+      + id          = (known after apply)
+      + length      = 13
+      + lower       = true
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
+      + number      = true
+      + numeric     = true
+      + result      = (known after apply)
+      + special     = false
+      + upper       = false
+    }
+
+  # module.spoke["spoke3"].azurerm_databricks_workspace.this will be created
+  + resource "azurerm_databricks_workspace" "this" {
+      + customer_managed_key_enabled                        = true
+      + disk_encryption_set_id                              = (known after apply)
+      + id                                                  = (known after apply)
+      + infrastructure_encryption_enabled                   = true
+      + location                                            = "westus3"
+      + managed_disk_cmk_key_vault_key_id                   = (known after apply)
+      + managed_disk_cmk_rotation_to_latest_version_enabled = true
+      + managed_disk_identity                               = (known after apply)
+      + managed_resource_group_id                           = (known after apply)
+      + managed_resource_group_name                         = (known after apply)
+      + managed_services_cmk_key_vault_key_id               = (known after apply)
+      + name                                                = "spoke3-adb-workspace"
+      + network_security_group_rules_required               = "NoAzureDatabricksRules"
+      + public_network_access_enabled                       = false
+      + resource_group_name                                 = "spoke3-rg"
+      + sku                                                 = "premium"
+      + storage_account_identity                            = (known after apply)
+      + tags                                                = {
+          + "Environment" = "dev"
+          + "Owner"       = "nathan.knox@databricks.com"
+          + "Project"     = "knox-sra-dev-spoke3"
+        }
+      + workspace_id                                        = (known after apply)
+      + workspace_url                                       = (known after apply)
+
+      + custom_parameters {
+          + nat_gateway_name                                     = (known after apply)
+          + no_public_ip                                         = true
+          + private_subnet_name                                  = "spoke3-container"
+          + private_subnet_network_security_group_association_id = (known after apply)
+          + public_ip_name                                       = (known after apply)
+          + public_subnet_name                                   = "spoke3-host"
+          + public_subnet_network_security_group_association_id  = (known after apply)
+          + storage_account_name                                 = (known after apply)
+          + storage_account_sku_name                             = (known after apply)
+          + virtual_network_id                                   = (known after apply)
+          + vnet_address_prefix                                  = (known after apply)
+        }
+    }
+
+  # module.spoke["spoke3"].azurerm_ip_group_cidr.container will be created
+  + resource "azurerm_ip_group_cidr" "container" {
+      + cidr        = "10.2.3.64/26"
+      + id          = (known after apply)
+      + ip_group_id = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_ip_group_cidr.host will be created
+  + resource "azurerm_ip_group_cidr" "host" {
+      + cidr        = "10.2.3.0/26"
+      + id          = (known after apply)
+      + ip_group_id = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_key_vault_access_policy.databricks will be created
+  + resource "azurerm_key_vault_access_policy" "databricks" {
+      + id              = (known after apply)
+      + key_permissions = [
+          + "Get",
+          + "UnwrapKey",
+          + "WrapKey",
+        ]
+      + key_vault_id    = (known after apply)
+      + object_id       = (known after apply)
+      + tenant_id       = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_key_vault_access_policy.managed will be created
+  + resource "azurerm_key_vault_access_policy" "managed" {
+      + id              = (known after apply)
+      + key_permissions = [
+          + "Get",
+          + "UnwrapKey",
+          + "WrapKey",
+        ]
+      + key_vault_id    = (known after apply)
+      + object_id       = (known after apply)
+      + tenant_id       = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_network_security_group.this will be created
+  + resource "azurerm_network_security_group" "this" {
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "spoke3-databricks-nsg"
+      + resource_group_name = "spoke3-rg"
+      + security_rule       = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_network_security_rule.aad will be created
+  + resource "azurerm_network_security_rule" "aad" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "AzureActiveDirectory"
+      + destination_port_range      = "443"
+      + direction                   = "Outbound"
+      + id                          = (known after apply)
+      + name                        = "AllowAAD"
+      + network_security_group_name = "spoke3-databricks-nsg"
+      + priority                    = 200
+      + protocol                    = "Tcp"
+      + resource_group_name         = "spoke3-rg"
+      + source_address_prefix       = "VirtualNetwork"
+      + source_port_range           = "*"
+    }
+
+  # module.spoke["spoke3"].azurerm_network_security_rule.azfrontdoor will be created
+  + resource "azurerm_network_security_rule" "azfrontdoor" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "AzureFrontDoor.Frontend"
+      + destination_port_range      = "443"
+      + direction                   = "Outbound"
+      + id                          = (known after apply)
+      + name                        = "AllowAzureFrontDoor"
+      + network_security_group_name = "spoke3-databricks-nsg"
+      + priority                    = 201
+      + protocol                    = "Tcp"
+      + resource_group_name         = "spoke3-rg"
+      + source_address_prefix       = "VirtualNetwork"
+      + source_port_range           = "*"
+    }
+
+  # module.spoke["spoke3"].azurerm_private_dns_zone.backend will be created
+  + resource "azurerm_private_dns_zone" "backend" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.azuredatabricks.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke3-rg"
+    }
+
+  # module.spoke["spoke3"].azurerm_private_dns_zone.dbfs_blob will be created
+  + resource "azurerm_private_dns_zone" "dbfs_blob" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.blob.core.windows.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke3-rg"
+    }
+
+  # module.spoke["spoke3"].azurerm_private_dns_zone.dbfs_dfs will be created
+  + resource "azurerm_private_dns_zone" "dbfs_dfs" {
+      + id                                                    = (known after apply)
+      + max_number_of_record_sets                             = (known after apply)
+      + max_number_of_virtual_network_links                   = (known after apply)
+      + max_number_of_virtual_network_links_with_registration = (known after apply)
+      + name                                                  = "privatelink.dfs.core.windows.net"
+      + number_of_record_sets                                 = (known after apply)
+      + resource_group_name                                   = "spoke3-rg"
+    }
+
+  # module.spoke["spoke3"].azurerm_private_dns_zone_virtual_network_link.backend will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "backend" {
+      + id                    = (known after apply)
+      + name                  = "databricks-vnetlink-backend"
+      + private_dns_zone_name = "privatelink.azuredatabricks.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke3-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_private_dns_zone_virtual_network_link.dbfs_blob will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_blob" {
+      + id                    = (known after apply)
+      + name                  = "dbfs-blob"
+      + private_dns_zone_name = "privatelink.blob.core.windows.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke3-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_private_dns_zone_virtual_network_link.dbfs_dfs will be created
+  + resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_dfs" {
+      + id                    = (known after apply)
+      + name                  = "dbfs-dfs"
+      + private_dns_zone_name = "privatelink.dfs.core.windows.net"
+      + registration_enabled  = false
+      + resource_group_name   = "spoke3-rg"
+      + virtual_network_id    = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_private_endpoint.backend will be created
+  + resource "azurerm_private_endpoint" "backend" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "databricks-pe-backend"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke3-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-backend"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke3-backend"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "databricks_ui_api",
+            ]
+        }
+    }
+
+  # module.spoke["spoke3"].azurerm_private_endpoint.dbfs_dfs will be created
+  + resource "azurerm_private_endpoint" "dbfs_dfs" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "dbfspe-dfs"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke3-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-dbfs"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke3-dbfs-dfs"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "dfs",
+            ]
+        }
+    }
+
+  # module.spoke["spoke3"].azurerm_private_endpoint.dbfspe_blob will be created
+  + resource "azurerm_private_endpoint" "dbfspe_blob" {
+      + custom_dns_configs       = (known after apply)
+      + id                       = (known after apply)
+      + location                 = "westus3"
+      + name                     = "dbfs-blob"
+      + network_interface        = (known after apply)
+      + private_dns_zone_configs = (known after apply)
+      + resource_group_name      = "spoke3-rg"
+      + subnet_id                = (known after apply)
+
+      + private_dns_zone_group {
+          + id                   = (known after apply)
+          + name                 = "private-dns-zone-dbfs"
+          + private_dns_zone_ids = (known after apply)
+        }
+
+      + private_service_connection {
+          + is_manual_connection           = false
+          + name                           = "ple-spoke3-dbfs-blob"
+          + private_connection_resource_id = (known after apply)
+          + private_ip_address             = (known after apply)
+          + subresource_names              = [
+              + "blob",
+            ]
+        }
+    }
+
+  # module.spoke["spoke3"].azurerm_resource_group.this will be created
+  + resource "azurerm_resource_group" "this" {
+      + id       = (known after apply)
+      + location = "westus3"
+      + name     = "spoke3-rg"
+    }
+
+  # module.spoke["spoke3"].azurerm_subnet.container will be created
+  + resource "azurerm_subnet" "container" {
+      + address_prefixes                               = [
+          + "10.2.3.64/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke3-container"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke3-rg"
+      + virtual_network_name                           = "spoke3-vnet"
+
+      + delegation {
+          + name = "databricks-container-subnet-delegation"
+
+          + service_delegation {
+              + actions = [
+                  + "Microsoft.Network/virtualNetworks/subnets/join/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+                ]
+              + name    = "Microsoft.Databricks/workspaces"
+            }
+        }
+    }
+
+  # module.spoke["spoke3"].azurerm_subnet.host will be created
+  + resource "azurerm_subnet" "host" {
+      + address_prefixes                               = [
+          + "10.2.3.0/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke3-host"
+      + private_endpoint_network_policies_enabled      = (known after apply)
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke3-rg"
+      + virtual_network_name                           = "spoke3-vnet"
+
+      + delegation {
+          + name = "databricks-host-subnet-delegation"
+
+          + service_delegation {
+              + actions = [
+                  + "Microsoft.Network/virtualNetworks/subnets/join/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+                  + "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+                ]
+              + name    = "Microsoft.Databricks/workspaces"
+            }
+        }
+    }
+
+  # module.spoke["spoke3"].azurerm_subnet.privatelink will be created
+  + resource "azurerm_subnet" "privatelink" {
+      + address_prefixes                               = [
+          + "10.2.3.128/26",
+        ]
+      + enforce_private_link_endpoint_network_policies = (known after apply)
+      + enforce_private_link_service_network_policies  = (known after apply)
+      + id                                             = (known after apply)
+      + name                                           = "spoke3-privatelink"
+      + private_endpoint_network_policies_enabled      = false
+      + private_link_service_network_policies_enabled  = (known after apply)
+      + resource_group_name                            = "spoke3-rg"
+      + virtual_network_name                           = "spoke3-vnet"
+    }
+
+  # module.spoke["spoke3"].azurerm_subnet_network_security_group_association.container will be created
+  + resource "azurerm_subnet_network_security_group_association" "container" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_subnet_network_security_group_association.host will be created
+  + resource "azurerm_subnet_network_security_group_association" "host" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_subnet_route_table_association.container will be created
+  + resource "azurerm_subnet_route_table_association" "container" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_subnet_route_table_association.host will be created
+  + resource "azurerm_subnet_route_table_association" "host" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_virtual_network.this will be created
+  + resource "azurerm_virtual_network" "this" {
+      + address_space       = [
+          + "10.2.3.0/24",
+        ]
+      + dns_servers         = (known after apply)
+      + guid                = (known after apply)
+      + id                  = (known after apply)
+      + location            = "westus3"
+      + name                = "spoke3-vnet"
+      + resource_group_name = "spoke3-rg"
+      + subnet              = (known after apply)
+    }
+
+  # module.spoke["spoke3"].azurerm_virtual_network_peering.hub_to_spoke will be created
+  + resource "azurerm_virtual_network_peering" "hub_to_spoke" {
+      + allow_forwarded_traffic      = false
+      + allow_gateway_transit        = false
+      + allow_virtual_network_access = true
+      + id                           = (known after apply)
+      + name                         = "from-knox-sra-dev-hub-vnet-to-spoke3-vnet-peer"
+      + remote_virtual_network_id    = (known after apply)
+      + resource_group_name          = "knox-sra-dev-hub"
+      + use_remote_gateways          = false
+      + virtual_network_name         = "knox-sra-dev-hub-vnet"
+    }
+
+  # module.spoke["spoke3"].azurerm_virtual_network_peering.spoke_to_hub will be created
+  + resource "azurerm_virtual_network_peering" "spoke_to_hub" {
+      + allow_forwarded_traffic      = false
+      + allow_gateway_transit        = false
+      + allow_virtual_network_access = true
+      + id                           = (known after apply)
+      + name                         = "from-spoke3-vnet-to-knox-sra-dev-hub-vnet-peer"
+      + remote_virtual_network_id    = (known after apply)
+      + resource_group_name          = "spoke3-rg"
+      + use_remote_gateways          = false
+      + virtual_network_name         = "spoke3-vnet"
+    }
+
+  # module.spoke["spoke3"].databricks_metastore_assignment.this will be created
+  + resource "databricks_metastore_assignment" "this" {
+      + default_catalog_name = "hive_metastore"
+      + id                   = (known after apply)
+      + metastore_id         = (known after apply)
+      + workspace_id         = (known after apply)
+    }
+
+  # module.spoke["spoke3"].random_string.dbfsnaming will be created
+  + resource "random_string" "dbfsnaming" {
+      + id          = (known after apply)
+      + length      = 13
+      + lower       = true
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
+      + number      = true
+      + numeric     = true
+      + result      = (known after apply)
+      + special     = false
+      + upper       = false
+    }
+
+Plan: 129 to add, 0 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

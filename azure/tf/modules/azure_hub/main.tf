@@ -16,7 +16,6 @@ locals {
     "webauth-host" : cidrsubnet(var.hub_vnet_cidr, 26 - local.hub_cidr_prefix, 1)
     "webauth-container" : cidrsubnet(var.hub_vnet_cidr, 26 - local.hub_cidr_prefix, 2)
     "privatelink" : cidrsubnet(var.hub_vnet_cidr, 24 - local.hub_cidr_prefix, 0)
-    # "testvm" : cidrsubnet(var.hub_vnet_cidr, 30 - local.hub_cidr_prefix, 0)
   }
 }
 

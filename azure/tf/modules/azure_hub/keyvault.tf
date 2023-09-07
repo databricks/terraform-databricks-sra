@@ -1,10 +1,11 @@
 # Why do `key_opts` and `key_permissions` differ in terms of required capitalization?
 resource "azurerm_key_vault" "this" {
-  name                = "${local.prefix}-keyvault"
+  name                = "example-hub-keyvault"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
   tenant_id           = local.tenant_id
-  sku_name            = "premium"
+
+  sku_name = "premium"
 
   soft_delete_retention_days = 7
 }
@@ -12,7 +13,7 @@ resource "azurerm_key_vault" "this" {
 resource "azurerm_key_vault_key" "managed_services" {
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
-  name         = "${local.prefix}-adb-managed-services"
+  name         = "adb-services"
   key_vault_id = azurerm_key_vault.this.id
   key_type     = "RSA"
   key_size     = 2048
@@ -30,7 +31,7 @@ resource "azurerm_key_vault_key" "managed_services" {
 resource "azurerm_key_vault_key" "managed_disk" {
   depends_on = [azurerm_key_vault_access_policy.terraform]
 
-  name         = "${local.prefix}-adb-managed-disk"
+  name         = "adb-disk"
   key_vault_id = azurerm_key_vault.this.id
   key_type     = "RSA"
   key_size     = 2048

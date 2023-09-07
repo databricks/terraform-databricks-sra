@@ -8,13 +8,14 @@ resource "azurerm_databricks_access_connector" "unity_catalog" {
 }
 
 resource "azurerm_storage_account" "unity_catalog" {
-  name                     = "${local.prefix}unity"
-  resource_group_name      = azurerm_resource_group.hub.name
-  location                 = azurerm_resource_group.hub.location
-  tags                     = azurerm_resource_group.hub.tags
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
-  is_hns_enabled           = true
+  name                          = "${local.prefix}unity"
+  resource_group_name           = azurerm_resource_group.hub.name
+  location                      = azurerm_resource_group.hub.location
+  tags                          = azurerm_resource_group.hub.tags
+  account_tier                  = "Standard"
+  account_replication_type      = "GRS"
+  is_hns_enabled                = true
+  public_network_access_enabled = false
 }
 
 resource "azurerm_storage_container" "unity_catalog" {

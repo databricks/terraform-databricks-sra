@@ -1,3 +1,4 @@
+# TODO: Need to move resource group to match the vnet - it doesn't like them being separate
 resource "azurerm_subnet" "host" {
   name                 = "webauth-host"
   resource_group_name  = azurerm_resource_group.webauth.name

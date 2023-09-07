@@ -4,11 +4,20 @@ locals {
     "container" : cidrsubnet(var.vnet_cidr, 2, 1)
     "privatelink" : cidrsubnet(var.vnet_cidr, 2, 2)
   }
+  dbfs_name = join("", ["dbstorage", random_string.dbfsnaming.result])
+}
+
+resource "random_string" "dbfsnaming" {
+  special = false
+  upper   = false
+  length  = 13
 }
 
 resource "azurerm_resource_group" "this" {
   name     = "${var.prefix}-rg"
   location = var.location
+
+  tags = var.tags
 }
 
 resource "azurerm_virtual_network" "this" {
@@ -16,12 +25,16 @@ resource "azurerm_virtual_network" "this" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.vnet_cidr]
+
+  tags = var.tags
 }
 
 resource "azurerm_network_security_group" "this" {
   name                = "${var.prefix}-databricks-nsg"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
+
+  tags = var.tags
 }
 
 resource "azurerm_subnet_network_security_group_association" "container" {

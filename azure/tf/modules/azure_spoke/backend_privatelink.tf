@@ -15,11 +15,15 @@ resource "azurerm_private_endpoint" "backend" {
     name                 = "private-dns-zone-backend"
     private_dns_zone_ids = [azurerm_private_dns_zone.backend.id]
   }
+
+  tags = var.tags
 }
 
 resource "azurerm_private_dns_zone" "backend" {
   name                = "privatelink.azuredatabricks.net"
   resource_group_name = azurerm_resource_group.this.name
+
+  tags = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "backend" {
@@ -27,4 +31,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "backend" {
   resource_group_name   = azurerm_resource_group.this.name
   private_dns_zone_name = azurerm_private_dns_zone.backend.name
   virtual_network_id    = azurerm_virtual_network.this.id
+
+  tags = var.tags
 }

@@ -37,8 +37,8 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
     rule {
       name                  = "adb-storage"
-      protocols             = ["TCP, UDP"]
-      source_ip_groups      = azurerm_ip_group.this
+      protocols             = ["TCP", "UDP"]
+      source_ip_groups      = [azurerm_ip_group.this.id]
       destination_addresses = [lookup(local.service_tags, "storage", "Storage")]
       destination_ports     = ["443"]
     }
@@ -46,7 +46,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
     rule {
       name                  = "adb-sql"
       protocols             = ["TCP"]
-      source_ip_groups      = azurerm_ip_group.this
+      source_ip_groups      = [azurerm_ip_group.this.id]
       destination_addresses = [lookup(local.service_tags, "sql", "Sql")]
       destination_ports     = ["3306"]
     }
@@ -54,7 +54,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
     rule {
       name                  = "adb-eventhub"
       protocols             = ["TCP"]
-      source_ip_groups      = azurerm_ip_group.this
+      source_ip_groups      = [azurerm_ip_group.this.id]
       destination_addresses = [lookup(local.service_tags, "eventhub", "EventHub")]
       destination_ports     = ["9093"]
     }
@@ -67,7 +67,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
     rule {
       name              = "public-repos"
-      source_ip_groups  = azurerm_ip_group.this
+      source_ip_groups  = [azurerm_ip_group.this.id]
       destination_fqdns = var.public_repos
       protocols {
         port = "443"
@@ -81,7 +81,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
     rule {
       name              = "IPinfo"
-      source_ip_groups  = azurerm_ip_group.this
+      source_ip_groups  = [azurerm_ip_group.this.id]
       destination_fqdns = ["*.ipinfo.io", "ipinfo.io"]
       protocols {
         port = "443"
@@ -99,7 +99,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
     rule {
       name              = "ganglia"
-      source_ip_groups  = azurerm_ip_group.this
+      source_ip_groups  = [azurerm_ip_group.this.id]
       destination_fqdns = ["cdnjs.cloudflare.com"]
       protocols {
         port = "443"
