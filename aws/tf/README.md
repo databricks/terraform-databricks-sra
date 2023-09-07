@@ -68,7 +68,7 @@ In this section, we break down additional security recommendations and opportuni
 1. Run `terraform apply -var-file ../example.tfvars`
 
 ## Network Diagram - Standard
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/img/Standard%20-%20Network%20Topology.png)
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/aws/aws/img/Standard%20-%20Network%20Topology.png)
 
 ## Network Diagram - Optional Firewall
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/img/Optional%20Firewall%20-%20Network%20Topology.png)
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/aws/aws/img/Optional%20Firewall%20-%20Network%20Topology.png)
