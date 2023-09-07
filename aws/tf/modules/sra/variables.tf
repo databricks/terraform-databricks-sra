@@ -1,25 +1,25 @@
 variable "databricks_account_id" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "client_id" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "client_secret" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "aws_account_id" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "resource_owner" {
-  type = string
+  type      = string
   sensitive = true
 }
 
@@ -29,6 +29,30 @@ variable "resource_prefix" {
 
 variable "region" {
   type = string
+}
+
+variable "region_name" {
+  type = string
+}
+
+variable "metastore_id" {
+  type      = string
+  sensitive = true
+}
+
+variable "enable_logging_boolean" {
+  type      = bool
+  sensitive = true
+}
+
+variable "enable_firewall_boolean" {
+  type      = bool
+  sensitive = true
+}
+
+variable "enable_restrictive_root_bucket_boolean" {
+  type      = bool
+  sensitive = true
 }
 
 variable "dbfsname" {
@@ -55,9 +79,26 @@ variable "private_subnets_cidr" {
   type = list(string)
 }
 
+variable "privatelink_subnets_cidr" {
+  type = list(string)
+}
+
 variable "public_subnets_cidr" {
   type = list(string)
 }
+
+variable "firewall_subnets_cidr" {
+  type = list(string)
+}
+
+variable "firewall_allow_list" {
+  type = list(string)
+}
+
+variable "firewall_protocol_deny_list" {
+  type = string
+}
+
 
 variable "availability_zones" {
   type = list(string)
