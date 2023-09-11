@@ -1,3 +1,4 @@
+# Why do `key_opts` and `key_permissions` differ in terms of required capitalization?
 # Define the Azure Key Vault resource
 resource "azurerm_key_vault" "this" {
   name                = "example-hub-keyvault"
