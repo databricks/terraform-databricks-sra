@@ -42,3 +42,6 @@ terraform.rc
 .idea
 ./.idea
 ./.idea/*
+
+# Git Config
+.gitconfig
