@@ -16,6 +16,9 @@ provider "google" {
   project = var.project
 }
 
+
 provider "databricks" {
-  host = var.databricks_workspace_url
+ alias                  = "workspace"
+ host                   = var.databricks_workspace_url
+ google_service_account = var.databricks_google_service_account
 }

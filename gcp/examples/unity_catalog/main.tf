@@ -5,4 +5,7 @@ module "unity_catalog" {
   databricks_workspace_url = var.databricks_workspace_url
   location = var.location
   resource_prefix = var.resource_prefix
+  databricks_google_service_account = var.databricks_google_service_account
+  databricks_account_id = var.databricks_account_id
+  account_console_url = var.account_console_url
 }

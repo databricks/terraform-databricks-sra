@@ -18,12 +18,14 @@ resource "google_storage_bucket" "unity_metastore" {
 }
 
 resource "databricks_metastore" "this" {
+  provider = databricks.workspace
   name          = "unity-catalog-${var.resource_prefix}"
   storage_root  = "gs://${google_storage_bucket.unity_metastore.name}"
   force_destroy = true
 }
 
 resource "databricks_metastore_data_access" "first" {
+  provider = databricks.workspace
   metastore_id = databricks_metastore.this.id
   databricks_gcp_service_account {}
   name       = "the-keys"
@@ -43,8 +45,11 @@ resource "google_storage_bucket_iam_member" "unity_sa_reader" {
 }
 
 resource "databricks_metastore_assignment" "this" {
+  provider = databricks.workspace
   count                = length(var.databricks_workspace_ids)
   workspace_id         = var.databricks_workspace_ids[count.index]
   metastore_id         = databricks_metastore.this.id
   default_catalog_name = "hive_metastore"
 }
+
+
