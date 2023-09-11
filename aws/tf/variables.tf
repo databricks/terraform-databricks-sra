@@ -1,15 +1,15 @@
 variable "client_id" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "client_secret" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 variable "databricks_account_id" {
-  type = string
+  type      = string
   sensitive = true
 }
 
@@ -18,6 +18,10 @@ variable "aws_account_id" {
 }
 
 variable "region" {
+  type = string
+}
+
+variable "region_name" {
   type = string
 }
 
