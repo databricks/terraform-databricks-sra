@@ -1,3 +1,4 @@
+# Define an Azure Databricks workspace resource
 resource "azurerm_databricks_workspace" "this" {
   name                                                = "${var.prefix}-adb-workspace"
   resource_group_name                                 = azurerm_resource_group.this.name
@@ -23,6 +24,7 @@ resource "azurerm_databricks_workspace" "this" {
   tags = var.tags
 }
 
+# Define an Azure Key Vault access policy for Databricks
 resource "azurerm_key_vault_access_policy" "databricks" {
   depends_on = [azurerm_databricks_workspace.this]
 
@@ -37,6 +39,7 @@ resource "azurerm_key_vault_access_policy" "databricks" {
   ]
 }
 
+# Define an Azure Key Vault access policy for managed disks
 resource "azurerm_key_vault_access_policy" "managed" {
   depends_on = [azurerm_databricks_workspace.this]
 
@@ -51,6 +54,7 @@ resource "azurerm_key_vault_access_policy" "managed" {
   ]
 }
 
+# Define a Databricks metastore assignment
 resource "databricks_metastore_assignment" "this" {
   # may need to use an explicit workspace-authenticated provider here
   # provider = databricks.workspace
