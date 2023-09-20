@@ -1,13 +1,18 @@
+# Define the subnet for the test VM using cidrsubnet function
 locals {
   testvm_subnet    = cidrsubnet(var.hub_vnet_cidr, 30 - local.hub_cidr_prefix, 0)
+
+  # Decode the JSON response from the ifconfig.co API to get the public IP address of the host machine
   ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
 }
 
+# Define a variable for the test VM password
 variable "test_vm_password" {
   type        = string
   description = "(Required) Password for the test VM"
 }
 
+# Create a subnet resource for the test VM
 resource "azurerm_subnet" "testvmsubnet" {
   name                 = "${local.prefix}-testvmsubnet"
   resource_group_name  = azurerm_resource_group.hub.name
@@ -16,6 +21,7 @@ resource "azurerm_subnet" "testvmsubnet" {
 }
 
 # From https://github.com/databricks/terraform-databricks-examples/blob/main/modules/adb-with-private-links-exfiltration-protection/testvm.tf
+# Create a network interface resource for the test VM
 resource "azurerm_network_interface" "testvmnic" {
   name                = "${local.prefix}-testvm-nic"
   location            = azurerm_resource_group.hub.location
@@ -29,6 +35,7 @@ resource "azurerm_network_interface" "testvmnic" {
   }
 }
 
+# Create a network security group resource for the test VM
 resource "azurerm_network_security_group" "testvm-nsg" {
   name                = "${local.prefix}-testvm-nsg"
   location            = azurerm_resource_group.hub.location
@@ -36,11 +43,13 @@ resource "azurerm_network_security_group" "testvm-nsg" {
   tags                = var.tags
 }
 
+# Associate the network security group with the network interface of the test VM
 resource "azurerm_network_interface_security_group_association" "testvmnsgassoc" {
   network_interface_id      = azurerm_network_interface.testvmnic.id
   network_security_group_id = azurerm_network_security_group.testvm-nsg.id
 }
 
+# Retrieve the public IP address of the host machine using the ifconfig.co API
 data "http" "my_public_ip" { // add your host machine ip into nsg
 
   url = "https://ifconfig.co/json"
@@ -49,6 +58,7 @@ data "http" "my_public_ip" { // add your host machine ip into nsg
   }
 }
 
+# Create a network security rule to allow RDP traffic to the test VM
 resource "azurerm_network_security_rule" "this" {
   name                        = "RDP"
   priority                    = 200
@@ -63,7 +73,7 @@ resource "azurerm_network_security_rule" "this" {
   resource_group_name         = azurerm_resource_group.hub.name
 }
 
-// give a public ip addr to vm
+# Create a public IP address resource for the test VM
 resource "azurerm_public_ip" "testvmpublicip" {
   name                = "${local.prefix}-vmpublicip"
   location            = azurerm_resource_group.hub.location
@@ -72,6 +82,7 @@ resource "azurerm_public_ip" "testvmpublicip" {
   sku                 = "Standard"
 }
 
+# Create a Windows virtual machine resource for the test VM
 resource "azurerm_windows_virtual_machine" "testvm" {
   name                = "${local.prefix}-test"
   resource_group_name = azurerm_resource_group.hub.name
@@ -96,10 +107,12 @@ resource "azurerm_windows_virtual_machine" "testvm" {
   }
 }
 
+# Output the public IP address of the test VM
 output "test_vm_public_ip" {
   value = azurerm_public_ip.testvmpublicip.ip_address
 }
 
+# Output the public IP address of the host machine
 output "my_ip_addr" {
   value = local.ifconfig_co_json.ip
 }

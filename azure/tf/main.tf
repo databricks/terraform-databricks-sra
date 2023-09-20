@@ -1,3 +1,5 @@
+# Define module "hub" with the source "./modules/azure_hub"
+# Pass the required variables to the module
 module "hub" {
   source = "./modules/azure_hub"
 
@@ -10,6 +12,7 @@ module "hub" {
   tags                    = var.tags
 }
 
+# Define module "spoke" with a for_each loop to iterate over each spoke configuration
 module "spoke" {
   for_each = {
     for index, spoke in var.spoke_config : spoke.prefix => spoke
@@ -17,6 +20,7 @@ module "spoke" {
 
   source = "./modules/azure_spoke"
 
+# Pass the required variables to the module
   prefix    = each.value.prefix
   vnet_cidr = each.value.cidr
   tags      = each.value.tags

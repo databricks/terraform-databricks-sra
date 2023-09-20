@@ -1,9 +1,11 @@
+# Create an Azure route table resource
 resource "azurerm_route_table" "this" {
   name                = "${local.prefix}-route-table"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
 }
 
+# Create a route in the route table to direct traffic to the firewall
 resource "azurerm_route" "firewall_route" {
   name                   = "to-firewall"
   resource_group_name    = azurerm_resource_group.hub.name

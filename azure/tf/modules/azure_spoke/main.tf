@@ -1,18 +1,24 @@
+```
+# Define subnets using cidrsubnet function
 locals {
   subnets = {
     "host" : cidrsubnet(var.vnet_cidr, 2, 0)
     "container" : cidrsubnet(var.vnet_cidr, 2, 1)
     "privatelink" : cidrsubnet(var.vnet_cidr, 2, 2)
   }
+
+  # Generate a random string for dbfs_name
   dbfs_name = join("", ["dbstorage", random_string.dbfsnaming.result])
 }
 
+# Generate a random string for dbfsnaming
 resource "random_string" "dbfsnaming" {
   special = false
   upper   = false
   length  = 13
 }
 
+# Create a resource group
 resource "azurerm_resource_group" "this" {
   name     = "${var.prefix}-rg"
   location = var.location
@@ -20,6 +26,7 @@ resource "azurerm_resource_group" "this" {
   tags = var.tags
 }
 
+# Create a virtual network
 resource "azurerm_virtual_network" "this" {
   name                = "${var.prefix}-vnet"
   location            = azurerm_resource_group.this.location
@@ -29,6 +36,7 @@ resource "azurerm_virtual_network" "this" {
   tags = var.tags
 }
 
+# Create a network security group
 resource "azurerm_network_security_group" "this" {
   name                = "${var.prefix}-databricks-nsg"
   location            = azurerm_resource_group.this.location
@@ -37,16 +45,19 @@ resource "azurerm_network_security_group" "this" {
   tags = var.tags
 }
 
+# Associate the container subnet with the network security group
 resource "azurerm_subnet_network_security_group_association" "container" {
   subnet_id                 = azurerm_subnet.container.id
   network_security_group_id = azurerm_network_security_group.this.id
 }
 
+# Associate the host subnet with the network security group
 resource "azurerm_subnet_network_security_group_association" "host" {
   subnet_id                 = azurerm_subnet.host.id
   network_security_group_id = azurerm_network_security_group.this.id
 }
 
+# Create the container subnet
 resource "azurerm_subnet" "container" {
   name                 = "${var.prefix}-container"
   resource_group_name  = azurerm_resource_group.this.name
@@ -68,6 +79,7 @@ resource "azurerm_subnet" "container" {
   }
 }
 
+# Create the host subnet
 resource "azurerm_subnet" "host" {
   name                 = "${var.prefix}-host"
   resource_group_name  = azurerm_resource_group.this.name
@@ -89,6 +101,7 @@ resource "azurerm_subnet" "host" {
   }
 }
 
+# Create the privatelink subnet
 resource "azurerm_subnet" "privatelink" {
   name                                      = "${var.prefix}-privatelink"
   resource_group_name                       = azurerm_resource_group.this.name
@@ -98,6 +111,7 @@ resource "azurerm_subnet" "privatelink" {
   address_prefixes = [local.subnets["privatelink"]]
 }
 
+# Create a network security rule for AAD
 resource "azurerm_network_security_rule" "aad" {
   name                        = "AllowAAD"
   priority                    = 200
@@ -112,6 +126,7 @@ resource "azurerm_network_security_rule" "aad" {
   network_security_group_name = azurerm_network_security_group.this.name
 }
 
+# Create a network security rule for Azure Front Door
 resource "azurerm_network_security_rule" "azfrontdoor" {
   name                        = "AllowAzureFrontDoor"
   priority                    = 201

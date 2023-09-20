@@ -1,3 +1,4 @@
+# Define a subnet resource for the Azure Firewall
 resource "azurerm_subnet" "firewall" {
   name                 = "AzureFirewallSubnet"
   resource_group_name  = azurerm_resource_group.hub.name
@@ -6,6 +7,7 @@ resource "azurerm_subnet" "firewall" {
   address_prefixes = [local.subnets["firewall"]]
 }
 
+# Define a public IP resource for the Azure Firewall
 resource "azurerm_public_ip" "this" {
   name                = "firewall-public-ip"
   location            = azurerm_resource_group.hub.location
@@ -14,27 +16,33 @@ resource "azurerm_public_ip" "this" {
   sku                 = "Standard"
 }
 
+# Define a firewall policy resource
 resource "azurerm_firewall_policy" "this" {
   name                = "databricks-fwpolicy"
   resource_group_name = var.hub_resource_group_name
   location            = azurerm_resource_group.hub.location
 }
 
+# Define an IP group resource
 resource "azurerm_ip_group" "this" {
   name                = "databricks-subnets"
   resource_group_name = azurerm_resource_group.hub.name
   location            = azurerm_resource_group.hub.location
 }
 
+# Define a firewall policy rule collection group resource
 resource "azurerm_firewall_policy_rule_collection_group" "this" {
   name               = "databricks"
   firewall_policy_id = azurerm_firewall_policy.this.id
   priority           = 200
+
+  # Define network rule collection within the rule collection group
   network_rule_collection {
     name     = "databricks-network-rc"
     priority = 100
     action   = "Allow"
 
+# Define rules within the network rule collection
     rule {
       name                  = "adb-storage"
       protocols             = ["TCP", "UDP"]
@@ -60,11 +68,13 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
     }
   }
 
+# Define application rule collection within the rule collection group
   application_rule_collection {
     name     = "databricks-app-rc"
     priority = 101
     action   = "Allow"
 
+# Define rules within the application rule collection
     rule {
       name              = "public-repos"
       source_ip_groups  = [azurerm_ip_group.this.id]
@@ -109,6 +119,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
   }
 }
 
+# Define a firewall resource
 resource "azurerm_firewall" "this" {
   name                = "${azurerm_virtual_network.this.name}-firewall"
   location            = azurerm_resource_group.hub.location
@@ -117,6 +128,7 @@ resource "azurerm_firewall" "this" {
   sku_tier            = "Standard"
   firewall_policy_id  = azurerm_firewall_policy.this.id
 
+# Define IP configuration for the firewall
   ip_configuration {
     name                 = "firewall-public-ip-config"
     subnet_id            = azurerm_subnet.firewall.id
