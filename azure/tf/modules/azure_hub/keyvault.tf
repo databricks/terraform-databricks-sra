@@ -20,7 +20,7 @@ resource "azurerm_key_vault_key" "managed_services" {
   key_type     = "RSA"
   key_size     = 2048
 
-# Define the key options for the managed services key
+  # Define the key options for the managed services key
   key_opts = [
     "decrypt",
     "encrypt",
@@ -40,7 +40,7 @@ resource "azurerm_key_vault_key" "managed_disk" {
   key_type     = "RSA"
   key_size     = 2048
 
-# Define the key options for the managed disk key
+  # Define the key options for the managed disk key
   key_opts = [
     "decrypt",
     "encrypt",
@@ -57,7 +57,7 @@ resource "azurerm_key_vault_access_policy" "terraform" {
   tenant_id    = azurerm_key_vault.this.tenant_id
   object_id    = data.azurerm_client_config.current.object_id
 
-# Define the key permissions for the access policy
+  # Define the key permissions for the access policy
   key_permissions = [
     "Get",
     "List",

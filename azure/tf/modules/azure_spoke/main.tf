@@ -1,4 +1,3 @@
-```
 # Define subnets using cidrsubnet function
 locals {
   subnets = {

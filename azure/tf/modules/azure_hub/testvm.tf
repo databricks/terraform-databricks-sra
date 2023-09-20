@@ -1,6 +1,6 @@
 # Define the subnet for the test VM using cidrsubnet function
 locals {
-  testvm_subnet    = cidrsubnet(var.hub_vnet_cidr, 30 - local.hub_cidr_prefix, 0)
+  testvm_subnet = cidrsubnet(var.hub_vnet_cidr, 30 - local.hub_cidr_prefix, 0)
 
   # Decode the JSON response from the ifconfig.co API to get the public IP address of the host machine
   ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)

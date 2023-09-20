@@ -5,7 +5,7 @@ resource "azurerm_private_endpoint" "backend" {
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
 
-# Configure the private service connection
+  # Configure the private service connection
   private_service_connection {
     name                           = "ple-${var.prefix}-backend"
     private_connection_resource_id = azurerm_databricks_workspace.this.id
@@ -13,7 +13,7 @@ resource "azurerm_private_endpoint" "backend" {
     subresource_names              = ["databricks_ui_api"]
   }
 
-# Configure the private DNS zone group
+  # Configure the private DNS zone group
   private_dns_zone_group {
     name                 = "private-dns-zone-backend"
     private_dns_zone_ids = [azurerm_private_dns_zone.backend.id]

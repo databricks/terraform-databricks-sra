@@ -7,7 +7,7 @@ resource "azurerm_subnet" "host" {
 
   address_prefixes = [local.subnets["webauth-host"]]
 
-# This delegation block specifies the actions that can be performed on the subnet by the Microsoft.Databricks/workspaces service
+  # This delegation block specifies the actions that can be performed on the subnet by the Microsoft.Databricks/workspaces service
   delegation {
     name = "databricks-host-subnet-delegation"
 
@@ -30,7 +30,7 @@ resource "azurerm_subnet" "container" {
 
   address_prefixes = [local.subnets["webauth-container"]]
 
-# This delegation block specifies the actions that can be performed on the subnet by the Microsoft.Databricks/workspaces service
+  # This delegation block specifies the actions that can be performed on the subnet by the Microsoft.Databricks/workspaces service
   delegation {
     name = "databricks-container-subnet-delegation"
 
@@ -73,7 +73,7 @@ resource "azurerm_databricks_workspace" "webauth" {
   public_network_access_enabled         = false
   network_security_group_rules_required = "NoAzureDatabricksRules"
 
-# This custom_parameters block specifies additional parameters for the databricks workspace
+  # This custom_parameters block specifies additional parameters for the databricks workspace
   custom_parameters {
     no_public_ip                                         = true
     virtual_network_id                                   = azurerm_virtual_network.this.id
@@ -107,7 +107,7 @@ resource "azurerm_private_endpoint" "webauth" {
   resource_group_name = azurerm_resource_group.webauth.name
   subnet_id           = azurerm_subnet.privatelink.id
 
-# This private_service_connection block specifies the connection details for the private endpoint
+  # This private_service_connection block specifies the connection details for the private endpoint
   private_service_connection {
     name                           = "pl-webauth"
     private_connection_resource_id = azurerm_databricks_workspace.webauth.id
@@ -115,7 +115,7 @@ resource "azurerm_private_endpoint" "webauth" {
     subresource_names              = ["browser_authentication"]
   }
 
-# This private_dns_zone_group block specifies the private DNS zone to associate with the private endpoint
+  # This private_dns_zone_group block specifies the private DNS zone to associate with the private endpoint
   private_dns_zone_group {
     name                 = "private-dns-zone-webauth"
     private_dns_zone_ids = [azurerm_private_dns_zone.webauth.id]

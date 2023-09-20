@@ -10,19 +10,19 @@ locals {
   }
 
   # Define a regular expression pattern to extract subscription ID and resource group from the resource group ID
-  resource_regex  = "/subscriptions/(.+)/resourceGroups/(.+)"
+  resource_regex = "/subscriptions/(.+)/resourceGroups/(.+)"
 
   # Extract the subscription ID using the regular expression pattern
   subscription_id = regex(local.resource_regex, azurerm_resource_group.hub.id)[0]
 
   # Extract the resource group using the regular expression pattern
-  resource_group  = regex(local.resource_regex, azurerm_resource_group.hub.id)[1]
+  resource_group = regex(local.resource_regex, azurerm_resource_group.hub.id)[1]
 
   # Get the tenant ID from the current Azure client configuration
-  tenant_id       = data.azurerm_client_config.current.tenant_id
+  tenant_id = data.azurerm_client_config.current.tenant_id
 
   # Generate a prefix for naming resources by combining the hub resource group name and a random string
-  prefix          = replace(replace(lower("${var.hub_resource_group_name}${random_string.naming.result}"), "rg", ""), "-", "")
+  prefix = replace(replace(lower("${var.hub_resource_group_name}${random_string.naming.result}"), "rg", ""), "-", "")
 
   # Extract the CIDR prefix from the hub VNet CIDR
   hub_cidr_prefix = split("/", var.hub_vnet_cidr)[1]

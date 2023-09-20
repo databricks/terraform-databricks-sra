@@ -13,7 +13,7 @@ resource "azurerm_private_endpoint" "dbfs_dfs" {
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
 
-# Define the private service connection for the dbfs_dfs resource
+  # Define the private service connection for the dbfs_dfs resource
   private_service_connection {
     name                           = "ple-${var.prefix}-dbfs-dfs"
     private_connection_resource_id = join("", [azurerm_databricks_workspace.this.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/", local.dbfs_name])
@@ -21,7 +21,7 @@ resource "azurerm_private_endpoint" "dbfs_dfs" {
     subresource_names              = ["dfs"]
   }
 
-# Associate the private DNS zone with the private endpoint
+  # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = "private-dns-zone-dbfs"
     private_dns_zone_ids = [azurerm_private_dns_zone.dbfs_dfs.id]
@@ -47,7 +47,7 @@ resource "azurerm_private_endpoint" "dbfspe_blob" {
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
 
-# Define the private service connection for the dbfs_blob resource
+  # Define the private service connection for the dbfs_blob resource
   private_service_connection {
     name                           = "ple-${var.prefix}-dbfs-blob"
     private_connection_resource_id = join("", [azurerm_databricks_workspace.this.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/", local.dbfs_name])
@@ -55,7 +55,7 @@ resource "azurerm_private_endpoint" "dbfspe_blob" {
     subresource_names              = ["blob"]
   }
 
-# Associate the private DNS zone with the private endpoint
+  # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = "private-dns-zone-dbfs"
     private_dns_zone_ids = [azurerm_private_dns_zone.dbfs_blob.id]

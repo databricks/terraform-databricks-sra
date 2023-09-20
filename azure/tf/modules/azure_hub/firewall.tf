@@ -42,7 +42,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
     priority = 100
     action   = "Allow"
 
-# Define rules within the network rule collection
+    # Define rules within the network rule collection
     rule {
       name                  = "adb-storage"
       protocols             = ["TCP", "UDP"]
@@ -68,13 +68,13 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
     }
   }
 
-# Define application rule collection within the rule collection group
+  # Define application rule collection within the rule collection group
   application_rule_collection {
     name     = "databricks-app-rc"
     priority = 101
     action   = "Allow"
 
-# Define rules within the application rule collection
+    # Define rules within the application rule collection
     rule {
       name              = "public-repos"
       source_ip_groups  = [azurerm_ip_group.this.id]
@@ -128,7 +128,7 @@ resource "azurerm_firewall" "this" {
   sku_tier            = "Standard"
   firewall_policy_id  = azurerm_firewall_policy.this.id
 
-# Define IP configuration for the firewall
+  # Define IP configuration for the firewall
   ip_configuration {
     name                 = "firewall-public-ip-config"
     subnet_id            = azurerm_subnet.firewall.id

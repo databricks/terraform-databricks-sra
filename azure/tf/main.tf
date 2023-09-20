@@ -20,7 +20,7 @@ module "spoke" {
 
   source = "./modules/azure_spoke"
 
-# Pass the required variables to the module
+  # Pass the required variables to the module
   prefix    = each.value.prefix
   vnet_cidr = each.value.cidr
   tags      = each.value.tags
