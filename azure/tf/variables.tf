@@ -35,6 +35,11 @@ variable "spoke_config" {
   description = "(Required) List of spoke configurations"
 }
 
+variable "test_vm_password" {
+  type        = string
+  description = "(Required) Password for the VM to be deployed in the hub for testing (in the absence of ExpressRoute etc.)"
+}
+
 variable "tags" {
   type        = map(string)
   description = "(Optional) Map of tags to attach to resources"

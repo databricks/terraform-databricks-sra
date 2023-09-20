@@ -5,8 +5,7 @@ locals {
 
 variable "test_vm_password" {
   type        = string
-  description = "(Optional) Password for the test VM"
-  default     = "changeMe123!"
+  description = "(Required) Password for the test VM"
 }
 
 resource "azurerm_subnet" "testvmsubnet" {

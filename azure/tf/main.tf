@@ -6,6 +6,7 @@ module "hub" {
   hub_resource_group_name = var.hub_resource_group_name
   hub_vnet_cidr           = var.hub_vnet_cidr
   public_repos            = var.public_repos
+  test_vm_password        = var.test_vm_password
   tags                    = var.tags
 }
 
@@ -13,8 +14,6 @@ module "spoke" {
   for_each = {
     for index, spoke in var.spoke_config : spoke.prefix => spoke
   }
-
-  # name = "${each.value.prefix}-spoke}"
 
   source = "./modules/azure_spoke"
 
