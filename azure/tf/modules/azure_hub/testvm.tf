@@ -1,7 +1,5 @@
 # Define the subnet for the test VM using cidrsubnet function
 locals {
-  testvm_subnet = cidrsubnet(var.hub_vnet_cidr, 30 - local.hub_cidr_prefix, 0)
-
   # Decode the JSON response from the ifconfig.co API to get the public IP address of the host machine
   ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
 }
@@ -17,7 +15,7 @@ resource "azurerm_subnet" "testvmsubnet" {
   name                 = "${local.prefix}-testvmsubnet"
   resource_group_name  = azurerm_resource_group.hub.name
   virtual_network_name = azurerm_virtual_network.this.name
-  address_prefixes     = [local.testvm_subnet]
+  address_prefixes     = [local.subnet_map["testvm"]]
 }
 
 # From https://github.com/databricks/terraform-databricks-examples/blob/main/modules/adb-with-private-links-exfiltration-protection/testvm.tf
@@ -84,7 +82,7 @@ resource "azurerm_public_ip" "testvmpublicip" {
 
 # Create a Windows virtual machine resource for the test VM
 resource "azurerm_windows_virtual_machine" "testvm" {
-  name                = "${local.prefix}-test"
+  name                = "pl-test-vm"
   resource_group_name = azurerm_resource_group.hub.name
   location            = azurerm_resource_group.hub.location
   size                = "Standard_F4s_v2"

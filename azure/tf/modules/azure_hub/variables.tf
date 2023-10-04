@@ -29,6 +29,11 @@ variable "hub_vnet_cidr" {
   }
 }
 
+variable "subnet_map" {
+  type        = map(string)
+  description = "(Required) Map of subnet names to CIDR blocks"
+}
+
 # Define the variable "public_repos" with type list of strings and a description
 variable "public_repos" {
   type        = list(string)

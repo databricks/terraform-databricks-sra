@@ -24,16 +24,7 @@ locals {
   # Generate a prefix for naming resources by combining the hub resource group name and a random string
   prefix = replace(replace(lower("${var.hub_resource_group_name}${random_string.naming.result}"), "rg", ""), "-", "")
 
-  # Extract the CIDR prefix from the hub VNet CIDR
-  hub_cidr_prefix = split("/", var.hub_vnet_cidr)[1]
-
-  # Define a map to store subnets with their corresponding CIDR prefixes
-  subnets = {
-    "firewall" : cidrsubnet(var.hub_vnet_cidr, 26 - local.hub_cidr_prefix, 0)
-    "webauth-host" : cidrsubnet(var.hub_vnet_cidr, 26 - local.hub_cidr_prefix, 1)
-    "webauth-container" : cidrsubnet(var.hub_vnet_cidr, 26 - local.hub_cidr_prefix, 2)
-    "privatelink" : cidrsubnet(var.hub_vnet_cidr, 24 - local.hub_cidr_prefix, 0)
-  }
+  subnet_map = var.subnet_map
 }
 
 # Retrieve the current Azure client configuration
@@ -72,5 +63,5 @@ resource "azurerm_subnet" "privatelink" {
   resource_group_name  = azurerm_resource_group.hub.name
   virtual_network_name = azurerm_virtual_network.this.name
 
-  address_prefixes = [local.subnets["privatelink"]]
+  address_prefixes = [local.subnet_map["privatelink"]]
 }

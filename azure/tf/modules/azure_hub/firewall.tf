@@ -4,7 +4,7 @@ resource "azurerm_subnet" "firewall" {
   resource_group_name  = azurerm_resource_group.hub.name
   virtual_network_name = azurerm_virtual_network.this.name
 
-  address_prefixes = [local.subnets["firewall"]]
+  address_prefixes = [local.subnet_map["firewall"]]
 }
 
 # Define a public IP resource for the Azure Firewall
