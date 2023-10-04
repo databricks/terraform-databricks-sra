@@ -22,10 +22,10 @@ module "SRA" {
   region_name     = var.region_name
 
   // Account-level Variables
-  metastore_id          = null // Metastore Configuration - leave null if there is no existing regional metastore
-  ucname                = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket           = "< bucket name >"
-  data_access_user      = "< user email >"
+  metastore_id           = null // Metastore Configuration - leave null if there is no existing regional metastore
+  ucname                 = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
+  data_bucket            = "< bucket name >"
+  data_access_user       = "< user email >"
   enable_logging_boolean = true // Logging Configuration
 
   // Workspace-level Variables
