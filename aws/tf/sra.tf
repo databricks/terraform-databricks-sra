@@ -1,16 +1,19 @@
 module "SRA" {
   source = "./modules/sra"
+
   providers = {
     databricks.mws = databricks.mws
     aws            = aws
   }
 
-  // Regional parameters for PrivateLink and optional metastore FQDN: https://docs.databricks.com/en/resources/supported-regions.html
   // Authentication Variables
   databricks_account_id = var.databricks_account_id
   client_id             = var.client_id
   client_secret         = var.client_secret
   aws_account_id        = var.aws_account_id
+
+  // Optional CMK admin ARN configuration
+  cmk_admin_arn = null // If not required, the root user of the AWS account is used
 
   // Tags & Naming Variables
   resource_prefix = var.resource_prefix
@@ -19,14 +22,11 @@ module "SRA" {
   region_name     = var.region_name
 
   // Account-level Variables
-  // Metastore Configuration - leave null if there is no existing regional metastore
-  metastore_id = null
-  ucname       = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket  = "<bucket name>"
-  data_access  = "<identity like user or group>"
-
-  // Logging Configuration - set to false if no logging configuration exists
-  enable_logging_boolean = false
+  metastore_id          = null // Metastore Configuration - leave null if there is no existing regional metastore
+  ucname                = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
+  data_bucket           = "< bucket name >"
+  data_access_user      = "< user email >"
+  enable_logging_boolean = true // Logging Configuration
 
   // Workspace-level Variables
   dbfsname                 = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
@@ -41,18 +41,24 @@ module "SRA" {
   relay_vpce_service       = "com.amazonaws.vpce.us-east-1.vpce-svc-00018a8c3ff62ffdf"
   workspace_vpce_service   = "com.amazonaws.vpce.us-east-1.vpce-svc-09143d1e626de2f04"
 
-  // Ip Access Lists - disabled by default, set to appropriate corporate egress IPs if enabled
-  ip_addresses = ["1.1.1.1", "1.2.3.0/24", "1.2.5.0/24"]
+  // Optional - IP Access Lists - Set to True to Enable
+  enable_ip_boolean = false
+  ip_addresses      = ["X.X.X.X", "X.X.X.X/XX", "X.X.X.X/XX"] // WARNING: Please validate that IPs entered are correct, recommend setting a break glass IP in case of a lockout
 
-  // AWS Firewall - set to true if you'd like to create an egress AWS Network Firewall
-  // WARNING: This product does incur uptime charges
-  enable_firewall_boolean     = false
+  // Optional - Cluster Example - Set to True to Enable
+  enable_cluster_boolean = false // WARNING: Clusters will spin-up Databricks clusters and AWS EC2 instances
+
+  // Optional - Security Analysis Tool - Set to True to Enable
+  enable_sat_boolean          = false // WARNING: SAT spins-up corresponding jobs and clusters. More information here: https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main
+  databricks_account_username = "string"
+  databricks_account_password = "string"
+
+  // Optional - Restrictive Root Bucket Configuration - Set to True to Enable
+  enable_restrictive_root_bucket_boolean = false // WARNING: Restrictive Root Bucket is frequently updated, but may not take into considerations all new product offerings
+
+  // Optional - AWS Firewall Configuration - Set to True to Enable
+  enable_firewall_boolean     = false // WARNING: AWS Network Firewall has an associated uptime charge. More information here: https://aws.amazon.com/network-firewall/pricing/
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]
   firewall_allow_list         = [".pypi.org", ".pythonhosted.org", ".cran.r-project.org", "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com"]
   firewall_protocol_deny_list = "ICMP,FTP,SSH"
-
-  // Restrictive Root Bucket - set to true if you'd like to restrict the workspace root bucket
-  // WARNING: The restrictive root bucket is updated occassionally, however, this is no guarantee on full functionality with new workspace functionality
-  enable_restrictive_root_bucket_boolean = true
-
 }

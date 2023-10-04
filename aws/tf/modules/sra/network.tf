@@ -1,4 +1,5 @@
 // EXPLANATION: Create the customer managed-vpc and security group rules
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.1.1"
@@ -21,7 +22,6 @@ module "vpc" {
 
   intra_subnet_names = [for az in var.availability_zones : format("%s-privatelink-%s", var.resource_prefix, az)]
   intra_subnets      = var.privatelink_subnets_cidr
-
 }
 
 // SG

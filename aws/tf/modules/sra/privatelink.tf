@@ -19,11 +19,7 @@ module "vpc_endpoints" {
     sts = {
       service             = "sts"
       private_dns_enabled = true
-      # subnet_ids = [
-      #   module.vpc.private_subnets[2],
-      #   module.vpc.private_subnets[3]
-      # ]
-      subnet_ids = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
+      subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
       tags = {
         Name = "${var.resource_prefix}-sts-vpc-endpoint"
       }
@@ -31,11 +27,7 @@ module "vpc_endpoints" {
     kinesis-streams = {
       service             = "kinesis-streams"
       private_dns_enabled = true
-      # subnet_ids = [
-      #   module.vpc.private_subnets[2],
-      #   module.vpc.private_subnets[3]
-      # ]
-      subnet_ids = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
+      subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
       tags = {
         Name = "${var.resource_prefix}-kinesis-vpc-endpoint"
       }
@@ -93,10 +85,6 @@ resource "aws_vpc_endpoint" "backend_rest" {
   service_name       = var.workspace_vpce_service
   vpc_endpoint_type  = "Interface"
   security_group_ids = [aws_security_group.privatelink.id]
-  # subnet_ids = [
-  #   module.vpc.private_subnets[2],
-  #   module.vpc.private_subnets[3]
-  # ]
   subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
@@ -111,10 +99,6 @@ resource "aws_vpc_endpoint" "backend_relay" {
   service_name       = var.relay_vpce_service
   vpc_endpoint_type  = "Interface"
   security_group_ids = [aws_security_group.privatelink.id]
-  # subnet_ids = [
-  #   module.vpc.private_subnets[2],
-  #   module.vpc.private_subnets[3]
-  # ]
   subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]

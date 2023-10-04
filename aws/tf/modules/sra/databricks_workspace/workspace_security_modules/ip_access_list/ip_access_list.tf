@@ -9,8 +9,6 @@ resource "databricks_workspace_conf" "this" {
 resource "databricks_ip_access_list" "allowed-list" {
   label     = "allow_in"
   list_type = "ALLOW"
-  ip_addresses = [
-    var.ip_addresses
-  ]
+  ip_addresses = var.ip_addresses
   depends_on = [databricks_workspace_conf.this]
 }

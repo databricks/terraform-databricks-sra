@@ -1,34 +1,42 @@
+variable "aws_account_id" {
+  description = "ID of the AWS account."
+  type        = string
+}
+
 variable "client_id" {
-  type      = string
-  sensitive = true
+  description = "Client ID for authentication."
+  type        = string
+  sensitive   = true
 }
 
 variable "client_secret" {
-  type      = string
-  sensitive = true
+  description = "Secret key for the client ID."
+  type        = string
+  sensitive   = true
 }
 
 variable "databricks_account_id" {
-  type      = string
-  sensitive = true
-}
-
-variable "aws_account_id" {
-  type = string
+  description = "ID of the Databricks account."
+  type        = string
+  sensitive   = true
 }
 
 variable "region" {
-  type = string
+  description = "AWS region code."
+  type        = string
 }
 
 variable "region_name" {
-  type = string
+  description = "Name of the AWS region."
+  type        = string
 }
 
 variable "resource_owner" {
-  type = string
+  description = "Owner of the resource."
+  type        = string
 }
 
 variable "resource_prefix" {
-  type = string
+  description = "Prefix for the resource names."
+  type        = string
 }
