@@ -42,7 +42,6 @@ module "uc_assignment" {
   ]
 }
 
-
 // Create Databricks Workspace
 module "databricks_mws_workspace" {
   source = "./databricks_account/workspace"
@@ -64,4 +63,33 @@ module "databricks_mws_workspace" {
   workspace_storage_key       = aws_kms_key.workspace_storage.arn
   managed_storage_key_alias   = aws_kms_alias.managed_storage_key_alias.name
   workspace_storage_key_alias = aws_kms_alias.workspace_storage_key_alias.name
+}
+
+// Service Principal
+module "service_principal" {
+  source = "./databricks_account/service_principal"
+  providers = {
+    databricks = databricks.mws
+  }
+
+  created_workspace_id = module.databricks_mws_workspace.workspace_id
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
+}
+
+// User Assignment
+module "user_assignment" {
+  source = "./databricks_account/user_assignment"
+  providers = {
+    databricks = databricks.mws
+  }
+
+  created_workspace_id = module.databricks_mws_workspace.workspace_id
+  data_access          = var.data_access_user
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
 }

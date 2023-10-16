@@ -11,7 +11,7 @@ module "uc_storage" {
   aws_account_id        = var.aws_account_id
   resource_prefix       = var.resource_prefix
   data_bucket           = var.data_bucket
-  data_access           = var.data_access
+  data_access_user      = var.data_access_user
 
   depends_on = [
     module.databricks_mws_workspace, module.uc_assignment
@@ -21,18 +21,6 @@ module "uc_storage" {
 // Workspace Admin Configuration
 module "admin_configuration" {
   source = "./databricks_workspace/workspace_security_modules/admin_configuration"
-  providers = {
-    databricks = databricks.created_workspace
-  }
-
-  depends_on = [
-    module.databricks_mws_workspace
-  ]
-}
-
-// Service Principal
-module "service_principal" {
-  source = "./databricks_workspace/workspace_security_modules/service_principal"
   providers = {
     databricks = databricks.created_workspace
   }
@@ -67,48 +55,51 @@ module "secret_management" {
 }
 
 // IP Access Lists - Optional
-# module "ip_access_list" {
-#     source = "./databricks_workspace/workspace_security_modules/ip_access_list"
-#     providers = {
-#       databricks = databricks.created_workspace
-#     }
+module "ip_access_list" {
+  source = "./databricks_workspace/workspace_security_modules/ip_access_list"
+  count  = var.enable_ip_boolean ? 1 : 0
+  providers = {
+    databricks = databricks.created_workspace
+  }
 
-#   ip_addresses = var.ip_addresses
+  ip_addresses = var.ip_addresses
 
-#   depends_on = [
-#     module.databricks_mws_workspace
-#     ]
-# }
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
+}
 
 // Create Create Cluster - Optional
-# module "cluster_configuration" {
-#     source = "./databricks_workspace/workspace_security_modules/cluster_configuration"
-#     providers = {
-#       databricks = databricks.created_workspace
-#     }
+module "cluster_configuration" {
+  source = "./databricks_workspace/workspace_security_modules/cluster_configuration"
+  count  = var.enable_cluster_boolean ? 1 : 0
+  providers = {
+    databricks = databricks.created_workspace
+  }
 
-#   secret_config_reference   = module.secret_management.config_reference
-#   resource_prefix           = var.resource_prefix
-#   depends_on                = [
-#     module.databricks_mws_workspace, module.secret_management
-#     ]
-# }
+  secret_config_reference = module.secret_management.config_reference
+  resource_prefix         = var.resource_prefix
+  depends_on = [
+    module.databricks_mws_workspace, module.secret_management
+  ]
+}
 
 // SAT Implementation - Optional
-# module "security_analysis_tool" {
-#     source = "./databricks_workspace/security_analysis_tool/aws"
-#     providers = {
-#       databricks = databricks.created_workspace
-#     }
+module "security_analysis_tool" {
+  source = "./databricks_workspace/security_analysis_tool/aws"
+  count  = var.enable_sat_boolean ? 1 : 0
+  providers = {
+    databricks = databricks.created_workspace
+  }
 
-#   databricks_url     = module.databricks_mws_workspace.workspace_url
-#   workspace_PAT      = module.service_principal.service_principal_id
-#   workspace_id       = module.databricks_mws_workspace.workspace_id
-#   account_console_id = var.databricks_account_id
-#   account_user       = var.databricks_account_username
-#   account_pass       = var.databricks_account_password
+  databricks_url     = module.databricks_mws_workspace.workspace_url
+  workspace_PAT      = module.service_principal.service_principal_id
+  workspace_id       = module.databricks_mws_workspace.workspace_id
+  account_console_id = var.databricks_account_id
+  account_user       = var.databricks_account_username
+  account_pass       = var.databricks_account_password
 
-#   depends_on                = [
-#     module.databricks_mws_workspace, module.service_principal
-#     ]
-# }
+  depends_on = [
+    module.databricks_mws_workspace, module.service_principal
+  ]
+}

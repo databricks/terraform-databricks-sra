@@ -1,4 +1,5 @@
 // EXPLANATION: Create the workspace root bucket
+
 resource "aws_s3_bucket" "root_storage_bucket" {
   bucket        = var.dbfsname
   force_destroy = true

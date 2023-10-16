@@ -40,6 +40,20 @@ In various `.tf` scripts, we have included direct links to the Databricks Terraf
 
 - **Cluster Tags and Pool Tags**: [Cluster and pool tags](https://docs.databricks.com/administration-guide/account-settings/usage-detail-tags-aws.html) allow customers to monitor cost and accurately attribute Databricks usage to your organization's business unit and teams (for chargebacks, for examples). These tags propagate both to detailed DBU usage reports and to AWS EC2 and AWS EBS instances for cost analysis.
 
+## Optional Deployment Configurations
+
+- **Audit and Billable Usage Logs**: Audit and Billable Usage Logs can be enabled twice across a Databricks account. If your account has logging configured, you can set this parameter to false, so that another logging configuration is created.
+
+- **IP Access Lists**: IP Access can be enabled to only allow a subset of IPs to access the Databricks workspace console. **NOTE:** Please verify all of the IPs are correct prior to enabling this feature to prevent a lockout scenario.
+
+- **Cluster Example**: An example of a cluster and a cluster policy has been included. **NOTE:** Please be aware this will create a cluster within your Databricks workspace including the underlying EC2 instance.
+
+- **Security Analysis Tool (SAT)**: The Security Analysis Tool analyzes customer's Databricks account and workspace security configurations and provides recommendations that can help them follow Databricks' security best practices. This can be enabled into the workspace that is being created. **NOTE:** Please be aware this creates a cluster, a job, and a dashboard within your environment. 
+
+- **Enable Restrictive Root Bucket**: A restrictive root bucket policy can be applied to the root bucket of the workspace. **NOTE:** Please be aware this bucket is updated frequently, however, may not contain prefixes for the latest product releases.
+
+- **AWS Network Firewall**: A AWS Network firewall can be added into the deployment with a specific allow list included.  **NOTE:** Please be aware the AWS Network firewall's cost is associated with its uptime.
+
 ## Additional Security Recommendations and Opportunities
 
 In this section, we break down additional security recommendations and opportunities to maintain a strong security posture that either cannot be configured into this Terraform script or is very specific to individual customers (e.g. SCIM, SSO, Front-End PrivateLink, etc.)
@@ -68,7 +82,7 @@ In this section, we break down additional security recommendations and opportuni
 1. Run `terraform apply -var-file ../example.tfvars`
 
 ## Network Diagram - Standard
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/aws/aws/img/Standard%20-%20Network%20Topology.png)
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Standard%20-%20Network%20Topology.png)
 
 ## Network Diagram - Optional Firewall
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/aws/aws/img/Optional%20Firewall%20-%20Network%20Topology.png)
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Optional%20Firewall%20-%20Network%20Topology.png)
