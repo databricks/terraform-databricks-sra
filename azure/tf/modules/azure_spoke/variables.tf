@@ -88,3 +88,21 @@ variable "tags" {
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
 }
+
+variable "databricks_app_object_id" {
+  type        = string
+  description = "(Required) The object ID of the AzureDatabricks App Registration"
+}
+
+variable "hub_private_link_info" {
+  type = object({
+    dns_zone_id = string
+    subnet_id   = string
+  })
+  description = "(Required) Hub Private link information"
+}
+
+variable "tenant_id" {
+  type        = string
+  description = "(Required) The tenant ID for the Azure subscription"
+}

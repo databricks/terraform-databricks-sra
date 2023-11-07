@@ -19,3 +19,5 @@
 ## Future State/Enhancements
 
 - [ ] HA/DR (w/optionality on spokes?)
+- [ ] Workspace mangement lock on webauth workspace
+- [ ] Make UC storage account public access disabled - at the moment it means the Terraform 403's when trying to create storage container

@@ -13,10 +13,10 @@ locals {
   resource_regex = "/subscriptions/(.+)/resourceGroups/(.+)"
 
   # Extract the subscription ID using the regular expression pattern
-  subscription_id = regex(local.resource_regex, azurerm_resource_group.hub.id)[0]
+  subscription_id = regex(local.resource_regex, azurerm_resource_group.this.id)[0]
 
   # Extract the resource group using the regular expression pattern
-  resource_group = regex(local.resource_regex, azurerm_resource_group.hub.id)[1]
+  resource_group = regex(local.resource_regex, azurerm_resource_group.this.id)[1]
 
   # Get the tenant ID from the current Azure client configuration
   tenant_id = data.azurerm_client_config.current.tenant_id
@@ -38,29 +38,28 @@ resource "random_string" "naming" {
 }
 
 # Create the hub resource group
-resource "azurerm_resource_group" "hub" {
+resource "azurerm_resource_group" "this" {
   name     = var.hub_resource_group_name
   location = var.location
-}
-
-# Create the webauth resource group
-resource "azurerm_resource_group" "webauth" {
-  name     = "${var.location}-webauthrg"
-  location = var.location
+  tags     = var.tags
 }
 
 # Create the hub virtual network
 resource "azurerm_virtual_network" "this" {
   name                = var.hub_vnet_name
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.hub_vnet_cidr]
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Create the privatelink subnet
 resource "azurerm_subnet" "privatelink" {
   name                 = "hub-privatelink"
-  resource_group_name  = azurerm_resource_group.hub.name
+  resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
 
   address_prefixes = [local.subnet_map["privatelink"]]

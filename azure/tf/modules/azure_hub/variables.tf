@@ -46,3 +46,8 @@ variable "tags" {
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
 }
+
+variable "client_secret" {
+  type        = string
+  description = "(Required) The client secret for the service principal"
+}

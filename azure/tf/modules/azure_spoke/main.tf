@@ -33,6 +33,10 @@ resource "azurerm_virtual_network" "this" {
   address_space       = [var.vnet_cidr]
 
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Create a network security group
@@ -42,6 +46,10 @@ resource "azurerm_network_security_group" "this" {
   resource_group_name = azurerm_resource_group.this.name
 
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Associate the container subnet with the network security group
@@ -105,7 +113,7 @@ resource "azurerm_subnet" "privatelink" {
   name                                      = "${var.prefix}-privatelink"
   resource_group_name                       = azurerm_resource_group.this.name
   virtual_network_name                      = azurerm_virtual_network.this.name
-  private_endpoint_network_policies_enabled = false
+  private_endpoint_network_policies_enabled = true
 
   address_prefixes = [local.subnets["privatelink"]]
 }

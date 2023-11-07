@@ -13,7 +13,7 @@ variable "test_vm_password" {
 # Create a subnet resource for the test VM
 resource "azurerm_subnet" "testvmsubnet" {
   name                 = "${local.prefix}-testvmsubnet"
-  resource_group_name  = azurerm_resource_group.hub.name
+  resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = [local.subnet_map["testvm"]]
 }
@@ -22,8 +22,8 @@ resource "azurerm_subnet" "testvmsubnet" {
 # Create a network interface resource for the test VM
 resource "azurerm_network_interface" "testvmnic" {
   name                = "${local.prefix}-testvm-nic"
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
 
   ip_configuration {
     name                          = "testvmip"
@@ -36,8 +36,8 @@ resource "azurerm_network_interface" "testvmnic" {
 # Create a network security group resource for the test VM
 resource "azurerm_network_security_group" "testvm-nsg" {
   name                = "${local.prefix}-testvm-nsg"
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
   tags                = var.tags
 }
 
@@ -68,14 +68,14 @@ resource "azurerm_network_security_rule" "this" {
   source_address_prefixes     = [local.ifconfig_co_json.ip]
   destination_address_prefix  = "VirtualNetwork"
   network_security_group_name = azurerm_network_security_group.testvm-nsg.name
-  resource_group_name         = azurerm_resource_group.hub.name
+  resource_group_name         = azurerm_resource_group.this.name
 }
 
 # Create a public IP address resource for the test VM
 resource "azurerm_public_ip" "testvmpublicip" {
   name                = "${local.prefix}-vmpublicip"
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -83,8 +83,8 @@ resource "azurerm_public_ip" "testvmpublicip" {
 # Create a Windows virtual machine resource for the test VM
 resource "azurerm_windows_virtual_machine" "testvm" {
   name                = "pl-test-vm"
-  resource_group_name = azurerm_resource_group.hub.name
-  location            = azurerm_resource_group.hub.location
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
   size                = "Standard_F4s_v2"
   admin_username      = "azureuser"
   admin_password      = var.test_vm_password
@@ -102,6 +102,10 @@ resource "azurerm_windows_virtual_machine" "testvm" {
     offer     = "windows-10"
     sku       = "19h2-pro-g2"
     version   = "latest"
+  }
+
+  lifecycle {
+    ignore_changes = [tags]
   }
 }
 

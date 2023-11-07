@@ -1,3 +1,7 @@
+variable "databricks_account_id" {
+  type        = string
+  description = "(Required) The Databricks account ID target for account-level operations"
+}
 variable "location" {
   type        = string
   description = "(Required) The location for the hub and spoke deployment"
@@ -44,4 +48,14 @@ variable "tags" {
   type        = map(string)
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
+}
+
+variable "client_secret" {
+  type        = string
+  description = "(Required) The client secret for the service principal"
+}
+
+variable "databricks_app_object_id" {
+  type        = string
+  description = "(Required) The object ID of the AzureDatabricks App Registration"
 }
