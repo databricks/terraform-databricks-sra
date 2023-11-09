@@ -1,10 +1,11 @@
 # Why do `key_opts` and `key_permissions` differ in terms of required capitalization?
 # Define the Azure Key Vault resource
 resource "azurerm_key_vault" "example" {
-  name                = "example-hub-keyvault"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  tenant_id           = local.tenant_id
+  name                     = "example-hub-keyvault"
+  location                 = azurerm_resource_group.this.location
+  resource_group_name      = azurerm_resource_group.this.name
+  tenant_id                = local.tenant_id
+  purge_protection_enabled = true
   # enable_rbac_authorization = true
 
   sku_name = "premium"

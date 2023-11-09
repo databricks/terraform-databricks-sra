@@ -22,6 +22,10 @@ resource "azurerm_databricks_workspace" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Define an Azure Key Vault access policy for Databricks

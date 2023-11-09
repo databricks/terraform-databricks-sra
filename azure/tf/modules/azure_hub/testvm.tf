@@ -31,6 +31,10 @@ resource "azurerm_network_interface" "testvmnic" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.testvmpublicip.id
   }
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Create a network security group resource for the test VM
@@ -39,6 +43,10 @@ resource "azurerm_network_security_group" "testvm-nsg" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   tags                = var.tags
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Associate the network security group with the network interface of the test VM
@@ -78,6 +86,10 @@ resource "azurerm_public_ip" "testvmpublicip" {
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
   sku                 = "Standard"
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Create a Windows virtual machine resource for the test VM
