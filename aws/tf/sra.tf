@@ -19,7 +19,7 @@ module "SRA" {
   resource_prefix = var.resource_prefix
   resource_owner  = var.resource_owner
   region          = var.region
-  region_name     = var.region_name
+  region_name     = var.region_name[var.region]
 
   // Account-level Variables
   metastore_id           = null // Metastore Configuration - leave null if there is no existing regional metastore
@@ -34,12 +34,12 @@ module "SRA" {
   private_subnets_cidr     = ["10.0.16.0/22", "10.0.24.0/22"]
   privatelink_subnets_cidr = ["10.0.32.0/26", "10.0.32.64/26"]
   public_subnets_cidr      = ["10.0.32.128/26", "10.0.32.192/26"]
-  availability_zones       = ["us-east-1a", "us-east-1b"]
-  sg_egress_ports          = [443, 3306, 6666]
+  availability_zones       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
+  sg_egress_ports          = [443, 2443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
   sg_ingress_protocol      = ["tcp", "udp"]
   sg_egress_protocol       = ["tcp", "udp"]
-  relay_vpce_service       = "com.amazonaws.vpce.us-east-1.vpce-svc-00018a8c3ff62ffdf"
-  workspace_vpce_service   = "com.amazonaws.vpce.us-east-1.vpce-svc-09143d1e626de2f04"
+  relay_vpce_service       = var.scc_relay[var.region]
+  workspace_vpce_service   = var.workspace[var.region]
 
   // Optional - IP Access Lists - Set to True to Enable
   enable_ip_boolean = false
