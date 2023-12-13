@@ -2,6 +2,8 @@ terraform {
   required_providers {
     databricks = {
       source = "databricks/databricks"
+      #version = "~> 1.29.0"
+      #current OIDC error in 1.31, uncomment above if you see error
     }
     aws = {
       source = "hashicorp/aws"

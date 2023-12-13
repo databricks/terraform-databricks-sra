@@ -52,6 +52,14 @@ resource "aws_security_group" "privatelink" {
 
   ingress {
     description     = "Inbound rules"
+    from_port       = 2443
+    to_port         = 2443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg.id]
+  }
+
+  ingress {
+    description     = "Inbound rules"
     from_port       = 6666
     to_port         = 6666
     protocol        = "tcp"
@@ -62,6 +70,14 @@ resource "aws_security_group" "privatelink" {
     description     = "Outbound rules"
     from_port       = 443
     to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg.id]
+  }
+
+  egress {
+    description     = "Outbound rules"
+    from_port       = 2443
+    to_port         = 2443
     protocol        = "tcp"
     security_groups = [aws_security_group.sg.id]
   }
