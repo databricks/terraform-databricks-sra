@@ -1,6 +1,10 @@
 // EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 
+
+// Skipped in custom operation mode
 module "vpc_endpoints" {
+  count = var.operation_mode != "custom" ? 1 : 0
+
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "3.11.0"
 
@@ -38,8 +42,10 @@ module "vpc_endpoints" {
   ]
 }
 
-// PrivateLink Security Group
+// Skipped in custom operation mode
 resource "aws_security_group" "privatelink" {
+  count = var.operation_mode != "custom" ? 1 : 0
+
   vpc_id = module.vpc.vpc_id
 
   ingress {
@@ -95,8 +101,10 @@ resource "aws_security_group" "privatelink" {
   }
 }
 
-// Databricks REST API endpoint
+// Databricks REST endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "backend_rest" {
+  count = var.operation_mode != "custom" ? 1 : 0
+
   vpc_id              = module.vpc.vpc_id
   service_name        = var.workspace_vpce_service
   vpc_endpoint_type   = "Interface"
@@ -109,8 +117,10 @@ resource "aws_vpc_endpoint" "backend_rest" {
   }
 }
 
-// Databricks SCC endpoint
+// Databricks SCC endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "backend_relay" {
+  count = var.operation_mode != "custom" ? 1 : 0
+
   vpc_id              = module.vpc.vpc_id
   service_name        = var.relay_vpce_service
   vpc_endpoint_type   = "Interface"

@@ -137,6 +137,9 @@ resource "aws_networkfirewall_rule_group" "databricks_fqdn_allowlist" {
   name     = "${var.resource_prefix}-${var.region}-databricks-fqdn-allowlist"
   type     = "STATEFUL"
   rule_group {
+    stateful_rule_options {
+      rule_order = "STRICT_ORDER"
+    }
     rules_source {
       rules_source_list {
         generated_rules_type = "ALLOWLIST"
@@ -158,63 +161,78 @@ resource "aws_networkfirewall_rule_group" "databricks_fqdn_allowlist" {
   }
 }
 
-// Protocol Deny LIst
-resource "aws_networkfirewall_rule_group" "databricks_protocol_denylist" {
+// Data for IP allow list
+data "external" "metastore_ip" {
+  program = ["sh", "${path.module}/metastore_ip.sh"]
+
+  query = {
+    metastore_domain = var.hive_metastore_fqdn
+  }
+}
+
+
+// JDBC Firewall group IP allow list
+resource "aws_networkfirewall_rule_group" "databricks_metastore_allowlist" {
   capacity = 100
-  name     = "${var.resource_prefix}-databricks-protocol-denylist"
+  name     = "${var.resource_prefix}-${var.region}-databricks-metastore-allowlist"
   type     = "STATEFUL"
   rule_group {
-    rule_variables {
-      ip_sets {
-        key = "HOME_NET"
-        ip_set {
-          definition = [var.vpc_cidr_range]
-        }
-      }
+    stateful_rule_options {
+      rule_order = "STRICT_ORDER"
     }
     rules_source {
-      dynamic "stateful_rule" {
-        for_each = var.firewall_protocol_deny_list
-        content {
-          action = "DROP"
-          header {
-            destination      = "ANY"
-            destination_port = "ANY"
-            protocol         = stateful_rule.value
-            direction        = "ANY"
-            source_port      = "ANY"
-            source           = "ANY"
-          }
-          rule_option {
-            keyword = "sid:${stateful_rule.key + 1}"
-          }
+      stateful_rule {
+        action = "PASS"
+        header {
+          destination      = "${data.external.metastore_ip.result["ip"]}"
+          destination_port = 3306
+          direction        = "FORWARD"
+          protocol         = "TCP"
+          source           = "ANY"
+          source_port      = "ANY"
+        }
+        rule_option {
+          keyword  = "sid"
+          settings = ["1"]
         }
       }
     }
   }
   tags = {
-    Name = "${var.resource_prefix}-databricks-protocol-denylist"
-  }
+    Name = "${var.resource_prefix}-${var.region}-databricks-metastore-allowlist"
+}
 }
 
-
-// NFW Policy
+# Firewall policy
 resource "aws_networkfirewall_firewall_policy" "databricks_nfw_policy" {
-  name = "${var.resource_prefix}-databricks-nfw-policy"
+  name = "${var.resource_prefix}-firewall-policy"
+
   firewall_policy {
+
+  stateful_engine_options {
+    rule_order = "STRICT_ORDER"
+    }
     stateless_default_actions          = ["aws:forward_to_sfe"]
     stateless_fragment_default_actions = ["aws:forward_to_sfe"]
+    stateful_default_actions           = ["aws:drop_established"]
+
     stateful_rule_group_reference {
+      priority = 1
       resource_arn = aws_networkfirewall_rule_group.databricks_fqdn_allowlist.arn
     }
+
     stateful_rule_group_reference {
-      resource_arn = aws_networkfirewall_rule_group.databricks_protocol_denylist.arn
+      priority = 2
+      resource_arn = aws_networkfirewall_rule_group.databricks_metastore_allowlist.arn
     }
+
   }
+
   tags = {
-    Name = "${var.resource_prefix}-${var.region}-databricks-nfw-policy"
+    Name = "${var.resource_prefix}-firewall-policy"
   }
 }
+
 
 // Firewall
 resource "aws_networkfirewall_firewall" "nfw" {

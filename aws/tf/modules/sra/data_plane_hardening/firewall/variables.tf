@@ -26,6 +26,10 @@ variable "firewall_allow_list" {
   type = list(string)
 }
 
+variable "hive_metastore_fqdn" {
+  type = string
+}
+
 variable "availability_zones" {
   type = list(string)
 }

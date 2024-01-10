@@ -1,4 +1,4 @@
-# Security Reference Architectures - Terraform Templates - Public Preview
+# Security Reference Architectures - Terraform Templates
 
 ## Project Overview
 
