@@ -23,20 +23,20 @@ module "SRA" {
   user_workspace_access  = ""
 
   // Account - Unity Catalog:
-  metastore_id           = null // Metastore configuration - leave null if there is no existing regional metastore
-  ucname                 = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket            = ""
-  user_data_access       = ""
+  metastore_id     = null // Metastore configuration - leave null if there is no existing regional metastore
+  ucname           = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
+  data_bucket      = ""
+  user_data_access = ""
 
   // Workspace - operation mode:
-  operation_mode         = "standard"  // Accepted values: standard, custom, firewall, or isolated
+  operation_mode = "standard" // Accepted values: standard, custom, firewall, or isolated
 
   // Workspace - AWS non-networking variables:
-  dbfsname                          = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
-  cmk_admin_arn                     = null   // If not provided, the root user of the AWS account is used
-  enable_cluster_boolean            = false  // WARNING: Clusters will spin-up Databricks clusters and AWS EC2 instances
-  workspace_service_principal_name  = "sra-example-sp"
-  
+  dbfsname                         = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
+  cmk_admin_arn                    = null  // If not provided, the root user of the AWS account is used
+  enable_cluster_boolean           = false // WARNING: Clusters will spin-up Databricks clusters and AWS EC2 instances
+  workspace_service_principal_name = "sra-example-sp"
+
   // Workspace - networking variables (optional if using custom operation mode):
   vpc_cidr_range           = "10.0.0.0/18"
   private_subnets_cidr     = ["10.0.16.0/22", "10.0.24.0/22"]
@@ -50,11 +50,11 @@ module "SRA" {
   workspace_vpce_service   = var.workspace[var.region]
 
   // Workspace - networking variables (required if using custom operation mode):
-  custom_vpc_id                   = "vpc_id"
-  custom_private_subnet_ids       = ["subnet_id_a", "subnet_id_b"]
-  custom_sg_id                    = ["sg_id_a"]
-  custom_relay_vpce_id            = "vpce_relay_id"
-  custom_workspace_vpce_id        = "vpce__workspace_id"
+  custom_vpc_id             = "vpc_id"
+  custom_private_subnet_ids = ["subnet_id_a", "subnet_id_b"]
+  custom_sg_id              = ["sg_id_a"]
+  custom_relay_vpce_id      = "vpce_relay_id"
+  custom_workspace_vpce_id  = "vpce__workspace_id"
 
   // Workspace - networking variables (required if using firewall operation mode):
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]
@@ -63,16 +63,16 @@ module "SRA" {
   hive_metastore_fqdn         = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com"
 
   // Workspace - restrictive AWS asset policies (optional):
-  enable_restrictive_root_bucket_boolean         = false 
-  enable_restrictive_s3_endpoint_boolean         = false
-  enable_restrictive_sts_endpoint_boolean        = false
-  enable_restrictive_kinesis_endpoint_boolean    = false
+  enable_restrictive_root_bucket_boolean      = false
+  enable_restrictive_s3_endpoint_boolean      = false
+  enable_restrictive_sts_endpoint_boolean     = false
+  enable_restrictive_kinesis_endpoint_boolean = false
 
   // Workspace - additional security features (optional): 
   enable_ip_boolean = false
   ip_addresses      = ["X.X.X.X", "X.X.X.X/XX", "X.X.X.X/XX"] // WARNING: Please validate that IPs entered are correct, recommend setting a break glass IP in case of a lockout
-  
+
   enable_sat_boolean          = false // WARNING: Security analysis tool spins-up jobs and clusters. More information here: https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main
   databricks_account_username = "string"
-  databricks_account_password = "string" 
+  databricks_account_password = "string"
 }

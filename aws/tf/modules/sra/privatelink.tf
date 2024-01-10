@@ -1,7 +1,200 @@
 // EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 
 
-// Skipped in custom operation mode
+// Restrictive S3 endpoint policy - only used if restrictive S3 endpoint policy is enabled
+data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
+  count = var.enable_restrictive_s3_endpoint_boolean ? 1 : 0
+
+  statement {
+    sid    = "Grant access to Databricks Root Bucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    resources = [
+      "arn:aws:s3:::${var.dbfsname}/*",
+      "arn:aws:s3:::${var.dbfsname}"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = ["414351767826"]
+    }
+
+    condition {
+      test     = "StringEqualsIfExists"
+      variable = "aws:SourceVpc"
+      values = [
+        module.vpc.vpc_id
+      ]
+    }
+  }
+
+  statement {
+    sid    = "Grant access to Databricks Unity Catalog Metastore Bucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    resources = [
+      "arn:aws:s3:::${var.ucname}/*",
+      "arn:aws:s3:::${var.ucname}"
+    ]
+  }
+
+  statement {
+    sid    = "Grant read-only access to Data Bucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    resources = [
+      "arn:aws:s3:::${var.data_bucket}/*",
+      "arn:aws:s3:::${var.data_bucket}"
+    ]
+  }
+
+  statement {
+    sid    = "Grant Databricks Read Access to Artifact and Data Buckets"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObjectVersion",
+      "s3:GetObject",
+      "s3:GetBucketLocation"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    resources = [
+      "arn:aws:s3:::databricks-prod-artifacts-${var.region}/*",
+      "arn:aws:s3:::databricks-prod-artifacts-${var.region}",
+      "arn:aws:s3:::databricks-datasets-${var.region_name}/*",
+      "arn:aws:s3:::databricks-datasets-${var.region_name}"
+    ]
+  }
+
+  statement {
+    sid    = "Grant access to Databricks Log Bucket"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    resources = [
+      "arn:aws:s3:::databricks-prod-storage-${var.region_name}/*",
+      "arn:aws:s3:::databricks-prod-storage-${var.region_name}"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = ["414351767826"]
+    }
+  }
+}
+
+// Restrictive STS endpoint policy - only used if restrictive STS endpoint policy is enabled
+data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
+  count = var.enable_restrictive_sts_endpoint_boolean ? 1 : 0
+
+  statement {
+    actions = [
+      "sts:AssumeRole",
+      "sts:GetAccessKeyInfo",
+      "sts:GetSessionToken",
+      "sts:DecodeAuthorizationMessage",
+      "sts:TagSession"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${var.aws_account_id}"]
+    }
+  }
+
+  statement {
+    actions = [
+      "sts:AssumeRole",
+      "sts:GetSessionToken",
+      "sts:TagSession"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::414351767826:user/databricks-datasets-readonly-user",
+        "414351767826"
+      ]
+    }
+  }
+}
+
+// Restrictive Kinesis endpoint policy - only used if restrictive Kinesis endpoint policy is enabled
+data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
+  statement {
+    actions = [
+      "kinesis:PutRecord",
+      "kinesis:PutRecords",
+      "kinesis:DescribeStream"
+    ]
+    effect    = "Allow"
+    resources = ["arn:aws:kinesis:${var.region}:414351767826:stream/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["414351767826"]
+    }
+  }
+}
+
+// VPC endpoint creation - Skipped in custom operation mode
 module "vpc_endpoints" {
   count = var.operation_mode != "custom" ? 1 : 0
 
@@ -16,6 +209,7 @@ module "vpc_endpoints" {
       service         = "s3"
       service_type    = "Gateway"
       route_table_ids = module.vpc.private_route_table_ids
+      policy          = var.enable_restrictive_s3_endpoint_boolean ? data.aws_iam_policy_document.s3_vpc_endpoint_policy.json : null
       tags = {
         Name = "${var.resource_prefix}-s3-vpc-endpoint"
       }
@@ -24,6 +218,7 @@ module "vpc_endpoints" {
       service             = "sts"
       private_dns_enabled = true
       subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
+      policy              = var.enable_restrictive_sts_endpoint_boolean ? data.aws_iam_policy_document.sts_vpc_endpoint_policy.json : null
       tags = {
         Name = "${var.resource_prefix}-sts-vpc-endpoint"
       }
@@ -32,6 +227,7 @@ module "vpc_endpoints" {
       service             = "kinesis-streams"
       private_dns_enabled = true
       subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
+      policy              = var.enable_restrictive_kinesis_endpoint_boolean ? data.aws_iam_policy_document.kinesis_vpc_endpoint_policy.json : null
       tags = {
         Name = "${var.resource_prefix}-kinesis-vpc-endpoint"
       }
@@ -42,7 +238,7 @@ module "vpc_endpoints" {
   ]
 }
 
-// Skipped in custom operation mode
+// Security group for privatelink - skipped in custom operation mode
 resource "aws_security_group" "privatelink" {
   count = var.operation_mode != "custom" ? 1 : 0
 

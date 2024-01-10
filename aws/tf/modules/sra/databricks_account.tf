@@ -88,8 +88,8 @@ module "user_assignment" {
     databricks = databricks.mws
   }
 
-  created_workspace_id      = module.databricks_mws_workspace.workspace_id
-  workspace_access          = var.user_workspace_access
+  created_workspace_id = module.databricks_mws_workspace.workspace_id
+  workspace_access     = var.user_workspace_access
 
   depends_on = [
     module.databricks_mws_workspace,
