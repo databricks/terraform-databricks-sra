@@ -25,8 +25,8 @@ module "SRA" {
   // Account - Unity Catalog:
   metastore_id     = null // Metastore configuration - leave null if there is no existing regional metastore
   ucname           = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket      = ""
-  user_data_access = ""
+  data_bucket      = "jd-test-bucket"
+  user_data_access = "jd.braun+awspsa@databricks.com"
 
   // Workspace - operation mode:
   operation_mode = "standard" // Accepted values: standard, custom, firewall, or isolated
@@ -50,11 +50,11 @@ module "SRA" {
   workspace_vpce_service   = var.workspace[var.region]
 
   // Workspace - networking variables (required if using custom operation mode):
-  custom_vpc_id             = "vpc_id"
-  custom_private_subnet_ids = ["subnet_id_a", "subnet_id_b"]
-  custom_sg_id              = ["sg_id_a"]
-  custom_relay_vpce_id      = "vpce_relay_id"
-  custom_workspace_vpce_id  = "vpce__workspace_id"
+  custom_vpc_id             =  null
+  custom_private_subnet_ids =  null // list of strings required
+  custom_sg_id              =  null 
+  custom_relay_vpce_id      =  null
+  custom_workspace_vpce_id  =  null
 
   // Workspace - networking variables (required if using firewall operation mode):
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]

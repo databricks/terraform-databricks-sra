@@ -8,11 +8,11 @@ module "harden_firewall" {
     aws = aws
   }
 
-  vpc_id                      = module.vpc.vpc_id
+  vpc_id                      = module.vpc[0].vpc_id
   vpc_cidr_range              = var.vpc_cidr_range
   public_subnets_cidr         = var.public_subnets_cidr
-  private_subnets_cidr        = module.vpc.private_subnets_cidr_blocks
-  private_subnet_rt           = module.vpc.private_route_table_ids
+  private_subnets_cidr        = module.vpc[0].private_subnets_cidr_blocks
+  private_subnet_rt           = module.vpc[0].private_route_table_ids
   firewall_subnets_cidr       = var.firewall_subnets_cidr
   firewall_allow_list         = var.firewall_allow_list
   firewall_protocol_deny_list = split(",", var.firewall_protocol_deny_list)

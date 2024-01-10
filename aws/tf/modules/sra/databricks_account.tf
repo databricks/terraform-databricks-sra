@@ -51,14 +51,14 @@ module "databricks_mws_workspace" {
 
   databricks_account_id       = var.databricks_account_id
   resource_prefix             = var.resource_prefix
-  security_group_ids          = var.custom_sg_id != null ? var.custom_sg_id : [aws_security_group.sg.id]
-  subnet_ids                  = var.custom_private_subnet_ids != null ? var.custom_private_subnet_ids : module.vpc.private_subnets
-  vpc_id                      = var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc.vpc_id
+  security_group_ids          = var.custom_sg_id != null ? [var.custom_sg_id] : [aws_security_group.sg[0].id]
+  subnet_ids                  = var.custom_private_subnet_ids != null ? var.custom_private_subnet_ids : module.vpc[0].private_subnets
+  vpc_id                      = var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id
   cross_account_role_arn      = aws_iam_role.cross_account_role.arn
   bucket_name                 = aws_s3_bucket.root_storage_bucket.id
   region                      = var.region
-  backend_rest                = var.custom_workspace_vpce_id != null ? var.custom_workspace_vpce_id : aws_vpc_endpoint.backend_rest.id
-  backend_relay               = var.custom_relay_vpce_id != null ? var.custom_relay_vpce_id : aws_vpc_endpoint.backend_relay.id
+  backend_rest                = var.custom_workspace_vpce_id != null ? var.custom_workspace_vpce_id : aws_vpc_endpoint.backend_rest[0].id
+  backend_relay               = var.custom_relay_vpce_id != null ? var.custom_relay_vpce_id : aws_vpc_endpoint.backend_relay[0].id
   managed_storage_key         = aws_kms_key.managed_storage.arn
   workspace_storage_key       = aws_kms_key.workspace_storage.arn
   managed_storage_key_alias   = aws_kms_alias.managed_storage_key_alias.name

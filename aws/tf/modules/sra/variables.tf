@@ -29,51 +29,27 @@ variable "client_secret" {
 variable "custom_private_subnet_ids" {
   type        = list(string)
   description = "List of custom private subnet IDs"
-
-  validation {
-    condition     = var.operation_mode != "custom" || length(var.custom_private_subnet_ids) > 0
-    error_message = "The custom_private_subnet_ids must be specified when operation_mode is 'custom'."
-  }
 }
 
 variable "custom_relay_vpce_id" {
   type        = string
   description = "Custom Relay VPC Endpoint ID"
-
-  validation {
-    condition     = var.operation_mode != "custom" || var.custom_relay_vpce_id != ""
-    error_message = "The custom_relay_vpce_id must be specified when operation_mode is 'custom'."
-  }
 }
 
-variable "custom_sg_id" {
-  type        = list(string)
-  description = "List of custom security group IDs"
 
-  validation {
-    condition     = var.operation_mode != "custom" || length(var.custom_sg_id) > 0
-    error_message = "The custom_sg_id must be specified when operation_mode is 'custom'."
-  }
+variable "custom_sg_id" {
+  type        = string
+  description = "Custom security group ID"
 }
 
 variable "custom_vpc_id" {
   type        = string
   description = "Custom VPC ID"
-
-  validation {
-    condition     = var.operation_mode != "custom" || var.custom_vpc_id != ""
-    error_message = "The custom_vpc_id must be specified when operation_mode is 'custom'."
-  }
 }
 
 variable "custom_workspace_vpce_id" {
   type        = string
   description = "Custom Workspace VPC Endpoint ID"
-
-  validation {
-    condition     = var.operation_mode != "custom" || var.custom_workspace_vpce_id != ""
-    error_message = "The custom_workspace_vpce_id must be specified when operation_mode is 'custom'."
-  }
 }
 
 
@@ -157,40 +133,20 @@ variable "enable_sat_boolean" {
 variable "firewall_allow_list" {
   description = "List of allowed firewall rules."
   type        = list(string)
-
-  validation {
-    condition     = var.operation_mode != "firewall" || length(var.firewall_allow_list) > 0
-    error_message = "The firewall_allow_list must be specified when operation_mode is 'firewall'."
-  }
 }
 
 variable "firewall_protocol_deny_list" {
   description = "Protocol list that the firewall should deny."
   type        = string
-
-  validation {
-    condition     = var.operation_mode != "firewall" || var.firewall_protocol_deny_list != ""
-    error_message = "The firewall_protocol_deny_list must be specified when operation_mode is 'firewall'."
-  }
 }
 
 variable "firewall_subnets_cidr" {
   description = "CIDR blocks for firewall subnets."
   type        = list(string)
-
-  validation {
-    condition     = var.operation_mode != "firewall" || length(var.firewall_subnets_cidr) > 0
-    error_message = "The firewall_subnets_cidr must be specified when operation_mode is 'firewall'."
-  }
 }
 
 variable "hive_metastore_fqdn" {
   type = string
-
-  validation {
-    condition     = var.operation_mode != "firewall" || length(var.hive_metastore_fqdn) > 0
-    error_message = "The hive_metastore_fqdn must be specified when operation_mode is 'firewall'."
-  }
 }
 
 variable "ip_addresses" {
@@ -209,7 +165,7 @@ variable "operation_mode" {
   description = "The type of network configuration."
 
   validation {
-    condition     = contains(["standard", "firewall", "custom", "isolated"], var.network_type)
+    condition     = contains(["standard", "firewall", "custom", "isolated"], var.operation_mode)
     error_message = "Invalid network type. Allowed values are: standard, firewall, custom, isolated."
   }
 }

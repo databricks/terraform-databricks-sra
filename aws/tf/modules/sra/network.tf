@@ -32,7 +32,7 @@ module "vpc" {
 resource "aws_security_group" "sg" {
   count = var.operation_mode != "custom" ? 1 : 0
 
-  vpc_id     = module.vpc.vpc_id
+  vpc_id     = module.vpc[0].vpc_id
   depends_on = [module.vpc]
 
   dynamic "ingress" {

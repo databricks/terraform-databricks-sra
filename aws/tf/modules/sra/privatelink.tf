@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       test     = "StringEqualsIfExists"
       variable = "aws:SourceVpc"
       values = [
-        module.vpc.vpc_id
+        module.vpc[0].vpc_id
       ]
     }
   }
@@ -178,6 +178,8 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
 
 // Restrictive Kinesis endpoint policy - only used if restrictive Kinesis endpoint policy is enabled
 data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
+  count = var.enable_restrictive_kinesis_endpoint_boolean ? 1 : 0
+
   statement {
     actions = [
       "kinesis:PutRecord",
@@ -201,15 +203,15 @@ module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "3.11.0"
 
-  vpc_id             = module.vpc.vpc_id
-  security_group_ids = [aws_security_group.sg.id]
+  vpc_id             =  module.vpc[0].vpc_id
+  security_group_ids = [aws_security_group.sg[0].id]
 
   endpoints = {
     s3 = {
       service         = "s3"
       service_type    = "Gateway"
-      route_table_ids = module.vpc.private_route_table_ids
-      policy          = var.enable_restrictive_s3_endpoint_boolean ? data.aws_iam_policy_document.s3_vpc_endpoint_policy.json : null
+      route_table_ids = module.vpc[0].private_route_table_ids
+      policy          = var.enable_restrictive_s3_endpoint_boolean ? data.aws_iam_policy_document.s3_vpc_endpoint_policy[0].json : null
       tags = {
         Name = "${var.resource_prefix}-s3-vpc-endpoint"
       }
@@ -217,8 +219,8 @@ module "vpc_endpoints" {
     sts = {
       service             = "sts"
       private_dns_enabled = true
-      subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
-      policy              = var.enable_restrictive_sts_endpoint_boolean ? data.aws_iam_policy_document.sts_vpc_endpoint_policy.json : null
+      subnet_ids          = length(module.vpc[0].intra_subnets) > 0 ? slice(module.vpc[0].intra_subnets, 0, min(2, length(module.vpc[0].intra_subnets))) : []
+      policy              = var.enable_restrictive_sts_endpoint_boolean ? data.aws_iam_policy_document.sts_vpc_endpoint_policy[0].json : null
       tags = {
         Name = "${var.resource_prefix}-sts-vpc-endpoint"
       }
@@ -226,8 +228,8 @@ module "vpc_endpoints" {
     kinesis-streams = {
       service             = "kinesis-streams"
       private_dns_enabled = true
-      subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
-      policy              = var.enable_restrictive_kinesis_endpoint_boolean ? data.aws_iam_policy_document.kinesis_vpc_endpoint_policy.json : null
+      subnet_ids          = length(module.vpc[0].intra_subnets) > 0 ? slice(module.vpc[0].intra_subnets, 0, min(2, length(module.vpc[0].intra_subnets))) : []
+      policy              = var.enable_restrictive_kinesis_endpoint_boolean ? data.aws_iam_policy_document.kinesis_vpc_endpoint_policy[0].json : null
       tags = {
         Name = "${var.resource_prefix}-kinesis-vpc-endpoint"
       }
@@ -242,14 +244,14 @@ module "vpc_endpoints" {
 resource "aws_security_group" "privatelink" {
   count = var.operation_mode != "custom" ? 1 : 0
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.vpc[0].vpc_id
 
   ingress {
     description     = "Inbound rules"
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"
-    security_groups = [aws_security_group.sg.id]
+    security_groups = [aws_security_group.sg[0].id]
   }
 
   ingress {
@@ -257,7 +259,7 @@ resource "aws_security_group" "privatelink" {
     from_port       = 2443
     to_port         = 2443
     protocol        = "tcp"
-    security_groups = [aws_security_group.sg.id]
+    security_groups = [aws_security_group.sg[0].id]
   }
 
   ingress {
@@ -265,7 +267,7 @@ resource "aws_security_group" "privatelink" {
     from_port       = 6666
     to_port         = 6666
     protocol        = "tcp"
-    security_groups = [aws_security_group.sg.id]
+    security_groups = [aws_security_group.sg[0].id]
   }
 
   egress {
@@ -273,7 +275,7 @@ resource "aws_security_group" "privatelink" {
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"
-    security_groups = [aws_security_group.sg.id]
+    security_groups = [aws_security_group.sg[0].id]
   }
 
   egress {
@@ -281,7 +283,7 @@ resource "aws_security_group" "privatelink" {
     from_port       = 2443
     to_port         = 2443
     protocol        = "tcp"
-    security_groups = [aws_security_group.sg.id]
+    security_groups = [aws_security_group.sg[0].id]
   }
 
   egress {
@@ -289,7 +291,7 @@ resource "aws_security_group" "privatelink" {
     from_port       = 6666
     to_port         = 6666
     protocol        = "tcp"
-    security_groups = [aws_security_group.sg.id]
+    security_groups = [aws_security_group.sg[0].id]
   }
 
   tags = {
@@ -301,11 +303,11 @@ resource "aws_security_group" "privatelink" {
 resource "aws_vpc_endpoint" "backend_rest" {
   count = var.operation_mode != "custom" ? 1 : 0
 
-  vpc_id              = module.vpc.vpc_id
+  vpc_id              = module.vpc[0].vpc_id
   service_name        = var.workspace_vpce_service
   vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.privatelink.id]
-  subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
+  security_group_ids  = [aws_security_group.privatelink[0].id]
+  subnet_ids          = length(module.vpc[0].intra_subnets) > 0 ? slice(module.vpc[0].intra_subnets, 0, min(2, length(module.vpc[0].intra_subnets))) : []
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
   tags = {
@@ -317,11 +319,11 @@ resource "aws_vpc_endpoint" "backend_rest" {
 resource "aws_vpc_endpoint" "backend_relay" {
   count = var.operation_mode != "custom" ? 1 : 0
 
-  vpc_id              = module.vpc.vpc_id
+  vpc_id              = module.vpc[0].vpc_id
   service_name        = var.relay_vpce_service
   vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.privatelink.id]
-  subnet_ids          = length(module.vpc.intra_subnets) > 0 ? slice(module.vpc.intra_subnets, 0, min(2, length(module.vpc.intra_subnets))) : []
+  security_group_ids  = [aws_security_group.privatelink[0].id]
+  subnet_ids          = length(module.vpc[0].intra_subnets) > 0 ? slice(module.vpc[0].intra_subnets, 0, min(2, length(module.vpc[0].intra_subnets))) : []
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
   tags = {

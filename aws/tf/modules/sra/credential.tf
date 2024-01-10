@@ -102,7 +102,7 @@ resource "aws_iam_role_policy" "cross_account" {
         ],
         "Condition" : {
           "StringEquals" : {
-            "ec2:vpc" : "arn:aws:ec2:${var.region}:${var.aws_account_id}:vpc/${module.vpc.vpc_id}"
+            "ec2:vpc" : "arn:aws:ec2:${var.region}:${var.aws_account_id}:vpc/${var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id}"
           }
         }
       },
@@ -203,10 +203,10 @@ resource "aws_iam_role_policy" "cross_account" {
           "ec2:RevokeSecurityGroupEgress",
           "ec2:RevokeSecurityGroupIngress"
         ],
-        "Resource" : "arn:aws:ec2:${var.region}:${var.aws_account_id}:security-group/${aws_security_group.sg.id}",
+        "Resource" : "arn:aws:ec2:${var.region}:${var.aws_account_id}:security-group/${var.custom_sg_id != null ? var.custom_sg_id : aws_security_group.sg[0].id}",
         "Condition" : {
           "StringEquals" : {
-            "ec2:vpc" : "arn:aws:ec2:${var.region}:${var.aws_account_id}:vpc/${module.vpc.vpc_id}"
+            "ec2:vpc" : "arn:aws:ec2:${var.region}:${var.aws_account_id}:vpc/${var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id}"
           }
         }
       },
