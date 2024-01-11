@@ -26,11 +26,31 @@ resource "databricks_mws_workspaces" "this" {
   }
 
   token {
-    comment = "Terraform"
+    comment = "Terraform generated PAT"
+    // 30 day token
+    lifetime_seconds = 2592000
   }
 
   # this makes sure that the NAT is created for outbound traffic before creating the workspace
   depends_on = [google_compute_router_nat.nat]
+}
+
+resource "databricks_workspace_conf" "this" {
+  provider = databricks.workspace
+  custom_config = {
+    "maxTokenLifetimeDays" = "30",
+    "enableIpAccessLists" = true
+  }
+  depends_on = [ databricks_mws_workspaces.this ]
+}
+
+resource "databricks_ip_access_list" "allowed-list" {
+  provider = databricks.workspace
+  label     = "allow_in"
+  list_type = "ALLOW"
+  ip_addresses = var.ip_addresses
+  
+  depends_on = [databricks_workspace_conf.this]
 }
 
 output "databricks_host" {

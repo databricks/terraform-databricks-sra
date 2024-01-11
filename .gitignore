@@ -49,3 +49,5 @@ terraform.rc
 # Nix/devshells
 .direnv*
 .envrc*
+
+*.hcl

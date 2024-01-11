@@ -1,31 +1,30 @@
 terraform {
   required_providers {
     databricks = {
-      source  = "databricks/databricks"
-      version = "1.8.0"
+      source = "databricks/databricks"
+      #version = "~> 1.29.0"
+      #current OIDC error in 1.31, uncomment above if you see error
     }
     aws = {
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
     }
   }
 }
 
 provider "aws" {
   region = var.region
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key  
   default_tags {
     tags = {
-    Owner = var.resource_owner
-    Resource = var.resource_prefix
+      Owner    = var.resource_owner
+      Resource = var.resource_prefix
     }
   }
 }
 
 provider "databricks" {
-  alias      = "mws"
-  host       = "https://accounts.cloud.databricks.com"
-  username   = var.databricks_account_username
-  password   = var.databricks_account_password
-  auth_type  =  "basic"
+  alias         = "mws"
+  host          = "https://accounts.cloud.databricks.com"
+  account_id    = var.databricks_account_id
+  client_id     = var.client_id
+  client_secret = var.client_secret
 }
