@@ -43,4 +43,11 @@ terraform.rc
 ./.idea
 ./.idea/*
 
+# Git Config
+.gitconfig
+
+# Nix/devshells
+.direnv*
+.envrc*
+
 *.hcl
