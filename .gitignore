@@ -45,3 +45,7 @@ terraform.rc
 
 # Git Config
 .gitconfig
+
+# Nix/devshells
+.direnv*
+.envrc*
