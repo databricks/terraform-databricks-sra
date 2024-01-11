@@ -11,7 +11,7 @@ module "uc_storage" {
   aws_account_id        = var.aws_account_id
   resource_prefix       = var.resource_prefix
   data_bucket           = var.data_bucket
-  data_access_user      = var.data_access_user
+  data_access_user      = var.user_data_access
 
   depends_on = [
     module.databricks_mws_workspace, module.uc_assignment

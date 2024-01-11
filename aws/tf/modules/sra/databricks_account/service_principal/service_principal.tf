@@ -1,7 +1,7 @@
 // Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/service_principal
 
 resource "databricks_service_principal" "sp" {
-  display_name         = "Example Terraform Service Principal"
+  display_name         = var.workspace_service_principal_name
   allow_cluster_create = true
 }
 

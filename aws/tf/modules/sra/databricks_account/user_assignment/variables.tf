@@ -2,6 +2,6 @@ variable "created_workspace_id" {
   type = string
 }
 
-variable "data_access" {
+variable "workspace_access" {
   type = string
 }

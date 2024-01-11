@@ -26,6 +26,33 @@ variable "client_secret" {
   sensitive   = true
 }
 
+variable "custom_private_subnet_ids" {
+  type        = list(string)
+  description = "List of custom private subnet IDs"
+}
+
+variable "custom_relay_vpce_id" {
+  type        = string
+  description = "Custom Relay VPC Endpoint ID"
+}
+
+
+variable "custom_sg_id" {
+  type        = string
+  description = "Custom security group ID"
+}
+
+variable "custom_vpc_id" {
+  type        = string
+  description = "Custom VPC ID"
+}
+
+variable "custom_workspace_vpce_id" {
+  type        = string
+  description = "Custom Workspace VPC Endpoint ID"
+}
+
+
 variable "databricks_account_id" {
   description = "ID of the Databricks account."
   type        = string
@@ -44,11 +71,6 @@ variable "databricks_account_username" {
   sensitive   = true
 }
 
-variable "data_access_user" {
-  description = "User to grant data access and workspace access."
-  type        = string
-}
-
 variable "data_bucket" {
   description = "S3 bucket for data storage."
   type        = string
@@ -61,12 +83,6 @@ variable "dbfsname" {
 
 variable "enable_cluster_boolean" {
   description = "Flag to enable cluster."
-  type        = bool
-  sensitive   = true
-}
-
-variable "enable_firewall_boolean" {
-  description = "Flag to enable firewall settings."
   type        = bool
   sensitive   = true
 }
@@ -89,6 +105,25 @@ variable "enable_restrictive_root_bucket_boolean" {
   sensitive   = true
 }
 
+variable "enable_restrictive_kinesis_endpoint_boolean" {
+  type        = bool
+  description = "Enable restrictive Kinesis endpoint boolean flag"
+  default     = false
+}
+
+variable "enable_restrictive_s3_endpoint_boolean" {
+  type        = bool
+  description = "Enable restrictive S3 endpoint boolean flag"
+  default     = false
+}
+
+variable "enable_restrictive_sts_endpoint_boolean" {
+  type        = bool
+  description = "Enable restrictive STS endpoint boolean flag"
+  default     = false
+}
+
+
 variable "enable_sat_boolean" {
   description = "Flag for a specific SAT (Service Access Token) configuration."
   type        = bool
@@ -110,6 +145,10 @@ variable "firewall_subnets_cidr" {
   type        = list(string)
 }
 
+variable "hive_metastore_fqdn" {
+  type = string
+}
+
 variable "ip_addresses" {
   description = "List of IP addresses to allow list."
   type        = list(string)
@@ -119,6 +158,16 @@ variable "metastore_id" {
   description = "ID for the Unity Catalog metastore."
   type        = string
   sensitive   = true
+}
+
+variable "operation_mode" {
+  type        = string
+  description = "The type of network configuration."
+
+  validation {
+    condition     = contains(["standard", "firewall", "custom", "isolated"], var.operation_mode)
+    error_message = "Invalid network type. Allowed values are: standard, firewall, custom, isolated."
+  }
 }
 
 variable "private_subnets_cidr" {
@@ -182,6 +231,16 @@ variable "ucname" {
   type        = string
 }
 
+variable "user_workspace_access" {
+  description = "User to grant admin workspace access."
+  type        = string
+}
+
+variable "user_data_access" {
+  description = "User to grant data access."
+  type        = string
+}
+
 variable "vpc_cidr_range" {
   description = "CIDR range for the VPC."
   type        = string
@@ -189,5 +248,10 @@ variable "vpc_cidr_range" {
 
 variable "workspace_vpce_service" {
   description = "VPCE service for the workspace REST API endpoint."
+  type        = string
+}
+
+variable "workspace_service_principal_name" {
+  description = "Service principle name"
   type        = string
 }
