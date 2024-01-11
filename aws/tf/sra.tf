@@ -19,17 +19,17 @@ module "SRA" {
   resource_owner  = var.resource_owner
 
   // Account - general
-  enable_logging_boolean = false // Logging configuration - set to false if a logging configuration currently exists
+  enable_logging_boolean = true // Logging configuration - set to false if a logging configuration currently exists
   user_workspace_access  = ""
 
   // Account - Unity Catalog:
   metastore_id     = null // Metastore configuration - leave null if there is no existing regional metastore
   ucname           = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket      = "jd-test-bucket"
-  user_data_access = "jd.braun+awspsa@databricks.com"
+  data_bucket      = ""
+  user_data_access = ""
 
   // Workspace - operation mode:
-  operation_mode = "standard" // Accepted values: standard, custom, firewall, or isolated
+  operation_mode = "custom" // Accepted values: standard, custom, firewall, or isolated
 
   // Workspace - AWS non-networking variables:
   dbfsname                         = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
@@ -52,7 +52,7 @@ module "SRA" {
   // Workspace - networking variables (required if using custom operation mode):
   custom_vpc_id             =  null
   custom_private_subnet_ids =  null // list of strings required
-  custom_sg_id              =  null 
+  custom_sg_id              =  null
   custom_relay_vpce_id      =  null
   custom_workspace_vpce_id  =  null
 

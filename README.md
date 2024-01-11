@@ -1,4 +1,4 @@
-# Security Reference Architectures - Terraform Templates
+# Security Reference Architectures (SRA) - Terraform Templates
 
 ## Project Overview
 
@@ -6,7 +6,7 @@ Security Reference Architecture (SRA) with Terraform templates makes deploying w
 
 
 - [AWS](https://github.com/databricks/security_reference_architectures/tree/main/aws)
-- Azure - WIP
+- [Azure](https://github.com/databricks/terraform-databricks-sra/tree/main/azure)
 - [GCP](https://github.com/databricks/security_reference_architectures/tree/main/gcp)
 
 ## Project support 
