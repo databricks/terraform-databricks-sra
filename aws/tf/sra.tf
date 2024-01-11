@@ -1,58 +1,78 @@
 module "SRA" {
   source = "./modules/sra"
+
   providers = {
     databricks.mws = databricks.mws
     aws            = aws
   }
 
-  // Regional parameters for PrivateLink and optional metastore FQDN: https://docs.databricks.com/en/resources/supported-regions.html
   // Authentication Variables
   databricks_account_id = var.databricks_account_id
   client_id             = var.client_id
   client_secret         = var.client_secret
   aws_account_id        = var.aws_account_id
+  region                = var.region
+  region_name           = var.region_name[var.region]
 
-  // Tags & Naming Variables
+  // Naming and tagging variables:
   resource_prefix = var.resource_prefix
   resource_owner  = var.resource_owner
-  region          = var.region
-  region_name     = var.region_name
 
-  // Account-level Variables
-  // Metastore Configuration - leave null if there is no existing regional metastore
-  metastore_id = null
-  ucname       = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket  = "<bucket name>"
-  data_access  = "<identity like user or group>"
+  // Account - general
+  enable_logging_boolean = true // Logging configuration - set to false if a logging configuration currently exists
+  user_workspace_access  = ""
 
-  // Logging Configuration - set to false if no logging configuration exists
-  enable_logging_boolean = false
+  // Account - Unity Catalog:
+  metastore_id     = null // Metastore configuration - leave null if there is no existing regional metastore
+  ucname           = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
+  data_bucket      = ""
+  user_data_access = ""
 
-  // Workspace-level Variables
-  dbfsname                 = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
+  // Workspace - operation mode:
+  operation_mode = "custom" // Accepted values: standard, custom, firewall, or isolated
+
+  // Workspace - AWS non-networking variables:
+  dbfsname                         = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
+  cmk_admin_arn                    = null  // If not provided, the root user of the AWS account is used
+  enable_cluster_boolean           = false // WARNING: Clusters will spin-up Databricks clusters and AWS EC2 instances
+  workspace_service_principal_name = "sra-example-sp"
+
+  // Workspace - networking variables (optional if using custom operation mode):
   vpc_cidr_range           = "10.0.0.0/18"
   private_subnets_cidr     = ["10.0.16.0/22", "10.0.24.0/22"]
   privatelink_subnets_cidr = ["10.0.32.0/26", "10.0.32.64/26"]
   public_subnets_cidr      = ["10.0.32.128/26", "10.0.32.192/26"]
-  availability_zones       = ["us-east-1a", "us-east-1b"]
-  sg_egress_ports          = [443, 3306, 6666]
+  availability_zones       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
+  sg_egress_ports          = [443, 2443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
   sg_ingress_protocol      = ["tcp", "udp"]
   sg_egress_protocol       = ["tcp", "udp"]
-  relay_vpce_service       = "com.amazonaws.vpce.us-east-1.vpce-svc-00018a8c3ff62ffdf"
-  workspace_vpce_service   = "com.amazonaws.vpce.us-east-1.vpce-svc-09143d1e626de2f04"
+  relay_vpce_service       = var.scc_relay[var.region]
+  workspace_vpce_service   = var.workspace[var.region]
 
-  // Ip Access Lists - disabled by default, set to appropriate corporate egress IPs if enabled
-  ip_addresses = ["1.1.1.1", "1.2.3.0/24", "1.2.5.0/24"]
+  // Workspace - networking variables (required if using custom operation mode):
+  custom_vpc_id             =  null
+  custom_private_subnet_ids =  null // list of strings required
+  custom_sg_id              =  null
+  custom_relay_vpce_id      =  null
+  custom_workspace_vpce_id  =  null
 
-  // AWS Firewall - set to true if you'd like to create an egress AWS Network Firewall
-  // WARNING: This product does incur uptime charges
-  enable_firewall_boolean     = false
+  // Workspace - networking variables (required if using firewall operation mode):
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]
-  firewall_allow_list         = [".pypi.org", ".pythonhosted.org", ".cran.r-project.org", "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com"]
-  firewall_protocol_deny_list = "ICMP,FTP,SSH"
+  firewall_allow_list         = [".pypi.org", ".cran.r-project.org", ".pythonhosted.org"]
+  firewall_protocol_deny_list = "IP"
+  hive_metastore_fqdn         = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com"
 
-  // Restrictive Root Bucket - set to true if you'd like to restrict the workspace root bucket
-  // WARNING: The restrictive root bucket is updated occassionally, however, this is no guarantee on full functionality with new workspace functionality
-  enable_restrictive_root_bucket_boolean = true
+  // Workspace - restrictive AWS asset policies (optional):
+  enable_restrictive_root_bucket_boolean      = false
+  enable_restrictive_s3_endpoint_boolean      = false
+  enable_restrictive_sts_endpoint_boolean     = false
+  enable_restrictive_kinesis_endpoint_boolean = false
 
+  // Workspace - additional security features (optional): 
+  enable_ip_boolean = false
+  ip_addresses      = ["X.X.X.X", "X.X.X.X/XX", "X.X.X.X/XX"] // WARNING: Please validate that IPs entered are correct, recommend setting a break glass IP in case of a lockout
+
+  enable_sat_boolean          = false // WARNING: Security analysis tool spins-up jobs and clusters. More information here: https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main
+  databricks_account_username = "string"
+  databricks_account_password = "string"
 }

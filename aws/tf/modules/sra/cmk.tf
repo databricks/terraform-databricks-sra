@@ -1,5 +1,9 @@
 // EXPLANATION: The customer-managed keys for workspace and managed storage
 
+locals {
+  cmk_admin_value = var.cmk_admin_arn == null ? "arn:aws:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
+}
+
 resource "aws_kms_key" "workspace_storage" {
   description = "KMS key for databricks workspace storage"
   policy = jsonencode({ Version : "2012-10-17",
@@ -9,7 +13,7 @@ resource "aws_kms_key" "workspace_storage" {
         "Sid" : "Enable IAM User Permissions",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.aws_account_id}:root"
+          "AWS" : [local.cmk_admin_value]
         },
         "Action" : "kms:*",
         "Resource" : "*"
@@ -75,7 +79,7 @@ resource "aws_kms_key" "managed_storage" {
         "Sid" : "Enable IAM User Permissions",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.aws_account_id}:root"
+          "AWS" : [local.cmk_admin_value]
         },
         "Action" : "kms:*",
         "Resource" : "*"

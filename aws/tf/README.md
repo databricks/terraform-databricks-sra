@@ -12,6 +12,20 @@ In this section, we break down each of the components that we've included in thi
 
 In various `.tf` scripts, we have included direct links to the Databricks Terraform documentation. The [official documentation](https://registry.terraform.io/providers/databricks/databricks/latest/docs) can be found here.
 
+## Operation Mode:
+
+There are four separate operation modes you can choose for the underlying network configurations of your workspaces: **standard**, **firewall**, **isolated**, and **custom**. 
+
+- **Standard**: Standard or standard open egress. Selecting 'standard' as the operation mode allows traffic to flow freely to the public internet. This mode is suitable for sandbox or development scenarios where data exfiltration protection is of minimal concern, and developers need to access public APIs, packages, and more.
+
+- **Firewall**: Firewall or limited egress. Choosing 'firewall' as the operation mode permits traffic flow only to a selected list of public addresses. This mode is applicable in situations where open internet access is necessary for certain tasks, but unfiltered traffic is not an option due to the sensitivity of the workloads or data. **NOTE**: Due to a limitation in the AWS Network Firewall's ability to use fully qualified domain names for non-HTTP/HTTPS traffic, an external data source is required for the external Hive metastore. For production scenarios, we recommend using Unity Catalog or self-hosted Hive metastores.
+
+- **Isolated**:  Isolated or no egress. Opting for 'isolated' as the operation mode prevents any traffic to the public internet. Traffic is limited to AWS private endpoints, either to AWS services or the Databricks control plane. This mode should be used in cases where access to the public internet is completely unsupported. **NOTE**: Apache Derby Metastore will be required for clusters and non-serverless SQL Warehouses. For more information, please view this [knowledge article](https://kb.databricks.com/metastore/set-up-embedded-metastore).
+
+- **Custom**: Custom or bring your own network. Selecting 'custom' allows you to input your own details for a VPC ID, subnet IDs, security group IDs, and PrivateLink endpoint IDs. This mode is recommended when networking assets are created in different pipelines or are pre-assigned to a team by a centralized infrastructure team.
+
+See the below networking diagrams for more information.
+
 ## Infrastructure Deployment
 
 - **Customer-managed VPC**: A [customer-managed VPC](https://docs.databricks.com/administration-guide/cloud-configurations/aws/customer-managed-vpc.html) allows Databricks customers to exercise more control over network configuration to comply with specific cloud security and governance standards that a customer's organization may require.
@@ -39,6 +53,20 @@ In various `.tf` scripts, we have included direct links to the Databricks Terraf
 - **Admin Console Configurations**: There are a number of configurations within the [admin console](https://docs.databricks.com/administration-guide/admin-console.html) that can be controlled to reduce your threat vector. In this example, we use the workspace configurations Terraform template to disable and enable numerous options.
 
 - **Cluster Tags and Pool Tags**: [Cluster and pool tags](https://docs.databricks.com/administration-guide/account-settings/usage-detail-tags-aws.html) allow customers to monitor cost and accurately attribute Databricks usage to your organization's business unit and teams (for chargebacks, for examples). These tags propagate both to detailed DBU usage reports and to AWS EC2 and AWS EBS instances for cost analysis.
+
+## Optional Deployment Configurations
+
+- **Audit and Billable Usage Logs**: Audit and Billable Usage Logs can be enabled twice across a Databricks account. If your account has logging configured, you can set this parameter to false, so that another logging configuration is created.
+
+- **IP Access Lists**: IP Access can be enabled to only allow a subset of IPs to access the Databricks workspace console. **NOTE:** Please verify all of the IPs are correct prior to enabling this feature to prevent a lockout scenario.
+
+- **Cluster Example**: An example of a cluster and a cluster policy has been included. **NOTE:** Please be aware this will create a cluster within your Databricks workspace including the underlying EC2 instance.
+
+- **Security Analysis Tool (SAT)**: The Security Analysis Tool analyzes customer's Databricks account and workspace security configurations and provides recommendations that can help them follow Databricks' security best practices. This can be enabled into the workspace that is being created. **NOTE:** Please be aware this creates a cluster, a job, and a dashboard within your environment. 
+
+- **Enable Restrictive Root Bucket**: A restrictive root bucket policy can be applied to the root bucket of the workspace. **NOTE:** Please be aware this bucket is updated frequently, however, may not contain prefixes for the latest product releases.
+
+- **AWS Network Firewall**: A AWS Network firewall can be added into the deployment with a specific allow list included.  **NOTE:** Please be aware the AWS Network firewall's cost is associated with its uptime.
 
 ## Additional Security Recommendations and Opportunities
 
@@ -68,7 +96,10 @@ In this section, we break down additional security recommendations and opportuni
 1. Run `terraform apply -var-file ../example.tfvars`
 
 ## Network Diagram - Standard
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/aws/aws/img/Standard%20-%20Network%20Topology.png)
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Standard%20-%20Network%20Topology.png)
 
-## Network Diagram - Optional Firewall
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/aws/aws/img/Optional%20Firewall%20-%20Network%20Topology.png)
+## Network Diagram - Firewall
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Firewall%20-%20Network%20Topology.png)
+
+## Network Diagram - Isolated
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Isolated%20-%20Network%20Topology.png)

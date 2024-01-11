@@ -108,7 +108,7 @@ resource "databricks_external_location" "data_example" {
 resource "databricks_grants" "data_example" {
   external_location = databricks_external_location.data_example.id
   grant {
-    principal  = var.data_access
+    principal  = var.data_access_user
     privileges = ["ALL_PRIVILEGES"]
   }
 }

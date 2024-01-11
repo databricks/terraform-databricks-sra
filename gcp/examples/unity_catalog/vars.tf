@@ -27,4 +27,10 @@ variable "project" {
 variable "databricks_google_service_account" {}
 variable "account_console_url" {}
 variable "databricks_account_id" {}
+variable "databricks_workspace_ids_for_existing_metastore" {}
+
+variable "existing_metastore_id" {}
+variable "data_access" {
+  type = string
+}
 
