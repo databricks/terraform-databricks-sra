@@ -25,7 +25,7 @@ module "uc_init" {
   databricks_account_id = var.databricks_account_id
   resource_prefix       = var.resource_prefix
   region                = var.region
-  ucname                = var.ucname
+  metastore_name        = var.metastore_name
 }
 
 // Unity Catalog Assignment

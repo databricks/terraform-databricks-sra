@@ -60,8 +60,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.ucname}/*",
-      "arn:aws:s3:::${var.ucname}"
+      "arn:aws:s3:::${var.metastore_name}/*",
+      "arn:aws:s3:::${var.metastore_name}"
     ]
   }
 
@@ -203,7 +203,7 @@ module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "3.11.0"
 
-  vpc_id             =  module.vpc[0].vpc_id
+  vpc_id             = module.vpc[0].vpc_id
   security_group_ids = [aws_security_group.sg[0].id]
 
   endpoints = {

@@ -226,7 +226,7 @@ variable "sg_ingress_protocol" {
   type        = list(string)
 }
 
-variable "ucname" {
+variable "metastore_name" {
   description = "Name of the Unity Catalog Metastore."
   type        = string
 }
@@ -243,6 +243,11 @@ variable "user_data_access" {
 
 variable "vpc_cidr_range" {
   description = "CIDR range for the VPC."
+  type        = string
+}
+
+variable "workspace_catalog_admin" {
+  description = "Admin for the workspace catalog"
   type        = string
 }
 

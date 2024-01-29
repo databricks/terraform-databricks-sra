@@ -19,17 +19,18 @@ module "SRA" {
   resource_owner  = var.resource_owner
 
   // Account - general
-  enable_logging_boolean = true // Logging configuration - set to false if a logging configuration currently exists
+  enable_logging_boolean = false // Logging configuration - set to false if a logging configuration currently exists
   user_workspace_access  = ""
 
   // Account - Unity Catalog:
-  metastore_id     = null // Metastore configuration - leave null if there is no existing regional metastore
-  ucname           = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket      = ""
-  user_data_access = ""
+  metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore
+  metastore_name          = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
+  data_bucket             = ""
+  workspace_catalog_admin = ""
+  user_data_access        = ""
 
   // Workspace - operation mode:
-  operation_mode = "custom" // Accepted values: standard, custom, firewall, or isolated
+  operation_mode = "isolated" // Accepted values: standard, custom, firewall, or isolated
 
   // Workspace - AWS non-networking variables:
   dbfsname                         = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
@@ -50,11 +51,11 @@ module "SRA" {
   workspace_vpce_service   = var.workspace[var.region]
 
   // Workspace - networking variables (required if using custom operation mode):
-  custom_vpc_id             =  null
-  custom_private_subnet_ids =  null // list of strings required
-  custom_sg_id              =  null
-  custom_relay_vpce_id      =  null
-  custom_workspace_vpce_id  =  null
+  custom_vpc_id             = null
+  custom_private_subnet_ids = null // list of strings required
+  custom_sg_id              = null
+  custom_relay_vpce_id      = null
+  custom_workspace_vpce_id  = null
 
   // Workspace - networking variables (required if using firewall operation mode):
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]

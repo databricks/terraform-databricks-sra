@@ -1,8 +1,27 @@
 // EXPLANATION: All modules that reside at the workspace level
 
+// Creates a Workspace Isolated Catalog
+module "uc_catalog" {
+  source = "./databricks_workspace/workspace_security_modules/uc_catalog"
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  databricks_account_id   = var.databricks_account_id
+  aws_account_id          = var.aws_account_id
+  resource_prefix         = var.resource_prefix
+  uc_catalog_name         = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
+  workspace_id            = module.databricks_mws_workspace.workspace_id
+  workspace_catalog_admin = var.workspace_catalog_admin
+
+  depends_on = [
+    module.databricks_mws_workspace, module.uc_assignment
+  ]
+}
+
 // Create Read-Only Storage Location for Data Bucket & External Location
-module "uc_storage" {
-  source = "./databricks_workspace/workspace_security_modules/uc_storage"
+module "uc_external_location" {
+  source = "./databricks_workspace/workspace_security_modules/uc_external_location"
   providers = {
     databricks = databricks.created_workspace
   }
