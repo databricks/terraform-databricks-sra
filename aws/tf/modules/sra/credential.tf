@@ -86,15 +86,12 @@ resource "aws_iam_role_policy" "cross_account" {
         ],
         "Condition" : {
           "StringEquals" : {
-            "aws:ResourceTag/Vendor" : "Databricks"
-          }
-        },
-        "Condition" : {
-          "StringEquals" : {
+            "aws:ResourceTag/Vendor" : "Databricks",
             "ec2:Owner" : "601306020600"
           }
         }
-      },
+      }
+      ,
       {
         "Sid" : "AllowEc2RunInstancePerVPCid",
         "Effect" : "Allow",
@@ -213,11 +210,6 @@ resource "aws_iam_role_policy" "cross_account" {
             "ec2:vpc" : "arn:aws:ec2:${var.region}:${var.aws_account_id}:vpc/${var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id}"
           }
         }
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : "iam:PassRole",
-        "Resource" : "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-s3-instance-profile"
       }
     ]
     }

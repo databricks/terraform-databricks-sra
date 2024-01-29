@@ -152,7 +152,7 @@ resource "databricks_catalog" "workspace_catalog" {
   properties = {
     purpose = "Catalog for workspace - ${var.workspace_id}"
   }
-  depends_on = [ databricks_external_location.workspace_catalog_external_location ]
+  depends_on = [databricks_external_location.workspace_catalog_external_location]
 }
 
 // Grant Admin Catalog Perms
