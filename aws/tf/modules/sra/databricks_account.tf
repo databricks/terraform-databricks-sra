@@ -13,7 +13,7 @@ module "log_delivery" {
 }
 
 
-// Create Unity Catalog
+// Create Unity Catalog Metastore - No Root Storage
 module "uc_init" {
   count  = var.metastore_id == null ? 1 : 0
   source = "./databricks_account/uc_init"

@@ -23,10 +23,10 @@ module "SRA" {
   user_workspace_access  = ""
 
   // Account - Unity Catalog:
-  metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore
+  metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore, does not create a root storage location
   metastore_name          = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
   data_bucket             = ""
-  workspace_catalog_admin = ""
+  workspace_catalog_admin = "" // Workspace specific catalogs are created, this user will become an admin of that catalog as an example
   user_data_access        = ""
 
   // Workspace - operation mode:
