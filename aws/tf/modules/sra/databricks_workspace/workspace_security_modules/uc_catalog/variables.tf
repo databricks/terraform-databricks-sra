@@ -10,10 +10,14 @@ variable "databricks_account_id" {
   type = string
 }
 
-variable "metastore_name" {
+variable "workspace_id" {
   type = string
 }
 
-variable "region" {
+variable "uc_catalog_name" {
+  type = string
+}
+
+variable "workspace_catalog_admin" {
   type = string
 }

@@ -13,7 +13,7 @@ module "log_delivery" {
 }
 
 
-// Create Unity Catalog
+// Create Unity Catalog Metastore - No Root Storage
 module "uc_init" {
   count  = var.metastore_id == null ? 1 : 0
   source = "./databricks_account/uc_init"
@@ -25,7 +25,7 @@ module "uc_init" {
   databricks_account_id = var.databricks_account_id
   resource_prefix       = var.resource_prefix
   region                = var.region
-  ucname                = var.ucname
+  metastore_name        = var.metastore_name
 }
 
 // Unity Catalog Assignment

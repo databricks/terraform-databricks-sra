@@ -38,7 +38,7 @@ See the below networking diagrams for more information.
 
 - **Restrictive Root Bucket**: Each workspace, prior to creation, registers a [dedicated S3 bucket](https://docs.databricks.com/administration-guide/account-api/aws-storage.html). This bucket is for workspace assets. On AWS, S3 bucket policies can be applied to limit access to the Databricks control plane and the customer data plane.
 
-- **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/data-governance/unity-catalog/index.html) is a unified governance solution for all data and AI assets including files, tables, and machine learning models. Unity Catalog provides a modern approach to granular access controls with centralized policy, auditing, and lineage tracking - all integrated into your Databricks workflow.
+- **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/data-governance/unity-catalog/index.html) is a unified governance solution for all data and AI assets including files, tables, and machine learning models. Unity Catalog provides a modern approach to granular access controls with centralized policy, auditing, and lineage tracking - all integrated into your Databricks workflow. **NOTE**: SRA creates a workspace specific catalog that is isolated to that individual workspace. To change these settings please update uc_catalog.tf under the workspace_security_modules.
 
 ## Post Workspace Deployment
 
