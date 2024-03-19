@@ -59,7 +59,7 @@ module "SRA" {
 
   // Workspace - networking variables (required if using firewall operation mode):
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]
-  firewall_allow_list         = [".pypi.org", ".cran.r-project.org", ".pythonhosted.org"]
+  firewall_allow_list         = [".pypi.org", ".cran.r-project.org", ".pythonhosted.org", ".spark-packages.org", ".maven.org", "maven.apache.org", ".storage-download.googleapis.com"]
   firewall_protocol_deny_list = "IP"
   hive_metastore_fqdn         = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com" //
 
