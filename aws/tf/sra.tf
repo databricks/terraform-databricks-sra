@@ -74,11 +74,11 @@ module "SRA" {
   ip_addresses      = ["X.X.X.X", "X.X.X.X/XX", "X.X.X.X/XX"] // WARNING: Please validate that IPs entered are correct, recommend setting a break glass IP in case of a lockout
 
   // Public Preview - System Tables Schemas (optional, if system tables audit log alerting is set to true and system table schemas are not enabled then it is required):
-  enable_system_tables_schema = true // WARNING: This feature is in public preview: https://docs.databricks.com/en/administration-guide/system-tables/index.html#enable-system-table-schemas
+  enable_system_tables_schema = false // WARNING: This feature is in public preview: https://docs.databricks.com/en/administration-guide/system-tables/index.html#enable-system-table-schemas
 
   // Solution Accelerator - Security Analysis Tool (optional):
-  enable_sat_boolean = true // WARNING: Security analysis tool spins-up jobs and clusters. More information here: https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main
+  enable_sat_boolean = false // WARNING: Security analysis tool spins-up jobs and clusters. More information here: https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main
 
   // Solution Accelerator - Audit Logs Alerting (optional):
-  enable_audit_log_alerting = true // WARNING: Audit Logs Alerting spins-up jobs and clusters. More information here: https://github.com/andyweaves/system-tables-audit-logs/tree/main/terraform
+  enable_audit_log_alerting = false // WARNING: Audit Logs Alerting spins-up jobs and clusters. More information here: https://github.com/andyweaves/system-tables-audit-logs/tree/main/terraform
 }
