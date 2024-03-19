@@ -81,7 +81,7 @@ module "service_principal" {
   ]
 }
 
-// User Assignment
+// User Workspace Assignment (Admin)
 module "user_assignment" {
   source = "./databricks_account/user_assignment"
   providers = {
@@ -89,7 +89,7 @@ module "user_assignment" {
   }
 
   created_workspace_id = module.databricks_mws_workspace.workspace_id
-  workspace_access     = var.user_workspace_access
+  workspace_access     = var.user_workspace_admin
 
   depends_on = [
     module.databricks_mws_workspace,

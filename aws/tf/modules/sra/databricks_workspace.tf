@@ -26,11 +26,11 @@ module "uc_external_location" {
     databricks = databricks.created_workspace
   }
 
-  databricks_account_id = var.databricks_account_id
-  aws_account_id        = var.aws_account_id
-  resource_prefix       = var.resource_prefix
-  data_bucket           = var.data_bucket
-  data_access_user      = var.user_data_access
+  databricks_account_id   = var.databricks_account_id
+  aws_account_id          = var.aws_account_id
+  resource_prefix         = var.resource_prefix
+  data_bucket             = var.data_bucket
+  external_location_admin = var.external_location_admin
 
   depends_on = [
     module.databricks_mws_workspace, module.uc_assignment
@@ -103,9 +103,22 @@ module "cluster_configuration" {
   ]
 }
 
+// Public Preview - System Table Schemas - Optional
+module "public_preview_system_table" {
+  source = "./databricks_workspace/public_preview/system_schema/"
+  count  = var.enable_system_tables_schema ? 1 : 0
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
+}
+
 // SAT Implementation - Optional
 module "security_analysis_tool" {
-  source = "./databricks_workspace/security_analysis_tool/aws"
+  source = "./databricks_workspace/solution_accelerators/security_analysis_tool/aws"
   count  = var.enable_sat_boolean ? 1 : 0
   providers = {
     databricks = databricks.created_workspace
@@ -115,10 +128,26 @@ module "security_analysis_tool" {
   workspace_PAT      = module.service_principal.service_principal_id
   workspace_id       = module.databricks_mws_workspace.workspace_id
   account_console_id = var.databricks_account_id
-  account_user       = var.databricks_account_username
-  account_pass       = var.databricks_account_password
+  client_id          = var.client_id
+  client_secret      = var.client_secret
+  use_sp_auth        = true
 
   depends_on = [
     module.databricks_mws_workspace, module.service_principal
+  ]
+}
+
+// System Tables Schemas - Optional
+module "audit_log_alerting" {
+  source = "./databricks_workspace/solution_accelerators/system_tables_audit_log/"
+  count  = var.enable_audit_log_alerting ? 1 : 0
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  alert_emails = [var.user_workspace_admin]
+
+  depends_on = [
+    module.databricks_mws_workspace, module.uc_assignment
   ]
 }

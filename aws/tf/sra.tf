@@ -19,18 +19,18 @@ module "SRA" {
   resource_owner  = var.resource_owner
 
   // Account - general
-  enable_logging_boolean = false // Logging configuration - set to false if a logging configuration currently exists
-  user_workspace_access  = ""
+  enable_logging_boolean = false // Logging configuration - set to true if you'd like to set-up billing and audit log delivery to an S3 bucket. System tables can be used as an alternative with no set-up.
+  user_workspace_admin   = null  // REQUIRED - Admin workspace user (e.g. firstname.lastname@company.com)
 
   // Account - Unity Catalog:
   metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore, does not create a root storage location
   metastore_name          = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket             = ""
-  workspace_catalog_admin = "" // Workspace specific catalogs are created, this user will become an admin of that catalog as an example
-  user_data_access        = ""
+  data_bucket             = null // REQUIRED - Existing S3 bucket name (e.g. data-bucket-s3-test)
+  workspace_catalog_admin = null // REQUIRED - Workspace specific catalogs are created, this user will become an admin of that catalog (e.g. firstname.lastname@company.com)
+  external_location_admin = null // REQUIRED - Read-only external location is created, this user will become an admin of that exteranl location (e.g. firstname.lastname@company.com)
 
   // Workspace - operation mode:
-  operation_mode = "isolated" // Accepted values: standard, custom, firewall, or isolated
+  operation_mode = "standard" // REQUIRED - Accepted values: standard, custom, firewall, or isolated. https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/README.md#operation-mode
 
   // Workspace - AWS non-networking variables:
   dbfsname                         = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
@@ -61,7 +61,7 @@ module "SRA" {
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]
   firewall_allow_list         = [".pypi.org", ".cran.r-project.org", ".pythonhosted.org"]
   firewall_protocol_deny_list = "IP"
-  hive_metastore_fqdn         = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com"
+  hive_metastore_fqdn         = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com" //
 
   // Workspace - restrictive AWS asset policies (optional):
   enable_restrictive_root_bucket_boolean      = false
@@ -69,11 +69,16 @@ module "SRA" {
   enable_restrictive_sts_endpoint_boolean     = false
   enable_restrictive_kinesis_endpoint_boolean = false
 
-  // Workspace - additional security features (optional): 
+  // Workspace - IP access list (optional):
   enable_ip_boolean = false
   ip_addresses      = ["X.X.X.X", "X.X.X.X/XX", "X.X.X.X/XX"] // WARNING: Please validate that IPs entered are correct, recommend setting a break glass IP in case of a lockout
 
-  enable_sat_boolean          = false // WARNING: Security analysis tool spins-up jobs and clusters. More information here: https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main
-  databricks_account_username = "string"
-  databricks_account_password = "string"
+  // Public Preview - System Tables Schemas (optional, if system tables audit log alerting is set to true and system table schemas are not enabled then it is required):
+  enable_system_tables_schema = true // WARNING: This feature is in public preview: https://docs.databricks.com/en/administration-guide/system-tables/index.html#enable-system-table-schemas
+
+  // Solution Accelerator - Security Analysis Tool (optional):
+  enable_sat_boolean = true // WARNING: Security analysis tool spins-up jobs and clusters. More information here: https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main
+
+  // Solution Accelerator - Audit Logs Alerting (optional):
+  enable_audit_log_alerting = true // WARNING: Audit Logs Alerting spins-up jobs and clusters. More information here: https://github.com/andyweaves/system-tables-audit-logs/tree/main/terraform
 }
