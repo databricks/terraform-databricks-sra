@@ -13,7 +13,6 @@ resource "time_sleep" "wait_30_seconds" {
 
 // Credential Configuration
 resource "databricks_mws_credentials" "this" {
-  account_id       = var.databricks_account_id
   role_arn         = var.cross_account_role_arn
   credentials_name = "${var.resource_prefix}-credentials"
   depends_on       = [time_sleep.wait_30_seconds]

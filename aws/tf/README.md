@@ -62,11 +62,21 @@ See the below networking diagrams for more information.
 
 - **Cluster Example**: An example of a cluster and a cluster policy has been included. **NOTE:** Please be aware this will create a cluster within your Databricks workspace including the underlying EC2 instance.
 
-- **Security Analysis Tool (SAT)**: The Security Analysis Tool analyzes customer's Databricks account and workspace security configurations and provides recommendations that can help them follow Databricks' security best practices. This can be enabled into the workspace that is being created. **NOTE:** Please be aware this creates a cluster, a job, and a dashboard within your environment. 
-
 - **Enable Restrictive Root Bucket**: A restrictive root bucket policy can be applied to the root bucket of the workspace. **NOTE:** Please be aware this bucket is updated frequently, however, may not contain prefixes for the latest product releases.
 
-- **AWS Network Firewall**: A AWS Network firewall can be added into the deployment with a specific allow list included.  **NOTE:** Please be aware the AWS Network firewall's cost is associated with its uptime.
+- **Enable Restrictive Kinesis, STS, and S3 Endpoint Policies**: Restrictive policies for Kinesis, STS, and S3 endpoints can be added for Databricks specific assets. **NOTE:** Please be aware thse policies could be updated and may result in potentially breaking changes. If this is the case, we recommend removing the policy.
+
+## Solution Accelerators
+
+- **Security Analysis Tool (SAT)**: The Security Analysis Tool analyzes customer's Databricks account and workspace security configurations and provides recommendations that can help them follow Databricks' security best practices. This can be enabled into the workspace that is being created. **NOTE:** Please be aware this creates a cluster, a job, and a dashboard within your environment. 
+
+- **Audit Log Alerting**: Audit Log Alerting, based on this [blog post](https://www.databricks.com/blog/improve-lakehouse-security-monitoring-using-system-tables-databricks-unity-catalog), creates 40+ SQL alerts to monitor for incidents based on a Zero Trust Architecture (ZTA) model. **NOTE:** Please be aware this creates a cluster, a job, and queries within your environment. 
+
+
+## Public Preview Features
+
+- **System Tables Schemas**: System Table schemas are currently in private preview. System Tables provide visiblity into access, billing, compute, and storage logs. In this deployment the metastore admin, service principle, owns the table. Additional grant statements will be needed. **NOTE:** Please note this is currently in public preview.
+
 
 ## Additional Security Recommendations and Opportunities
 
@@ -87,13 +97,15 @@ In this section, we break down additional security recommendations and opportuni
 ## Getting Started
 
 1. Clone this Repo
-1. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
-1. Fill out `example.tfvars` and place in `tf` directory
-1. CD into `tf`
-1. Run `terraform init`
-1. Run `terraform validate`
-1. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
-1. Run `terraform apply -var-file ../example.tfvars`
+2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
+3. Decide which [operation](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) mode you'd like to use.
+4. Fill out `sra.tf` in place
+5. Fill out `example.tfvars` and place in `tf` directory
+6. CD into `tf`
+7. Run `terraform init`
+8. Run `terraform validate`
+9. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
+10. Run `terraform apply -var-file ../example.tfvars`
 
 ## Network Diagram - Standard
 ![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Standard%20-%20Network%20Topology.png)
@@ -103,3 +115,11 @@ In this section, we break down additional security recommendations and opportuni
 
 ## Network Diagram - Isolated
 ![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Isolated%20-%20Network%20Topology.png)
+
+## FAQ
+
+- **I've cloned the GitHub repo, what's the recommended way to add Databricks additional resources to it?**
+
+If you'd like to add additional resources to the repository, the first step is to identify if this resource is using the **account** or **workspace** provider.
+
+For example, if it uses the **account** provider, then we'd recommend creating a new module under the [modules/sra/databricks_account](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf/modules/sra/databricks_account) folder. Then, that module can be called in the top level [databricks_account.tf](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/modules/sra/databricks_account.tf) file. This process is the same for the workspace provider by placing a new module in the [modules/sra/databricks_workspace folder](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf/modules/sra/databricks_workspace) and call it in the [databricks_workspace.tf](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/modules/sra/databricks_workspace.tf) file.

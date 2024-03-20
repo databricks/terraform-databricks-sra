@@ -104,7 +104,6 @@ resource "aws_iam_role" "log_delivery" {
 
 // Databricks Credential Configuration for Logs
 resource "databricks_mws_credentials" "log_writer" {
-  account_id       = var.databricks_account_id
   credentials_name = "${var.resource_prefix}-log-delivery-credential"
   role_arn         = aws_iam_role.log_delivery.arn
   depends_on = [

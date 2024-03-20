@@ -14,6 +14,6 @@ variable "data_bucket" {
   type = string
 }
 
-variable "data_access_user" {
+variable "external_location_admin" {
   type = string
 }

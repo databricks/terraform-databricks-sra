@@ -59,26 +59,21 @@ variable "databricks_account_id" {
   sensitive   = true
 }
 
-variable "databricks_account_password" {
-  description = "Password for the Databricks account."
-  type        = string
-  sensitive   = true
-}
-
-variable "databricks_account_username" {
-  description = "Username for the Databricks account."
-  type        = string
-  sensitive   = true
-}
-
 variable "data_bucket" {
   description = "S3 bucket for data storage."
   type        = string
+  nullable    = false
 }
 
 variable "dbfsname" {
   description = "Name for Databricks File System (DBFS)."
   type        = string
+}
+
+variable "enable_audit_log_alerting" {
+  description = "Flag to audit log alerting."
+  type        = bool
+  sensitive   = true
 }
 
 variable "enable_cluster_boolean" {
@@ -130,6 +125,12 @@ variable "enable_sat_boolean" {
   sensitive   = true
 }
 
+variable "enable_system_tables_schema" {
+  description = "Flag for enabling public preview system schema access"
+  type        = bool
+  sensitive   = true
+}
+
 variable "firewall_allow_list" {
   description = "List of allowed firewall rules."
   type        = list(string)
@@ -163,6 +164,7 @@ variable "metastore_id" {
 variable "operation_mode" {
   type        = string
   description = "The type of network configuration."
+  nullable    = false
 
   validation {
     condition     = contains(["standard", "firewall", "custom", "isolated"], var.operation_mode)
@@ -231,14 +233,16 @@ variable "metastore_name" {
   type        = string
 }
 
-variable "user_workspace_access" {
+variable "user_workspace_admin" {
   description = "User to grant admin workspace access."
   type        = string
+  nullable    = false
 }
 
-variable "user_data_access" {
-  description = "User to grant data access."
+variable "external_location_admin" {
+  description = "User to grant external location admin."
   type        = string
+  nullable    = false
 }
 
 variable "vpc_cidr_range" {

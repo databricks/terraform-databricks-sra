@@ -30,16 +30,6 @@ variable "sqlw_id" {
 
 ### AWS Specific Variables
 
-variable "account_user" {
-  description = "Account Console Username"
-  type        = string
-}
-
-variable "account_pass" {
-  description = "Account Console Password"
-  type        = string
-}
-
 variable "use_sp_auth" {
   description = "Authenticate with Service Principal OAuth tokens instead of user and password"
   type        = bool

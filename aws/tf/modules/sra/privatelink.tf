@@ -60,8 +60,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.metastore_name}/*",
-      "arn:aws:s3:::${var.metastore_name}"
+      "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}/*",
+      "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
     ]
   }
 
@@ -134,6 +134,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       values   = ["414351767826"]
     }
   }
+  depends_on = [module.databricks_mws_workspace]
 }
 
 // Restrictive STS endpoint policy - only used if restrictive STS endpoint policy is enabled
@@ -236,7 +237,7 @@ module "vpc_endpoints" {
     }
   }
   depends_on = [
-    module.vpc
+    module.vpc, module.databricks_mws_workspace
   ]
 }
 
