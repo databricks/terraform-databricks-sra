@@ -1,4 +1,4 @@
-# Security Reference Architecture Template
+# Security Reference Architecture Template.
 
 # Introduction:
 
