@@ -76,7 +76,6 @@ resource "databricks_mws_customer_managed_keys" "workspace_storage" {
 
 // Private Access Setting Configuration
 resource "databricks_mws_private_access_settings" "pas" {
-  account_id                   = var.databricks_account_id
   private_access_settings_name = "${var.resource_prefix}-PAS"
   region                       = var.region
   public_access_enabled        = true
