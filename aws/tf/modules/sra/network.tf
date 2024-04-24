@@ -38,26 +38,29 @@ resource "aws_security_group" "sg" {
   dynamic "ingress" {
     for_each = var.sg_ingress_protocol
     content {
-      from_port = 0
-      to_port   = 65535
-      protocol  = ingress.value
-      self      = true
+      description = "Databricks - Data Plane Security Group - Internode Communication"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = ingress.value
+      self        = true
     }
   }
 
   dynamic "egress" {
     for_each = var.sg_egress_protocol
     content {
-      from_port = 0
-      to_port   = 65535
-      protocol  = egress.value
-      self      = true
+      description = "Databricks - Data Plane Security Group - Internode Communication"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = egress.value
+      self        = true
     }
   }
 
   dynamic "egress" {
     for_each = var.sg_egress_ports
     content {
+      description = "Databricks - Data Plane Security Group - REST (443), Secure Cluster Connectivity (6666), Future Extendability (8443-8451)"
       from_port   = egress.value
       to_port     = egress.value
       protocol    = "tcp"
@@ -67,4 +70,15 @@ resource "aws_security_group" "sg" {
   tags = {
     Name = "${var.resource_prefix}-data-plane-sg"
   }
+}
+
+resource "aws_security_group_rule" "esc_conditional_egress" {
+  count             = var.compliance_security_profile != false ? 1 : 0
+  type              = "egress"
+  from_port         = 2443
+  to_port           = 2443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.sg[0].id
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Databricks - Data Plane Security Group -  FIPS encryption"
 }

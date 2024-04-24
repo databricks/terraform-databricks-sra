@@ -1,3 +1,50 @@
+// Security group for privatelink - skipped in custom operation mode
+resource "aws_security_group" "privatelink" {
+  count = var.operation_mode != "custom" ? 1 : 0
+
+  vpc_id = module.vpc[0].vpc_id
+
+  ingress {
+    description     = "Databricks - PrivateLink Endpoint SG - REST API"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg[0].id]
+  }
+
+  ingress {
+    description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity"
+    from_port       = 6666
+    to_port         = 6666
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg[0].id]
+  }
+
+  ingress {
+    description     = "Databricks - PrivateLink Endpoint SG - Future Extendability"
+    from_port       = 8443
+    to_port         = 8451
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg[0].id]
+  }
+
+  tags = {
+    Name = "${var.resource_prefix}-private-link-sg"
+  }
+}
+
+resource "aws_security_group_rule" "esc_conditional_ingress_pl_ingress" {
+  count                    = var.compliance_security_profile != false ? 1 : 0
+  description              = "Databricks - PrivateLink Endpoint SG - FIPS Encryption"
+  type                     = "ingress"
+  from_port                = 2443
+  to_port                  = 2443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.privatelink[0].id
+  source_security_group_id = aws_security_group.sg[0].id
+}
+
+
 // EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 
 
@@ -205,7 +252,7 @@ module "vpc_endpoints" {
   version = "3.11.0"
 
   vpc_id             = module.vpc[0].vpc_id
-  security_group_ids = [aws_security_group.sg[0].id]
+  security_group_ids = [aws_security_group.privatelink[0].id]
 
   endpoints = {
     s3 = {
@@ -239,65 +286,6 @@ module "vpc_endpoints" {
   depends_on = [
     module.vpc, module.databricks_mws_workspace
   ]
-}
-
-// Security group for privatelink - skipped in custom operation mode
-resource "aws_security_group" "privatelink" {
-  count = var.operation_mode != "custom" ? 1 : 0
-
-  vpc_id = module.vpc[0].vpc_id
-
-  ingress {
-    description     = "Inbound rules"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg[0].id]
-  }
-
-  ingress {
-    description     = "Inbound rules"
-    from_port       = 2443
-    to_port         = 2443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg[0].id]
-  }
-
-  ingress {
-    description     = "Inbound rules"
-    from_port       = 6666
-    to_port         = 6666
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg[0].id]
-  }
-
-  egress {
-    description     = "Outbound rules"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg[0].id]
-  }
-
-  egress {
-    description     = "Outbound rules"
-    from_port       = 2443
-    to_port         = 2443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg[0].id]
-  }
-
-  egress {
-    description     = "Outbound rules"
-    from_port       = 6666
-    to_port         = 6666
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg[0].id]
-  }
-
-  tags = {
-    Name = "${var.resource_prefix}-private-link-sg"
-  }
 }
 
 // Databricks REST endpoint - skipped in custom operation mode

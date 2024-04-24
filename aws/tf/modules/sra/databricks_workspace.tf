@@ -39,6 +39,7 @@ module "uc_external_location" {
 
 // Workspace Admin Configuration
 module "admin_configuration" {
+  count  = var.enable_admin_configs ? 1 : 0
   source = "./databricks_workspace/workspace_security_modules/admin_configuration"
   providers = {
     databricks = databricks.created_workspace

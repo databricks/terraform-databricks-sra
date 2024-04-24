@@ -167,9 +167,21 @@ variable "operation_mode" {
   nullable    = false
 
   validation {
-    condition     = contains(["standard", "firewall", "custom", "isolated"], var.operation_mode)
-    error_message = "Invalid network type. Allowed values are: standard, firewall, custom, isolated."
+    condition     = contains(["sandbox", "firewall", "custom", "isolated"], var.operation_mode)
+    error_message = "Invalid network type. Allowed values are: sandbox, firewall, custom, isolated."
   }
+}
+
+variable "compliance_security_profile" {
+  type        = bool
+  description = "Add 2443 to security group configuration"
+  nullable    = false
+}
+
+variable "enable_admin_configs" {
+  type        = bool
+  description = "Enable workspace configs"
+  nullable    = false
 }
 
 variable "private_subnets_cidr" {

@@ -14,9 +14,9 @@ In various `.tf` scripts, we have included direct links to the Databricks Terraf
 
 ## Operation Mode:
 
-There are four separate operation modes you can choose for the underlying network configurations of your workspaces: **standard**, **firewall**, **isolated**, and **custom**. 
+There are four separate operation modes you can choose for the underlying network configurations of your workspaces: **sandbox**, **firewall**, **isolated**, and **custom**. 
 
-- **Standard**: Standard or standard open egress. Selecting 'standard' as the operation mode allows traffic to flow freely to the public internet. This mode is suitable for sandbox or development scenarios where data exfiltration protection is of minimal concern, and developers need to access public APIs, packages, and more.
+- **Sandbox**: Sandbox or open egress. Selecting 'sandbox' as the operation mode allows traffic to flow freely to the public internet. This mode is suitable for sandbox or development scenarios where data exfiltration protection is of minimal concern, and developers need to access public APIs, packages, and more.
 
 - **Firewall**: Firewall or limited egress. Choosing 'firewall' as the operation mode permits traffic flow only to a selected list of public addresses. This mode is applicable in situations where open internet access is necessary for certain tasks, but unfiltered traffic is not an option due to the sensitivity of the workloads or data. **NOTE**: Due to a limitation in the AWS Network Firewall's ability to use fully qualified domain names for non-HTTP/HTTPS traffic, an external data source is required for the external Hive metastore. For production scenarios, we recommend using Unity Catalog or self-hosted Hive metastores.
 
@@ -107,8 +107,8 @@ In this section, we break down additional security recommendations and opportuni
 9. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
 10. Run `terraform apply -var-file ../example.tfvars`
 
-## Network Diagram - Standard
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Standard%20-%20Network%20Topology.png)
+## Network Diagram - Sandbox
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Sandbox%20-%20Network%20Topology.png)
 
 ## Network Diagram - Firewall
 ![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Firewall%20-%20Network%20Topology.png)
