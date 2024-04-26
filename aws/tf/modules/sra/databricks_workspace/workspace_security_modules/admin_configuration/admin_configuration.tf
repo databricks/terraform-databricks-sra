@@ -9,6 +9,6 @@ resource "databricks_workspace_conf" "just_config_map" {
     "enable-X-Content-Type-Options" = "true",
     "enable-X-XSS-Protection"       = "true",
     "enableDbfsFileBrowser"         = "false",
-    "enforceUserIsolation"          = "true"
+    "enforceUserIsolation"          = "false"
   }
 }
