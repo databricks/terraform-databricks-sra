@@ -67,7 +67,7 @@ resource "databricks_metastore_data_access" "this" {
   # }
   azure_service_principal {
     directory_id   = local.tenant_id
-    application_id = "7c9c3353-8de8-4c49-8087-e5ef24b887d3"
+    application_id = var.application_id
     client_secret  = var.client_secret
   }
 
