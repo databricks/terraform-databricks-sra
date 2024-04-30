@@ -174,7 +174,7 @@ variable "operation_mode" {
 
 variable "compliance_security_profile" {
   type        = bool
-  description = "Add 2443 to security group configuration"
+  description = "Add 2443 to security group configuration or nitro instance"
   nullable    = false
 }
 

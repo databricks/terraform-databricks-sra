@@ -97,8 +97,9 @@ module "cluster_configuration" {
     databricks = databricks.created_workspace
   }
 
-  secret_config_reference = module.secret_management.config_reference
-  resource_prefix         = var.resource_prefix
+  compliance_security_profile = var.compliance_security_profile
+  secret_config_reference     = module.secret_management.config_reference
+  resource_prefix             = var.resource_prefix
   depends_on = [
     module.databricks_mws_workspace, module.secret_management
   ]
