@@ -25,6 +25,8 @@ module "vpc" {
 
   intra_subnet_names = [for az in var.availability_zones : format("%s-privatelink-%s", var.resource_prefix, az)]
   intra_subnets      = var.privatelink_subnets_cidr
+
+  default_network_acl_ingress = var.default_network_acl_ingress
 }
 
 
