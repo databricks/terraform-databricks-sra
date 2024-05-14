@@ -39,6 +39,7 @@ module "uc_external_location" {
 
 // Workspace Admin Configuration
 module "admin_configuration" {
+  count  = var.enable_admin_configs ? 1 : 0
   source = "./databricks_workspace/workspace_security_modules/admin_configuration"
   providers = {
     databricks = databricks.created_workspace
@@ -96,8 +97,9 @@ module "cluster_configuration" {
     databricks = databricks.created_workspace
   }
 
-  secret_config_reference = module.secret_management.config_reference
-  resource_prefix         = var.resource_prefix
+  compliance_security_profile = var.compliance_security_profile
+  secret_config_reference     = module.secret_management.config_reference
+  resource_prefix             = var.resource_prefix
   depends_on = [
     module.databricks_mws_workspace, module.secret_management
   ]

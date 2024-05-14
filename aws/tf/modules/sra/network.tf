@@ -38,30 +38,45 @@ resource "aws_security_group" "sg" {
   dynamic "ingress" {
     for_each = var.sg_ingress_protocol
     content {
-      from_port = 0
-      to_port   = 65535
-      protocol  = ingress.value
-      self      = true
+      description = "Databricks - Data Plane Security Group - Internode Communication"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = ingress.value
+      self        = true
     }
   }
 
   dynamic "egress" {
     for_each = var.sg_egress_protocol
     content {
-      from_port = 0
-      to_port   = 65535
-      protocol  = egress.value
-      self      = true
+      description = "Databricks - Data Plane Security Group - Internode Communication"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = egress.value
+      self        = true
     }
   }
 
   dynamic "egress" {
     for_each = var.sg_egress_ports
     content {
+      description = "Databricks - Data Plane Security Group - REST (443), Secure Cluster Connectivity (6666), Future Extendability (8443-8451)"
       from_port   = egress.value
       to_port     = egress.value
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+
+    dynamic "egress" {
+     for_each = var.compliance_security_profile ? [2443] : []
+    
+    content {
+      description       = "Databricks - Data Plane Security Group -  FIPS encryption"      
+      from_port         = 2443
+      to_port           = 2443
+      protocol          = "tcp"
+      cidr_blocks       = ["0.0.0.0/0"]
     }
   }
   tags = {

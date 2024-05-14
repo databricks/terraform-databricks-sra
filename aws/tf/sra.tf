@@ -30,12 +30,14 @@ module "SRA" {
   external_location_admin = null // REQUIRED - Read-only external location is created, this user will become an admin of that exteranl location (e.g. firstname.lastname@company.com)
 
   // Workspace - operation mode:
-  operation_mode = "standard" // REQUIRED - Accepted values: standard, custom, firewall, or isolated. https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/README.md#operation-mode
+  operation_mode              = "sandbox" // REQUIRED - Accepted values: sandbox, custom, firewall, or isolated. https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/README.md#operation-mode
+  compliance_security_profile = false     // REQUIRED - If you are using compliance security profile, please enable this to true. This adds port 2443 (FIPS) as a security group rule.
 
   // Workspace - AWS non-networking variables:
   dbfsname                         = join("", [var.resource_prefix, "-", var.region, "-", "dbfsroot"])
   cmk_admin_arn                    = null  // If not provided, the root user of the AWS account is used
   enable_cluster_boolean           = false // WARNING: Clusters will spin-up Databricks clusters and AWS EC2 instances
+  enable_admin_configs             = false // WARNING: The workspace_conf resource is evolving API that may change from provider to provider. Please review the in-resource documentation (admin_configuration.tf) before enabling.
   workspace_service_principal_name = "sra-example-sp"
 
   // Workspace - networking variables (optional if using custom operation mode):
@@ -44,7 +46,7 @@ module "SRA" {
   privatelink_subnets_cidr = ["10.0.32.0/26", "10.0.32.64/26"]
   public_subnets_cidr      = ["10.0.32.128/26", "10.0.32.192/26"]
   availability_zones       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1]]
-  sg_egress_ports          = [443, 2443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
+  sg_egress_ports          = [443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
   sg_ingress_protocol      = ["tcp", "udp"]
   sg_egress_protocol       = ["tcp", "udp"]
   relay_vpce_service       = var.scc_relay[var.region]
