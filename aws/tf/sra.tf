@@ -39,6 +39,7 @@ module "SRA" {
   enable_cluster_boolean           = false // WARNING: Clusters will spin-up Databricks clusters and AWS EC2 instances
   enable_admin_configs             = false // WARNING: The workspace_conf resource is evolving API that may change from provider to provider. Please review the in-resource documentation (admin_configuration.tf) before enabling.
   workspace_service_principal_name = "sra-example-sp"
+  deployment_name                  = var.deployment_name
 
   // Workspace - networking variables (optional if using custom operation mode):
   vpc_cidr_range           = "10.0.0.0/18"

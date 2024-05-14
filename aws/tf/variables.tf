@@ -62,6 +62,11 @@ variable "resource_prefix" {
   type        = string
 }
 
+variable "deployment_name" {
+  description = "Suffix for workspace names."
+  type        = string
+}
+
 data "aws_availability_zones" "available" {
   state = "available"
 }

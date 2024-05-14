@@ -225,6 +225,11 @@ variable "resource_prefix" {
   type        = string
 }
 
+variable "deployment_name" {
+  description = "Suffix for workspace names."
+  type        = string
+}
+
 variable "sg_egress_ports" {
   description = "List of egress ports for security groups."
   type        = list(string)

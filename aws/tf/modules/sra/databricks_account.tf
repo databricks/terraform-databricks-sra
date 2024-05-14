@@ -51,6 +51,7 @@ module "databricks_mws_workspace" {
 
   databricks_account_id       = var.databricks_account_id
   resource_prefix             = var.resource_prefix
+  deployment_name             = var.deployment_name 
   security_group_ids          = var.custom_sg_id != null ? [var.custom_sg_id] : [aws_security_group.sg[0].id]
   subnet_ids                  = var.custom_private_subnet_ids != null ? var.custom_private_subnet_ids : module.vpc[0].private_subnets
   vpc_id                      = var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id

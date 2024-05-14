@@ -53,3 +53,7 @@ variable "managed_storage_key_alias" {
 variable "workspace_storage_key_alias" {
   type = string
 }
+
+variable "deployment_name" {
+  type = string
+}
