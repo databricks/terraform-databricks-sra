@@ -28,22 +28,22 @@ resource "aws_security_group" "privatelink" {
     security_groups = [aws_security_group.sg[0].id]
   }
 
+  dynamic "ingress" {
+     for_each = var.compliance_security_profile ? [2443] : []
+    
+    content {
+      description       = "Databricks - Data Plane Security Group -  FIPS encryption"      
+      from_port         = 2443
+      to_port           = 2443
+      protocol          = "tcp"
+      security_groups   = [aws_security_group.sg[0].id]
+    }
+  }
+
   tags = {
     Name = "${var.resource_prefix}-private-link-sg"
   }
 }
-
-resource "aws_security_group_rule" "esc_conditional_ingress_pl_ingress" {
-  count                    = var.compliance_security_profile != false ? 1 : 0
-  description              = "Databricks - PrivateLink Endpoint SG - FIPS Encryption"
-  type                     = "ingress"
-  from_port                = 2443
-  to_port                  = 2443
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.privatelink[0].id
-  source_security_group_id = aws_security_group.sg[0].id
-}
-
 
 // EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 

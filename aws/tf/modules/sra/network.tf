@@ -67,18 +67,19 @@ resource "aws_security_group" "sg" {
       cidr_blocks = ["0.0.0.0/0"]
     }
   }
+
+    dynamic "egress" {
+     for_each = var.compliance_security_profile ? [2443] : []
+    
+    content {
+      description       = "Databricks - Data Plane Security Group -  FIPS encryption"      
+      from_port         = 2443
+      to_port           = 2443
+      protocol          = "tcp"
+      cidr_blocks       = ["0.0.0.0/0"]
+    }
+  }
   tags = {
     Name = "${var.resource_prefix}-data-plane-sg"
   }
-}
-
-resource "aws_security_group_rule" "esc_conditional_egress" {
-  count             = var.compliance_security_profile != false ? 1 : 0
-  type              = "egress"
-  from_port         = 2443
-  to_port           = 2443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.sg[0].id
-  cidr_blocks       = ["0.0.0.0/0"]
-  description       = "Databricks - Data Plane Security Group -  FIPS encryption"
 }
