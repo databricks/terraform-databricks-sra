@@ -32,7 +32,7 @@ resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
   depends_on = [azurerm_key_vault_access_policy.databricks]
 
   workspace_id     = azurerm_databricks_workspace.this.workspace_id
-  key_vault_key_id = var.key_vault_id
+  key_vault_key_id = var.managed_disk_key_id
 }
 
 # Define an Azure Key Vault access policy for Databricks

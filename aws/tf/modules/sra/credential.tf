@@ -112,13 +112,25 @@ resource "aws_iam_role_policy" "cross_account" {
         "Effect" : "Allow",
         "Action" : "ec2:RunInstances",
         "NotResource" : [
-          "arn:aws:ec2:${var.region}:${var.aws_account_id}:image/*",
           "arn:aws:ec2:${var.region}:${var.aws_account_id}:network-interface/*",
           "arn:aws:ec2:${var.region}:${var.aws_account_id}:subnet/*",
           "arn:aws:ec2:${var.region}:${var.aws_account_id}:security-group/*",
           "arn:aws:ec2:${var.region}:${var.aws_account_id}:volume/*",
           "arn:aws:ec2:${var.region}:${var.aws_account_id}:instance/*"
         ]
+      },
+      {
+        "Sid": "DatabricksSuppliedImages",
+        "Effect": "Deny",
+        "Action": "ec2:RunInstances",
+        "Resource": [
+          "arn:aws:ec2:*:*:image/*"
+        ],
+        "Condition": {
+          "StringNotEquals": {
+            "ec2:Owner": "601306020600"
+          }
+        }
       },
       {
         "Sid" : "EC2TerminateInstancesTag",
