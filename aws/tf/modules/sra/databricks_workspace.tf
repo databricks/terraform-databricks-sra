@@ -22,6 +22,7 @@ module "uc_catalog" {
 // Create Read-Only Storage Location for Data Bucket & External Location
 module "uc_external_location" {
   source = "./databricks_workspace/workspace_security_modules/uc_external_location"
+  count  = var.enable_uc_external_location_example ? 1 : 0
   providers = {
     databricks = databricks.created_workspace
   }

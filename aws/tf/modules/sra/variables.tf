@@ -287,3 +287,7 @@ variable "default_network_acl_ingress" {
     },
   ]
 }
+
+variable "enable_uc_external_location_example" {
+  default = false
+}
