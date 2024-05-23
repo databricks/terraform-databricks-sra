@@ -29,7 +29,7 @@ module "SRA" {
 
   // Account - Unity Catalog - Data:
   enable_read_only_external_location = false // Creates a read-only external location and corresponding IAM role, based on the value of the data_bucket variable
-  read_only_data_bucket              = null  // Accepts an S3 path (e.g. "s3://data-bucket")
+  read_only_data_bucket              = null  //  Accepts an S3 bucket name ("data-bucket")
   read_only_external_location_admin  = null  //  This user will become an admin of that external location (e.g. firstname.lastname@company.com)
 
   // Workspace - operation mode:
