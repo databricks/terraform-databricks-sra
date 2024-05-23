@@ -66,8 +66,8 @@ resource "aws_iam_role_policy" "storage_credential_policy" {
           "s3:GetLifecycleConfiguration",
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.data_bucket}/*",
-          "arn:aws:s3:::${var.data_bucket}"
+          "arn:aws:s3:::${var.read_only_data_bucket}/*",
+          "arn:aws:s3:::${var.read_only_data_bucket}"
         ],
         "Effect" : "Allow"
       },
@@ -97,7 +97,7 @@ resource "databricks_storage_credential" "external" {
 // External Location
 resource "databricks_external_location" "data_example" {
   name            = "external-location-example"
-  url             = "s3://${var.data_bucket}/"
+  url             = "s3://${var.read_only_data_bucket}/"
   credential_name = databricks_storage_credential.external.id
   skip_validation = true
   read_only       = true
@@ -108,7 +108,7 @@ resource "databricks_external_location" "data_example" {
 resource "databricks_grants" "data_example" {
   external_location = databricks_external_location.data_example.id
   grant {
-    principal  = var.external_location_admin
+    principal  = var.read_only_external_location_admin
     privileges = ["ALL_PRIVILEGES"]
   }
 }

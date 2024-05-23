@@ -128,8 +128,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.data_bucket}/*",
-      "arn:aws:s3:::${var.data_bucket}"
+      "arn:aws:s3:::${var.read_only_data_bucket}/*",
+      "arn:aws:s3:::${var.read_only_data_bucket}"
     ]
   }
 

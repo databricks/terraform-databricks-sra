@@ -59,10 +59,9 @@ variable "databricks_account_id" {
   sensitive   = true
 }
 
-variable "data_bucket" {
+variable "read_only_data_bucket" {
   description = "S3 bucket for data storage."
   type        = string
-  nullable    = false
 }
 
 variable "dbfsname" {
@@ -78,6 +77,12 @@ variable "enable_audit_log_alerting" {
 
 variable "enable_cluster_boolean" {
   description = "Flag to enable cluster."
+  type        = bool
+  sensitive   = true
+}
+
+variable "enable_read_only_external_location" {
+  description = "Flag to enable read only external location"
   type        = bool
   sensitive   = true
 }
@@ -251,10 +256,9 @@ variable "user_workspace_admin" {
   nullable    = false
 }
 
-variable "external_location_admin" {
+variable "read_only_external_location_admin" {
   description = "User to grant external location admin."
   type        = string
-  nullable    = false
 }
 
 variable "vpc_cidr_range" {

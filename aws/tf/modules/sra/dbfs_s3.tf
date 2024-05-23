@@ -11,7 +11,7 @@ resource "aws_s3_bucket" "root_storage_bucket" {
 resource "aws_s3_bucket_versioning" "root_bucket_versioning" {
   bucket = aws_s3_bucket.root_storage_bucket.id
   versioning_configuration {
-    status = "Enabled"
+    status = "Disabled"
   }
 }
 
