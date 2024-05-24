@@ -149,6 +149,7 @@ resource "databricks_catalog" "workspace_catalog" {
   comment        = "This catalog is for workspace - ${var.workspace_id}"
   isolation_mode = "ISOLATED"
   storage_root   = "s3://${var.uc_catalog_name}/catalog/"
+  owner = "DataBricks Data Engineer"
   properties = {
     purpose = "Catalog for workspace - ${var.workspace_id}"
   }
