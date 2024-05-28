@@ -29,14 +29,14 @@ resource "aws_security_group" "privatelink" {
   }
 
   dynamic "ingress" {
-     for_each = var.compliance_security_profile ? [2443] : []
-    
+    for_each = var.compliance_security_profile ? [2443] : []
+
     content {
-      description       = "Databricks - Data Plane Security Group -  FIPS encryption"      
-      from_port         = 2443
-      to_port           = 2443
-      protocol          = "tcp"
-      security_groups   = [aws_security_group.sg[0].id]
+      description     = "Databricks - Data Plane Security Group -  FIPS encryption"
+      from_port       = 2443
+      to_port         = 2443
+      protocol        = "tcp"
+      security_groups = [aws_security_group.sg[0].id]
     }
   }
 

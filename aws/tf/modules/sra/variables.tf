@@ -73,36 +73,42 @@ variable "enable_audit_log_alerting" {
   description = "Flag to audit log alerting."
   type        = bool
   sensitive   = true
+  default     = false
 }
 
 variable "enable_cluster_boolean" {
   description = "Flag to enable cluster."
   type        = bool
   sensitive   = true
+  default     = false
 }
 
 variable "enable_read_only_external_location" {
   description = "Flag to enable read only external location"
   type        = bool
   sensitive   = true
+  default     = false
 }
 
 variable "enable_ip_boolean" {
   description = "Flag to enable IP-related configurations."
   type        = bool
   sensitive   = true
+  default     = false
 }
 
 variable "enable_logging_boolean" {
   description = "Flag to enable logging."
   type        = bool
   sensitive   = true
+  default     = false
 }
 
 variable "enable_restrictive_root_bucket_boolean" {
   description = "Flag to enable restrictive root bucket settings."
   type        = bool
   sensitive   = true
+  default     = false
 }
 
 variable "enable_restrictive_kinesis_endpoint_boolean" {
@@ -128,12 +134,14 @@ variable "enable_sat_boolean" {
   description = "Flag for a specific SAT (Service Access Token) configuration."
   type        = bool
   sensitive   = true
+  default     = false
 }
 
 variable "enable_system_tables_schema" {
   description = "Flag for enabling public preview system schema access"
   type        = bool
   sensitive   = true
+  default     = false
 }
 
 variable "firewall_allow_list" {
