@@ -29,14 +29,14 @@ resource "aws_security_group" "privatelink" {
   }
 
   dynamic "ingress" {
-     for_each = var.compliance_security_profile ? [2443] : []
-    
+    for_each = var.compliance_security_profile ? [2443] : []
+
     content {
-      description       = "Databricks - Data Plane Security Group -  FIPS encryption"      
-      from_port         = 2443
-      to_port           = 2443
-      protocol          = "tcp"
-      security_groups   = [aws_security_group.sg[0].id]
+      description     = "Databricks - Data Plane Security Group -  FIPS encryption"
+      from_port       = 2443
+      to_port         = 2443
+      protocol        = "tcp"
+      security_groups = [aws_security_group.sg[0].id]
     }
   }
 
@@ -128,8 +128,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.data_bucket}/*",
-      "arn:aws:s3:::${var.data_bucket}"
+      "arn:aws:s3:::${var.read_only_data_bucket}/*",
+      "arn:aws:s3:::${var.read_only_data_bucket}"
     ]
   }
 

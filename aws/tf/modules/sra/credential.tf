@@ -120,15 +120,15 @@ resource "aws_iam_role_policy" "cross_account" {
         ]
       },
       {
-        "Sid": "DatabricksSuppliedImages",
-        "Effect": "Deny",
-        "Action": "ec2:RunInstances",
-        "Resource": [
+        "Sid" : "DatabricksSuppliedImages",
+        "Effect" : "Deny",
+        "Action" : "ec2:RunInstances",
+        "Resource" : [
           "arn:aws:ec2:*:*:image/*"
         ],
-        "Condition": {
-          "StringNotEquals": {
-            "ec2:Owner": "601306020600"
+        "Condition" : {
+          "StringNotEquals" : {
+            "ec2:Owner" : "601306020600"
           }
         }
       },

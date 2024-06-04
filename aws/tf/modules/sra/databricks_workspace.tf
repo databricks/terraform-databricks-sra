@@ -21,16 +21,17 @@ module "uc_catalog" {
 
 // Create Read-Only Storage Location for Data Bucket & External Location
 module "uc_external_location" {
+  count  = var.enable_read_only_external_location ? 1 : 0
   source = "./databricks_workspace/workspace_security_modules/uc_external_location"
   providers = {
     databricks = databricks.created_workspace
   }
 
-  databricks_account_id   = var.databricks_account_id
-  aws_account_id          = var.aws_account_id
-  resource_prefix         = var.resource_prefix
-  data_bucket             = var.data_bucket
-  external_location_admin = var.external_location_admin
+  databricks_account_id             = var.databricks_account_id
+  aws_account_id                    = var.aws_account_id
+  resource_prefix                   = var.resource_prefix
+  read_only_data_bucket             = var.read_only_data_bucket
+  read_only_external_location_admin = var.read_only_external_location_admin
 
   depends_on = [
     module.databricks_mws_workspace, module.uc_assignment

@@ -68,15 +68,15 @@ resource "aws_security_group" "sg" {
     }
   }
 
-    dynamic "egress" {
-     for_each = var.compliance_security_profile ? [2443] : []
-    
+  dynamic "egress" {
+    for_each = var.compliance_security_profile ? [2443] : []
+
     content {
-      description       = "Databricks - Data Plane Security Group -  FIPS encryption"      
-      from_port         = 2443
-      to_port           = 2443
-      protocol          = "tcp"
-      cidr_blocks       = ["0.0.0.0/0"]
+      description = "Databricks - Data Plane Security Group -  FIPS encryption"
+      from_port   = 2443
+      to_port     = 2443
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
     }
   }
   tags = {

@@ -25,9 +25,12 @@ module "SRA" {
   // Account - Unity Catalog:
   metastore_id            = null // Metastore configuration - leave null if there is no existing regional metastore, does not create a root storage location
   metastore_name          = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  data_bucket             = null // REQUIRED - Existing S3 bucket name (e.g. data-bucket-s3-test)
   workspace_catalog_admin = null // REQUIRED - Workspace specific catalogs are created, this user will become an admin of that catalog (e.g. firstname.lastname@company.com)
-  external_location_admin = null // REQUIRED - Read-only external location is created, this user will become an admin of that exteranl location (e.g. firstname.lastname@company.com)
+
+  // Account - Unity Catalog - Data:
+  enable_read_only_external_location = false // Creates a read-only external location and corresponding IAM role, based on the value of the data_bucket variable
+  read_only_data_bucket              = null  //  Accepts an S3 bucket name ("data-bucket")
+  read_only_external_location_admin  = null  //  This user will become an admin of that external location (e.g. firstname.lastname@company.com)
 
   // Workspace - operation mode:
   operation_mode              = "sandbox" // REQUIRED - Accepted values: sandbox, custom, firewall, or isolated. https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/README.md#operation-mode
@@ -63,7 +66,7 @@ module "SRA" {
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26"]
   firewall_allow_list         = [".pypi.org", ".cran.r-project.org", ".pythonhosted.org", ".spark-packages.org", ".maven.org", "maven.apache.org", ".storage-download.googleapis.com"]
   firewall_protocol_deny_list = "IP"
-  hive_metastore_fqdn         = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com" //
+  hive_metastore_fqdn         = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com" // https://docs.databricks.com/en/resources/supported-regions.html#rds-addresses-for-legacy-hive-metastore
 
   // Workspace - restrictive AWS asset policies (optional):
   enable_restrictive_root_bucket_boolean      = false

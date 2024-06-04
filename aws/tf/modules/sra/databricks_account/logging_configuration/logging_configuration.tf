@@ -13,7 +13,7 @@ resource "aws_s3_bucket" "log_delivery" {
 resource "aws_s3_bucket_versioning" "log_delivery" {
   bucket = aws_s3_bucket.log_delivery.id
   versioning_configuration {
-    status = "Enabled"
+    status = "Disabled"
   }
 }
 
