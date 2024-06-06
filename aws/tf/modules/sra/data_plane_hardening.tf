@@ -33,9 +33,9 @@ module "restrictive_root_bucket" {
     aws = aws
   }
 
-  workspace_id = module.databricks_mws_workspace.workspace_id
-  region_name  = var.region_name
-  dbfsname     = var.dbfsname
+  workspace_id   = module.databricks_mws_workspace.workspace_id
+  region_name    = var.region_name
+  root_s3_bucket = "${var.resource_prefix}-workspace-root-storage"
 
   depends_on = [module.databricks_mws_workspace]
 }

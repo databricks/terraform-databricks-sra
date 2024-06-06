@@ -2,7 +2,7 @@ terraform {
   required_providers {
     databricks = {
       source  = "databricks/databricks"
-      version = "~> 1.35.0"
+      version = "~> 1.46.0"
     }
     aws = {
       source = "hashicorp/aws"
@@ -14,7 +14,6 @@ provider "aws" {
   region = var.region
   default_tags {
     tags = {
-      Owner    = var.resource_owner
       Resource = var.resource_prefix
     }
   }

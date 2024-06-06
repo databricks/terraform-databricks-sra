@@ -5,3 +5,7 @@ variable "metastore_id" {
 variable "workspace_id" {
   type = string
 }
+
+variable "region" {
+  type = string
+}

@@ -7,7 +7,7 @@ module "vpc" {
 
   count = var.operation_mode != "custom" ? 1 : 0
 
-  name = "${var.resource_prefix}-data-plane-VPC"
+  name = "${var.resource_prefix}-classic-compute-plane-vpc"
   cidr = var.vpc_cidr_range
   azs  = var.availability_zones
 
@@ -38,7 +38,7 @@ resource "aws_security_group" "sg" {
   dynamic "ingress" {
     for_each = var.sg_ingress_protocol
     content {
-      description = "Databricks - Data Plane Security Group - Internode Communication"
+      description = "Databricks - Workspace SG - Internode Communication"
       from_port   = 0
       to_port     = 65535
       protocol    = ingress.value
@@ -49,7 +49,7 @@ resource "aws_security_group" "sg" {
   dynamic "egress" {
     for_each = var.sg_egress_protocol
     content {
-      description = "Databricks - Data Plane Security Group - Internode Communication"
+      description = "Databricks - Workspace SG - Internode Communication"
       from_port   = 0
       to_port     = 65535
       protocol    = egress.value
@@ -60,7 +60,7 @@ resource "aws_security_group" "sg" {
   dynamic "egress" {
     for_each = var.sg_egress_ports
     content {
-      description = "Databricks - Data Plane Security Group - REST (443), Secure Cluster Connectivity (6666), Future Extendability (8443-8451)"
+      description = "Databricks - Workspace SG - REST (443), Secure Cluster Connectivity (6666), Future Extendability (8443-8451)"
       from_port   = egress.value
       to_port     = egress.value
       protocol    = "tcp"
@@ -69,10 +69,10 @@ resource "aws_security_group" "sg" {
   }
 
   dynamic "egress" {
-    for_each = var.compliance_security_profile ? [2443] : []
+    for_each = var.compliance_security_profile_egress_ports ? [2443] : []
 
     content {
-      description = "Databricks - Data Plane Security Group -  FIPS encryption"
+      description = "Databricks - Workspace Security Group -  FIPS encryption"
       from_port   = 2443
       to_port     = 2443
       protocol    = "tcp"
@@ -80,6 +80,6 @@ resource "aws_security_group" "sg" {
     }
   }
   tags = {
-    Name = "${var.resource_prefix}-data-plane-sg"
+    Name = "${var.resource_prefix}-workspace-sg"
   }
 }

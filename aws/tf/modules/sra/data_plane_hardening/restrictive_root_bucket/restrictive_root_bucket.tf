@@ -2,7 +2,7 @@
 
 // Restrictive Bucket Policy
 resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
-  bucket = var.dbfsname
+  bucket = var.root_s3_bucket
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -19,8 +19,8 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
           "s3:GetBucketLocation"
         ],
         Resource = [
-          "arn:aws:s3:::${var.dbfsname}/*",
-          "arn:aws:s3:::${var.dbfsname}"
+          "arn:aws:s3:::${var.root_s3_bucket}/*",
+          "arn:aws:s3:::${var.root_s3_bucket}"
         ]
       },
       {
@@ -34,21 +34,21 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
           "s3:DeleteObject"
         ],
         Resource = [
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/0_databricks_dev",
-          "arn:aws:s3:::${var.dbfsname}/ephemeral/${var.region_name}-prod/${var.workspace_id}/*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}.*/*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/databricks/init/*/*.sh",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/user/hive/warehouse/*.db/",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/user/hive/warehouse/*.db/*-*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/user/hive/warehouse/*__PLACEHOLDER__/",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/user/hive/warehouse/*.db/*__PLACEHOLDER__/",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/FileStore/*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/databricks/mlflow/*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/databricks/mlflow-*/*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/mlflow-*/*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/pipelines/*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/local_disk0/tmp/*",
-          "arn:aws:s3:::${var.dbfsname}/${var.region_name}-prod/${var.workspace_id}/tmp/*"
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/0_databricks_dev",
+          "arn:aws:s3:::${var.root_s3_bucket}/ephemeral/${var.region_name}-prod/${var.workspace_id}/*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}.*/*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/databricks/init/*/*.sh",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/user/hive/warehouse/*.db/",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/user/hive/warehouse/*.db/*-*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/user/hive/warehouse/*__PLACEHOLDER__/",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/user/hive/warehouse/*.db/*__PLACEHOLDER__/",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/FileStore/*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/databricks/mlflow/*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/databricks/mlflow-*/*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/mlflow-*/*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/pipelines/*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/local_disk0/tmp/*",
+          "arn:aws:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/tmp/*"
         ]
       },
       {
@@ -57,8 +57,8 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
         Action    = ["s3:*"],
         Principal = "*",
         Resource = [
-          "arn:aws:s3:::${var.dbfsname}/*",
-          "arn:aws:s3:::${var.dbfsname}"
+          "arn:aws:s3:::${var.root_s3_bucket}/*",
+          "arn:aws:s3:::${var.root_s3_bucket}"
         ],
         Condition = {
           Bool = {

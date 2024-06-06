@@ -64,11 +64,6 @@ variable "read_only_data_bucket" {
   type        = string
 }
 
-variable "dbfsname" {
-  description = "Name for Databricks File System (DBFS)."
-  type        = string
-}
-
 variable "enable_audit_log_alerting" {
   description = "Flag to audit log alerting."
   type        = bool
@@ -83,7 +78,7 @@ variable "enable_cluster_boolean" {
   default     = false
 }
 
-variable "enable_read_only_external_location" {
+variable "enable_read_only_external_location_boolean" {
   description = "Flag to enable read only external location"
   type        = bool
   sensitive   = true
@@ -137,7 +132,7 @@ variable "enable_sat_boolean" {
   default     = false
 }
 
-variable "enable_system_tables_schema" {
+variable "enable_system_tables_schema_boolean" {
   description = "Flag for enabling public preview system schema access"
   type        = bool
   sensitive   = true
@@ -168,30 +163,29 @@ variable "ip_addresses" {
   type        = list(string)
 }
 
-variable "metastore_id" {
-  description = "ID for the Unity Catalog metastore."
-  type        = string
-  sensitive   = true
+variable "metastore_exists" {
+  description = "If a metastore exists"
+  type        = bool
 }
 
 variable "operation_mode" {
   type        = string
-  description = "The type of network configuration."
+  description = "The type of Operation Mode for the workspace network configuration."
   nullable    = false
 
   validation {
     condition     = contains(["sandbox", "firewall", "custom", "isolated"], var.operation_mode)
-    error_message = "Invalid network type. Allowed values are: sandbox, firewall, custom, isolated."
+    error_message = "Invalid operation model. Allowed values are: sandbox, firewall, custom, isolated."
   }
 }
 
-variable "compliance_security_profile" {
+variable "compliance_security_profile_egress_ports" {
   type        = bool
   description = "Add 2443 to security group configuration or nitro instance"
   nullable    = false
 }
 
-variable "enable_admin_configs" {
+variable "enable_admin_configs_boolean" {
   type        = bool
   description = "Enable workspace configs"
   nullable    = false
@@ -227,12 +221,6 @@ variable "relay_vpce_service" {
   type        = string
 }
 
-variable "resource_owner" {
-  description = "Owner of the resource."
-  type        = string
-  sensitive   = true
-}
-
 variable "resource_prefix" {
   description = "Prefix for the resource names."
   type        = string
@@ -251,11 +239,6 @@ variable "sg_egress_protocol" {
 variable "sg_ingress_protocol" {
   description = "List of ingress protocols for security groups."
   type        = list(string)
-}
-
-variable "metastore_name" {
-  description = "Name of the Unity Catalog Metastore."
-  type        = string
 }
 
 variable "user_workspace_admin" {
@@ -284,7 +267,7 @@ variable "workspace_vpce_service" {
   type        = string
 }
 
-variable "workspace_service_principal_name" {
+variable "workspace_admin_service_principal_name" {
   description = "Service principle name"
   type        = string
 }

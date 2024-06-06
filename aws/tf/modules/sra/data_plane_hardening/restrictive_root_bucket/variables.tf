@@ -2,7 +2,7 @@ variable "region_name" {
   type = string
 }
 
-variable "dbfsname" {
+variable "root_s3_bucket" {
   type = string
 }
 

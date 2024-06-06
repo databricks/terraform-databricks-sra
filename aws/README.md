@@ -1,16 +1,19 @@
 # Security Reference Architecture Template
 
+
 ## Introduction
 
 Databricks has worked with thousands of customers to securely deploy the Databricks platform with appropriate security features to meet their architecture requirements.
 
 This Security Reference Architecture (SRA) repository implements common security features as a unified terraform templates that are typically deployed by our security conscious customers.
 
+
 ## Component Breakdown and Description
 
 In this section, we break down each of the components that we've included in this Security Reference Architecture.
 
 In various `.tf` scripts, we have included direct links to the Databricks Terraform documentation. The [official documentation](https://registry.terraform.io/providers/databricks/databricks/latest/docs) can be found here.
+
 
 ## Operation Mode:
 
@@ -26,6 +29,7 @@ There are four separate operation modes you can choose for the underlying networ
 
 See the below networking diagrams for more information.
 
+
 ## Infrastructure Deployment
 
 - **Customer-managed VPC**: A [customer-managed VPC](https://docs.databricks.com/administration-guide/cloud-configurations/aws/customer-managed-vpc.html) allows Databricks customers to exercise more control over network configuration to comply with specific cloud security and governance standards that a customer's organization may require.
@@ -40,9 +44,8 @@ See the below networking diagrams for more information.
 
 - **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/data-governance/unity-catalog/index.html) is a unified governance solution for all data and AI assets including files, tables, and machine learning models. Unity Catalog provides a modern approach to granular access controls with centralized policy, auditing, and lineage tracking - all integrated into your Databricks workflow. **NOTE**: SRA creates a workspace specific catalog that is isolated to that individual workspace. To change these settings please update uc_catalog.tf under the workspace_security_modules.
 
-## Post Workspace Deployment
 
-- **Audit and Billing Log Delivery**: Databricks delivers logs to your S3 buckets. [Audit logs](https://docs.databricks.com/administration-guide/account-settings/audit-logs.html) contain two levels of events: workspace-level audit logs with workspace-level events and account-level audit logs with account-level events. In addition to these logs, you can generate additional events by enabling verbose audit logs. [Billable usage logs](https://docs.databricks.com/administration-guide/account-settings/billable-usage-delivery.html) are delivered daily to an AWS S3 storage bucket. There will be a separate CSV file for each workspace. This file contains historical data about the workspace's cluster usage in Databricks Units (DBUs).
+## Post Workspace Deployment
 
 - **Service Principals**: A [Service principal](https://docs.databricks.com/administration-guide/users-groups/service-principals.html) is an identity that you create in Databricks for use with automated tools, jobs, and applications. It's against best practice to tie production workloads to individual user accounts, and so we recommend configuring these service principals within Databricks. In this template, we create an example service principal.
 
@@ -50,21 +53,25 @@ See the below networking diagrams for more information.
 
 - **Secret Management** Integrating with heterogenous systems requires managing a potentially large set of credentials and safely distributing them across an organization. Instead of directly entering your credentials into a notebook, use [Databricks secrets](https://docs.databricks.com/security/secrets/index.html) to store your credentials and reference them in notebooks and jobs. In this template, we create an example secret.
 
-- **Admin Console Configurations**: There are a number of configurations within the [admin console](https://docs.databricks.com/administration-guide/admin-console.html) that can be controlled to reduce your threat vector. In this example, we use the workspace configurations Terraform template to disable and enable numerous options.
-
-- **Cluster Tags and Pool Tags**: [Cluster and pool tags](https://docs.databricks.com/administration-guide/account-settings/usage-detail-tags-aws.html) allow customers to monitor cost and accurately attribute Databricks usage to your organization's business unit and teams (for chargebacks, for examples). These tags propagate both to detailed DBU usage reports and to AWS EC2 and AWS EBS instances for cost analysis.
 
 ## Optional Deployment Configurations
 
-- **Audit and Billable Usage Logs**: Audit and Billable Usage Logs can be enabled twice across a Databricks account. If your account has logging configured, you can set this parameter to false, so that another logging configuration is created.
-
-- **IP Access Lists**: IP Access can be enabled to only allow a subset of IPs to access the Databricks workspace console. **NOTE:** Please verify all of the IPs are correct prior to enabling this feature to prevent a lockout scenario.
+- **Audit and Billable Usage Logs**: Databricks delivers logs to your S3 buckets. [Audit logs](https://docs.databricks.com/administration-guide/account-settings/audit-logs.html) contain two levels of events: workspace-level audit logs with workspace-level events and account-level audit logs with account-level events. In addition to these logs, you can generate additional events by enabling verbose audit logs. [Billable usage logs](https://docs.databricks.com/administration-guide/account-settings/billable-usage-delivery.html) are delivered daily to an AWS S3 storage bucket. There will be a separate CSV file for each workspace. This file contains historical data about the workspace's cluster usage in Databricks Units (DBUs).
 
 - **Cluster Example**: An example of a cluster and a cluster policy has been included. **NOTE:** Please be aware this will create a cluster within your Databricks workspace including the underlying EC2 instance.
 
-- **Enable Restrictive Root Bucket**: A restrictive root bucket policy can be applied to the root bucket of the workspace. **NOTE:** Please be aware this bucket is updated frequently, however, may not contain prefixes for the latest product releases.
+- **IP Access Lists**: IP Access can be enabled to only allow a subset of IPs to access the Databricks workspace console. **NOTE:** Please verify all of the IPs are correct prior to enabling this feature to prevent a lockout scenario.
 
-- **Enable Restrictive Kinesis, STS, and S3 Endpoint Policies**: Restrictive policies for Kinesis, STS, and S3 endpoints can be added for Databricks specific assets. **NOTE:** Please be aware thse policies could be updated and may result in potentially breaking changes. If this is the case, we recommend removing the policy.
+- **Read Only External Location**: This creates a read-only external location in Unity Catalog for a given bucket as well as the corresponding AWS IAM role.
+
+- **Restrictive Root Bucket**: A restrictive root bucket policy can be applied to the root bucket of the workspace. **NOTE:** Please be aware this bucket is updated frequently, however, may not contain prefixes for the latest product releases.
+
+- **Restrictive Kinesis, STS, and S3 Endpoint Policies**: Restrictive policies for Kinesis, STS, and S3 endpoints can be added for Databricks specific assets. **NOTE:** Please be aware thse policies could be updated and may result in potentially breaking changes. If this is the case, we recommend removing the policy.
+
+- **System Tables**: System tables are a Databricks-hosted analytical store of your account’s operational data found in the system catalog. System tables can be used for historical observability across your account. This is currently in public preview, so is optional to enable or not.
+
+- **Workspace Admin. Configurations**: Workspace administration configurations that can be enabled that align with security best practices. The Terraform resource is experimental, which is why it is optional. Documentation on each configuration is provided in the Terraform file.
+
 
 ## Solution Accelerators
 
@@ -94,27 +101,32 @@ In this section, we break down additional security recommendations and opportuni
 
 - **Evaluate Whether your Workflow requires using Git Repos or CI/CD**: Mature organizations often build production workloads by using CI/CD to integrate code scanning, better control permissions, perform linting, and more. When there is highly sensitive data analyzed, a CI/CD process can also allow scanning for known scenarios such as hard coded secrets.
 
+
 ## Getting Started
 
 1. Clone this Repo
 2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
 3. Decide which [operation](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) mode you'd like to use.
 4. Fill out `sra.tf` in place
-5. Fill out `example.tfvars` and place in `tf` directory
+5. Fill out `example.tfvars` and place in `tf` directory, remove the .example part of the file name
 6. CD into `tf`
 7. Run `terraform init`
 8. Run `terraform validate`
 9. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
 10. Run `terraform apply -var-file ../example.tfvars`
 
+
 ## Network Diagram - Sandbox
 ![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Sandbox%20-%20Network%20Topology.png)
+
 
 ## Network Diagram - Firewall
 ![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Firewall%20-%20Network%20Topology.png)
 
+
 ## Network Diagram - Isolated
 ![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Isolated%20-%20Network%20Topology.png)
+
 
 ## FAQ
 

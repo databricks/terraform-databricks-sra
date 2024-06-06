@@ -76,7 +76,6 @@ resource "databricks_mws_customer_managed_keys" "workspace_storage" {
 
 // Private Access Setting Configuration
 resource "databricks_mws_private_access_settings" "pas" {
-  account_id                   = var.databricks_account_id
   private_access_settings_name = "${var.resource_prefix}-PAS"
   region                       = var.region
   public_access_enabled        = true
@@ -85,9 +84,10 @@ resource "databricks_mws_private_access_settings" "pas" {
 
 // Workspace Configuration
 resource "databricks_mws_workspaces" "this" {
-  account_id                               = var.databricks_account_id
-  aws_region                               = var.region
-  workspace_name                           = var.resource_prefix
+  account_id     = var.databricks_account_id
+  aws_region     = var.region
+  workspace_name = var.resource_prefix
+  # deployment_name                          = "development-company-A" // Deployment name for the workspace URL. This is not enabled by default on an account. Please reach out to your Databricks representative for more information.
   credentials_id                           = databricks_mws_credentials.this.credentials_id
   storage_configuration_id                 = databricks_mws_storage_configurations.this.storage_configuration_id
   network_id                               = databricks_mws_networks.this.network_id
