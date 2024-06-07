@@ -108,7 +108,7 @@ In this section, we break down additional security recommendations and opportuni
 2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
 3. Decide which [operation](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) mode you'd like to use.
 4. Fill out `sra.tf` in place
-5. Fill out `example.tfvars` and place in `tf` directory, remove the .example part of the file name
+5. Fill out `template.tfvars.example` remove the .example part of the file name
 6. CD into `tf`
 7. Run `terraform init`
 8. Run `terraform validate`
