@@ -38,7 +38,7 @@ resource "aws_s3_bucket_public_access_block" "root_storage_bucket" {
 }
 
 data "databricks_aws_bucket_policy" "this" {
-  databricks_e2_account_id =  var.databricks_account_id
+  databricks_e2_account_id = var.databricks_account_id
   bucket                   = aws_s3_bucket.root_storage_bucket.bucket
 }
 
