@@ -21,11 +21,11 @@ module "SRA" {
   user_workspace_admin                   = null             // Workspace admin user email.
   operation_mode                         = "sandbox"        // Operation mode (sandbox, custom, firewall, isolated).
   workspace_admin_service_principal_name = "sra-example-sp" // Creates an example admin SP for automation use cases.
-  metastore_exists                       = false            // If a regional metastore exists set to true.
+  metastore_exists                       = false            // If a regional metastore exists set to true. If there are multiple regional metastores, you can comment out "uc_init" and add the metastore ID directly in to the module call for "uc_assignment".
 
   // AWS Specific Variables:
   cmk_admin_arn                            = null // CMK admin ARN, defaults to the AWS account root user.
-  vpc_cidr_range                           = "10.0.0.0/18"
+  vpc_cidr_range                           = "10.0.0.0/18" // Please re-define the subsequent subnet ranges if the VPC CIDR range is updated.
   private_subnets_cidr                     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
   privatelink_subnets_cidr                 = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
   availability_zones                       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1], data.aws_availability_zones.available.names[2]]

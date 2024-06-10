@@ -175,7 +175,7 @@ variable "operation_mode" {
 
   validation {
     condition     = contains(["sandbox", "firewall", "custom", "isolated"], var.operation_mode)
-    error_message = "Invalid operation model. Allowed values are: sandbox, firewall, custom, isolated."
+    error_message = "Invalid operation mode. Allowed values are: sandbox, firewall, custom, isolated."
   }
 }
 
