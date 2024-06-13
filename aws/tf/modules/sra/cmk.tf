@@ -6,7 +6,8 @@ locals {
 
 resource "aws_kms_key" "workspace_storage" {
   description = "KMS key for databricks workspace storage"
-  policy = jsonencode({ Version : "2012-10-17",
+  policy = jsonencode({
+    Version : "2012-10-17",
     "Id" : "key-policy-workspace-storage",
     Statement : [
       {
@@ -58,13 +59,17 @@ resource "aws_kms_key" "workspace_storage" {
         }
       }
     ]
-    }
-  )
+  })
   depends_on = [aws_iam_role.cross_account_role]
+
+  tags = {
+    Resource = var.resource_prefix
+  }
 }
 
+
 resource "aws_kms_alias" "workspace_storage_key_alias" {
-  name          = "alias/${var.resource_prefix}-workspace-storage-key-alias"
+  name          = "alias/${var.resource_prefix}-workspace-storage-key"
   target_key_id = aws_kms_key.workspace_storage.id
 }
 
@@ -104,9 +109,13 @@ resource "aws_kms_key" "managed_storage" {
     ]
     }
   )
+
+  tags = {
+    Resource = var.resource_prefix
+  }
 }
 
 resource "aws_kms_alias" "managed_storage_key_alias" {
-  name          = "alias/${var.resource_prefix}-managed-storage-key-alias"
+  name          = "alias/${var.resource_prefix}-managed-storage-key"
   target_key_id = aws_kms_key.managed_storage.key_id
 }

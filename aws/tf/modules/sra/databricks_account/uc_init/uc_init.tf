@@ -2,7 +2,7 @@
 
 // Metastore
 resource "databricks_metastore" "this" {
-  name          = "unity-catalog-${var.resource_prefix}"
+  name          = "${var.resource_prefix}-${var.region}-unity-catalog"
   region        = var.region
   force_destroy = true
 }

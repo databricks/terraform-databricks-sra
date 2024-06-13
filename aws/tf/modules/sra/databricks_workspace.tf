@@ -21,7 +21,7 @@ module "uc_catalog" {
 
 // Create Read-Only Storage Location for Data Bucket & External Location
 module "uc_external_location" {
-  count  = var.enable_read_only_external_location ? 1 : 0
+  count  = var.enable_read_only_external_location_boolean ? 1 : 0
   source = "./databricks_workspace/workspace_security_modules/uc_external_location"
   providers = {
     databricks = databricks.created_workspace
@@ -40,7 +40,7 @@ module "uc_external_location" {
 
 // Workspace Admin Configuration
 module "admin_configuration" {
-  count  = var.enable_admin_configs ? 1 : 0
+  count  = var.enable_admin_configs_boolean ? 1 : 0
   source = "./databricks_workspace/workspace_security_modules/admin_configuration"
   providers = {
     databricks = databricks.created_workspace
@@ -98,9 +98,9 @@ module "cluster_configuration" {
     databricks = databricks.created_workspace
   }
 
-  compliance_security_profile = var.compliance_security_profile
-  secret_config_reference     = module.secret_management.config_reference
-  resource_prefix             = var.resource_prefix
+  compliance_security_profile_egress_ports = var.compliance_security_profile_egress_ports
+  secret_config_reference                  = module.secret_management.config_reference
+  resource_prefix                          = var.resource_prefix
   depends_on = [
     module.databricks_mws_workspace, module.secret_management
   ]
@@ -109,7 +109,7 @@ module "cluster_configuration" {
 // Public Preview - System Table Schemas - Optional
 module "public_preview_system_table" {
   source = "./databricks_workspace/public_preview/system_schema/"
-  count  = var.enable_system_tables_schema ? 1 : 0
+  count  = var.enable_system_tables_schema_boolean ? 1 : 0
   providers = {
     databricks = databricks.created_workspace
   }

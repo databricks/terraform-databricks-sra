@@ -29,10 +29,10 @@ resource "aws_security_group" "privatelink" {
   }
 
   dynamic "ingress" {
-    for_each = var.compliance_security_profile ? [2443] : []
+    for_each = var.compliance_security_profile_egress_ports ? [2443] : []
 
     content {
-      description     = "Databricks - Data Plane Security Group -  FIPS encryption"
+      description     = "Databricks - PrivateLink Endpoint SG -  FIPS encryption"
       from_port       = 2443
       to_port         = 2443
       protocol        = "tcp"
@@ -70,8 +70,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.dbfsname}/*",
-      "arn:aws:s3:::${var.dbfsname}"
+      "arn:aws:s3:::${var.resource_prefix}-workspace-root-storage/*",
+      "arn:aws:s3:::${var.resource_prefix}-workspace-root-storage"
     ]
 
     condition {
@@ -267,7 +267,7 @@ module "vpc_endpoints" {
     sts = {
       service             = "sts"
       private_dns_enabled = true
-      subnet_ids          = length(module.vpc[0].intra_subnets) > 0 ? slice(module.vpc[0].intra_subnets, 0, min(2, length(module.vpc[0].intra_subnets))) : []
+      subnet_ids          = module.vpc[0].intra_subnets
       policy              = var.enable_restrictive_sts_endpoint_boolean ? data.aws_iam_policy_document.sts_vpc_endpoint_policy[0].json : null
       tags = {
         Name = "${var.resource_prefix}-sts-vpc-endpoint"
@@ -276,7 +276,7 @@ module "vpc_endpoints" {
     kinesis-streams = {
       service             = "kinesis-streams"
       private_dns_enabled = true
-      subnet_ids          = length(module.vpc[0].intra_subnets) > 0 ? slice(module.vpc[0].intra_subnets, 0, min(2, length(module.vpc[0].intra_subnets))) : []
+      subnet_ids          = module.vpc[0].intra_subnets
       policy              = var.enable_restrictive_kinesis_endpoint_boolean ? data.aws_iam_policy_document.kinesis_vpc_endpoint_policy[0].json : null
       tags = {
         Name = "${var.resource_prefix}-kinesis-vpc-endpoint"
@@ -296,7 +296,7 @@ resource "aws_vpc_endpoint" "backend_rest" {
   service_name        = var.workspace_vpce_service
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
-  subnet_ids          = length(module.vpc[0].intra_subnets) > 0 ? slice(module.vpc[0].intra_subnets, 0, min(2, length(module.vpc[0].intra_subnets))) : []
+  subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
   tags = {
@@ -312,7 +312,7 @@ resource "aws_vpc_endpoint" "backend_relay" {
   service_name        = var.relay_vpce_service
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
-  subnet_ids          = length(module.vpc[0].intra_subnets) > 0 ? slice(module.vpc[0].intra_subnets, 0, min(2, length(module.vpc[0].intra_subnets))) : []
+  subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
   tags = {

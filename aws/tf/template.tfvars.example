@@ -1,9 +1,8 @@
-#copy file and remove .example suffix
+# Configuration Variables for AWS and Databricks
 
-aws_account_id        = ""
-client_id             = ""
-client_secret         = ""
-databricks_account_id = ""
-region                = ""
-resource_owner        = ""
-resource_prefix       = ""
+aws_account_id = ""        // AWS account ID where resources will be deployed.
+client_id = ""             // Service principal ID for Databricks with admin permissions.
+client_secret = ""         // Secret for the corresponding service principal.
+databricks_account_id = "" // Databricks account ID.
+region = ""                // AWS and Databricks region (e.g., us-west-2).
+resource_prefix = ""       // Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles).

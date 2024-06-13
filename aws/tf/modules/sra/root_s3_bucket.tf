@@ -1,10 +1,10 @@
 // EXPLANATION: Create the workspace root bucket
 
 resource "aws_s3_bucket" "root_storage_bucket" {
-  bucket        = var.dbfsname
+  bucket        = "${var.resource_prefix}-workspace-root-storage"
   force_destroy = true
   tags = {
-    Name = var.dbfsname
+    Name = var.resource_prefix
   }
 }
 
@@ -38,7 +38,8 @@ resource "aws_s3_bucket_public_access_block" "root_storage_bucket" {
 }
 
 data "databricks_aws_bucket_policy" "this" {
-  bucket = aws_s3_bucket.root_storage_bucket.bucket
+  databricks_e2_account_id = var.databricks_account_id
+  bucket                   = aws_s3_bucket.root_storage_bucket.bucket
 }
 
 # Bucket policy to use if the restrictive root bucket is set to false

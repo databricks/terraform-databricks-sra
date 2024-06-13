@@ -78,21 +78,6 @@ resource "aws_iam_role_policy" "cross_account" {
         } }
       },
       {
-        "Sid" : "AllowEc2RunInstanceImagePerTag",
-        "Effect" : "Allow",
-        "Action" : "ec2:RunInstances",
-        "Resource" : [
-          "arn:aws:ec2:${var.region}:${var.aws_account_id}:image/*"
-        ],
-        "Condition" : {
-          "StringEquals" : {
-            "aws:ResourceTag/Vendor" : "Databricks",
-            "ec2:Owner" : "601306020600"
-          }
-        }
-      }
-      ,
-      {
         "Sid" : "AllowEc2RunInstancePerVPCid",
         "Effect" : "Allow",
         "Action" : "ec2:RunInstances",

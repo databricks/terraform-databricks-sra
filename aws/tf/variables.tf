@@ -52,11 +52,6 @@ variable "region_name" {
   }
 }
 
-variable "resource_owner" {
-  description = "Owner of the resource."
-  type        = string
-}
-
 variable "resource_prefix" {
   description = "Prefix for the resource names."
   type        = string
