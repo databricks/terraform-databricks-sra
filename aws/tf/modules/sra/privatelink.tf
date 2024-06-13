@@ -70,8 +70,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.resource_prefix}-workspace-root-storage}/*",
-      "arn:aws:s3:::${var.resource_prefix}-workspace-root-storage}"
+      "arn:aws:s3:::${var.resource_prefix}-workspace-root-storage/*",
+      "arn:aws:s3:::${var.resource_prefix}-workspace-root-storage"
     ]
 
     condition {
