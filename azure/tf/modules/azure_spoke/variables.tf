@@ -106,3 +106,10 @@ variable "tenant_id" {
   type        = string
   description = "(Required) The tenant ID for the Azure subscription"
 }
+
+# Resource placeholder that checks to see if private_dbfs should be created
+variable "boolean_create_private_dbfs" {
+  description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
+  type        = bool
+  default     = true
+}
