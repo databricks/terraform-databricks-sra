@@ -12,6 +12,10 @@ resource "databricks_system_schema" "compute" {
   schema = "compute"
 }
 
+resource "databricks_system_schema" "workflow" {
+  schema = "workflow"
+}
+
 resource "databricks_system_schema" "marketplace" {
   schema = "marketplace"
 }
