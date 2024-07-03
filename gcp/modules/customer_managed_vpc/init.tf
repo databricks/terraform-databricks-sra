@@ -41,7 +41,7 @@ variable "mws_workspace_gke_master_ip_range" {
   default = "10.3.0.0/28"
 }
 
-//Users can connect to workspace only thes list of IP's
+//Users can connect to workspace only from this list of IP's
 variable "ip_addresses" {
   type = list(string)
 }

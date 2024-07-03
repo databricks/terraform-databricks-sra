@@ -1,0 +1,2 @@
+Prerequisite : the current SA (configured via GOOGLE_APPLICATION_CREDENTIALS) needs to have token impersonnation rights over the SA "old_admin_account"
+Do note that this doesn't even check that the google service accounts exist, so it does need to be provisionned somewhere else
