@@ -11,7 +11,7 @@ module "SRA" {
   client_secret         = var.client_secret
   aws_account_id        = var.aws_account_id
   region                = var.region
-  region_name           = var.region_name[var.region]
+  region_name           = var.region_name[var.databricks_gov_shard]
 
   // Naming and Tagging Variables:
   resource_prefix = var.resource_prefix
@@ -30,11 +30,11 @@ module "SRA" {
   privatelink_subnets_cidr                 = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
   availability_zones                       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1], data.aws_availability_zones.available.names[2]]
   sg_egress_ports                          = [443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
-  compliance_security_profile_egress_ports = false // Set to true to enable compliance security profile related egress ports (2443)
+  compliance_security_profile_egress_ports = true // Set to true to enable compliance security profile related egress ports (2443)
   sg_ingress_protocol                      = ["tcp", "udp"]
   sg_egress_protocol                       = ["tcp", "udp"]
-  relay_vpce_service                       = var.scc_relay[var.region]
-  workspace_vpce_service                   = var.workspace[var.region]
+  relay_vpce_service                       = var.scc_relay[var.databricks_gov_shard]
+  workspace_vpce_service                   = var.workspace[var.databricks_gov_shard]
 
   // Operation Mode Specific Variables:
   // Sandbox and Firewall Modes
@@ -44,7 +44,7 @@ module "SRA" {
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26", "10.0.33.128/26"]
   firewall_allow_list         = [".pypi.org", ".cran.r-project.org", ".pythonhosted.org", ".spark-packages.org", ".maven.org", "maven.apache.org", ".storage-download.googleapis.com"]
   firewall_protocol_deny_list = "IP"
-  hive_metastore_fqdn         = var.hms_fqdn[var.region] // https://docs.databricks.com/en/resources/supported-regions.html#rds-addresses-for-legacy-hive-metastore
+  hive_metastore_fqdn         = var.hms_fqdn[var.databricks_gov_shard] // https://docs.databricks.com/en/resources/supported-regions.html#rds-addresses-for-legacy-hive-metastore
 
   // Custom Mode Specific:
   custom_vpc_id             = null
