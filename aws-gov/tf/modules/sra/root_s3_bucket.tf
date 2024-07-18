@@ -37,9 +37,32 @@ resource "aws_s3_bucket_public_access_block" "root_storage_bucket" {
   depends_on              = [aws_s3_bucket.root_storage_bucket]
 }
 
-data "databricks_aws_bucket_policy" "this" {
-  databricks_e2_account_id = var.databricks_account_id
-  bucket                   = aws_s3_bucket.root_storage_bucket.bucket
+data "aws_iam_policy_document" "this" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:PutObject",
+      "s3:DeleteObject"]
+    resources = [
+      "${aws_s3_bucket.root_storage_bucket.arn}/*",
+      aws_s3_bucket.root_storage_bucket.arn]
+    principals {
+      identifiers = ["arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:root"]
+      type        = "AWS"
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalTag/DatabricksAccountId"
+
+      values = [
+        var.databricks_account_id
+      ]
+    }
+  }
 }
 
 # Bucket policy to use if the restrictive root bucket is set to false
@@ -47,7 +70,7 @@ resource "aws_s3_bucket_policy" "root_bucket_policy" {
   count = var.enable_restrictive_root_bucket_boolean ? 0 : 1
 
   bucket     = aws_s3_bucket.root_storage_bucket.id
-  policy     = data.databricks_aws_bucket_policy.this.json
+  policy     = data.aws_iam_policy_document.this.json
   depends_on = [aws_s3_bucket_public_access_block.root_storage_bucket]
 }
 
@@ -56,7 +79,7 @@ resource "aws_s3_bucket_policy" "root_bucket_policy_ignore" {
   count = var.enable_restrictive_root_bucket_boolean ? 1 : 0
 
   bucket     = aws_s3_bucket.root_storage_bucket.id
-  policy     = data.databricks_aws_bucket_policy.this.json
+  policy     = data.aws_iam_policy_document.this.json
   depends_on = [aws_s3_bucket_public_access_block.root_storage_bucket]
 
   lifecycle {
