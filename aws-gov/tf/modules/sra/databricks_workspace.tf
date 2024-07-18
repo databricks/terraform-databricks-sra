@@ -7,12 +7,15 @@ module "uc_catalog" {
     databricks = databricks.created_workspace
   }
 
-  databricks_account_id   = var.databricks_account_id
-  aws_account_id          = var.aws_account_id
-  resource_prefix         = var.resource_prefix
-  uc_catalog_name         = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
-  workspace_id            = module.databricks_mws_workspace.workspace_id
-  workspace_catalog_admin = var.workspace_catalog_admin
+  databricks_account_id          = var.databricks_account_id
+  aws_account_id                 = var.aws_account_id
+  resource_prefix                = var.resource_prefix
+  uc_catalog_name                = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
+  workspace_id                   = module.databricks_mws_workspace.workspace_id
+  workspace_catalog_admin        = var.workspace_catalog_admin
+  databricks_gov_shard           = var.databricks_gov_shard
+  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
+  uc_master_role_id              = var.uc_master_role_id
 
   depends_on = [
     module.databricks_mws_workspace, module.uc_assignment
@@ -32,6 +35,9 @@ module "uc_external_location" {
   resource_prefix                   = var.resource_prefix
   read_only_data_bucket             = var.read_only_data_bucket
   read_only_external_location_admin = var.read_only_external_location_admin
+  databricks_gov_shard              = var.databricks_gov_shard
+  databricks_prod_aws_account_id    = var.databricks_prod_aws_account_id
+  uc_master_role_id                 = var.uc_master_role_id
 
   depends_on = [
     module.databricks_mws_workspace, module.uc_assignment

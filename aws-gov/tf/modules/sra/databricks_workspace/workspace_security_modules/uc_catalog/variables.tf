@@ -21,3 +21,15 @@ variable "uc_catalog_name" {
 variable "workspace_catalog_admin" {
   type = string
 }
+
+variable "databricks_gov_shard" {
+  type = string
+}
+
+variable "databricks_prod_aws_account_id" {
+  type = map(string)
+}
+
+variable "uc_master_role_id" {
+  type = map(string)
+}

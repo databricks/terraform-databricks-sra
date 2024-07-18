@@ -6,19 +6,22 @@ module "SRA" {
   }
 
   // Common Authentication Variables
-  databricks_account_id = var.databricks_account_id
-  client_id             = var.client_id
-  client_secret         = var.client_secret
-  aws_account_id        = var.aws_account_id
-  region                = var.region
-  region_name           = var.region_name[var.databricks_gov_shard]
+  databricks_account_id          = var.databricks_account_id
+  client_id                      = var.client_id
+  client_secret                  = var.client_secret
+  aws_account_id                 = var.aws_account_id
+  region                         = var.region
+  region_name                    = var.region_name[var.databricks_gov_shard]
+  databricks_gov_shard           = var.databricks_gov_shard
+  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
+  uc_master_role_id              = var.uc_master_role_id
 
   // Naming and Tagging Variables:
   resource_prefix = var.resource_prefix
 
   // Required Variables:
-  workspace_catalog_admin                = null             // Workspace catalog admin email.
-  user_workspace_admin                   = null             // Workspace admin user email.
+  workspace_catalog_admin                = null            // Workspace catalog admin email.
+  user_workspace_admin                   = null            // Workspace admin user email.
   operation_mode                         = "sandbox"        // Operation mode (sandbox, custom, firewall, isolated).
   workspace_admin_service_principal_name = "sra-example-sp" // Creates an example admin SP for automation use cases.
   metastore_exists                       = false            // If a regional metastore exists set to true. If there are multiple regional metastores, you can comment out "uc_init" and add the metastore ID directly in to the module call for "uc_assignment".

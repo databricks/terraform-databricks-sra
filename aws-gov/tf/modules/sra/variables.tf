@@ -271,3 +271,18 @@ variable "workspace_admin_service_principal_name" {
   description = "Service principal name"
   type        = string
 }
+
+variable "databricks_gov_shard" {
+  description = "Gov Shard civilian or dod"
+  type        = string
+}
+
+variable "databricks_prod_aws_account_id" {
+  description = "Databricks Prod AWS Account Id"
+  type = map(string)
+}
+
+variable "uc_master_role_id" {
+  description = "UC Master Role ID"
+  type = map(string)
+}
