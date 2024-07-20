@@ -56,7 +56,8 @@ resource "aws_iam_role" "storage_credential_role" {
 resource "aws_iam_role_policy" "storage_credential_policy" {
   name = "${var.resource_prefix}-storage-credential-policy"
   role = aws_iam_role.storage_credential_role.id
-  policy = jsonencode({ Version : "2012-10-17",
+  policy = jsonencode({
+    Version : "2012-10-17",
     Statement : [
       {
         "Action" : [

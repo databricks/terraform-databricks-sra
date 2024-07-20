@@ -1,13 +1,26 @@
 // EXPLANATION: The cross-account role for the Databricks workspace
 
-// Cross Account Role
-data "databricks_aws_assume_role_policy" "this" {
-  external_id = var.databricks_account_id
+// Cross Account Trust Policy
+data "aws_iam_policy_document" "passrole_for_cross_account_credential" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      identifiers = ["arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:root"]
+      type        = "AWS"
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "sts:ExternalId"
+      values   = [var.databricks_account_id]
+    }
+  }
 }
 
+// Cross Account Role
 resource "aws_iam_role" "cross_account_role" {
   name               = "${var.resource_prefix}-crossaccount"
-  assume_role_policy = data.databricks_aws_assume_role_policy.this.json
+  assume_role_policy = data.aws_iam_policy_document.passrole_for_cross_account_credential.json
   tags = {
     Name = "${var.resource_prefix}-crossaccount-role"
   }
@@ -113,7 +126,7 @@ resource "aws_iam_role_policy" "cross_account" {
         ],
         "Condition" : {
           "StringNotEquals" : {
-            "ec2:Owner" : "601306020600"
+            "ec2:Owner" : "044732911619"
           }
         }
       },
