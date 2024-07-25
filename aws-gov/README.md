@@ -106,7 +106,7 @@ In this section, we break down additional security recommendations and opportuni
 
 1. Clone this Repo
 2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
-3. Decide which [operation](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) mode you'd like to use.
+3. Decide which [operation](https://github.com/databricks/terraform-databricks-sra/tree/main/aws-gov/tf#operation-mode) mode you'd like to use.
 4. Fill out `sra.tf` in place
 5. Fill out `template.tfvars.example` remove the .example part of the file name
 6. CD into `tf`
@@ -117,15 +117,15 @@ In this section, we break down additional security recommendations and opportuni
 
 
 ## Network Diagram - Sandbox
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Sandbox%20-%20Network%20Topology.png)
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws-gov/img/Sandbox%20-%20Network%20Topology.png)
 
 
 ## Network Diagram - Firewall
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Firewall%20-%20Network%20Topology.png)
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws-gov/img/Firewall%20-%20Network%20Topology.png)
 
 
 ## Network Diagram - Isolated
-![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Isolated%20-%20Network%20Topology.png)
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws-gov/img/Isolated%20-%20Network%20Topology.png)
 
 
 ## FAQ
@@ -134,4 +134,4 @@ In this section, we break down additional security recommendations and opportuni
 
 If you'd like to add additional resources to the repository, the first step is to identify if this resource is using the **account** or **workspace** provider.
 
-For example, if it uses the **account** provider, then we'd recommend creating a new module under the [modules/sra/databricks_account](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf/modules/sra/databricks_account) folder. Then, that module can be called in the top level [databricks_account.tf](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/modules/sra/databricks_account.tf) file. This process is the same for the workspace provider by placing a new module in the [modules/sra/databricks_workspace folder](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf/modules/sra/databricks_workspace) and call it in the [databricks_workspace.tf](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/tf/modules/sra/databricks_workspace.tf) file.
+For example, if it uses the **account** provider, then we'd recommend creating a new module under the [modules/sra/databricks_account](https://github.com/databricks/terraform-databricks-sra/tree/main/aws-gov/tf/modules/sra/databricks_account) folder. Then, that module can be called in the top level [databricks_account.tf](https://github.com/databricks/terraform-databricks-sra/blob/main/aws-gov/tf/modules/sra/databricks_account.tf) file. This process is the same for the workspace provider by placing a new module in the [modules/sra/databricks_workspace folder](https://github.com/databricks/terraform-databricks-sra/tree/main/aws-gov/tf/modules/sra/databricks_workspace) and call it in the [databricks_workspace.tf](https://github.com/databricks/terraform-databricks-sra/blob/main/aws-gov/tf/modules/sra/databricks_workspace.tf) file.

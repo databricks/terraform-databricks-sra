@@ -6,19 +6,22 @@ module "SRA" {
   }
 
   // Common Authentication Variables
-  databricks_account_id = var.databricks_account_id
-  client_id             = var.client_id
-  client_secret         = var.client_secret
-  aws_account_id        = var.aws_account_id
-  region                = var.region
-  region_name           = var.region_name[var.region]
+  databricks_account_id          = var.databricks_account_id
+  client_id                      = var.client_id
+  client_secret                  = var.client_secret
+  aws_account_id                 = var.aws_account_id
+  region                         = var.region
+  region_name                    = var.region_name[var.databricks_gov_shard]
+  databricks_gov_shard           = var.databricks_gov_shard
+  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
+  uc_master_role_id              = var.uc_master_role_id
 
   // Naming and Tagging Variables:
   resource_prefix = var.resource_prefix
 
   // Required Variables:
-  workspace_catalog_admin                = null             // Workspace catalog admin email.
-  user_workspace_admin                   = null             // Workspace admin user email.
+  workspace_catalog_admin                = null            // Workspace catalog admin email.
+  user_workspace_admin                   = null            // Workspace admin user email.
   operation_mode                         = "sandbox"        // Operation mode (sandbox, custom, firewall, isolated).
   workspace_admin_service_principal_name = "sra-example-sp" // Creates an example admin SP for automation use cases.
   metastore_exists                       = false            // If a regional metastore exists set to true. If there are multiple regional metastores, you can comment out "uc_init" and add the metastore ID directly in to the module call for "uc_assignment".
@@ -30,11 +33,11 @@ module "SRA" {
   privatelink_subnets_cidr                 = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
   availability_zones                       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1], data.aws_availability_zones.available.names[2]]
   sg_egress_ports                          = [443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
-  compliance_security_profile_egress_ports = false // Set to true to enable compliance security profile related egress ports (2443)
+  compliance_security_profile_egress_ports = true // Set to true to enable compliance security profile related egress ports (2443)
   sg_ingress_protocol                      = ["tcp", "udp"]
   sg_egress_protocol                       = ["tcp", "udp"]
-  relay_vpce_service                       = var.scc_relay[var.region]
-  workspace_vpce_service                   = var.workspace[var.region]
+  relay_vpce_service                       = var.scc_relay[var.databricks_gov_shard]
+  workspace_vpce_service                   = var.workspace[var.databricks_gov_shard]
 
   // Operation Mode Specific Variables:
   // Sandbox and Firewall Modes
@@ -44,7 +47,7 @@ module "SRA" {
   firewall_subnets_cidr       = ["10.0.33.0/26", "10.0.33.64/26", "10.0.33.128/26"]
   firewall_allow_list         = [".pypi.org", ".cran.r-project.org", ".pythonhosted.org", ".spark-packages.org", ".maven.org", "maven.apache.org", ".storage-download.googleapis.com"]
   firewall_protocol_deny_list = "IP"
-  hive_metastore_fqdn         = var.hms_fqdn[var.region] // https://docs.databricks.com/en/resources/supported-regions.html#rds-addresses-for-legacy-hive-metastore
+  hive_metastore_fqdn         = var.hms_fqdn[var.databricks_gov_shard] // https://docs.databricks.com/en/resources/supported-regions.html#rds-addresses-for-legacy-hive-metastore
 
   // Custom Mode Specific:
   custom_vpc_id             = null

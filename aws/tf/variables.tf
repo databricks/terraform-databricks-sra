@@ -102,3 +102,24 @@ variable "scc_relay" {
     #"us-west-1" = ""
   }
 }
+
+variable "hms_fqdn" {
+  type = map(string)
+  default = {
+    "ap-northeast-1" = "mddx5a4bpbpm05.cfrfsun7mryq.ap-northeast-1.rds.amazonaws.com"
+    "ap-northeast-2" = "md1915a81ruxky5.cfomhrbro6gt.ap-northeast-2.rds.amazonaws.com"
+    "ap-south-1"     = "mdjanpojt83v6j.c5jml0fhgver.ap-south-1.rds.amazonaws.com"
+    "ap-southeast-1" = "md1n4trqmokgnhr.csnrqwqko4ho.ap-southeast-1.rds.amazonaws.com"
+    "ap-southeast-2" = "mdnrak3rme5y1c.c5f38tyb1fdu.ap-southeast-2.rds.amazonaws.com"
+    "ca-central-1"   = "md1w81rjeh9i4n5.co1tih5pqdrl.ca-central-1.rds.amazonaws.com"
+    "eu-central-1"   = "mdv2llxgl8lou0.ceptxxgorjrc.eu-central-1.rds.amazonaws.com"
+    "eu-west-1"      = "md15cf9e1wmjgny.cxg30ia2wqgj.eu-west-1.rds.amazonaws.com"
+    "eu-west-2"      = "mdio2468d9025m.c6fvhwk6cqca.eu-west-2.rds.amazonaws.com"
+    "eu-west-3"      = "metastorerds-dbconsolidationmetastore-asda4em2u6eg.c2ybp3dss6ua.eu-west-3.rds.amazonaws.com"
+    "sa-east-1"      = "metastorerds-dbconsolidationmetastore-fqekf3pck8yw.cog1aduyg4im.sa-east-1.rds.amazonaws.com"
+    "us-east-1"      = "mdb7sywh50xhpr.chkweekm4xjq.us-east-1.rds.amazonaws.com"
+    "us-east-2"      = "md7wf1g369xf22.cluz8hwxjhb6.us-east-2.rds.amazonaws.com"
+    "us-west-2"      = "mdpartyyphlhsp.caj77bnxuhme.us-west-2.rds.amazonaws.com"
+    "us-west-1"      = "mdzsbtnvk0rnce.c13weuwubexq.us-west-1.rds.amazonaws.com"
+  }
+}
