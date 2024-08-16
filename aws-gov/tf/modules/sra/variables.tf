@@ -286,3 +286,8 @@ variable "uc_master_role_id" {
   description = "UC Master Role ID"
   type = map(string)
 }
+
+variable "log_delivery_role_name" {
+  description = "Log Delivery Role Name"
+  type = map(string)
+}
