@@ -54,6 +54,14 @@ variable "uc_master_role_id" {
   }
 }
 
+variable "log_delivery_role_name" {
+  type = map(string)
+  default = {
+    "civilian" = "SaasUsageDeliveryRole-prod-aws-gov-IAMRole-L4QM0RCHYQ1G"
+    "dod"      = "SaasUsageDeliveryRole-prod-aws-gov-dod-IAMRole-1DMEHBYR8VC5P"
+  }
+}
+
 variable "databricks_gov_shard" {
   description = "pick shard: civilian, dod"
   validation {

@@ -84,17 +84,27 @@ resource "aws_s3_bucket_policy" "log_delivery" {
 // IAM Role
 
 // Assume Role Policy Log Delivery
-data "databricks_aws_assume_role_policy" "log_delivery" {
-  external_id      = var.databricks_account_id
-  for_log_delivery = true
+data "aws_iam_policy_document" "passrole_for_log_delivery" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      identifiers = ["arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:${var.log_delivery_role_name[var.databricks_gov_shard]}"]
+      type        = "AWS"
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "sts:ExternalId"
+      values   = [var.databricks_account_id]
+    }
+  }
 }
-
 
 // Log Delivery IAM Role
 resource "aws_iam_role" "log_delivery" {
   name               = "${var.resource_prefix}-log-delivery"
   description        = "(${var.resource_prefix}) Log Delivery Role"
-  assume_role_policy = data.databricks_aws_assume_role_policy.log_delivery.json
+  assume_role_policy = data.aws_iam_policy_document.passrole_for_log_delivery.json
   tags = {
     Name = "${var.resource_prefix}-log-delivery-role"
   }
