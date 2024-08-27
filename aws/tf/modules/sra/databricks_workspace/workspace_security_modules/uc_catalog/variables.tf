@@ -2,6 +2,10 @@ variable "aws_account_id" {
   type = string
 }
 
+variable "cmk_admin_arn" {
+  type = string
+}
+
 variable "resource_prefix" {
   type = string
 }

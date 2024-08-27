@@ -41,7 +41,8 @@ resource "aws_security_group" "privatelink" {
   }
 
   tags = {
-    Name = "${var.resource_prefix}-private-link-sg"
+    Name    = "${var.resource_prefix}-private-link-sg",
+    Project = var.resource_prefix
   }
 }
 
@@ -217,7 +218,7 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::414351767826:user/databricks-datasets-readonly-user",
+        "arn:aws:iam::414351767826:user/databricks-datasets-readonly-user-prod",
         "414351767826"
       ]
     }
@@ -261,7 +262,8 @@ module "vpc_endpoints" {
       route_table_ids = module.vpc[0].private_route_table_ids
       policy          = var.enable_restrictive_s3_endpoint_boolean ? data.aws_iam_policy_document.s3_vpc_endpoint_policy[0].json : null
       tags = {
-        Name = "${var.resource_prefix}-s3-vpc-endpoint"
+        Name    = "${var.resource_prefix}-s3-vpc-endpoint"
+        Project = var.resource_prefix
       }
     },
     sts = {
@@ -270,7 +272,8 @@ module "vpc_endpoints" {
       subnet_ids          = module.vpc[0].intra_subnets
       policy              = var.enable_restrictive_sts_endpoint_boolean ? data.aws_iam_policy_document.sts_vpc_endpoint_policy[0].json : null
       tags = {
-        Name = "${var.resource_prefix}-sts-vpc-endpoint"
+        Name    = "${var.resource_prefix}-sts-vpc-endpoint"
+        Project = var.resource_prefix
       }
     },
     kinesis-streams = {
@@ -279,7 +282,8 @@ module "vpc_endpoints" {
       subnet_ids          = module.vpc[0].intra_subnets
       policy              = var.enable_restrictive_kinesis_endpoint_boolean ? data.aws_iam_policy_document.kinesis_vpc_endpoint_policy[0].json : null
       tags = {
-        Name = "${var.resource_prefix}-kinesis-vpc-endpoint"
+        Name    = "${var.resource_prefix}-kinesis-vpc-endpoint"
+        Project = var.resource_prefix
       }
     }
   }
@@ -300,7 +304,8 @@ resource "aws_vpc_endpoint" "backend_rest" {
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
   tags = {
-    Name = "${var.resource_prefix}-databricks-backend-rest"
+    Name    = "${var.resource_prefix}-databricks-backend-rest"
+    Project = var.resource_prefix
   }
 }
 
@@ -316,6 +321,7 @@ resource "aws_vpc_endpoint" "backend_relay" {
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
   tags = {
-    Name = "${var.resource_prefix}-databricks-backend-relay"
+    Name    = "${var.resource_prefix}-databricks-backend-relay"
+    Project = var.resource_prefix
   }
 }

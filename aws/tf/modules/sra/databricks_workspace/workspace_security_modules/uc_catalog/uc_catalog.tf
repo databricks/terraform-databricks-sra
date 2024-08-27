@@ -1,90 +1,82 @@
 resource "null_resource" "previous" {}
 
 resource "time_sleep" "wait_30_seconds" {
-  depends_on = [null_resource.previous]
-
+  depends_on      = [null_resource.previous]
   create_duration = "30s"
 }
 
-
-// Unity Catalog Trust Policy
-data "aws_iam_policy_document" "passrole_for_unity_catalog_catalog" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    principals {
-      identifiers = ["arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"]
-      type        = "AWS"
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "sts:ExternalId"
-      values   = [var.databricks_account_id]
-    }
-  }
-  statement {
-    sid     = "ExplicitSelfRoleAssumption"
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.aws_account_id}:root"]
-    }
-    condition {
-      test     = "ArnLike"
-      variable = "aws:PrincipalArn"
-      values   = ["arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-unity-catalog-${var.workspace_id}"]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "sts:ExternalId"
-      values   = [var.databricks_account_id]
-    }
-  }
+// Unity Catalog Trust Policy - Data Source
+data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
+  aws_account_id = var.aws_account_id
+  role_name      = "${var.resource_prefix}-catalog-${var.workspace_id}"
+  external_id    = var.databricks_account_id
 }
 
 // Unity Catalog Role
 resource "aws_iam_role" "unity_catalog_role" {
-  name               = "${var.resource_prefix}-unity-catalog-${var.workspace_id}"
-  assume_role_policy = data.aws_iam_policy_document.passrole_for_unity_catalog_catalog.json
+  name               = "${var.resource_prefix}-catalog-${var.workspace_id}"
+  assume_role_policy = data.databricks_aws_unity_catalog_assume_role_policy.unity_catalog.json
   tags = {
-    Name = "${var.resource_prefix}-unity-catalog"
+    Name    = "${var.resource_prefix}-catalog-${var.workspace_id}"
+    Project = var.resource_prefix
   }
 }
 
-// Unity Catalog IAM Policy
-data "aws_iam_policy_document" "unity_catalog_iam_policy" {
-  statement {
-    actions = [
-      "s3:GetObject",
-      "s3:GetObjectVersion",
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:DeleteObject",
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-
-    resources = [
-      "arn:aws:s3:::${var.uc_catalog_name}/*",
-      "arn:aws:s3:::${var.uc_catalog_name}"
-    ]
-
-    effect = "Allow"
-  }
-
-  statement {
-    actions   = ["sts:AssumeRole"]
-    resources = ["arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-unity-catalog-${var.workspace_id}"]
-    effect    = "Allow"
-  }
+// Unity Catalog Policy - Data Source
+data "databricks_aws_unity_catalog_policy" "unity_catalog_iam_policy" {
+  aws_account_id = var.aws_account_id
+  bucket_name    = var.uc_catalog_name
+  role_name      = "${var.resource_prefix}-catalog-${var.workspace_id}"
+  kms_name       = aws_kms_alias.catalog_storage_key_alias.arn
 }
 
 // Unity Catalog Policy
 resource "aws_iam_role_policy" "unity_catalog" {
-  name   = "${var.resource_prefix}-unity-catalog-policy-${var.workspace_id}"
+  name   = "${var.resource_prefix}-catalog-policy-${var.workspace_id}"
   role   = aws_iam_role.unity_catalog_role.id
-  policy = data.aws_iam_policy_document.unity_catalog_iam_policy.json
+  policy = data.databricks_aws_unity_catalog_policy.unity_catalog_iam_policy.json
+}
+
+// Unity Catalog KMS
+resource "aws_kms_key" "catalog_storage" {
+  description = "KMS key for Databricks catalog storage ${var.workspace_id}"
+  policy = jsonencode({
+    Version : "2012-10-17",
+    "Id" : "key-policy-catalog-storage-${var.workspace_id}",
+    Statement : [
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [var.cmk_admin_arn]
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow IAM Role to use the key",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-catalog-${var.workspace_id}"
+        },
+        "Action" : [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey*"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+  tags = {
+    Name    = "${var.resource_prefix}-catalog-storage-${var.workspace_id}-key"
+    Project = var.resource_prefix
+  }
+}
+
+resource "aws_kms_alias" "catalog_storage_key_alias" {
+  name          = "alias/${var.resource_prefix}-catalog-storage-${var.workspace_id}-key"
+  target_key_id = aws_kms_key.catalog_storage.id
 }
 
 
@@ -93,7 +85,8 @@ resource "aws_s3_bucket" "unity_catalog_bucket" {
   bucket        = var.uc_catalog_name
   force_destroy = true
   tags = {
-    Name = var.uc_catalog_name
+    Name    = var.uc_catalog_name
+    Project = var.resource_prefix
   }
 }
 
@@ -106,12 +99,14 @@ resource "aws_s3_bucket_versioning" "unity_catalog_versioning" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "unity_catalog" {
   bucket = aws_s3_bucket.unity_catalog_bucket.bucket
-
   rule {
+    bucket_key_enabled = true
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.catalog_storage.arn
     }
   }
+  depends_on = [aws_kms_alias.catalog_storage_key_alias]
 }
 
 resource "aws_s3_bucket_public_access_block" "unity_catalog" {
@@ -129,7 +124,8 @@ resource "databricks_storage_credential" "workspace_catalog_storage_credential" 
   aws_iam_role {
     role_arn = aws_iam_role.unity_catalog_role.arn
   }
-  depends_on = [aws_iam_role.unity_catalog_role, time_sleep.wait_30_seconds]
+  depends_on     = [aws_iam_role.unity_catalog_role, time_sleep.wait_30_seconds]
+  isolation_mode = "ISOLATION_MODE_ISOLATED"
 }
 
 // External Location
@@ -137,11 +133,9 @@ resource "databricks_external_location" "workspace_catalog_external_location" {
   name            = var.uc_catalog_name
   url             = "s3://${var.uc_catalog_name}/catalog/"
   credential_name = databricks_storage_credential.workspace_catalog_storage_credential.id
-  skip_validation = true
-  read_only       = false
-  comment         = "Managed by TF"
+  comment         = "External location for catalog ${var.uc_catalog_name}"
+  isolation_mode  = "ISOLATION_MODE_ISOLATED"
 }
-
 
 // Workspace Catalog
 resource "databricks_catalog" "workspace_catalog" {
