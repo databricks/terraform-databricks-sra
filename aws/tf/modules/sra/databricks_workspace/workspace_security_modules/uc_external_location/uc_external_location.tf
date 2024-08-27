@@ -47,7 +47,7 @@ resource "aws_iam_role_policy" "storage_credential_policy" {
           "sts:AssumeRole"
         ],
         "Resource" : [
-          "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-storage-credential"
+          "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-storage-credential-example"
         ],
         "Effect" : "Allow"
       }
