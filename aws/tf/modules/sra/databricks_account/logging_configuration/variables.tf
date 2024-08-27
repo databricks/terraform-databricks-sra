@@ -1,7 +1,7 @@
-variable "resource_prefix" {
+variable "databricks_account_id" {
   type = string
 }
 
-variable "databricks_account_id" {
+variable "resource_prefix" {
   type = string
 }

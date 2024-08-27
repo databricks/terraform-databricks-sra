@@ -7,13 +7,13 @@ module "uc_catalog" {
     databricks = databricks.created_workspace
   }
 
-  databricks_account_id   = var.databricks_account_id
-  aws_account_id          = var.aws_account_id
-  resource_prefix         = var.resource_prefix
-  uc_catalog_name         = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
-  cmk_admin_arn           = var.cmk_admin_arn == null ? "arn:aws:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
-  workspace_id            = module.databricks_mws_workspace.workspace_id
-  workspace_catalog_admin = var.workspace_catalog_admin
+  databricks_account_id        = var.databricks_account_id
+  aws_account_id               = var.aws_account_id
+  resource_prefix              = var.resource_prefix
+  uc_catalog_name              = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
+  cmk_admin_arn                = var.cmk_admin_arn == null ? "arn:aws:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
+  workspace_id                 = module.databricks_mws_workspace.workspace_id
+  user_workspace_catalog_admin = var.user_workspace_catalog_admin
 
   depends_on = [
     module.databricks_mws_workspace, module.uc_assignment
