@@ -25,8 +25,11 @@ module "vpc" {
 
   intra_subnet_names = [for az in var.availability_zones : format("%s-privatelink-%s", var.resource_prefix, az)]
   intra_subnets      = var.privatelink_subnets_cidr
-}
 
+  tags = {
+    Project = var.resource_prefix
+  }
+}
 
 // Security group - skipped in custom mode
 resource "aws_security_group" "sg" {
@@ -80,6 +83,7 @@ resource "aws_security_group" "sg" {
     }
   }
   tags = {
-    Name = "${var.resource_prefix}-workspace-sg"
+    Name    = "${var.resource_prefix}-workspace-sg"
+    Project = var.resource_prefix
   }
 }

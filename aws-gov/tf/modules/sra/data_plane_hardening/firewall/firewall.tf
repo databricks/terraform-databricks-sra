@@ -8,7 +8,8 @@ resource "aws_subnet" "public" {
   availability_zone       = element(var.availability_zones, count.index)
   map_public_ip_on_launch = true
   tags = {
-    Name = "${var.resource_prefix}-public-${element(var.availability_zones, count.index)}"
+    Name    = "${var.resource_prefix}-public-${element(var.availability_zones, count.index)}"
+    Project = var.resource_prefix
   }
 }
 
@@ -25,7 +26,8 @@ resource "aws_nat_gateway" "ngw" {
   subnet_id     = element(aws_subnet.public.*.id, count.index)
   depends_on    = [aws_internet_gateway.igw]
   tags = {
-    Name = "${var.resource_prefix}-ngw-${element(var.availability_zones, count.index)}"
+    Name    = "${var.resource_prefix}-ngw-${element(var.availability_zones, count.index)}"
+    Project = var.resource_prefix
   }
 }
 
@@ -37,13 +39,13 @@ resource "aws_route" "private" {
   nat_gateway_id         = element(aws_nat_gateway.ngw.*.id, count.index)
 }
 
-
 // Public RT
 resource "aws_route_table" "public_rt" {
   count  = length(var.public_subnets_cidr)
   vpc_id = var.vpc_id
   tags = {
-    Name = "${var.resource_prefix}-public-rt-${element(var.availability_zones, count.index)}"
+    Name    = "${var.resource_prefix}-public-rt-${element(var.availability_zones, count.index)}"
+    Project = var.resource_prefix
   }
 }
 
@@ -63,7 +65,8 @@ resource "aws_subnet" "firewall" {
   availability_zone       = element(var.availability_zones, count.index)
   map_public_ip_on_launch = false
   tags = {
-    Name = "${var.resource_prefix}-firewall-${element(var.availability_zones, count.index)}"
+    Name    = "${var.resource_prefix}-firewall-${element(var.availability_zones, count.index)}"
+    Project = var.resource_prefix
   }
 }
 
@@ -72,7 +75,8 @@ resource "aws_route_table" "firewall_rt" {
   count  = length(var.firewall_subnets_cidr)
   vpc_id = var.vpc_id
   tags = {
-    Name = "${var.resource_prefix}-firewall-rt-${element(var.availability_zones, count.index)}"
+    Name    = "${var.resource_prefix}-firewall-rt-${element(var.availability_zones, count.index)}"
+    Project = var.resource_prefix
   }
 }
 
@@ -87,7 +91,8 @@ resource "aws_route_table_association" "firewall" {
 resource "aws_internet_gateway" "igw" {
   vpc_id = var.vpc_id
   tags = {
-    Name = "${var.resource_prefix}-igw"
+    Name    = "${var.resource_prefix}-igw"
+    Project = var.resource_prefix
   }
 }
 
@@ -95,7 +100,8 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_route_table" "igw_rt" {
   vpc_id = var.vpc_id
   tags = {
-    Name = "${var.resource_prefix}-igw-rt"
+    Name    = "${var.resource_prefix}-igw-rt"
+    Project = var.resource_prefix
   }
 }
 
@@ -105,16 +111,34 @@ resource "aws_route_table_association" "igw" {
   route_table_id = aws_route_table.igw_rt.id
 }
 
+// Local Map for Availability Zone to Index
+locals {
+  az_to_index_map = {
+    for idx, az in var.availability_zones :
+    az => idx
+  }
+
+  firewall_endpoints_by_az = {
+    for sync_state in aws_networkfirewall_firewall.nfw.firewall_status[0].sync_states :
+    sync_state.availability_zone => sync_state.attachment[0].endpoint_id
+  }
+
+  az_to_endpoint_map = {
+    for az in var.availability_zones :
+    az => lookup(local.firewall_endpoints_by_az, az, null)
+  }
+}
+
 // Public Route
 resource "aws_route" "public" {
-  count                  = length(var.public_subnets_cidr)
-  route_table_id         = element(aws_route_table.public_rt.*.id, count.index)
+  for_each               = local.az_to_endpoint_map
+  route_table_id         = aws_route_table.public_rt[local.az_to_index_map[each.key]].id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id        = tolist(aws_networkfirewall_firewall.nfw.firewall_status[0].sync_states)[count.index].attachment[0].endpoint_id
+  vpc_endpoint_id        = each.value
   depends_on             = [aws_networkfirewall_firewall.nfw]
 }
 
-// Firewall Route
+// Firewall Outbound Route
 resource "aws_route" "firewall_outbound" {
   count                  = length(var.firewall_subnets_cidr)
   route_table_id         = element(aws_route_table.firewall_rt.*.id, count.index)
@@ -122,12 +146,12 @@ resource "aws_route" "firewall_outbound" {
   gateway_id             = aws_internet_gateway.igw.id
 }
 
-// Add a route back to FW
+// Firewall Inbound Route
 resource "aws_route" "firewall_inbound" {
-  count                  = length(var.public_subnets_cidr)
+  for_each               = local.az_to_endpoint_map
   route_table_id         = aws_route_table.igw_rt.id
-  destination_cidr_block = element(var.public_subnets_cidr, count.index)
-  vpc_endpoint_id        = tolist(aws_networkfirewall_firewall.nfw.firewall_status[0].sync_states)[count.index].attachment[0].endpoint_id
+  destination_cidr_block = element(var.public_subnets_cidr, index(var.availability_zones, each.key))
+  vpc_endpoint_id        = each.value
   depends_on             = [aws_networkfirewall_firewall.nfw]
 }
 
@@ -157,7 +181,8 @@ resource "aws_networkfirewall_rule_group" "databricks_fqdn_allowlist" {
     }
   }
   tags = {
-    Name = "${var.resource_prefix}-${var.region}-databricks-fqdn-allowlist"
+    Name    = "${var.resource_prefix}-${var.region}-databricks-fqdn-allowlist"
+    Project = var.resource_prefix
   }
 }
 
@@ -169,7 +194,6 @@ data "external" "metastore_ip" {
     metastore_domain = var.hive_metastore_fqdn
   }
 }
-
 
 // JDBC Firewall group IP allow list
 resource "aws_networkfirewall_rule_group" "databricks_metastore_allowlist" {
@@ -199,11 +223,12 @@ resource "aws_networkfirewall_rule_group" "databricks_metastore_allowlist" {
     }
   }
   tags = {
-    Name = "${var.resource_prefix}-${var.region}-databricks-metastore-allowlist"
+    Name    = "${var.resource_prefix}-${var.region}-databricks-metastore-allowlist"
+    Project = var.resource_prefix
   }
 }
 
-# Firewall policy
+// Firewall policy
 resource "aws_networkfirewall_firewall_policy" "databricks_nfw_policy" {
   name = "${var.resource_prefix}-firewall-policy"
 
@@ -229,10 +254,10 @@ resource "aws_networkfirewall_firewall_policy" "databricks_nfw_policy" {
   }
 
   tags = {
-    Name = "${var.resource_prefix}-firewall-policy"
+    Name    = "${var.resource_prefix}-firewall-policy"
+    Project = var.resource_prefix
   }
 }
-
 
 // Firewall
 resource "aws_networkfirewall_firewall" "nfw" {
@@ -246,6 +271,7 @@ resource "aws_networkfirewall_firewall" "nfw" {
     }
   }
   tags = {
-    Name = "${var.resource_prefix}-${var.region}-databricks-nfw"
+    Name    = "${var.resource_prefix}-${var.region}-databricks-nfw"
+    Project = var.resource_prefix
   }
 }

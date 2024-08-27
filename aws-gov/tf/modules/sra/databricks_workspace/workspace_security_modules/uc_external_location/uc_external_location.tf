@@ -44,17 +44,17 @@ data "aws_iam_policy_document" "passrole_for_storage_credential" {
 
 // Storage Credential Role
 resource "aws_iam_role" "storage_credential_role" {
-  name               = "${var.resource_prefix}-storage-credential"
+  name               = "${var.resource_prefix}-storage-credential-example"
   assume_role_policy = data.aws_iam_policy_document.passrole_for_storage_credential.json
   tags = {
-    Name = "${var.resource_prefix}-storage_credential_role"
+    Name    = "${var.resource_prefix}-storage-credential-example"
+    Project = var.resource_prefix
   }
 }
 
-
 // Storage Credential Policy
 resource "aws_iam_role_policy" "storage_credential_policy" {
-  name = "${var.resource_prefix}-storage-credential-policy"
+  name = "${var.resource_prefix}-storage-credential-policy-example"
   role = aws_iam_role.storage_credential_role.id
   policy = jsonencode({
     Version : "2012-10-17",
@@ -77,7 +77,7 @@ resource "aws_iam_role_policy" "storage_credential_policy" {
           "sts:AssumeRole"
         ],
         "Resource" : [
-          "arn:aws-us-gov:iam::${var.aws_account_id}:role/${var.resource_prefix}-storage-credential"
+          "arn:aws-us-gov:iam::${var.aws_account_id}:role/${var.resource_prefix}-storage-credential-example"
         ],
         "Effect" : "Allow"
       }
@@ -92,7 +92,8 @@ resource "databricks_storage_credential" "external" {
   aws_iam_role {
     role_arn = aws_iam_role.storage_credential_role.arn
   }
-  depends_on = [aws_iam_role.storage_credential_role, time_sleep.wait_30_seconds]
+  isolation_mode = "ISOLATION_MODE_ISOLATED"
+  depends_on     = [aws_iam_role.storage_credential_role, time_sleep.wait_30_seconds]
 }
 
 // External Location
@@ -100,9 +101,9 @@ resource "databricks_external_location" "data_example" {
   name            = "external-location-example"
   url             = "s3://${var.read_only_data_bucket}/"
   credential_name = databricks_storage_credential.external.id
-  skip_validation = true
   read_only       = true
-  comment         = "Managed by TF"
+  comment         = "Read only external location for ${var.read_only_data_bucket}"
+  isolation_mode  = "ISOLATION_MODE_ISOLATED"
 }
 
 // External Location Grant
