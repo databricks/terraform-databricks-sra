@@ -220,6 +220,21 @@ resource "aws_networkfirewall_rule_group" "databricks_metastore_allowlist" {
           settings = ["1"]
         }
       }
+      stateful_rule {
+        action = "DROP"
+        header {
+          destination      = "0.0.0.0/0"
+          destination_port = 3306
+          direction        = "FORWARD"
+          protocol         = "TCP"
+          source           = "ANY"
+          source_port      = "ANY"
+        }
+        rule_option {
+          keyword  = "sid"
+          settings = ["2"]
+        }
+      }
     }
   }
   tags = {
