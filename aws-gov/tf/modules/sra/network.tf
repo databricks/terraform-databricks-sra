@@ -39,7 +39,7 @@ resource "aws_security_group" "sg" {
   depends_on = [module.vpc]
 
   dynamic "ingress" {
-    for_each = var.sg_ingress_protocol
+    for_each = ["tcp", "udp"]
     content {
       description = "Databricks - Workspace SG - Internode Communication"
       from_port   = 0
@@ -50,7 +50,7 @@ resource "aws_security_group" "sg" {
   }
 
   dynamic "egress" {
-    for_each = var.sg_egress_protocol
+    for_each = ["tcp", "udp"]
     content {
       description = "Databricks - Workspace SG - Internode Communication"
       from_port   = 0
