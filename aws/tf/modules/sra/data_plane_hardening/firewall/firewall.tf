@@ -179,7 +179,7 @@ resource "aws_networkfirewall_rule_group" "databricks_fqdn_allowlist" {
         }
       }
     }
-  }
+  }    
   tags = {
     Name    = "${var.resource_prefix}-${var.region}-databricks-fqdn-allowlist"
     Project = var.resource_prefix
@@ -218,6 +218,21 @@ resource "aws_networkfirewall_rule_group" "databricks_metastore_allowlist" {
         rule_option {
           keyword  = "sid"
           settings = ["1"]
+        }
+      }
+      stateful_rule {
+        action = "DROP"
+        header {
+          destination      = "0.0.0.0/0" 
+          destination_port = 3306
+          direction        = "FORWARD"
+          protocol         = "TCP"
+          source           = "ANY"
+          source_port      = "ANY"
+        }
+        rule_option {
+          keyword  = "sid"
+          settings = ["2"]
         }
       }
     }
