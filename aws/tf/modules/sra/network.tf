@@ -25,6 +25,10 @@ module "vpc" {
 
   intra_subnet_names = [for az in var.availability_zones : format("%s-privatelink-%s", var.resource_prefix, az)]
   intra_subnets      = var.privatelink_subnets_cidr
+
+  tags = {
+    Project = var.resource_prefix
+  }
 }
 
 
@@ -36,7 +40,7 @@ resource "aws_security_group" "sg" {
   depends_on = [module.vpc]
 
   dynamic "ingress" {
-    for_each = var.sg_ingress_protocol
+    for_each = ["tcp", "udp"]
     content {
       description = "Databricks - Workspace SG - Internode Communication"
       from_port   = 0
@@ -47,7 +51,7 @@ resource "aws_security_group" "sg" {
   }
 
   dynamic "egress" {
-    for_each = var.sg_egress_protocol
+    for_each = ["tcp", "udp"]
     content {
       description = "Databricks - Workspace SG - Internode Communication"
       from_port   = 0
@@ -80,6 +84,7 @@ resource "aws_security_group" "sg" {
     }
   }
   tags = {
-    Name = "${var.resource_prefix}-workspace-sg"
+    Name    = "${var.resource_prefix}-workspace-sg"
+    Project = var.resource_prefix
   }
 }

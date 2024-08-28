@@ -1,24 +1,4 @@
-variable "vpc_id" {
-  type = string
-}
-
-variable "vpc_cidr_range" {
-  type = string
-}
-
-variable "public_subnets_cidr" {
-  type = list(string)
-}
-
-variable "private_subnets_cidr" {
-  type = list(string)
-}
-
-variable "private_subnet_rt" {
-  type = list(string)
-}
-
-variable "firewall_subnets_cidr" {
+variable "availability_zones" {
   type = list(string)
 }
 
@@ -26,11 +6,23 @@ variable "firewall_allow_list" {
   type = list(string)
 }
 
+variable "firewall_subnets_cidr" {
+  type = list(string)
+}
+
 variable "hive_metastore_fqdn" {
   type = string
 }
 
-variable "availability_zones" {
+variable "private_subnet_rt" {
+  type = list(string)
+}
+
+variable "private_subnets_cidr" {
+  type = list(string)
+}
+
+variable "public_subnets_cidr" {
   type = list(string)
 }
 
@@ -42,6 +34,10 @@ variable "resource_prefix" {
   type = string
 }
 
-variable "firewall_protocol_deny_list" {
-  type = list(string)
+variable "vpc_cidr_range" {
+  type = string
+}
+
+variable "vpc_id" {
+  type = string
 }

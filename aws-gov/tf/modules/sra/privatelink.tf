@@ -41,7 +41,8 @@ resource "aws_security_group" "privatelink" {
   }
 
   tags = {
-    Name = "${var.resource_prefix}-private-link-sg"
+    Name    = "${var.resource_prefix}-private-link-sg",
+    Project = var.resource_prefix
   }
 }
 
@@ -217,7 +218,7 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:user/databricks-datasets-readonly-user",
+        "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:user/databricks-datasets-readonly-user-prod",
         "${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"
       ]
     }
@@ -261,7 +262,8 @@ module "vpc_endpoints" {
       route_table_ids = module.vpc[0].private_route_table_ids
       policy          = var.enable_restrictive_s3_endpoint_boolean ? data.aws_iam_policy_document.s3_vpc_endpoint_policy[0].json : null
       tags = {
-        Name = "${var.resource_prefix}-s3-vpc-endpoint"
+        Name    = "${var.resource_prefix}-s3-vpc-endpoint"
+        Project = var.resource_prefix
       }
     },
     sts = {
@@ -270,7 +272,8 @@ module "vpc_endpoints" {
       subnet_ids          = module.vpc[0].intra_subnets
       policy              = var.enable_restrictive_sts_endpoint_boolean ? data.aws_iam_policy_document.sts_vpc_endpoint_policy[0].json : null
       tags = {
-        Name = "${var.resource_prefix}-sts-vpc-endpoint"
+        Name    = "${var.resource_prefix}-sts-vpc-endpoint"
+        Project = var.resource_prefix
       }
     },
     kinesis-streams = {
@@ -279,7 +282,8 @@ module "vpc_endpoints" {
       subnet_ids          = module.vpc[0].intra_subnets
       policy              = var.enable_restrictive_kinesis_endpoint_boolean ? data.aws_iam_policy_document.kinesis_vpc_endpoint_policy[0].json : null
       tags = {
-        Name = "${var.resource_prefix}-kinesis-vpc-endpoint"
+        Name    = "${var.resource_prefix}-kinesis-vpc-endpoint"
+        Project = var.resource_prefix
       }
     }
   }
@@ -293,14 +297,15 @@ resource "aws_vpc_endpoint" "backend_rest" {
   count = var.operation_mode != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
-  service_name        = var.workspace_vpce_service
+  service_name        = var.workspace[var.databricks_gov_shard]
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
   subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
   tags = {
-    Name = "${var.resource_prefix}-databricks-backend-rest"
+    Name    = "${var.resource_prefix}-databricks-backend-rest"
+    Project = var.resource_prefix
   }
 }
 
@@ -309,13 +314,14 @@ resource "aws_vpc_endpoint" "backend_relay" {
   count = var.operation_mode != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
-  service_name        = var.relay_vpce_service
+  service_name        = var.scc_relay[var.databricks_gov_shard]
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
   subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
   depends_on          = [module.vpc.vpc_id]
   tags = {
-    Name = "${var.resource_prefix}-databricks-backend-relay"
+    Name    = "${var.resource_prefix}-databricks-backend-relay"
+    Project = var.resource_prefix
   }
 }

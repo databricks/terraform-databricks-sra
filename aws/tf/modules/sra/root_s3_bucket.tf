@@ -4,7 +4,8 @@ resource "aws_s3_bucket" "root_storage_bucket" {
   bucket        = "${var.resource_prefix}-workspace-root-storage"
   force_destroy = true
   tags = {
-    Name = var.resource_prefix
+    Name    = "${var.resource_prefix}-workspace-root-storage"
+    Project = var.resource_prefix
   }
 }
 
@@ -17,7 +18,6 @@ resource "aws_s3_bucket_versioning" "root_bucket_versioning" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "root_storage_bucket" {
   bucket = aws_s3_bucket.root_storage_bucket.bucket
-
   rule {
     bucket_key_enabled = true
     apply_server_side_encryption_by_default {

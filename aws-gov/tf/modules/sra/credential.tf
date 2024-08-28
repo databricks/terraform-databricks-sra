@@ -19,10 +19,11 @@ data "aws_iam_policy_document" "passrole_for_cross_account_credential" {
 
 // Cross Account Role
 resource "aws_iam_role" "cross_account_role" {
-  name               = "${var.resource_prefix}-crossaccount"
+  name               = "${var.resource_prefix}-cross-account"
   assume_role_policy = data.aws_iam_policy_document.passrole_for_cross_account_credential.json
   tags = {
-    Name = "${var.resource_prefix}-crossaccount-role"
+    Name    = "${var.resource_prefix}-cross-account"
+    Project = var.resource_prefix
   }
 }
 

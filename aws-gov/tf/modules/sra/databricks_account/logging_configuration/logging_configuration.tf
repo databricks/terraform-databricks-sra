@@ -5,7 +5,8 @@ resource "aws_s3_bucket" "log_delivery" {
   bucket        = "${var.resource_prefix}-log-delivery"
   force_destroy = true
   tags = {
-    Name = "${var.resource_prefix}-log-delivery"
+    Name    = "${var.resource_prefix}-log-delivery"
+    Project = var.resource_prefix
   }
 }
 
@@ -106,7 +107,8 @@ resource "aws_iam_role" "log_delivery" {
   description        = "(${var.resource_prefix}) Log Delivery Role"
   assume_role_policy = data.aws_iam_policy_document.passrole_for_log_delivery.json
   tags = {
-    Name = "${var.resource_prefix}-log-delivery-role"
+    Name    = "${var.resource_prefix}-log-delivery-role"
+    Project = var.resource_prefix
   }
 }
 
@@ -114,6 +116,7 @@ resource "aws_iam_role" "log_delivery" {
 
 // Databricks Credential Configuration for Logs
 resource "databricks_mws_credentials" "log_writer" {
+  account_id                 = var.databricks_account_id
   credentials_name = "${var.resource_prefix}-log-delivery-credential"
   role_arn         = aws_iam_role.log_delivery.arn
   depends_on = [

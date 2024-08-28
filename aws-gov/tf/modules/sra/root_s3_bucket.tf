@@ -4,7 +4,8 @@ resource "aws_s3_bucket" "root_storage_bucket" {
   bucket        = "${var.resource_prefix}-workspace-root-storage"
   force_destroy = true
   tags = {
-    Name = var.resource_prefix
+    Name    = "${var.resource_prefix}-workspace-root-storage"
+    Project = var.resource_prefix
   }
 }
 

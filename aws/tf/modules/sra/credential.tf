@@ -6,10 +6,11 @@ data "databricks_aws_assume_role_policy" "this" {
 }
 
 resource "aws_iam_role" "cross_account_role" {
-  name               = "${var.resource_prefix}-crossaccount"
+  name               = "${var.resource_prefix}-cross-account"
   assume_role_policy = data.databricks_aws_assume_role_policy.this.json
   tags = {
-    Name = "${var.resource_prefix}-crossaccount-role"
+    Name    = "${var.resource_prefix}-cross-account"
+    Project = var.resource_prefix
   }
 }
 

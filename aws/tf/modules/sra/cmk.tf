@@ -63,7 +63,8 @@ resource "aws_kms_key" "workspace_storage" {
   depends_on = [aws_iam_role.cross_account_role]
 
   tags = {
-    Resource = var.resource_prefix
+    Name    = "${var.resource_prefix}-workspace-storage-key"
+    Project = var.resource_prefix
   }
 }
 
@@ -111,7 +112,8 @@ resource "aws_kms_key" "managed_storage" {
   )
 
   tags = {
-    Resource = var.resource_prefix
+    Project = var.resource_prefix
+    Name    = "${var.resource_prefix}-managed-storage-key"
   }
 }
 

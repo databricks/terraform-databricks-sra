@@ -2,10 +2,10 @@ variable "metastore_id" {
   type = string
 }
 
-variable "workspace_id" {
+variable "region" {
   type = string
 }
 
-variable "region" {
+variable "workspace_id" {
   type = string
 }
