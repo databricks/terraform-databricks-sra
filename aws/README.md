@@ -1,4 +1,4 @@
-# Security Reference Architecture Template
+# Security Reference Architectures (SRA) - Terraform Templates
 
 
 ## Introduction
@@ -21,7 +21,7 @@ There are four separate operation modes you can choose for the underlying networ
 
 - **Sandbox**: Sandbox or open egress. Selecting 'sandbox' as the operation mode allows traffic to flow freely to the public internet. This mode is suitable for sandbox or development scenarios where data exfiltration protection is of minimal concern, and developers need to access public APIs, packages, and more.
 
-- **Firewall**: Firewall or limited egress. Choosing 'firewall' as the operation mode permits traffic flow only to a selected list of public addresses. This mode is applicable in situations where open internet access is necessary for certain tasks, but unfiltered traffic is not an option due to the sensitivity of the workloads or data. **NOTE**: Due to a limitation in the AWS Network Firewall's ability to use fully qualified domain names for non-HTTP/HTTPS traffic, an external data source is required for the external Hive metastore. For production scenarios, we recommend using Unity Catalog or self-hosted Hive metastores.
+- **Firewall**: Firewall or limited egress. Choosing 'firewall' as the operation mode permits traffic flow only to a selected list of public addresses. This mode is applicable in situations where open internet access is necessary for certain tasks, but unfiltered traffic is not an option due to the sensitivity of the workloads or data. **NOTE**: Due to a limitation in the AWS Network Firewall's ability to use fully qualified domain names for non-HTTP/HTTPS traffic, an external data source is required for the external Hive metastore. For sensitive production workloads, it is recommended to use isolated operation mode and Unity Catalog, a self-hosted Hive metastore, or to explore other firewall services to address AWS Network Firewall's limitations.
 
 - **Isolated**:  Isolated or no egress. Opting for 'isolated' as the operation mode prevents any traffic to the public internet. Traffic is limited to AWS private endpoints, either to AWS services or the Databricks control plane. This mode should be used in cases where access to the public internet is completely unsupported. **NOTE**: Apache Derby Metastore will be required for clusters and non-serverless SQL Warehouses. For more information, please view this [knowledge article](https://kb.databricks.com/metastore/set-up-embedded-metastore).
 
