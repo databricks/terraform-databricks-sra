@@ -1,4 +1,4 @@
-# Security Reference Architecture Template
+# Security Reference Architectures (SRA) - Terraform Templates
 
 
 ## Introduction
