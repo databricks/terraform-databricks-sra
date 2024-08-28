@@ -153,6 +153,6 @@ resource "databricks_catalog" "workspace_catalog" {
 resource "databricks_grant" "workspace_catalog" {
   catalog = databricks_catalog.workspace_catalog.name
 
-  principal  = var.workspace_catalog_admin
+  principal  = var.user_workspace_catalog_admin
   privileges = ["ALL_PRIVILEGES"]
 }
