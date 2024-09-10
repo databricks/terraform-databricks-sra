@@ -296,8 +296,3 @@ variable "workspace" {
     #"us-west-1" = ""
   }
 }
-
-variable "workspace_admin_service_principal_name" {
-  description = "Service principle name"
-  type        = string
-}

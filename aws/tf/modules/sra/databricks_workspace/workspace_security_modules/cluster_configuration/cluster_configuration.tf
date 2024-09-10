@@ -49,7 +49,7 @@ locals {
     }
   )
 
-  selected_policy = var.operation_mode == "Isolated" ? local.default_policy : local.isolated_policy
+  selected_policy = var.operation_mode == "isolated" ? local.isolated_policy : local.default_policy
 
   final_policy = { for k, v in local.selected_policy : k => v if v != null }
 }
@@ -71,10 +71,6 @@ resource "databricks_cluster" "example" {
   autoscale {
     min_workers = 1
     max_workers = 2
-  }
-
-  spark_conf = {
-    "secret.example" = var.secret_config_reference
   }
 
   depends_on = [
