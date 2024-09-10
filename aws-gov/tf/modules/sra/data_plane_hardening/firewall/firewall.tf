@@ -186,13 +186,8 @@ resource "aws_networkfirewall_rule_group" "databricks_fqdn_allowlist" {
   }
 }
 
-// Data for IP allow list
-data "external" "metastore_ip" {
-  program = ["sh", "${path.module}/metastore_ip.sh"]
-
-  query = {
-    metastore_domain = var.hive_metastore_fqdn
-  }
+data "dns_a_record_set" "metastore_dns" {
+  host     = var.hive_metastore_fqdn
 }
 
 // JDBC Firewall group IP allow list
@@ -205,10 +200,28 @@ resource "aws_networkfirewall_rule_group" "databricks_metastore_allowlist" {
       rule_order = "STRICT_ORDER"
     }
     rules_source {
+      dynamic "stateful_rule" {
+        for_each = toset(data.dns_a_record_set.metastore_dns.addrs)
+        content {
+          action = "PASS"
+          header {
+              destination      = stateful_rule.value
+            destination_port = 3306
+            direction        = "FORWARD"
+            protocol         = "TCP"
+            source           = "ANY"
+            source_port      = "ANY"
+          }
+          rule_option {
+            keyword  = "sid"
+            settings = ["1"]
+          }
+        }
+      }
       stateful_rule {
-        action = "PASS"
+        action = "DROP"
         header {
-          destination      = data.external.metastore_ip.result["ip"]
+          destination      = "0.0.0.0/0"
           destination_port = 3306
           direction        = "FORWARD"
           protocol         = "TCP"
@@ -217,7 +230,7 @@ resource "aws_networkfirewall_rule_group" "databricks_metastore_allowlist" {
         }
         rule_option {
           keyword  = "sid"
-          settings = ["1"]
+          settings = ["2"]
         }
       }
     }
@@ -250,7 +263,6 @@ resource "aws_networkfirewall_firewall_policy" "databricks_nfw_policy" {
       priority     = 2
       resource_arn = aws_networkfirewall_rule_group.databricks_metastore_allowlist.arn
     }
-
   }
 
   tags = {
