@@ -17,8 +17,11 @@ This guide uses the following variables in configurations:
 - `gcp_auth_file` - JSON keys for service account. DO NOT place this file in this project.
 - `env` - Environment used to spin up infrastructure. This is merely a tag.
 - `region` - Region in which infrastructure is spun up.
-- `zone` - Zone specified for the GCP Terraform provider
 - `network_id` - UUID which is created once the Network Configuration is created via the Databricks account console for GCP. This should be created using the IP range, secondary ranges, and Google Compute Network is created.
+- `use_existing_key` - flag ("true" or "false") allowing for either the mode where you provide the resource ID to your CMEK resource, or let the module create a new one by providing key_name and keyring_name
+- `key_name` & `keyring_name` - name to be given to the CMEK used by Databricks for encryption. Not useful if bringing an existing `cmek_resource_id`
+- `cmek_resource_id` - ID to your existing CMEK. 
+- `hive_metastore_ip` - IP to the regional Metastore. This value can be found here - https://docs.gcp.databricks.com/en/resources/ip-domain-region.html#addresses-for-default-metastore. The module will create an Egress opening to this IP Address.
 
 This guide is provided as-is and you can use this guide as the basis for your custom Terraform module. Note that for BYO VPC (a.k.a. customer managed VPC), there is a 2-step process as full automation via the tradition `databricks_mws_networks` is not supported at this time for GCP.
 
