@@ -2,12 +2,14 @@ variable "databricks_account_id" {}
 variable "databricks_google_service_account" {}
 variable "google_project" {}
 variable "google_region" {}
-variable "google_zone" {}
-variable "backend_rest_psce" {}
-variable "relay_psce" {}
 
 variable "workspace_pe" {}
 variable "relay_pe" {}
+
+variable "use_existing_cmek" {}
+variable "key_name" {}
+variable "keyring_name" {}
+variable "cmek_resource_id" {}
 
 variable "account_console_url" {}
 
@@ -25,15 +27,15 @@ variable "google_pe_subnet_secondary_ip_range" {
   default = "192.168.10.0/24"
 }
 
-variable "network_ip_cidr_range"{
+variable "nodes_ip_cidr_range"{
   default = "10.0.0.0/16"
 }
 
-variable "network_secondary_ip_cidr_range1"{
+variable "pod_ip_cidr_range"{
   default = "10.1.0.0/16"
 }
 
-variable "network_secondary_ip_cidr_range2"{
+variable "service_ip_cidr_range"{
   default = "10.2.0.0/20"
 }
 
@@ -44,6 +46,11 @@ variable "mws_workspace_gke_master_ip_range" {
 //Users can connect to workspace only from this list of IP's
 variable "ip_addresses" {
   type = list(string)
+}
+
+// Regional value for the Hive Metastore IP (allowing Egress to this public IP)
+variable "hive_metastore_ip" {
+  default = "34.76.244.202"
 }
 
 
@@ -61,10 +68,11 @@ terraform {
   required_providers {
     databricks = {
       source = "databricks/databricks"
-      version = ">=1.23.0"
+      version = ">=1.51.0"
     }
     google = {
       source  = "hashicorp/google"
+      version = ">= 6.2.0"
     }
   }
 }
@@ -72,7 +80,6 @@ terraform {
 provider "google" {
   project = var.google_project
   region  = var.google_region
-  zone    = var.google_zone
 }
 
 // initialize provider in "accounts" mode to provision new workspace

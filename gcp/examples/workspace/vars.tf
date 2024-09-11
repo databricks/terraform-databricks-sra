@@ -20,6 +20,12 @@ variable "google_zone" {}
 variable "backend_rest_psce" {}
 variable "relay_psce" {}
 
+variable "key_name" {}
+variable "keyring_name" {}
+variable "use_existing_cmek" {}
+variable "hive_metastore_ip" {}
+variable "cmek_resource_id" {}
+
 variable "workspace_pe" {}
 variable "relay_pe" {}
 

@@ -6,16 +6,16 @@ resource "google_compute_network" "dbx_private_vpc" {
 
 resource "google_compute_subnetwork" "network-with-private-secondary-ip-ranges" {
   name          = "test-dbx-${random_string.suffix.result}"
-  ip_cidr_range = var.network_ip_cidr_range
+  ip_cidr_range = var.nodes_ip_cidr_range
   region        = var.google_region
   network       = google_compute_network.dbx_private_vpc.id
   secondary_ip_range {
     range_name    = "pods"
-    ip_cidr_range = var.network_secondary_ip_cidr_range1
+    ip_cidr_range = var.pod_ip_cidr_range
   }
   secondary_ip_range {
     range_name    = "svc"
-    ip_cidr_range = var.network_secondary_ip_cidr_range2
+    ip_cidr_range = var.service_ip_cidr_range
   }
   private_ip_google_access = true
 }

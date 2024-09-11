@@ -1,5 +1,4 @@
 resource "databricks_mws_private_access_settings" "pas" {
- account_id                   = var.databricks_account_id
  provider       = databricks.accounts
  private_access_settings_name = "pas-${random_string.suffix.result}"
  region                       = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
