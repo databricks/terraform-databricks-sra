@@ -8,7 +8,7 @@ module "customer_managed_vpc" {
 
   workspace_pe = var.workspace_pe
  relay_pe =  var.relay_pe
-  google_pe_subnet = var.google_pe_subnet
+  google_pe_subnet = var.google_pe_subnet 
   relay_pe_ip_name = var.relay_pe_ip_name
   workspace_pe_ip_name = var.workspace_pe_ip_name
   relay_service_attachment = var.relay_service_attachment

@@ -16,10 +16,6 @@ variable "google_region" {}
 variable "google_project" {}
 
 variable "databricks_account_id" {}
-variable "google_zone" {}
-variable "backend_rest_psce" {}
-variable "relay_psce" {}
-
 variable "key_name" {}
 variable "keyring_name" {}
 variable "use_existing_cmek" {}
