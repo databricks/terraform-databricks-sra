@@ -73,6 +73,7 @@ module "system_table" {
   providers = {
     databricks = databricks.created_workspace
   }
+  depends_on = [ module.uc_assignment ]
 }
 
 // SAT Implementation - Optional

@@ -139,7 +139,7 @@ resource "databricks_external_location" "workspace_catalog_external_location" {
 
 // Workspace Catalog
 resource "databricks_catalog" "workspace_catalog" {
-  name           = var.uc_catalog_name
+  name           = replace(var.uc_catalog_name, "-", "_")
   comment        = "This catalog is for workspace - ${var.workspace_id}"
   isolation_mode = "ISOLATED"
   storage_root   = "s3://${var.uc_catalog_name}/catalog/"
@@ -147,6 +147,13 @@ resource "databricks_catalog" "workspace_catalog" {
     purpose = "Catalog for workspace - ${var.workspace_id}"
   }
   depends_on = [databricks_external_location.workspace_catalog_external_location]
+}
+
+// Set Workspace Catalog as Default
+resource "databricks_default_namespace_setting" "this" {
+  namespace {
+    value = replace(var.uc_catalog_name, "-", "_")
+  }
 }
 
 // Grant Admin Catalog Perms
