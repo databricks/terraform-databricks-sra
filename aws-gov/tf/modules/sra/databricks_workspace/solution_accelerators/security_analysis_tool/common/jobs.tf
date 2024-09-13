@@ -1,53 +1,65 @@
 resource "databricks_job" "initializer" {
   name = "SAT Initializer Notebook (one-time)"
-  new_cluster {
-    num_workers    = 5
-    spark_version  = data.databricks_spark_version.latest_lts.id
-    node_type_id   = data.databricks_node_type.smallest.id
-    runtime_engine = "PHOTON"
-    dynamic "gcp_attributes" {
-      for_each = var.gcp_impersonate_service_account == "" ? [] : [var.gcp_impersonate_service_account]
-      content {
-        google_service_account = var.gcp_impersonate_service_account
+  job_cluster {
+    job_cluster_key = "job_cluster"
+    new_cluster {
+      num_workers    = 5
+      spark_version  = data.databricks_spark_version.latest_lts.id
+      node_type_id   = data.databricks_node_type.smallest.id
+      runtime_engine = "PHOTON"
+      dynamic "gcp_attributes" {
+        for_each = var.gcp_impersonate_service_account == "" ? [] : [var.gcp_impersonate_service_account]
+        content {
+          google_service_account = var.gcp_impersonate_service_account
+        }
       }
     }
   }
 
-  library {
-    pypi {
-      package = "dbl-sat-sdk"
+  task {
+    task_key        = "Initializer"
+    job_cluster_key = "job_cluster"
+    library {
+      pypi {
+        package = "dbl-sat-sdk"
+      }
+    }
+    notebook_task {
+      notebook_path = "${databricks_repo.security_analysis_tool.workspace_path}/notebooks/security_analysis_initializer"
     }
   }
-
-  notebook_task {
-    notebook_path = "${databricks_repo.security_analysis_tool.path}/notebooks/security_analysis_initializer"
-  }
-
 }
 
 resource "databricks_job" "driver" {
   name = "SAT Driver Notebook"
-  new_cluster {
-    num_workers    = 5
-    spark_version  = data.databricks_spark_version.latest_lts.id
-    node_type_id   = data.databricks_node_type.smallest.id
-    runtime_engine = "PHOTON"
-    dynamic "gcp_attributes" {
-      for_each = var.gcp_impersonate_service_account == "" ? [] : [var.gcp_impersonate_service_account]
-      content {
-        google_service_account = var.gcp_impersonate_service_account
+  job_cluster {
+    job_cluster_key = "job_cluster"
+    new_cluster {
+      num_workers    = 5
+      spark_version  = data.databricks_spark_version.latest_lts.id
+      node_type_id   = data.databricks_node_type.smallest.id
+      runtime_engine = "PHOTON"
+      dynamic "gcp_attributes" {
+        for_each = var.gcp_impersonate_service_account == "" ? [] : [var.gcp_impersonate_service_account]
+        content {
+          google_service_account = var.gcp_impersonate_service_account
+        }
       }
     }
   }
 
-  library {
-    pypi {
-      package = "dbl-sat-sdk"
-    }
-  }
 
-  notebook_task {
-    notebook_path = "${databricks_repo.security_analysis_tool.path}/notebooks/security_analysis_driver"
+  task {
+    task_key        = "Driver"
+    job_cluster_key = "job_cluster"
+    library {
+      pypi {
+        package = "dbl-sat-sdk"
+      }
+    }
+    notebook_task {
+      notebook_path = "${databricks_repo.security_analysis_tool.workspace_path}/notebooks/security_analysis_driver"
+    }
   }
 
   schedule {

@@ -287,9 +287,6 @@ module "vpc_endpoints" {
       }
     }
   }
-  depends_on = [
-    module.vpc, module.databricks_mws_workspace
-  ]
 }
 
 // Databricks REST endpoint - skipped in custom operation mode

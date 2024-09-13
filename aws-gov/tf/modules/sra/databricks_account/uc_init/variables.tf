@@ -6,6 +6,10 @@ variable "databricks_account_id" {
   type = string
 }
 
+variable "metastore_exists" {
+  type = string
+}
+
 variable "metastore_name" {
   type = string
 }

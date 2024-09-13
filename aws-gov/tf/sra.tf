@@ -21,11 +21,10 @@ module "SRA" {
   resource_prefix = var.resource_prefix
 
   // REQUIRED - Workspace and Unity Catalog:
-  user_workspace_admin                   = null             // Workspace admin user email.
-  user_workspace_catalog_admin           = null             // Workspace catalog admin email.
-  operation_mode                         = "isolated"       // Operation mode (sandbox, custom, firewall, isolated), see README.md for more information.
-  workspace_admin_service_principal_name = "sra-example-sp" // Creates an example admin SP for automation use cases.
-  metastore_exists                       = false            // If a regional metastore exists set to true. If there are multiple regional metastores, you can comment out "uc_init" and add the metastore ID directly in to the module call for "uc_assignment".
+  user_workspace_admin         = null       // Workspace admin user email.
+  user_workspace_catalog_admin = null       // Workspace catalog admin email.
+  operation_mode               = "isolated" // Operation mode (sandbox, custom, firewall, isolated), see README.md for more information.
+  metastore_exists             = false      // If a regional metastore exists set to true. If there are multiple regional metastores, you can comment out "uc_init" and add the metastore ID directly in to the module call for "uc_assignment".
 
   // REQUIRED - AWS Infrastructure:
   cmk_admin_arn                            = null          // CMK admin ARN, defaults to the AWS account root user.
@@ -51,7 +50,7 @@ module "SRA" {
   custom_relay_vpce_id      = null
   custom_workspace_vpce_id  = null
 
-  // OPTIONAL - Examples, Workspace Hardening, Public Previews, and Solution Accelerators:
+  // OPTIONAL - Examples, Workspace Hardening, and Solution Accelerators:
   enable_read_only_external_location_boolean = false // Set to true to enable a read-only external location.
   read_only_data_bucket                      = null  // S3 bucket name for read-only data.
   read_only_external_location_admin          = null  // Admin for the external location.
@@ -68,7 +67,7 @@ module "SRA" {
   enable_ip_boolean = false                                   // Set to true to enable IP access list.
   ip_addresses      = ["X.X.X.X", "X.X.X.X/XX", "X.X.X.X/XX"] // Specify IP addresses for access.
 
-  enable_system_tables_schema_boolean = false // Set to true to enable system table schemas (Public Preview).
+  enable_system_tables_schema_boolean = false // Set to true to enable system table schemas
 
   enable_sat_boolean        = false // Set to true to enable Security Analysis Tool. https://github.com/databricks-industry-solutions/security-analysis-tool
   enable_audit_log_alerting = false // Set to true to create 40+ queries for audit log alerting based on user activity. https://github.com/andyweaves/system-tables-audit-logs
