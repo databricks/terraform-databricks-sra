@@ -13,7 +13,7 @@ module "uc_catalog" {
   uc_catalog_name                = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
   cmk_admin_arn                  = var.cmk_admin_arn == null ? "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:root" : var.cmk_admin_arn
   workspace_id                   = module.databricks_mws_workspace.workspace_id
-  user_workspace_catalog_admin   = var.workspace_catalog_admin
+  user_workspace_catalog_admin   = var.user_workspace_catalog_admin
   databricks_gov_shard           = var.databricks_gov_shard
   databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
   uc_master_role_id              = var.uc_master_role_id
@@ -79,6 +79,7 @@ module "system_table" {
   providers = {
     databricks = databricks.created_workspace
   }
+  depends_on = [ module.uc_assignment ]
 }
 
 // SAT Implementation - Optional
