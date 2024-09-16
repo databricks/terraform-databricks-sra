@@ -21,7 +21,8 @@ There are four separate operation modes you can choose for the underlying networ
 
 - **Sandbox**: Sandbox or open egress. Selecting 'sandbox' as the operation mode allows traffic to flow freely to the public internet. This mode is suitable for sandbox or development scenarios where data exfiltration protection is of minimal concern, and developers need to access public APIs, packages, and more.
 
-- **Firewall**: Firewall or limited egress. Choosing 'firewall' as the operation mode permits traffic flow only to a selected list of public addresses. This mode is applicable in situations where open internet access is necessary for certain tasks, but unfiltered traffic is not an option due to the sensitivity of the workloads or data. **NOTE**: Due to a limitation in the AWS Network Firewall's ability to use fully qualified domain names for non-HTTP/HTTPS traffic, an external data source is required for the external Hive metastore. For sensitive production workloads, it is recommended to use isolated operation mode and Unity Catalog, a self-hosted Hive metastore, or to explore other firewall services to address AWS Network Firewall's limitations.
+- **Firewall**: Firewall or limited egress. Choosing 'firewall' as the operation mode permits traffic flow only to a selected list of public addresses. This mode is applicable in situations where open internet access is necessary for certain tasks, but unfiltered traffic is not an option due to the sensitivity of the workloads or data. 
+    - **WARNING**: Due to a limitation in AWS Network Firewall's support for fully qualified domain names (FQDNs) in non-HTTP/HTTPS traffic, an IP address is required to allow communication with the Hive Metastore. This dependency on a static IP introduces the potential for downtime if the Hive Metastore's IP changes. For sensitive production workloads, it is recommended to explore the isolated operation mode or consider alternative firewall solutions that provide better handling of dynamic IPs or FQDNs.
 
 - **Isolated**:  Isolated or no egress. Opting for 'isolated' as the operation mode prevents any traffic to the public internet. Traffic is limited to AWS private endpoints, either to AWS services or the Databricks control plane. This mode should be used in cases where access to the public internet is completely unsupported. **NOTE**: Apache Derby Metastore will be required for clusters and non-serverless SQL Warehouses. For more information, please view this [knowledge article](https://kb.databricks.com/metastore/set-up-embedded-metastore).
 
@@ -45,18 +46,10 @@ See the below networking diagrams for more information.
 - **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/data-governance/unity-catalog/index.html) is a unified governance solution for all data and AI assets including files, tables, and machine learning models. Unity Catalog provides a modern approach to granular access controls with centralized policy, auditing, and lineage tracking - all integrated into your Databricks workflow. **NOTE**: SRA creates a workspace specific catalog that is isolated to that individual workspace. To change these settings please update uc_catalog.tf under the workspace_security_modules.
 
 
-## Post Workspace Deployment
-
-- **Service Principals**: A [Service principal](https://docs.databricks.com/administration-guide/users-groups/service-principals.html) is an identity that you create in Databricks for use with automated tools, jobs, and applications. It's against best practice to tie production workloads to individual user accounts, and so we recommend configuring these service principals within Databricks. In this template, we create an example service principal.
-
-- **Token Management**: [Personal access tokens](https://docs.databricks.com/dev-tools/api/latest/authentication.html) are used to access Databricks REST APIs in-lieu of passwords. In this template we create an example token and set its time-to-live. This can be set at an administrative level for all users.
-
-- **Secret Management** Integrating with heterogeneous systems requires managing a potentially large set of credentials and safely distributing them across an organization. Instead of directly entering your credentials into a notebook, use [Databricks secrets](https://docs.databricks.com/security/secrets/index.html) to store your credentials and reference them in notebooks and jobs. In this template, we create an example secret.
-
-
 ## Optional Deployment Configurations
 
 - **Audit and Billable Usage Logs**: Databricks delivers logs to your S3 buckets. [Audit logs](https://docs.databricks.com/administration-guide/account-settings/audit-logs.html) contain two levels of events: workspace-level audit logs with workspace-level events and account-level audit logs with account-level events. In addition to these logs, you can generate additional events by enabling verbose audit logs. [Billable usage logs](https://docs.databricks.com/administration-guide/account-settings/billable-usage-delivery.html) are delivered daily to an AWS S3 storage bucket. There will be a separate CSV file for each workspace. This file contains historical data about the workspace's cluster usage in Databricks Units (DBUs).
+- **System Tables Schemas**: System Tables provide visiblity into access, billing, compute, Lakeflow, and storage logs. These tables can be found within the system catalog in Unity Catalog.
 
 - **Cluster Example**: An example of a cluster and a cluster policy has been included. **NOTE:** Please be aware this will create a cluster within your Databricks workspace including the underlying EC2 instance.
 
@@ -78,11 +71,6 @@ See the below networking diagrams for more information.
 - **Security Analysis Tool (SAT)**: The Security Analysis Tool analyzes customer's Databricks account and workspace security configurations and provides recommendations that can help them follow Databricks' security best practices. This can be enabled into the workspace that is being created. **NOTE:** Please be aware this creates a cluster, a job, and a dashboard within your environment. 
 
 - **Audit Log Alerting**: Audit Log Alerting, based on this [blog post](https://www.databricks.com/blog/improve-lakehouse-security-monitoring-using-system-tables-databricks-unity-catalog), creates 40+ SQL alerts to monitor for incidents based on a Zero Trust Architecture (ZTA) model. **NOTE:** Please be aware this creates a cluster, a job, and queries within your environment. 
-
-
-## Public Preview Features
-
-- **System Tables Schemas**: System Table schemas are currently in private preview. System Tables provide visiblity into access, billing, compute, and storage logs. In this deployment the metastore admin, service principle, owns the table. Additional grant statements will be needed. **NOTE:** Please note this is currently in public preview.
 
 
 ## Additional Security Recommendations and Opportunities
@@ -109,11 +97,12 @@ In this section, we break down additional security recommendations and opportuni
 3. Decide which [operation](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) mode you'd like to use.
 4. Fill out `sra.tf` in place
 5. Fill out `template.tfvars.example` remove the .example part of the file name
-6. CD into `tf`
-7. Run `terraform init`
-8. Run `terraform validate`
-9. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
-10. Run `terraform apply -var-file ../example.tfvars`
+6. Configure the [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration) and [Databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authentication) provider authentication
+7. CD into `tf`
+8. Run `terraform init`
+9. Run `terraform validate`
+10. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
+11. Run `terraform apply -var-file ../example.tfvars`
 
 
 ## Network Diagram - Sandbox

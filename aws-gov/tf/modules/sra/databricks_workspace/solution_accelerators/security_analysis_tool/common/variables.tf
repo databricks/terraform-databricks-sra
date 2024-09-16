@@ -34,3 +34,13 @@ variable "gcp_impersonate_service_account" {
   description = "GCP Service Account to impersonate (e.g. xyz-sa-2@project.iam.gserviceaccount.com)"
   default     = ""
 }
+
+variable "analysis_schema_name" {
+  type        = string
+  description = "Name of the schema to be used for analysis"
+}
+
+variable "proxies" {
+  type        = map(any)
+  description = "Proxies to be used for Databricks API calls"
+}

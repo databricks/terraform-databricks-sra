@@ -259,11 +259,6 @@ variable "workspace" {
   }
 }
 
-variable "workspace_admin_service_principal_name" {
-  description = "Service principal name"
-  type        = string
-}
-
 // AWS Gov Only Variables
 variable "databricks_gov_shard" {
   description = "Gov Shard civilian or dod"
