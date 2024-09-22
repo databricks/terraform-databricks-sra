@@ -13,9 +13,6 @@ module "SRA" {
   region                         = var.region
   databricks_gov_shard           = var.databricks_gov_shard
   region_name                    = var.region_name[var.databricks_gov_shard]
-  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id[var.databricks_gov_shard]
-  uc_master_role_id              = var.uc_master_role_id[var.databricks_gov_shard]
-  log_delivery_role_name         = var.log_delivery_role_name[var.databricks_gov_shard]
 
   // REQUIRED - Naming and Tagging:
   resource_prefix = var.resource_prefix
