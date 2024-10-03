@@ -108,4 +108,8 @@ module "audit_log_alerting" {
   }
 
   alert_emails = [var.user_workspace_admin]
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
 }
