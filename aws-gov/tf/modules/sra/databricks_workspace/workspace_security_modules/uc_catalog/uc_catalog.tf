@@ -107,7 +107,7 @@ resource "aws_kms_key" "catalog_storage" {
         "Sid" : "Allow IAM Role to use the key",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:role/${var.resource_prefix}-catalog-${var.workspace_id}"
+          "AWS" : "arn:aws-us-gov:iam::${var.aws_account_id}:role/${var.resource_prefix}-catalog-${var.workspace_id}"
         },
         "Action" : [
           "kms:Decrypt",
