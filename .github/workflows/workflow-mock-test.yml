@@ -1,0 +1,18 @@
+# This workflow is used for testing the terraform-ruw reusable workflow.
+
+name: Workflow Mock Tests
+on:
+  push:
+#    paths:
+#      - 'workflow-mock/**'
+#  pull_request:
+#    paths:
+#      - 'workflow-mock/**'
+jobs:
+  workflow-mock-test:
+    uses: ./.github/workflows/terraform-ruw.yml
+    with:
+      working_directory: workflow-mock
+      environment: mock
+    # This is used so that the reusable workflow can inherit repo secrets for auth to cloud providers.
+    secrets: inherit

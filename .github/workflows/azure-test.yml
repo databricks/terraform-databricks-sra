@@ -1,0 +1,15 @@
+name: Azure Tests
+on:
+  push:
+    paths:
+      - 'azure/tf/**'
+  pull_request:
+    paths:
+      - 'azure/tf/**'
+jobs:
+  test-azure:
+    uses: ./.github/workflows/terraform-ruw.yml
+    with:
+      working_directory: azure/tf
+    # This is used so that the reusable workflow can inherit repo secrets for auth to cloud providers.
+    secrets: inherit
