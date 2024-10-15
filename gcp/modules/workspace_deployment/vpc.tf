@@ -5,7 +5,7 @@ resource "google_compute_network" "dbx_private_vpc" {
 }
 
 resource "google_compute_subnetwork" "network-with-private-secondary-ip-ranges" {
-  name          = "test-dbx-${random_string.suffix.result}"
+  name          = "ws-subnet-dbx-${random_string.suffix.result}"
   ip_cidr_range = var.nodes_ip_cidr_range
   region        = var.google_region
   network       = google_compute_network.dbx_private_vpc.id
@@ -20,58 +20,17 @@ resource "google_compute_subnetwork" "network-with-private-secondary-ip-ranges" 
   private_ip_google_access = true
 }
 
-resource "google_compute_router" "router" {
-  name    = "my-router-${random_string.suffix.result}"
-  region  = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
-  network = google_compute_network.dbx_private_vpc.id
-}
-
-resource "google_compute_router_nat" "nat" {
-  name                               = "my-router-nat-${random_string.suffix.result}"
-  router                             = google_compute_router.router.name
-  region                             = google_compute_router.router.region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-}
-
-resource "databricks_mws_vpc_endpoint" "backend_rest_vpce" {
-depends_on =[google_compute_forwarding_rule.backend_psc_ep]
- provider     = databricks.accounts
-
- account_id          = var.databricks_account_id
- vpc_endpoint_name   = "vpce-backend-rest-${random_string.suffix.result}"
- gcp_vpc_endpoint_info {
-   project_id        = var.google_project
-   psc_endpoint_name = var.workspace_pe
-   endpoint_region   = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
- }
-}
-
-resource "databricks_mws_vpc_endpoint" "relay_vpce" {
-  depends_on = [ google_compute_forwarding_rule.frontend_psc_ep ]
- provider     = databricks.accounts
-
- account_id          = var.databricks_account_id
- vpc_endpoint_name   = "vpce-relay-${random_string.suffix.result}"
- gcp_vpc_endpoint_info {
-   project_id        = var.google_project
-   psc_endpoint_name = var.relay_pe
-   endpoint_region   = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
- }
-}
-
-
-resource "databricks_mws_networks" "this" {
+resource "databricks_mws_networks" "network_config" {
   provider     = databricks.accounts
   account_id   = var.databricks_account_id
-  network_name = "test-demo-${random_string.suffix.result}"
+  network_name = "config-eu1-${random_string.suffix.result}"
   gcp_network_info {
     network_project_id    = var.google_project
-    vpc_id                = google_compute_network.dbx_private_vpc.name
-    subnet_id             = google_compute_subnetwork.network-with-private-secondary-ip-ranges.name
-    subnet_region         = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
-    pod_ip_range_name     = "pods"
-    service_ip_range_name = "svc"
+    vpc_id                = var.use_existing_vpc? var.existing_vpc_name:google_compute_network.dbx_private_vpc.name
+    subnet_id             = var.use_existing_vpc?var.existing_subnet_name:google_compute_subnetwork.network-with-private-secondary-ip-ranges.name
+    subnet_region         = var.google_region
+    pod_ip_range_name     = var.use_existing_vpc?var.existing_pod_range_name:"pods"
+    service_ip_range_name = var.use_existing_vpc?var.existing_service_range_name:"svc"
   }
   vpc_endpoints {
     

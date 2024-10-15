@@ -1,4 +1,7 @@
+
+
 resource "databricks_mws_private_access_settings" "pas" {
+ count = var.use_existing_pas ? 0 : 1
  provider       = databricks.accounts
  private_access_settings_name = "pas-${random_string.suffix.result}"
  region                       = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
@@ -9,7 +12,7 @@ resource "databricks_mws_private_access_settings" "pas" {
 resource "databricks_mws_workspaces" "this" {
   provider       = databricks.accounts
   account_id     = var.databricks_account_id
-  workspace_name = "tf-demo-test-${random_string.suffix.result}"
+  workspace_name = var.workspace_name
   location       = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
   cloud_resource_container {
     gcp {
@@ -17,8 +20,8 @@ resource "databricks_mws_workspaces" "this" {
     }
   }
 
-  private_access_settings_id = databricks_mws_private_access_settings.pas.private_access_settings_id
-  network_id = databricks_mws_networks.this.network_id
+  private_access_settings_id = var.use_existing_pas? var.existing_pas_id:databricks_mws_private_access_settings.pas[0].private_access_settings_id
+  network_id = databricks_mws_networks.network_config.network_id
   gke_config {
     connectivity_type = "PRIVATE_NODE_PUBLIC_MASTER"
     master_ip_range   = var.mws_workspace_gke_master_ip_range
@@ -27,11 +30,15 @@ resource "databricks_mws_workspaces" "this" {
   token {
     comment = "Terraform generated PAT"
     // 30 day token
-    lifetime_seconds = 2592000
+    lifetime_seconds = 259200
   }
+  storage_customer_managed_key_id = databricks_mws_customer_managed_keys.this.customer_managed_key_id
+  managed_services_customer_managed_key_id = databricks_mws_customer_managed_keys.this.customer_managed_key_id
 
   # this makes sure that the NAT is created for outbound traffic before creating the workspace
-  depends_on = [google_compute_router_nat.nat]
+  # not needed if the workspace uses backend PSC (recommended)
+  # depends_on = [google_compute_router_nat.nat]
+  depends_on = [ databricks_mws_customer_managed_keys.this]
 }
 
 resource "databricks_workspace_conf" "this" {
