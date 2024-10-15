@@ -4,7 +4,7 @@ resource "databricks_mws_private_access_settings" "pas" {
  count = var.use_existing_pas ? 0 : 1
  provider       = databricks.accounts
  private_access_settings_name = "pas-${random_string.suffix.result}"
- region                       = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
+ region                       = google_compute_subnetwork.network-with-private-secondary-ip-ranges[0].region
  public_access_enabled        = true
  private_access_level         = "ACCOUNT"
 }
@@ -13,7 +13,7 @@ resource "databricks_mws_workspaces" "this" {
   provider       = databricks.accounts
   account_id     = var.databricks_account_id
   workspace_name = var.workspace_name
-  location       = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
+  location       = var.google_region
   cloud_resource_container {
     gcp {
       project_id = var.google_project
