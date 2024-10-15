@@ -1,4 +1,5 @@
 resource "google_compute_firewall" "deny_egress" {
+  count = var.harden_network ? 1 : 0
   name                    = "deny-egress-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1100
@@ -15,6 +16,7 @@ resource "google_compute_firewall" "deny_egress" {
 # This is the only Egress rule that goes to a public internet IP
 # It can be avoided if the workspace is UC-enabled and that the spark config is configured to avoid fetching the metastore IP
 resource "google_compute_firewall" "to_databricks_managed_hive" {
+  count = var.harden_network ? 1 : 0
   name                    = "to-databricks-managed-hive-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1010
@@ -28,6 +30,7 @@ resource "google_compute_firewall" "to_databricks_managed_hive" {
 }
 
 resource "google_compute_firewall" "to_gke_health_checks" {
+  count = var.harden_network ? 1 : 0
   name                    = "to-gke-health-checks-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1010
@@ -41,6 +44,7 @@ resource "google_compute_firewall" "to_gke_health_checks" {
 }
 
 resource "google_compute_firewall" "from_gke_health_checks" {
+  count = var.harden_network ? 1 : 0
   name                    = "from-gke-health-checks-${google_compute_network.dbx_private_vpc.name}"
   direction               = "INGRESS"
   priority                = 1010
@@ -54,6 +58,7 @@ resource "google_compute_firewall" "from_gke_health_checks" {
 }
 
 resource "google_compute_firewall" "to_gke_cp" {
+  count = var.harden_network ? 1 : 0
   name                    = "to-gke-cp-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1010
@@ -67,6 +72,7 @@ resource "google_compute_firewall" "to_gke_cp" {
 }
 
 resource "google_compute_firewall" "to_google_apis" {
+  count = var.harden_network ? 1 : 0
   name                    = "to-google-apis-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1010
@@ -79,6 +85,7 @@ resource "google_compute_firewall" "to_google_apis" {
 }
 
 resource "google_compute_firewall" "to_gke_nodes_subnet" {
+  count = var.harden_network ? 1 : 0
   name                    = "to-gke-nodes-subnet-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1010

@@ -2,14 +2,11 @@ variable "databricks_account_id" {}
 variable "databricks_google_service_account" {}
 variable "google_project" {}
 variable "google_region" {}
+# variable "google_zone" {}
 
 variable "workspace_pe" {}
 variable "relay_pe" {}
 
-variable "use_existing_cmek" {}
-variable "key_name" {}
-variable "keyring_name" {}
-variable "cmek_resource_id" {}
 
 variable "account_console_url" {}
 
@@ -19,6 +16,15 @@ variable "google_pe_subnet" {}
 # Private ip address assigned to PSC endpoints
 variable "relay_pe_ip_name" {}
 variable "workspace_pe_ip_name" {}
+
+# For the value of the regional Hive Metastore IP, refer to the Databricks documentation
+# Here - https://docs.gcp.databricks.com/en/resources/ip-domain-region.html
+variable "hive_metastore_ip" {}
+
+variable "use_existing_cmek" {}
+variable "key_name" {}
+variable "keyring_name" {}
+
 
 variable "google_pe_subnet_ip_cidr_range" {
   default = "10.3.0.0/24"
@@ -43,16 +49,48 @@ variable "mws_workspace_gke_master_ip_range" {
   default = "10.3.0.0/28"
 }
 
-//Users can connect to workspace only from this list of IP's
+variable "use_existing_vpc" {
+  default = false
+}
+variable "existing_vpc_name" {
+  default = ""
+}
+variable "existing_subnet_name" {
+  default = ""
+}
+variable "existing_pod_range_name"{
+  default = ""
+}
+variable "existing_service_range_name"{
+  default = ""
+}
+
+variable "use_existing_PSC_EP" {
+  default = false
+}
+
+
+variable "harden_network" {
+  # Flag to enable Firewall setup by the current module
+  default = true
+}
+
+
+//Users can connect to workspace only thes list of IP's
 variable "ip_addresses" {
   type = list(string)
 }
 
-// Regional value for the Hive Metastore IP (allowing Egress to this public IP)
-variable "hive_metastore_ip" {
-  default = "34.76.244.202"
+variable "cmek_resource_id" {
+  default = ""
 }
-
+variable "use_existing_pas" {}
+variable "existing_pas_id" {
+  default = ""
+}
+variable "workspace_name" {
+  default = "tf-demo-test"
+}
 
 
 
@@ -72,7 +110,8 @@ terraform {
     }
     google = {
       source  = "hashicorp/google"
-      version = ">= 6.2.0"
+      version = ">=5.43.1"
+
     }
   }
 }
@@ -80,6 +119,8 @@ terraform {
 provider "google" {
   project = var.google_project
   region  = var.google_region
+  impersonate_service_account = var.databricks_google_service_account
+  # zone    = var.google_zone
 }
 
 // initialize provider in "accounts" mode to provision new workspace
@@ -123,7 +164,8 @@ resource "databricks_user" "me" {
 
 
  provider  = databricks.workspace
- user_name = data.google_client_openid_userinfo.me.email
+#  user_name = data.google_client_openid_userinfo.me.email
+ user_name = "aleksander.callebat@databricks.com"
 }
 
 
