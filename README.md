@@ -1,10 +1,14 @@
 # Security Reference Architectures (SRA) - Terraform Templates
+<p align="center">
+  <img src="https://i.ibb.co/NrfH2qc/Screenshot-2024-09-17-at-1-02-06-PM.png" />
+</p>
 
 ## Project Overview
 
 Security Reference Architecture (SRA) with Terraform templates makes deploying workspaces with Security Best Practices easy. You can programmatically deploy workspaces and the required cloud infrastructure using the official Databricks Terraform provider. These unified Terraform templates are pre-configured with hardened security settings similar to our most security-conscious customers. The initial templates based on [Databricks Security Best Practices](https://www.databricks.com/trust/security-features#best-practices)
 
 - [AWS](https://github.com/databricks/terraform-databricks-sra/tree/main/aws)
+- [AWS Govcloud](https://github.com/databricks/terraform-databricks-sra/tree/main/aws-gov)
 - [Azure](https://github.com/databricks/terraform-databricks-sra/tree/main/azure)
 - [GCP](https://github.com/databricks/terraform-databricks-sra/tree/main/gcp)
 

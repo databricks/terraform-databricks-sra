@@ -5,7 +5,8 @@ resource "aws_s3_bucket" "log_delivery" {
   bucket        = "${var.resource_prefix}-log-delivery"
   force_destroy = true
   tags = {
-    Name = "${var.resource_prefix}-log-delivery"
+    Name    = "${var.resource_prefix}-log-delivery"
+    Project = var.resource_prefix
   }
 }
 
@@ -96,7 +97,8 @@ resource "aws_iam_role" "log_delivery" {
   description        = "(${var.resource_prefix}) Log Delivery Role"
   assume_role_policy = data.databricks_aws_assume_role_policy.log_delivery.json
   tags = {
-    Name = "${var.resource_prefix}-log-delivery-role"
+    Name    = "${var.resource_prefix}-log-delivery-role"
+    Project = var.resource_prefix
   }
 }
 
