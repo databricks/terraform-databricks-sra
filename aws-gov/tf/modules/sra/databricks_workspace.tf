@@ -11,7 +11,7 @@ module "uc_catalog" {
   aws_account_id                 = var.aws_account_id
   resource_prefix                = var.resource_prefix
   uc_catalog_name                = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
-  cmk_admin_arn                  = var.cmk_admin_arn == null ? "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:root" : var.cmk_admin_arn
+  cmk_admin_arn                  = var.cmk_admin_arn == null ? "arn:aws-us-gov:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
   workspace_id                   = module.databricks_mws_workspace.workspace_id
   user_workspace_catalog_admin   = var.user_workspace_catalog_admin
   databricks_gov_shard           = var.databricks_gov_shard
@@ -113,4 +113,8 @@ module "audit_log_alerting" {
   }
 
   alert_emails = [var.user_workspace_admin]
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
 }
