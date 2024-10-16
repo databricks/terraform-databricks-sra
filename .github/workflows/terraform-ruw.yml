@@ -80,6 +80,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         name: Checkout source code
+      - uses: actions/cache@v4
+        name: Cache TFLint Plugins
+        with:
+          path: ~/.tflint.d/plugins
+          key: tflint-${{ runner.os }}-${{ hashFiles('**/.tflint.hcl') }}
       - uses: terraform-linters/setup-tflint@v4
         name: Setup TFLint
         with:
