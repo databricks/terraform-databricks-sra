@@ -11,5 +11,6 @@ jobs:
     uses: ./.github/workflows/terraform-ruw.yml
     with:
       working_directory: azure/tf
+      tflint_args: --var 'tags={"foo":"bar"}'
     # This is used so that the reusable workflow can inherit repo secrets for auth to cloud providers.
     secrets: inherit
