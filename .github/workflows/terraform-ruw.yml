@@ -1,4 +1,5 @@
 on:
+  # This makes the workflow reusable. It is not meant to be executed independently of a calling workflow.
   workflow_call:
     inputs:
       # Actions settings
@@ -8,7 +9,7 @@ on:
         required: true
       environment:
         # Note: The environment setting will NOT allow secrets from that environment to be used in the RUW. Only
-        # environment variables and deploy rules are useful here.
+        # environment variables and deploy rules are useful here. This can also be used for OIDC.
         type: string
         default: null
         required: false
@@ -46,14 +47,14 @@ on:
         type: string
         default: "~>1.0"
         required: false
-        description: Version of Terraform to install for jobs that use it.
+        description: Version of Terraform to install for jobs that use it. This supports constraint strings also (e.g. ~>1.0)
 
       # Terraform fmt settings
       terraform_fmt_enabled:
         type: boolean
         default: true
         required: false
-        description: Should terraform fmt related jobs run
+        description: Should terraform fmt related jobs run?
       terraform_fmt_check:
         type: boolean
         default: false
@@ -73,6 +74,7 @@ on:
         description: Additional arguments to pass to the terraform test command e.g. "-var 'foo=bar' -filter=tests/mock_plan.tftest.hcl"
 
 jobs:
+  # TFLint Job
   tflint:
     environment: ${{ inputs.environment }}
     if: inputs.tflint_enabled
@@ -80,6 +82,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         name: Checkout source code
+      # A cache is configured to avoid downloading plugins on every run
       - uses: actions/cache@v4
         name: Cache TFLint Plugins
         with:
@@ -99,6 +102,7 @@ jobs:
         run: tflint -f compact --minimum-failure-severity=${{ inputs.tflint_minimum_failure_severity }} --recursive ${{ inputs.tflint_args }}
         working-directory: ${{ inputs.working_directory }}
 
+  # Terraform fmt job
   terraform-fmt:
     environment: ${{ inputs.environment }}
     runs-on: ${{ inputs.runs_on }}
@@ -114,20 +118,26 @@ jobs:
         run: terraform fmt -check=${{ inputs.terraform_fmt_check }} -write=false -recursive
         working-directory: ${{ inputs.working_directory }}
 
+  # Terraform test job
   terraform-test:
     environment: ${{ inputs.environment }}
     runs-on: ${{ inputs.runs_on }}
     if: inputs.terraform_test_enabled
+    # This environment variable sets the plugin cache dir for Terraform, and is also used to configure a cache directory
     env:
       TF_PLUGIN_CACHE_DIR:  ${{ github.workspace }}/.terraform.d/plugin-cache
     steps:
       - uses: actions/checkout@v4
         name: Checkout source code
+      # Create the cache directory
       - run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+      # Initialize the cache
       - uses: actions/cache@v4
         name: Cache Terraform Providers
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          # The cache key includes the OS, working directory, and a hash of all versions.tf in the repo.
+          # A change to any of these will cause a new cache to be created (or reused if it exists)
           key: terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-${{ hashFiles('**/versions.tf') }}
           restore-keys:
             terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-
