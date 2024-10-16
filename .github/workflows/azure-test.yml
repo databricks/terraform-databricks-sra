@@ -1,3 +1,5 @@
+# This workflow is used for testing the Azure terraform module.
+
 name: Azure Tests
 on:
   push:
@@ -14,5 +16,3 @@ jobs:
     with:
       working_directory: azure/tf
       tflint_args: "--config=$(pwd)/.tflint.hcl"
-    # This is used so that the reusable workflow can inherit repo secrets for auth to cloud providers.
-    secrets: inherit
