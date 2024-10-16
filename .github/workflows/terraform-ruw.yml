@@ -35,6 +35,11 @@ on:
         description: Minimum severity required before TFLint considers a rule finding an error
         required: false
         default: error
+      tflint_args:
+        type: string
+        description: Additional arguments to pass to the tflint command e.g. "-var 'foo=bar'"
+        required: false
+        default: null
 
       # Terraform settings
       terraform_version:
@@ -65,7 +70,7 @@ on:
         type: string
         default: null
         required: false
-        description: Additional arguments to pass to the terraform test command e.g. "-var 'foo=bar'"
+        description: Additional arguments to pass to the terraform test command e.g. "-var 'foo=bar' -filter=tests/mock_plan.tftest.hcl"
 
 jobs:
   tflint:
@@ -86,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         working-directory: ${{ inputs.working_directory }}
       - name: Run TFLint
-        run: tflint -f compact --minimum-failure-severity=${{ inputs.tflint_minimum_failure_severity }} --recursive
+        run: tflint -f compact --minimum-failure-severity=${{ inputs.tflint_minimum_failure_severity }} --recursive ${{ inputs.tflint_args }}
         working-directory: ${{ inputs.working_directory }}
 
   terraform-fmt:
