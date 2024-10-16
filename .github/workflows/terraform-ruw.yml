@@ -1,5 +1,6 @@
 on:
   # This makes the workflow reusable. It is not meant to be executed independently of a calling workflow.
+  # This makes the workflow reusable. It is not meant to be executed independently of a calling workflow.
   workflow_call:
     inputs:
       # Actions settings
@@ -119,40 +120,26 @@ jobs:
         working-directory: ${{ inputs.working_directory }}
 
   # Terraform test job
+  # Terraform test job
   terraform-test:
     environment: ${{ inputs.environment }}
     runs-on: ${{ inputs.runs_on }}
     if: inputs.terraform_test_enabled
-<<<<<<< HEAD
     # This environment variable sets the plugin cache dir for Terraform, and is also used to configure a cache directory
     env:
       TF_PLUGIN_CACHE_DIR:  ${{ github.workspace }}/.terraform.d/plugin-cache
-      # Terraform will not use the cache if the dependency lock file is not committed to the repo. This is a workaround.
-      # https://developer.hashicorp.com/terraform/cli/config/config-file#allowing-the-provider-plugin-cache-to-break-the-dependency-lock-file
-      TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE: true
     steps:
       - uses: actions/checkout@v4
         name: Checkout source code
       # Create the cache directory
       - run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
       # Initialize the cache
-=======
-    env:
-      TF_PLUGIN_CACHE_DIR:  ${{ github.workspace }}/.terraform.d/plugin-cache
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout source code
-      - run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
->>>>>>> ae94fa5 (ci(terraform-ruw): Add support for provider caching)
       - uses: actions/cache@v4
         name: Cache Terraform Providers
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-<<<<<<< HEAD
           # The cache key includes the OS, working directory, and a hash of all versions.tf in the repo.
           # A change to any of these will cause a new cache to be created (or reused if it exists)
-=======
->>>>>>> ae94fa5 (ci(terraform-ruw): Add support for provider caching)
           key: terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-${{ hashFiles('**/versions.tf') }}
           restore-keys:
             terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-
