@@ -118,9 +118,20 @@ jobs:
     environment: ${{ inputs.environment }}
     runs-on: ${{ inputs.runs_on }}
     if: inputs.terraform_test_enabled
+    env:
+      TF_PLUGIN_CACHE_DIR:  ${{ github.workspace }}/.terraform.d/plugin-cache
     steps:
       - uses: actions/checkout@v4
         name: Checkout source code
+      - run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+      - uses: actions/cache@v4
+        name: Cache Terraform Providers
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-${{ hashFiles('**/versions.tf') }}
+          restore-keys:
+            terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-
+            terraform-providers-${{ runner.os }}-
       - uses: hashicorp/setup-terraform@v3
         name: Setup Terraform
         with:
@@ -128,7 +139,6 @@ jobs:
       - name: terraform init
         run: terraform init
         working-directory: ${{ inputs.working_directory }}
-      - run: echo ${TF_VAR_TRIGGER_VALUE}
       - name: terraform test
         run: terraform test ${{ inputs.terraform_test_args }}
         working-directory: ${{ inputs.working_directory }}
