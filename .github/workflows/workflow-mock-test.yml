@@ -17,6 +17,5 @@ jobs:
     uses: ./.github/workflows/terraform-ruw.yml
     with:
       working_directory: workflow-mock
-      environment: mock
     # This is used so that the reusable workflow can inherit repo secrets for auth to cloud providers.
     secrets: inherit
