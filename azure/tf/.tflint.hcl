@@ -1,3 +1,7 @@
+config {
+    variables = ["tags={\"foo\"=\"bar\"}"]
+}
+
 plugin "terraform" {
   enabled = true
 }
