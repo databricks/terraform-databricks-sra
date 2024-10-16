@@ -123,6 +123,7 @@ jobs:
     environment: ${{ inputs.environment }}
     runs-on: ${{ inputs.runs_on }}
     if: inputs.terraform_test_enabled
+<<<<<<< HEAD
     # This environment variable sets the plugin cache dir for Terraform, and is also used to configure a cache directory
     env:
       TF_PLUGIN_CACHE_DIR:  ${{ github.workspace }}/.terraform.d/plugin-cache
@@ -135,18 +136,32 @@ jobs:
       # Create the cache directory
       - run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
       # Initialize the cache
+=======
+    env:
+      TF_PLUGIN_CACHE_DIR:  ${{ github.workspace }}/.terraform.d/plugin-cache
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout source code
+      - run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+>>>>>>> ae94fa5 (ci(terraform-ruw): Add support for provider caching)
       - uses: actions/cache@v4
         name: Cache Terraform Providers
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+<<<<<<< HEAD
           # The cache key includes the OS, working directory, and a hash of all versions.tf in the repo.
           # A change to any of these will cause a new cache to be created (or reused if it exists)
+=======
+>>>>>>> ae94fa5 (ci(terraform-ruw): Add support for provider caching)
           key: terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-${{ hashFiles('**/versions.tf') }}
           restore-keys:
             terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-
             terraform-providers-${{ runner.os }}-
+<<<<<<< HEAD
       - name: List plugin cache contents
         run: ls -R ${{ env.TF_PLUGIN_CACHE_DIR }}
+=======
+>>>>>>> ae94fa5 (ci(terraform-ruw): Add support for provider caching)
       - uses: hashicorp/setup-terraform@v3
         name: Setup Terraform
         with:
