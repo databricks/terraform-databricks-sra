@@ -3,9 +3,11 @@ on:
   push:
     paths:
       - 'azure/tf/**'
+      - '.github/workflows/azure-test.yml'
   pull_request:
     paths:
       - 'azure/tf/**'
+      - '.github/workflows/azure-test.yml'
 jobs:
   test-azure:
     uses: ./.github/workflows/terraform-ruw.yml
