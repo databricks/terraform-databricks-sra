@@ -128,6 +128,9 @@ jobs:
     # This environment variable sets the plugin cache dir for Terraform, and is also used to configure a cache directory
     env:
       TF_PLUGIN_CACHE_DIR:  ${{ github.workspace }}/.terraform.d/plugin-cache
+      # Terraform will not use the cache if the dependency lock file is not committed to the repo. This is a workaround.
+      # https://developer.hashicorp.com/terraform/cli/config/config-file#allowing-the-provider-plugin-cache-to-break-the-dependency-lock-file
+      TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE: true
     steps:
       - uses: actions/checkout@v4
         name: Checkout source code
