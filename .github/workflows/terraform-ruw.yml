@@ -144,11 +144,7 @@ jobs:
           restore-keys:
             terraform-providers-${{ runner.os }}-${{ inputs.working_directory }}-
             terraform-providers-${{ runner.os }}-
-<<<<<<< HEAD
-      - name: List plugin cache contents
-        run: ls -R ${{ env.TF_PLUGIN_CACHE_DIR }}
-=======
->>>>>>> ae94fa5 (ci(terraform-ruw): Add support for provider caching)
+
       - uses: hashicorp/setup-terraform@v3
         name: Setup Terraform
         with:
