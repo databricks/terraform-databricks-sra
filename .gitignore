@@ -51,3 +51,7 @@ terraform.rc
 .envrc*
 
 *.hcl
+
+# Include tflint configurations for CI workflows
+!**/.tflint.hcl
+!**/*.tftest.hcl
