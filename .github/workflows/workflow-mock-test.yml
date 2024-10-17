@@ -4,16 +4,16 @@ name: Workflow Mock Tests
 on:
   push:
     paths:
-      - 'workflow-mock/**'
+      - '.workflow-mock/**'
       - '.github/workflows/workflow-mock-test.yml'
       - '.github/workflows/terraform-ruw.yml'
   pull_request:
     paths:
-      - 'workflow-mock/**'
+      - '.workflow-mock/**'
       - '.github/workflows/workflow-mock-test.yml'
       - '.github/workflows/terraform-ruw.yml'
 jobs:
   workflow-mock-test:
     uses: ./.github/workflows/terraform-ruw.yml
     with:
-      working_directory: workflow-mock
+      working_directory: .workflow-mock
