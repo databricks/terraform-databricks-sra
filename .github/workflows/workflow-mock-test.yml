@@ -16,4 +16,4 @@ jobs:
   workflow-mock-test:
     uses: ./.github/workflows/terraform-ruw.yml
     with:
-      working_directory: workflow-mock
+      working_directory: .workflow-mock
