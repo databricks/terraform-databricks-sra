@@ -229,4 +229,7 @@ resource "aws_iam_role_policy" "cross_account" {
   depends_on = [
     module.vpc, aws_security_group.sg
   ]
+  lifecycle {
+    ignore_changes = [ policy ]
+  }
 }
