@@ -11,4 +11,7 @@ resource "databricks_workspace_conf" "just_config_map" {
     "enableDbfsFileBrowser"         = "false",
     "enforceUserIsolation"          = "false"
   }
+  lifecycle {
+    ignore_changes = [ custom_config ]
+  }
 }
