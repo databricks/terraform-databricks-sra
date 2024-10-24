@@ -69,4 +69,7 @@ resource "aws_security_group" "sg" {
   tags = {
     Name = "${var.resource_prefix}-data-plane-sg"
   }
+  lifecycle {
+    ignore_changes = [ egress ]
+  }
 }
