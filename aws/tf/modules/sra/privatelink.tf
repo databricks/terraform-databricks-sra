@@ -1,6 +1,6 @@
 // Security group for privatelink - skipped in custom operation mode
 resource "aws_security_group" "privatelink" {
-  count = var.operation_mode != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" ? 1 : 0
 
   vpc_id = module.vpc[0].vpc_id
 
@@ -28,18 +28,6 @@ resource "aws_security_group" "privatelink" {
     security_groups = [aws_security_group.sg[0].id]
   }
 
-  dynamic "ingress" {
-    for_each = var.compliance_security_profile_egress_ports ? [2443] : []
-
-    content {
-      description     = "Databricks - PrivateLink Endpoint SG -  FIPS encryption"
-      from_port       = 2443
-      to_port         = 2443
-      protocol        = "tcp"
-      security_groups = [aws_security_group.sg[0].id]
-    }
-  }
-
   tags = {
     Name    = "${var.resource_prefix}-private-link-sg",
     Project = var.resource_prefix
@@ -48,11 +36,9 @@ resource "aws_security_group" "privatelink" {
 
 // EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 
-
-// Restrictive S3 endpoint policy - only used if restrictive S3 endpoint policy is enabled
+// Restrictive S3 endpoint policy:
 data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
-  count = var.enable_restrictive_s3_endpoint_boolean ? 1 : 0
-
+  count = var.network_configuration != "custom" ? 1 : 0
   statement {
     sid    = "Grant access to Databricks Root Bucket"
     effect = "Allow"
@@ -114,28 +100,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   }
 
   statement {
-    sid    = "Grant read-only access to Data Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:GetObjectVersion",
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    resources = [
-      "arn:aws:s3:::${var.read_only_data_bucket}/*",
-      "arn:aws:s3:::${var.read_only_data_bucket}"
-    ]
-  }
-
-  statement {
-    sid    = "Grant Databricks Read Access to Artifact and Data Buckets"
+    sid    = "Grant Databricks Read Access to Artifact, Data, and System Table Buckets"
     effect = "Allow"
     actions = [
       "s3:ListBucket",
@@ -152,8 +117,10 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     resources = [
       "arn:aws:s3:::databricks-prod-artifacts-${var.region}/*",
       "arn:aws:s3:::databricks-prod-artifacts-${var.region}",
-      "arn:aws:s3:::databricks-datasets-${var.region_name}/*",
-      "arn:aws:s3:::databricks-datasets-${var.region_name}"
+      "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}/*",
+      "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}",
+      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket/*",
+      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket"
     ]
   }
 
@@ -172,8 +139,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::databricks-prod-storage-${var.region_name}/*",
-      "arn:aws:s3:::databricks-prod-storage-${var.region_name}"
+      "arn:aws:s3:::databricks-prod-storage-${var.region_bucket_name}/*",
+      "arn:aws:s3:::databricks-prod-storage-${var.region_bucket_name}"
     ]
 
     condition {
@@ -185,10 +152,9 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   depends_on = [module.databricks_mws_workspace]
 }
 
-// Restrictive STS endpoint policy - only used if restrictive STS endpoint policy is enabled
+// Restrictive STS endpoint policy:
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
-  count = var.enable_restrictive_sts_endpoint_boolean ? 1 : 0
-
+  count = var.network_configuration != "custom" ? 1 : 0
   statement {
     actions = [
       "sts:AssumeRole",
@@ -225,10 +191,9 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
   }
 }
 
-// Restrictive Kinesis endpoint policy - only used if restrictive Kinesis endpoint policy is enabled
+// Restrictive Kinesis endpoint policy:
 data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
-  count = var.enable_restrictive_kinesis_endpoint_boolean ? 1 : 0
-
+  count = var.network_configuration != "custom" ? 1 : 0
   statement {
     actions = [
       "kinesis:PutRecord",
@@ -247,7 +212,7 @@ data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
 
 // VPC endpoint creation - Skipped in custom operation mode
 module "vpc_endpoints" {
-  count = var.operation_mode != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" ? 1 : 0
 
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "3.11.0"
@@ -260,7 +225,7 @@ module "vpc_endpoints" {
       service         = "s3"
       service_type    = "Gateway"
       route_table_ids = module.vpc[0].private_route_table_ids
-      policy          = var.enable_restrictive_s3_endpoint_boolean ? data.aws_iam_policy_document.s3_vpc_endpoint_policy[0].json : null
+      policy          = data.aws_iam_policy_document.s3_vpc_endpoint_policy[0].json
       tags = {
         Name    = "${var.resource_prefix}-s3-vpc-endpoint"
         Project = var.resource_prefix
@@ -270,7 +235,7 @@ module "vpc_endpoints" {
       service             = "sts"
       private_dns_enabled = true
       subnet_ids          = module.vpc[0].intra_subnets
-      policy              = var.enable_restrictive_sts_endpoint_boolean ? data.aws_iam_policy_document.sts_vpc_endpoint_policy[0].json : null
+      policy              = data.aws_iam_policy_document.sts_vpc_endpoint_policy[0].json
       tags = {
         Name    = "${var.resource_prefix}-sts-vpc-endpoint"
         Project = var.resource_prefix
@@ -280,7 +245,7 @@ module "vpc_endpoints" {
       service             = "kinesis-streams"
       private_dns_enabled = true
       subnet_ids          = module.vpc[0].intra_subnets
-      policy              = var.enable_restrictive_kinesis_endpoint_boolean ? data.aws_iam_policy_document.kinesis_vpc_endpoint_policy[0].json : null
+      policy              = data.aws_iam_policy_document.kinesis_vpc_endpoint_policy[0].json
       tags = {
         Name    = "${var.resource_prefix}-kinesis-vpc-endpoint"
         Project = var.resource_prefix
@@ -291,7 +256,7 @@ module "vpc_endpoints" {
 
 // Databricks REST endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "backend_rest" {
-  count = var.operation_mode != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
   service_name        = var.workspace[var.region]
@@ -308,7 +273,7 @@ resource "aws_vpc_endpoint" "backend_rest" {
 
 // Databricks SCC endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "backend_relay" {
-  count = var.operation_mode != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
   service_name        = var.scc_relay[var.region]

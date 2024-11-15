@@ -51,6 +51,31 @@ resource "aws_iam_role_policy" "cross_account" {
         ]
       },
       {
+        "Sid" : "FleetPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeFleetHistory",
+          "ec2:ModifyFleet",
+          "ec2:DeleteFleets",
+          "ec2:DescribeFleetInstances",
+          "ec2:DescribeFleets",
+          "ec2:CreateFleet",
+          "ec2:DeleteLaunchTemplate",
+          "ec2:GetLaunchTemplateData",
+          "ec2:CreateLaunchTemplate",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:DescribeLaunchTemplateVersions",
+          "ec2:ModifyLaunchTemplate",
+          "ec2:DeleteLaunchTemplateVersions",
+          "ec2:CreateLaunchTemplateVersion",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:GetSpotPlacementScores"
+        ],
+        "Resource" : [
+          "*"
+        ]
+      },
+      {
         "Sid" : "InstancePoolsSupport",
         "Effect" : "Allow",
         "Action" : [
