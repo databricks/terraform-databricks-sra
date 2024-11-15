@@ -1,19 +1,21 @@
 resource "google_compute_subnetwork" "backend_pe_subnetwork" {
+  count = var.use_existing_PSC_EP ? 0 : 1
   name          = var.google_pe_subnet
   ip_cidr_range = var.google_pe_subnet_ip_cidr_range
   region        = var.google_region
   network       = google_compute_network.dbx_private_vpc.id
   secondary_ip_range {
-    range_name    = "tf-test-secondary-range-update1"
+    range_name    = "tf-secondary-range-update1"
     ip_cidr_range = var.google_pe_subnet_secondary_ip_range
   }
-    private_ip_google_access = true
+  private_ip_google_access = true
 
-            depends_on=[google_compute_network.dbx_private_vpc]
+  depends_on=[google_compute_network.dbx_private_vpc]
 }
 
 
 resource "google_compute_forwarding_rule" "backend_psc_ep" {
+  count = var.use_existing_PSC_EP ? 0 : 1
   depends_on = [
     google_compute_address.backend_pe_ip_address, google_compute_network.dbx_private_vpc
   ]
@@ -21,21 +23,24 @@ resource "google_compute_forwarding_rule" "backend_psc_ep" {
   project     = var.google_project
   name        = var.relay_pe
   network     = google_compute_network.dbx_private_vpc.id
-  ip_address  = google_compute_address.backend_pe_ip_address.id
+  ip_address  = google_compute_address.backend_pe_ip_address[0].id
   target      = var.relay_service_attachment
   load_balancing_scheme = "" #This field must be set to "" if the target is an URI of a service attachment. Default value is EXTERNAL
 }
 
 resource "google_compute_address" "backend_pe_ip_address" {
+  count = var.use_existing_PSC_EP ? 0 : 1
   name         = var.relay_pe_ip_name
   provider     = google
   project      = var.google_project
   region       = var.google_region
-  subnetwork   = google_compute_subnetwork.backend_pe_subnetwork.name
+  subnetwork   = google_compute_subnetwork.backend_pe_subnetwork[0].name
   address_type = "INTERNAL"
 }
 
 resource "google_compute_forwarding_rule" "frontend_psc_ep" {
+  count = var.use_existing_PSC_EP ? 0 : 1
+
   depends_on = [
     google_compute_address.frontend_pe_ip_address
   ]
@@ -44,24 +49,51 @@ resource "google_compute_forwarding_rule" "frontend_psc_ep" {
   project     = var.google_project
   network     = google_compute_network.dbx_private_vpc.id
 
-  ip_address  = google_compute_address.frontend_pe_ip_address.id
+  ip_address  = google_compute_address.frontend_pe_ip_address[0].id
   target      = var.workspace_service_attachment
   load_balancing_scheme = "" #This field must be set to "" if the target is an URI of a service attachment. Default value is EXTERNAL
 }
 
 resource "google_compute_address" "frontend_pe_ip_address" {
+  count = var.use_existing_PSC_EP ? 0 : 1
+  
   name         = var.workspace_pe_ip_name
   provider     = google
   project      = var.google_project
   region       = var.google_region
-  subnetwork   = google_compute_subnetwork.backend_pe_subnetwork.name
+  subnetwork   = google_compute_subnetwork.backend_pe_subnetwork[0].name
   address_type = "INTERNAL"
 }
 
+resource "databricks_mws_vpc_endpoint" "backend_rest_vpce" {
+  depends_on =[google_compute_forwarding_rule.backend_psc_ep]
+  provider     = databricks.accounts
+  account_id          = var.databricks_account_id
+  vpc_endpoint_name   = "vpce-backend-rest"
+  gcp_vpc_endpoint_info {
+   project_id        = var.google_project
+   psc_endpoint_name = var.workspace_pe
+   endpoint_region   = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
+ }
+}
+
+resource "databricks_mws_vpc_endpoint" "relay_vpce" {
+  provider     = databricks.accounts
+  depends_on = [ google_compute_forwarding_rule.frontend_psc_ep ]
+  account_id          = var.databricks_account_id
+  vpc_endpoint_name   = "vpce-relay"
+  gcp_vpc_endpoint_info {
+    project_id        = var.google_project
+    psc_endpoint_name = var.relay_pe
+    endpoint_region   = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
+ }
+}
+
 output "front_end_psc_status"{
-  value = "Frontend psc status: ${google_compute_forwarding_rule.frontend_psc_ep.psc_connection_status}"
+  value = "Frontend psc status: ${var.use_existing_PSC_EP?"Pre-provisioned":google_compute_forwarding_rule.frontend_psc_ep[0].psc_connection_status}"
 }
 
 output "backend_end_psc_status"{
-  value = "Backend psc status: ${google_compute_forwarding_rule.backend_psc_ep.psc_connection_status}"
+  value = "Backend psc status: ${var.use_existing_PSC_EP?"Pre-provisioned":google_compute_forwarding_rule.backend_psc_ep[0].psc_connection_status}"
 }
+

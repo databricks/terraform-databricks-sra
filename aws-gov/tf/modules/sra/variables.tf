@@ -265,18 +265,30 @@ variable "databricks_gov_shard" {
   type        = string
 }
 
+
 variable "databricks_prod_aws_account_id" {
   description = "Databricks Prod AWS Account Id"
   type = map(string)
+  default = {
+    "civilian" = "044793339203"
+    "dod"      = "170661010020"
+  }
 }
 
 variable "log_delivery_role_name" {
   description = "Log Delivery Role Name"
   type = map(string)
+  default = {
+    "civilian" = "SaasUsageDeliveryRole-prod-aws-gov-IAMRole-L4QM0RCHYQ1G"
+    "dod"      = "SaasUsageDeliveryRole-prod-aws-gov-dod-IAMRole-1DMEHBYR8VC5P"
+  }
 }
 
 variable "uc_master_role_id" {
   description = "UC Master Role ID"
   type = map(string)
+  default = {
+    "civilian" = "1QRFA8SGY15OJ"
+    "dod"      = "1DI6DL6ZP26AS"
+  }
 }
-

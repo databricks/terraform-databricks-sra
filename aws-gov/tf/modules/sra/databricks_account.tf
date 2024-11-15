@@ -11,8 +11,8 @@ module "log_delivery" {
   databricks_account_id          = var.databricks_account_id
   resource_prefix                = var.resource_prefix
   databricks_gov_shard           = var.databricks_gov_shard
-  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id[var.databricks_gov_shard]
-  log_delivery_role_name         = var.log_delivery_role_name[var.databricks_gov_shard]
+  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
+  log_delivery_role_name         = var.log_delivery_role_name
 }
 
 

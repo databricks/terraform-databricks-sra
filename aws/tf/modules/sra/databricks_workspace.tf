@@ -55,4 +55,3 @@ module "restrictive_root_bucket" {
 
   depends_on = [module.databricks_mws_workspace]
 }
-

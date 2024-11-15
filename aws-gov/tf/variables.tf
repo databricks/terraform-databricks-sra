@@ -64,27 +64,3 @@ variable "databricks_gov_shard" {
     error_message = "Valid values for var: databricks_gov_shard are (civilian, dod)."
   }
 }
-
-variable "databricks_prod_aws_account_id" {
-  type = map(string)
-  default = {
-    "civilian" = "044793339203"
-    "dod"      = "170661010020"
-  }
-}
-
-variable "log_delivery_role_name" {
-  type = map(string)
-  default = {
-    "civilian" = "SaasUsageDeliveryRole-prod-aws-gov-IAMRole-L4QM0RCHYQ1G"
-    "dod"      = "SaasUsageDeliveryRole-prod-aws-gov-dod-IAMRole-1DMEHBYR8VC5P"
-  }
-}
-
-variable "uc_master_role_id" {
-  type = map(string)
-  default = {
-    "civilian" = "1QRFA8SGY15OJ"
-    "dod"      = "1DI6DL6ZP26AS"
-  }
-}
