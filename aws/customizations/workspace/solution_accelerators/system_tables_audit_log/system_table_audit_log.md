@@ -14,10 +14,10 @@ module "system_tables_audit_log" {
     databricks = databricks.created_workspace
   }
 
-  alert_emails = [var.user_workspace_admin]
+  alert_emails = [var.admin_user]
 
   depends_on = [
-    module.databricks_mws_workspace
+    module.databricks_mws_workspace, module.uc_assignment
   ]
 }
 ```

@@ -66,14 +66,6 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       variable = "aws:PrincipalAccount"
       values   = ["414351767826"]
     }
-
-    condition {
-      test     = "StringEqualsIfExists"
-      variable = "aws:SourceVpc"
-      values = [
-        module.vpc[0].vpc_id
-      ]
-    }
   }
 
   statement {
@@ -97,6 +89,16 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}/*",
       "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
     ]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = [var.aws_account_id]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "s3:ResourceAccount"
+      values   = [var.aws_account_id]
+    }
   }
 
   statement {
@@ -122,6 +124,11 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket/*",
       "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket"
     ]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = ["414351767826"]
+    }
   }
 
   statement {

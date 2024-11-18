@@ -1,6 +1,8 @@
 ### Sandbox (Open Egress)
 Using open egress allows traffic to flow freely to the public internet. This networking configuration is suitable for sandbox or development scenarios where data exfiltration protection is of minimal concern, and developers need access to public APIs, packages, and more.
 
+Please note that a public subnet CIDR range is required.
+
 
 ### How to use this network configuration:
 
@@ -23,7 +25,7 @@ module "vpc" {
   create_igw             = true
 
   public_subnet_names = [for az in var.availability_zones : format("%s-public-%s", var.resource_prefix, az)]
-  public_subnets      = var.public_subnets_cidr
+  public_subnets      = <list(string) of public subnet CIDR ranges>
 
   private_subnet_names = [for az in var.availability_zones : format("%s-private-%s", var.resource_prefix, az)]
   private_subnets      = var.private_subnets_cidr
