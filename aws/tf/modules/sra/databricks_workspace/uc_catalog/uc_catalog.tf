@@ -1,40 +1,14 @@
 resource "null_resource" "previous" {}
 
-resource "time_sleep" "wait_30_seconds" {
+// Wait to prevent race condition between IAM role and external location validation
+resource "time_sleep" "wait_60_seconds" {
   depends_on      = [null_resource.previous]
-  create_duration = "30s"
+  create_duration = "60s"
 }
 
-// Unity Catalog Trust Policy - Data Source
-data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
-  aws_account_id = var.aws_account_id
-  role_name      = "${var.resource_prefix}-catalog-${var.workspace_id}"
-  external_id    = var.databricks_account_id
-}
-
-// Unity Catalog Role
-resource "aws_iam_role" "unity_catalog_role" {
-  name               = "${var.resource_prefix}-catalog-${var.workspace_id}"
-  assume_role_policy = data.databricks_aws_unity_catalog_assume_role_policy.unity_catalog.json
-  tags = {
-    Name    = "${var.resource_prefix}-catalog-${var.workspace_id}"
-    Project = var.resource_prefix
-  }
-}
-
-// Unity Catalog Policy - Data Source
-data "databricks_aws_unity_catalog_policy" "unity_catalog_iam_policy" {
-  aws_account_id = var.aws_account_id
-  bucket_name    = var.uc_catalog_name
-  role_name      = "${var.resource_prefix}-catalog-${var.workspace_id}"
-  kms_name       = aws_kms_alias.catalog_storage_key_alias.arn
-}
-
-// Unity Catalog Policy
-resource "aws_iam_role_policy" "unity_catalog" {
-  name   = "${var.resource_prefix}-catalog-policy-${var.workspace_id}"
-  role   = aws_iam_role.unity_catalog_role.id
-  policy = data.databricks_aws_unity_catalog_policy.unity_catalog_iam_policy.json
+locals {
+  uc_iam_role          = "${var.resource_prefix}-catalog-${var.workspace_id}"
+  uc_catalog_name_us = replace(var.uc_catalog_name, "-", "_")
 }
 
 // Unity Catalog KMS
@@ -57,7 +31,7 @@ resource "aws_kms_key" "catalog_storage" {
         "Sid" : "Allow IAM Role to use the key",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-catalog-${var.workspace_id}"
+          "AWS" : "arn:aws:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
         },
         "Action" : [
           "kms:Decrypt",
@@ -79,6 +53,52 @@ resource "aws_kms_alias" "catalog_storage_key_alias" {
   target_key_id = aws_kms_key.catalog_storage.id
 }
 
+// Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
+resource "databricks_storage_credential" "workspace_catalog_storage_credential" {
+  name = "${var.uc_catalog_name}-storage-credential"
+  aws_iam_role {
+    role_arn = "arn:aws:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
+  }
+  isolation_mode = "ISOLATION_MODE_ISOLATED"
+}
+
+// Unity Catalog Trust Policy - Data Source
+data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
+  aws_account_id = var.aws_account_id
+  role_name      = local.uc_iam_role
+  external_id    = databricks_storage_credential.workspace_catalog_storage_credential.aws_iam_role[0].external_id
+}
+
+// Unity Catalog Policy - Data Source
+data "databricks_aws_unity_catalog_policy" "unity_catalog" {
+  aws_account_id = var.aws_account_id
+  bucket_name    = var.uc_catalog_name
+  role_name      = local.uc_iam_role
+  kms_name       = aws_kms_alias.catalog_storage_key_alias.arn
+}
+
+// Unity Catalog Policy
+resource "aws_iam_policy" "unity_catalog" {
+  name   = "${var.resource_prefix}-catalog-policy-${var.workspace_id}"
+  policy = data.databricks_aws_unity_catalog_policy.unity_catalog.json
+}
+
+// Unity Catalog Role
+resource "aws_iam_role" "unity_catalog" {
+  name               = local.uc_iam_role
+  assume_role_policy = data.databricks_aws_unity_catalog_assume_role_policy.unity_catalog.json
+  tags = {
+    Name    = local.uc_iam_role
+    Project = var.resource_prefix
+  }
+}
+
+// Unity Catalog Policy Attachment
+resource "aws_iam_policy_attachment" "unity_catalog_attach" {
+  name       = "unity_catalog_policy_attach"
+  roles      = [aws_iam_role.unity_catalog.name]
+  policy_arn = aws_iam_policy.unity_catalog.arn
+}
 
 // Unity Catalog S3
 resource "aws_s3_bucket" "unity_catalog_bucket" {
@@ -118,32 +138,22 @@ resource "aws_s3_bucket_public_access_block" "unity_catalog" {
   depends_on              = [aws_s3_bucket.unity_catalog_bucket]
 }
 
-// Storage Credential
-resource "databricks_storage_credential" "workspace_catalog_storage_credential" {
-  name = aws_iam_role.unity_catalog_role.name
-  aws_iam_role {
-    role_arn = aws_iam_role.unity_catalog_role.arn
-  }
-  isolation_mode = "ISOLATION_MODE_ISOLATED"
-  depends_on     = [aws_iam_role_policy.unity_catalog, time_sleep.wait_30_seconds]
-}
-
 // External Location
 resource "databricks_external_location" "workspace_catalog_external_location" {
-  name            = var.uc_catalog_name
-  url             = "s3://${var.uc_catalog_name}/catalog/"
+  name            = "${var.uc_catalog_name}-external-location"
+  url             = "s3://${var.uc_catalog_name}/"
   credential_name = databricks_storage_credential.workspace_catalog_storage_credential.id
   comment         = "External location for catalog ${var.uc_catalog_name}"
   isolation_mode  = "ISOLATION_MODE_ISOLATED"
-  depends_on      = [aws_iam_role_policy.unity_catalog, time_sleep.wait_30_seconds]
+  depends_on      = [aws_iam_policy_attachment.unity_catalog_attach, time_sleep.wait_60_seconds]
 }
 
 // Workspace Catalog
 resource "databricks_catalog" "workspace_catalog" {
-  name           = replace(var.uc_catalog_name, "-", "_")
+  name           = local.uc_catalog_name_us
   comment        = "This catalog is for workspace - ${var.workspace_id}"
   isolation_mode = "ISOLATED"
-  storage_root   = "s3://${var.uc_catalog_name}/catalog/"
+  storage_root   = "s3://${var.uc_catalog_name}/"
   properties = {
     purpose = "Catalog for workspace - ${var.workspace_id}"
   }
@@ -153,7 +163,7 @@ resource "databricks_catalog" "workspace_catalog" {
 // Set Workspace Catalog as Default
 resource "databricks_default_namespace_setting" "this" {
   namespace {
-    value = replace(var.uc_catalog_name, "-", "_")
+    value = local.uc_catalog_name_us
   }
 }
 

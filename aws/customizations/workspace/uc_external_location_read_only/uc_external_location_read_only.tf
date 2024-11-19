@@ -1,16 +1,25 @@
 resource "null_resource" "previous" {}
 
-resource "time_sleep" "wait_30_seconds" {
+resource "time_sleep" "wait_60_seconds" {
   depends_on = [null_resource.previous]
 
-  create_duration = "30s"
+  create_duration = "60s"
+}
+
+// Storage Credential
+resource "databricks_storage_credential" "external" {
+  name = aws_iam_role.storage_credential_role.name
+  aws_iam_role {
+    role_arn = "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-storage-credential-example"
+  }
+  isolation_mode = "ISOLATION_MODE_ISOLATED"
 }
 
 // Storage Credential Trust Policy
 data "databricks_aws_unity_catalog_assume_role_policy" "external_location_example" {
   aws_account_id = var.aws_account_id
   role_name      = "${var.resource_prefix}-storage-credential-example"
-  external_id    = var.databricks_account_id
+  external_id    = databricks_storage_credential.external.aws_iam_role[0].external_id
 }
 
 // Storage Credential Role
@@ -56,16 +65,6 @@ resource "aws_iam_role_policy" "storage_credential_policy" {
   )
 }
 
-// Storage Credential
-resource "databricks_storage_credential" "external" {
-  name = aws_iam_role.storage_credential_role.name
-  aws_iam_role {
-    role_arn = aws_iam_role.storage_credential_role.arn
-  }
-  isolation_mode = "ISOLATION_MODE_ISOLATED"
-  depends_on     = [aws_iam_role.storage_credential_role, time_sleep.wait_30_seconds]
-}
-
 // External Location
 resource "databricks_external_location" "data_example" {
   name            = "external-location-example"
@@ -74,6 +73,7 @@ resource "databricks_external_location" "data_example" {
   read_only       = true
   comment         = "Read only external location for ${var.read_only_data_bucket}"
   isolation_mode  = "ISOLATION_MODE_ISOLATED"
+  depends_on = [ time_sleep.wait_60_seconds ]
 }
 
 // External Location Grant

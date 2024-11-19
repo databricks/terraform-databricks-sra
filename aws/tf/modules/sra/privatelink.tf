@@ -39,6 +39,7 @@ resource "aws_security_group" "privatelink" {
 // Restrictive S3 endpoint policy:
 data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
+
   statement {
     sid    = "Grant access to Databricks Root Bucket"
     effect = "Allow"
@@ -89,6 +90,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}/*",
       "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
     ]
+
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
@@ -102,7 +104,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   }
 
   statement {
-    sid    = "Grant Databricks Read Access to Artifact, Data, and System Table Buckets"
+    sid    = "Grant access to Artifact Buckets"
     effect = "Allow"
     actions = [
       "s3:ListBucket",
@@ -119,14 +121,11 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     resources = [
       "arn:aws:s3:::databricks-prod-artifacts-${var.region}/*",
       "arn:aws:s3:::databricks-prod-artifacts-${var.region}",
-      "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}/*",
-      "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}",
-      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket/*",
-      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket"
     ]
+
     condition {
       test     = "StringEquals"
-      variable = "aws:PrincipalAccount"
+      variable = "aws:ResourceAccount"
       values   = ["414351767826"]
     }
   }
@@ -156,8 +155,35 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       values   = ["414351767826"]
     }
   }
-  depends_on = [module.databricks_mws_workspace]
+
+  statement {
+    sid    = "Grant access to Databricks System Tables Bucket"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObjectVersion",
+      "s3:GetObject",
+      "s3:GetBucketLocation"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    resources = [
+      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket/*",
+      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = ["414351767826"]
+    }
+  }
 }
+
 
 // Restrictive STS endpoint policy:
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
@@ -271,7 +297,6 @@ resource "aws_vpc_endpoint" "backend_rest" {
   security_group_ids  = [aws_security_group.privatelink[0].id]
   subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
-  depends_on          = [module.vpc.vpc_id]
   tags = {
     Name    = "${var.resource_prefix}-databricks-backend-rest"
     Project = var.resource_prefix
@@ -288,7 +313,6 @@ resource "aws_vpc_endpoint" "backend_relay" {
   security_group_ids  = [aws_security_group.privatelink[0].id]
   subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
-  depends_on          = [module.vpc.vpc_id]
   tags = {
     Name    = "${var.resource_prefix}-databricks-backend-relay"
     Project = var.resource_prefix
