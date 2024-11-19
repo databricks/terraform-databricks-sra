@@ -131,32 +131,6 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   }
 
   statement {
-    sid    = "Grant access to Databricks Log Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    resources = [
-      "arn:aws:s3:::databricks-prod-storage-${var.region_bucket_name}/*",
-      "arn:aws:s3:::databricks-prod-storage-${var.region_bucket_name}"
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:PrincipalAccount"
-      values   = ["414351767826"]
-    }
-  }
-
-  statement {
     sid    = "Grant access to Databricks System Tables Bucket"
     effect = "Allow"
     actions = [
@@ -182,8 +156,60 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       values   = ["414351767826"]
     }
   }
-}
 
+  statement {
+    sid    = "Grant access to Databricks Sample Data Bucket"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObjectVersion",
+      "s3:GetObject",
+      "s3:GetBucketLocation"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    resources = [
+      "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}/*",
+      "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = ["414351767826"]
+    }
+  }
+
+  statement {
+    sid    = "Grant access to Databricks Log Bucket"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    resources = [
+      "arn:aws:s3:::databricks-prod-storage-${var.region_bucket_name}/*",
+      "arn:aws:s3:::databricks-prod-storage-${var.region_bucket_name}"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values   = ["414351767826"]
+    }
+  }
+}
 
 // Restrictive STS endpoint policy:
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
