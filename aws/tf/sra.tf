@@ -26,8 +26,8 @@ module "SRA" {
   availability_zones       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1], data.aws_availability_zones.available.names[2]]
   sg_egress_ports          = [443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
-  // REQUIRED IF USING NON-ROOTCMK ADMIN:
-  # cmk_admin_arn    = null       // CMK admin ARN, defaults to the AWS account root user.
+  // REQUIRED IF USING NON-ROOT ACCOUNT CMK ADMIN:
+  # cmk_admin_arn    = null       // CMK admin ARN, defaults to the AWS account root.
 
   // REQUIRED IF USING CUSTOM NETWORK:
   # custom_vpc_id             = null
