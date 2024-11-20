@@ -279,8 +279,8 @@ variable "log_delivery_role_name" {
   description = "Log Delivery Role Name"
   type = map(string)
   default = {
-    "civilian" = "SaasUsageDeliveryRole-prod-aws-gov-IAMRole-L4QM0RCHYQ1G"
-    "dod"      = "SaasUsageDeliveryRole-prod-aws-gov-dod-IAMRole-1DMEHBYR8VC5P"
+    "civilian" = "role/SaasUsageDeliveryRole-prod-aws-gov-IAMRole-L4QM0RCHYQ1G"
+    "dod"      = "role/SaasUsageDeliveryRole-prod-aws-gov-dod-IAMRole-1DMEHBYR8VC5P"
   }
 }
 
