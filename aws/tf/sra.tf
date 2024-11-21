@@ -27,12 +27,12 @@ module "SRA" {
   sg_egress_ports          = [443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
   // REQUIRED IF USING NON-ROOT ACCOUNT CMK ADMIN:
-  # cmk_admin_arn    = null       // CMK admin ARN, defaults to the AWS account root.
+  # cmk_admin_arn             = "arn:aws:iam::123456789012:user/CMKAdmin" // Example CMK ARN
 
   // REQUIRED IF USING CUSTOM NETWORK:
-  # custom_vpc_id             = null
-  # custom_private_subnet_ids = null // List of custom private subnet IDs required.
-  # custom_sg_id              = null
-  # custom_relay_vpce_id      = null
-  # custom_workspace_vpce_id  = null
+  # custom_vpc_id             = "vpc-0abc123456def7890" // Example VPC ID
+  # custom_private_subnet_ids = ["subnet-0123456789abcdef0", "subnet-0abcdef1234567890"] // Example private subnet IDs
+  # custom_sg_id              = "sg-0123456789abcdef0" // Example security group ID
+  # custom_relay_vpce_id      = "vpce-0abc123456def7890" // Example PrivateLink endpoint ID for Databricks relay
+  # custom_workspace_vpce_id  = "vpce-0abcdef1234567890" // Example PrivateLink endpoint ID for Databricks workspace
 }

@@ -8,7 +8,7 @@ resource "time_sleep" "wait_60_seconds" {
 }
 
 locals {
-  uc_iam_role          = "${var.resource_prefix}-catalog-${var.workspace_id}"
+  uc_iam_role        = "${var.resource_prefix}-catalog-${var.workspace_id}"
   uc_catalog_name_us = replace(var.uc_catalog_name, "-", "_")
 }
 
