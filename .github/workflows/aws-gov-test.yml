@@ -11,7 +11,11 @@ on:
       - 'aws-gov/tf/**'
       - '.github/workflows/aws-gov-test.yml'
 jobs:
+<<<<<<< HEAD
   test-aws-gov:
+=======
+  test-azure:
+>>>>>>> 2db44e4 (ci(aws-gov): Add testing workflow for aws-gov)
     uses: ./.github/workflows/terraform-ruw.yml
     with:
       working_directory: aws-gov/tf
