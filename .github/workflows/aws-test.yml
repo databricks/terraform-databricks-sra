@@ -11,7 +11,7 @@ on:
       - 'aws/tf/**'
       - '.github/workflows/aws-test.yml'
 jobs:
-  test-azure:
+  test-aws:
     uses: ./.github/workflows/terraform-ruw.yml
     with:
       working_directory: aws/tf
