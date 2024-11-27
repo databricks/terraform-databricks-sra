@@ -2,6 +2,11 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+variable "admin_user" {
+  description = "Email of the admin user for the workspace and workspace catalog."
+  type        = string
+}
+
 variable "aws_account_id" {
   description = "ID of the AWS account."
   type        = string
@@ -53,6 +58,28 @@ variable "region_name" {
     "us-east-2"      = "ohio"
     "us-west-2"      = "oregon"
     #"us-west-1" = "oregon"
+  }
+}
+
+variable "region_bucket_name" {
+  description = "Name of the AWS region. (e.g. virginia)"
+  type        = map(string)
+  default = {
+    "ap-northeast-1" = "tokyo"
+    "ap-northeast-2" = "seoul"
+    "ap-south-1"     = "mumbai"
+    "ap-southeast-1" = "singapore"
+    "ap-southeast-2" = "sydney"
+    "ca-central-1"   = "montreal"
+    "eu-central-1"   = "frankfurt"
+    "eu-west-1"      = "ireland"
+    "eu-west-2"      = "london"
+    "eu-west-3"      = "paris"
+    "sa-east-1"      = "saopaulo"
+    "us-east-1"      = "virginia"
+    "us-east-2"      = "ohio"
+    "us-west-2"      = "oregon"
+    # "us-west-1"      = "oregon"
   }
 }
 
