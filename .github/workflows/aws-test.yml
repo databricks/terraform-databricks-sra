@@ -12,10 +12,14 @@ on:
       - '.github/workflows/aws-test.yml'
 jobs:
 <<<<<<< HEAD
+<<<<<<< HEAD
   test-aws:
 =======
   test-azure:
 >>>>>>> 8f0f581 (ci(aws): Add testing workflow for aws)
+=======
+  test-aws:
+>>>>>>> a9ae24c (ci: Fix misnamed test job for AWS + AWS-gov)
     uses: ./.github/workflows/terraform-ruw.yml
     with:
       working_directory: aws/tf
