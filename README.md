@@ -19,6 +19,62 @@ Please note the code in this project is provided for your exploration only, and 
 
 Any issues discovered through the use of this project should be filed as GitHub Issues on the Repo. They will be reviewed as time permits, but there are no formal SLAs for support.
 
+### Example of `dev.tfvars` File
+
+To customize the Terraform configuration for your development environment, create a `dev.tfvars` file with the following content:
+
+```hcl
+# Required Variables
+application_id = "your-application-id"
+databricks_account_id = "your-databricks-account-id"
+location = "your-region"
+
+hub_vnet_cidr = "10.0.0.0/16"
+hub_resource_group_name = "your-hub-resource-group-name"
+hub_vnet_name = "your-hub-vnet-name"
+
+test_vm_password = "your-vm-password"
+client_secret = "your-client-secret"
+databricks_app_object_id = "your-databricks-app-object-id"
+
+# Optional Variables
+public_repos = [
+  "python.org",
+  "*.python.org",
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org",
+  "cran.r-project.org",
+  "*.cran.r-project.org",
+  "r-project.org"
+]
+
+spoke_config = [
+  {
+    prefix = "spoke1"
+    cidr   = "10.1.0.0/16"
+    tags   = {
+      environment = "dev"
+      owner       = "team1"
+    }
+  },
+  {
+    prefix = "spoke2"
+    cidr   = "10.2.0.0/16"
+    tags   = {
+      environment = "prod"
+      owner       = "team2"
+    }
+  }
+]
+
+tags = {
+  environment = "dev"
+  owner       = "your-team-name"
+}
+```
+
 ## Using the Makefile
 
 The provided Makefile simplifies working with Terraform configurations for different platforms and environments. Below is a guide on how to use it.
