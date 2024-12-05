@@ -47,10 +47,23 @@ module "hub" {
   tags               = var.tags
   resource_suffix    = var.hub_resource_suffix
 
+<<<<<<< HEAD
   #options
   is_kms_enabled           = true
   is_firewall_enabled      = true
   is_unity_catalog_enabled = true
+=======
+  location                = var.location
+  hub_vnet_name           = var.hub_vnet_name
+  hub_resource_group_name = var.hub_resource_group_name
+  hub_vnet_cidr           = var.hub_vnet_cidr
+  subnet_map              = module.subnet_addrs.network_cidr_blocks
+  public_repos            = var.public_repos
+  test_vm_password        = var.test_vm_password
+  client_secret           = var.client_secret
+  application_id          = var.application_id
+  tags                    = var.tags
+>>>>>>> 55184a6 (fix missing application_id for sp)
 }
 
 module "hub_catalog" {
