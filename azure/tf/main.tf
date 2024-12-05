@@ -46,6 +46,7 @@ module "hub" {
   public_repos            = var.public_repos
   test_vm_password        = var.test_vm_password
   client_secret           = var.client_secret
+  application_id          = var.application_id
   tags                    = var.tags
 }
 

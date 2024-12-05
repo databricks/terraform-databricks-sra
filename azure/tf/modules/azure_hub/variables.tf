@@ -53,5 +53,6 @@ variable "client_secret" {
 }
 
 variable "application_id" {
-	type = string
+  type        = string
+  description = "(Required) The unique identifier for the application for the service principal"
 }
