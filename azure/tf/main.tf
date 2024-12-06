@@ -63,7 +63,13 @@ module "hub" {
   client_secret           = var.client_secret
   application_id          = var.application_id
   tags                    = var.tags
+<<<<<<< HEAD
 >>>>>>> 55184a6 (fix missing application_id for sp)
+=======
+
+  #options
+  is_kms_enabled = false
+>>>>>>> d243d1c (make key vault optional on Azure)
 }
 
 module "hub_catalog" {
@@ -85,4 +91,35 @@ module "hub_catalog" {
   providers = {
     databricks.workspace = databricks.hub
   }
+<<<<<<< HEAD
+=======
+
+  source = "./modules/azure_spoke"
+
+  # Pass the required variables to the module
+  prefix    = each.value.prefix
+  vnet_cidr = each.value.cidr
+  tags      = each.value.tags
+
+  location                 = var.location
+  route_table_id           = module.hub.route_table_id
+  metastore_id             = module.hub.metastore_id
+  hub_vnet_name            = module.hub.vnet_name
+  hub_resource_group_name  = module.hub.resource_group_name
+  hub_vnet_id              = module.hub.vnet_id
+  key_vault_id             = module.hub.key_vault_id
+  ipgroup_id               = module.hub.ipgroup_id
+  managed_disk_key_id      = module.hub.managed_disk_key_id
+  managed_services_key_id  = module.hub.managed_services_key_id
+  databricks_app_object_id = var.databricks_app_object_id
+  hub_private_link_info    = module.hub.private_link_info
+  tenant_id                = module.hub.tenant_id
+
+  #options
+  is_kms_enabled                      = false
+  is_frontend_private_link_enabled    = false
+  is_storage_private_endpoint_enabled = true
+
+  depends_on = [module.hub]
+>>>>>>> d243d1c (make key vault optional on Azure)
 }

@@ -1,11 +1,24 @@
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
 resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
   name                     = module.naming.key_vault.name_unique
+=======
+# Why do `key_opts` and `key_permissions` differ in terms of required capitalization?
+# Define the Azure Key Vault resource
+resource "azurerm_key_vault" "this" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  name                     = "${local.prefix}-kv"
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
   location                 = azurerm_resource_group.this.location
   resource_group_name      = azurerm_resource_group.this.name
   tenant_id                = var.client_config.tenant_id
   purge_protection_enabled = true
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
+=======
+  # enable_rbac_authorization = true
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
 
   sku_name                   = "premium"
   soft_delete_retention_days = 7
@@ -17,7 +30,11 @@ resource "azurerm_key_vault" "this" {
 resource "azurerm_key_vault_key" "managed_services" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   name         = "${module.naming.key_vault_key.name}-adb-services"
+=======
+  name         = "${local.prefix}-adb-services"
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
   key_vault_id = azurerm_key_vault.this[0].id
   key_type     = "RSA"
   key_size     = 2048
@@ -32,8 +49,11 @@ resource "azurerm_key_vault_key" "managed_services" {
     "wrapKey",
   ]
 
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   tags = var.tags
 
+=======
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
   depends_on = [azurerm_key_vault_access_policy.terraform]
 }
 
@@ -41,7 +61,11 @@ resource "azurerm_key_vault_key" "managed_services" {
 resource "azurerm_key_vault_key" "managed_disk" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   name         = "${module.naming.key_vault_key.name}-adb-disk"
+=======
+  name         = "${local.prefix}-adb-disk"
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
   key_vault_id = azurerm_key_vault.this[0].id
   key_type     = "RSA"
   key_size     = 2048
@@ -56,8 +80,11 @@ resource "azurerm_key_vault_key" "managed_disk" {
     "wrapKey",
   ]
 
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   tags = var.tags
 
+=======
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
   depends_on = [azurerm_key_vault_access_policy.terraform]
 }
 
@@ -67,7 +94,11 @@ resource "azurerm_key_vault_access_policy" "terraform" {
 
   key_vault_id = azurerm_key_vault.this[0].id
   tenant_id    = azurerm_key_vault.this[0].tenant_id
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   object_id    = var.client_config.object_id
+=======
+  object_id    = data.azurerm_client_config.current.object_id
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
 
   key_permissions = [
     "Get",
@@ -114,7 +145,11 @@ resource "azurerm_private_dns_zone" "key_vault" {
 resource "azurerm_private_endpoint" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   name                = "${module.naming.private_endpoint.name}-kv"
+=======
+  name                = "${local.prefix}-kv-pe"
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
@@ -137,7 +172,11 @@ resource "azurerm_private_endpoint" "key_vault" {
 resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   name                  = "${var.resource_suffix}-keyvault-vnetlink"
+=======
+  name                  = "${local.prefix}-keyvault-vnetlink"
+>>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
   resource_group_name   = azurerm_resource_group.this.name
   private_dns_zone_name = azurerm_private_dns_zone.key_vault[0].name
   virtual_network_id    = azurerm_virtual_network.this.id

@@ -4,6 +4,12 @@ variable "location" {
   description = "(Required) The location for the resources in this module"
 }
 
+variable "is_kms_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable KMS (Azure Key Vault) encryption for resources"
+  default     = true
+}
+
 # Define the variable "hub_resource_group_name" with type string and a description
 variable "hub_resource_group_name" {
   type        = string
