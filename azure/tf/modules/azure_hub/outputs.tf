@@ -15,15 +15,15 @@ output "route_table_id" {
 }
 
 output "key_vault_id" {
-  value = azurerm_key_vault.example.id
+  value = length(azurerm_key_vault.this) > 0 ? azurerm_key_vault.this[0].id : null
 }
 
 output "managed_disk_key_id" {
-  value = azurerm_key_vault_key.managed_disk.id
+  value = length(azurerm_key_vault_key.managed_disk) > 0 ? azurerm_key_vault_key.managed_disk[0].id : null
 }
 
 output "managed_services_key_id" {
-  value = azurerm_key_vault_key.managed_services.id
+  value = length(azurerm_key_vault_key.managed_services) > 0 ? azurerm_key_vault_key.managed_services[0].id : null
 }
 
 output "vnet_id" {

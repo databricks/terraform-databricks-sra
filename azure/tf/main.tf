@@ -48,6 +48,9 @@ module "hub" {
   client_secret           = var.client_secret
   application_id          = var.application_id
   tags                    = var.tags
+
+  #options
+  is_kms_enabled = false
 }
 
 # Define module "spoke" with a for_each loop to iterate over each spoke configuration
@@ -77,5 +80,10 @@ module "spoke" {
   hub_private_link_info    = module.hub.private_link_info
   tenant_id                = module.hub.tenant_id
 
-  # depends_on = [module.hub]
+  #options
+  is_kms_enabled                      = false
+  is_frontend_private_link_enabled    = false
+  is_storage_private_endpoint_enabled = true
+
+  depends_on = [module.hub]
 }
