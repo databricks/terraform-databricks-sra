@@ -4,6 +4,7 @@ resource "azurerm_databricks_workspace" "this" {
   resource_group_name                                 = azurerm_resource_group.this.name
   location                                            = var.location
   sku                                                 = "premium"
+  
   managed_disk_cmk_key_vault_key_id                   = var.managed_disk_key_id
   managed_services_cmk_key_vault_key_id               = var.managed_services_key_id
   managed_disk_cmk_rotation_to_latest_version_enabled = true
