@@ -6,7 +6,7 @@ variable "is_storage_private_endpoint_enabled" {
 
 variable "is_kms_enabled" {
   type        = bool
-  description = "(Optional - default to true) Enable KMS (Key Management Service) encryption for resources"
+  description = "(Optional - default to true) Enable KMS (Azure Key Vault) encryption for resources"
   default     = true
 }
 
