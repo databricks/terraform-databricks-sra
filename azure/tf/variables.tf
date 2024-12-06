@@ -80,3 +80,9 @@ variable "sat_service_principal" {
   description = "(Optional) Service principal configuration for running SAT. If this is not provided, a service principal will be created. The created service principal name can be configured with the name field in this variable."
   sensitive   = true
 }
+
+variable "metastore_id" {
+  type        = string
+  default     = ""
+  description = "Required if is_unity_catalog_enabled = false"  
+}

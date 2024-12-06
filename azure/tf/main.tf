@@ -77,7 +77,11 @@ module "hub" {
 >>>>>>> 8af490c (make firewall optional)
 =======
   is_test_vm_enabled = false
+<<<<<<< HEAD
 >>>>>>> 443bd1d (make test vm optional)
+=======
+  is_unity_catalog_enabled = false
+>>>>>>> 58ad671 (make uc creation optional)
 }
 
 module "hub_catalog" {
@@ -111,7 +115,7 @@ module "hub_catalog" {
 
   location                 = var.location
   route_table_id           = module.hub.route_table_id
-  metastore_id             = module.hub.metastore_id
+  metastore_id             = module.hub.is_unity_catalog_enabled ? module.hub.metastore_id : var.metastore_id
   hub_vnet_name            = module.hub.vnet_name
   hub_resource_group_name  = module.hub.resource_group_name
   hub_vnet_id              = module.hub.vnet_id

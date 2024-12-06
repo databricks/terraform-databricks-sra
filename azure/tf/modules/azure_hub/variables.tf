@@ -12,16 +12,26 @@ variable "is_kms_enabled" {
 
 variable "is_firewall_enabled" {
   type        = bool
-  description = "(Optional - default to false) Enable Firewall for resources"
+  description = "(Optional - default to true) Enable Firewall for resources"
   default     = true
 }
 
 variable "is_test_vm_enabled" {
   type        = bool
-  description = "(Optional - default to false) Enable the bastion VM"
+  description = "(Optional - default to true) Enable the bastion VM"
   default     = true
 }
 
+variable "test_vm_password" {
+  type        = string
+  description = "(Required) Password for the test VM"
+}
+
+variable "is_unity_catalog_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable creation of new UC"
+  default     = true
+}
 
 # Define the variable "hub_resource_group_name" with type string and a description
 variable "hub_resource_group_name" {
@@ -80,9 +90,4 @@ variable "firewall_sku" {
   type        = string
   description = "SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
   default     = "Standard"
-}
-
-variable "test_vm_password" {
-  type        = string
-  description = "(Required) Password for the test VM"
 }
