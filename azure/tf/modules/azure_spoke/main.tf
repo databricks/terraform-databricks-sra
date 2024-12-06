@@ -113,7 +113,6 @@ resource "azurerm_subnet" "privatelink" {
   name                                      = "${var.prefix}-privatelink"
   resource_group_name                       = azurerm_resource_group.this.name
   virtual_network_name                      = azurerm_virtual_network.this.name
-  private_endpoint_network_policies_enabled = true
 
   address_prefixes = [local.subnets["privatelink"]]
 }
