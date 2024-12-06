@@ -53,6 +53,7 @@ module "hub" {
   is_kms_enabled = false
   is_firewall_enabled = false
   is_test_vm_enabled = false
+  is_unity_catalog_enabled = false
 }
 
 # Define module "spoke" with a for_each loop to iterate over each spoke configuration
@@ -70,7 +71,7 @@ module "spoke" {
 
   location                 = var.location
   route_table_id           = module.hub.route_table_id
-  metastore_id             = module.hub.metastore_id
+  metastore_id             = module.hub.is_unity_catalog_enabled ? module.hub.metastore_id : var.metastore_id
   hub_vnet_name            = module.hub.vnet_name
   hub_resource_group_name  = module.hub.resource_group_name
   hub_vnet_id              = module.hub.vnet_id
