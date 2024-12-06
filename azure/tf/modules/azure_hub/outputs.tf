@@ -44,9 +44,15 @@ output "vnet_name" {
 }
 
 output "metastore_id" {
-  value       = databricks_metastore.this.id
+  value = length(databricks_metastore.this) > 0 ? databricks_metastore.this[0].id : null
   description = "The unique ID of the Databricks Metastore."
 }
+
+output "is_unity_catalog_enabled" {
+  value = var.is_unity_catalog_enabled
+  description = "If UC creation is enabled"
+}
+
 
 output "resource_group_name" {
   value       = azurerm_resource_group.this.name
