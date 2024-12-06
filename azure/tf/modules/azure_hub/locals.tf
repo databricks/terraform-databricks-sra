@@ -25,4 +25,6 @@ locals {
   prefix = replace(replace(lower("${var.hub_resource_group_name}${random_string.naming.result}"), "rg", ""), "-", "")
 
   subnet_map = var.subnet_map
+
+  ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
 }
