@@ -4,6 +4,18 @@ variable "is_storage_private_endpoint_enabled" {
   default     = false
 }
 
+variable "is_kms_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable KMS (Key Management Service) encryption for resources"
+  default     = true
+}
+
+variable "is_frontend_private_link_enabled" {
+  type        = bool
+  description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
+  default     = false
+}
+
 variable "location" {
   type        = string
   description = "(Required) The location for the spoke deployment"
