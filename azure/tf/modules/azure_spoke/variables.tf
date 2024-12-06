@@ -16,6 +16,13 @@ variable "is_frontend_private_link_enabled" {
   default     = false
 }
 
+# Resource placeholder that checks to see if private_dbfs should be created
+variable "boolean_create_private_dbfs" {
+  description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
+  type        = bool
+  default     = true
+}
+
 variable "location" {
   type        = string
   description = "(Required) The location for the spoke deployment"
@@ -117,11 +124,4 @@ variable "hub_private_link_info" {
 variable "tenant_id" {
   type        = string
   description = "(Required) The tenant ID for the Azure subscription"
-}
-
-# Resource placeholder that checks to see if private_dbfs should be created
-variable "boolean_create_private_dbfs" {
-  description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
-  type        = bool
-  default     = true
 }

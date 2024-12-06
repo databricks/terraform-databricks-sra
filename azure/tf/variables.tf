@@ -64,7 +64,7 @@ variable "databricks_app_object_id" {
   description = "(Required) The object ID of the AzureDatabricks App Registration"
 }
 
-variable "metastore_id" {
+variable "databricks_metastore_id" {
   type        = string
   default     = ""
   description = "Required if is_unity_catalog_enabled = false"  
