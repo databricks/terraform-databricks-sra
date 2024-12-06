@@ -4,7 +4,7 @@ output "client_config" {
 }
 
 output "firewall_name" {
-  value = azurerm_firewall.this.name
+  value = length(azurerm_firewall.this) > 0 ? azurerm_firewall.this[0].name : ""
   description = "The name of the Azure Firewall resource."
 }
 

@@ -51,6 +51,7 @@ module "hub" {
 
   #options
   is_kms_enabled = false
+  is_firewall_enabled = false
 }
 
 # Define module "spoke" with a for_each loop to iterate over each spoke configuration
