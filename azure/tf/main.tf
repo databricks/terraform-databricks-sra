@@ -73,7 +73,11 @@ module "hub" {
 >>>>>>> d243d1c (make key vault optional on Azure)
 =======
   is_firewall_enabled = false
+<<<<<<< HEAD
 >>>>>>> 8af490c (make firewall optional)
+=======
+  is_test_vm_enabled = false
+>>>>>>> 443bd1d (make test vm optional)
 }
 
 module "hub_catalog" {
