@@ -1,4 +1,5 @@
 # resource "azurerm_private_endpoint" "frontend" {
+#   count               = is_frontend_private_link_enabled ? 1 : 0
 #   name                = "${var.prefix}-frontend"
 #   location            = var.location
 #   resource_group_name = var.hub_resource_group_name
