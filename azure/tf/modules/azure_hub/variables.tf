@@ -16,6 +16,13 @@ variable "is_firewall_enabled" {
   default     = true
 }
 
+variable "is_test_vm_enabled" {
+  type        = bool
+  description = "(Optional - default to false) Enable the bastion VM"
+  default     = true
+}
+
+
 # Define the variable "hub_resource_group_name" with type string and a description
 variable "hub_resource_group_name" {
   type        = string
@@ -73,4 +80,9 @@ variable "firewall_sku" {
   type        = string
   description = "SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
   default     = "Standard"
+}
+
+variable "test_vm_password" {
+  type        = string
+  description = "(Required) Password for the test VM"
 }
