@@ -69,7 +69,11 @@ module "hub" {
 
   #options
   is_kms_enabled = false
+<<<<<<< HEAD
 >>>>>>> d243d1c (make key vault optional on Azure)
+=======
+  is_firewall_enabled = false
+>>>>>>> 8af490c (make firewall optional)
 }
 
 module "hub_catalog" {
