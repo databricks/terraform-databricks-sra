@@ -10,6 +10,7 @@ variable "is_frontend_private_link_enabled" {
   default     = false
 }
 
+<<<<<<< HEAD:azure/tf/modules/spoke/variables.tf
 # Resource placeholder that checks to see if private_dbfs should be created
 variable "boolean_create_private_dbfs" {
   description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
@@ -17,6 +18,20 @@ variable "boolean_create_private_dbfs" {
   default     = true
 }
 
+=======
+variable "is_kms_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable KMS (Key Management Service) encryption for resources"
+  default     = true
+}
+
+variable "is_frontend_private_link_enabled" {
+  type        = bool
+  description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
+  default     = false
+}
+
+>>>>>>> 31c6a21 (make kms and fe privatelink optional):azure/tf/modules/azure_spoke/variables.tf
 variable "location" {
   type        = string
   description = "(Required) The location for the spoke deployment"
