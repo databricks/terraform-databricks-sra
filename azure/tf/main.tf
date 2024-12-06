@@ -68,6 +68,7 @@ module "hub" {
 =======
 
   #options
+<<<<<<< HEAD
   is_kms_enabled = false
 <<<<<<< HEAD
 >>>>>>> d243d1c (make key vault optional on Azure)
@@ -80,6 +81,11 @@ module "hub" {
 <<<<<<< HEAD
 >>>>>>> 443bd1d (make test vm optional)
 =======
+=======
+  is_kms_enabled           = false
+  is_firewall_enabled      = false
+  is_test_vm_enabled       = false
+>>>>>>> 721eaf9 (fix linting)
   is_unity_catalog_enabled = false
 >>>>>>> 58ad671 (make uc creation optional)
 }
@@ -115,7 +121,7 @@ module "hub_catalog" {
 
   location                 = var.location
   route_table_id           = module.hub.route_table_id
-  metastore_id             = module.hub.is_unity_catalog_enabled ? module.hub.metastore_id : var.metastore_id
+  metastore_id             = module.hub.is_unity_catalog_enabled ? module.hub.metastore_id : var.databricks_metastore_id
   hub_vnet_name            = module.hub.vnet_name
   hub_resource_group_name  = module.hub.resource_group_name
   hub_vnet_id              = module.hub.vnet_id
@@ -131,6 +137,7 @@ module "hub_catalog" {
   is_kms_enabled                      = false
   is_frontend_private_link_enabled    = false
   is_storage_private_endpoint_enabled = true
+  boolean_create_private_dbfs         = false
 
   depends_on = [module.hub]
 >>>>>>> d243d1c (make key vault optional on Azure)

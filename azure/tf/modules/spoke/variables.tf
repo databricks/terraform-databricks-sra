@@ -11,6 +11,9 @@ variable "is_frontend_private_link_enabled" {
 }
 
 <<<<<<< HEAD:azure/tf/modules/spoke/variables.tf
+<<<<<<< HEAD:azure/tf/modules/spoke/variables.tf
+=======
+>>>>>>> 721eaf9 (fix linting):azure/tf/modules/azure_spoke/variables.tf
 # Resource placeholder that checks to see if private_dbfs should be created
 variable "boolean_create_private_dbfs" {
   description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
@@ -18,6 +21,7 @@ variable "boolean_create_private_dbfs" {
   default     = true
 }
 
+<<<<<<< HEAD:azure/tf/modules/spoke/variables.tf
 =======
 variable "is_kms_enabled" {
   type        = bool
@@ -32,6 +36,8 @@ variable "is_frontend_private_link_enabled" {
 }
 
 >>>>>>> 31c6a21 (make kms and fe privatelink optional):azure/tf/modules/azure_spoke/variables.tf
+=======
+>>>>>>> 721eaf9 (fix linting):azure/tf/modules/azure_spoke/variables.tf
 variable "location" {
   type        = string
   description = "(Required) The location for the spoke deployment"
@@ -116,3 +122,24 @@ variable "tags" {
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
 }
+<<<<<<< HEAD:azure/tf/modules/spoke/variables.tf
+=======
+
+variable "databricks_app_object_id" {
+  type        = string
+  description = "(Required) The object ID of the AzureDatabricks App Registration"
+}
+
+variable "hub_private_link_info" {
+  type = object({
+    dns_zone_id = string
+    subnet_id   = string
+  })
+  description = "(Required) Hub Private link information"
+}
+
+variable "tenant_id" {
+  type        = string
+  description = "(Required) The tenant ID for the Azure subscription"
+}
+>>>>>>> 721eaf9 (fix linting):azure/tf/modules/azure_spoke/variables.tf

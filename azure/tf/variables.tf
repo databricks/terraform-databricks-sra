@@ -81,7 +81,7 @@ variable "sat_service_principal" {
   sensitive   = true
 }
 
-variable "metastore_id" {
+variable "databricks_metastore_id" {
   type        = string
   default     = ""
   description = "Required if is_unity_catalog_enabled = false"  
