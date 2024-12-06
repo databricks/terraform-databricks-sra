@@ -1,5 +1,7 @@
 # Define a subnet resource for the Azure Firewall
 resource "azurerm_subnet" "firewall" {
+  count = var.is_firewall_enabled ? 1 : 0
+
   name                 = "AzureFirewallSubnet"
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
@@ -9,11 +11,13 @@ resource "azurerm_subnet" "firewall" {
 
 # Define a public IP resource for the Azure Firewall
 resource "azurerm_public_ip" "this" {
-  name                = "firewall-public-ip"
+  count = var.is_firewall_enabled ? 1 : 0
+
+  name                = "${local.prefix}-fw-public-ip"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
-  sku                 = "Standard"
+  sku                 = var.firewall_sku
 
   lifecycle {
     ignore_changes = [tags]
@@ -22,31 +26,24 @@ resource "azurerm_public_ip" "this" {
 
 # Define a firewall policy resource
 resource "azurerm_firewall_policy" "this" {
-  name                = "databricks-fwpolicy"
+  count = var.is_firewall_enabled ? 1 : 0
+
+  name                = "${local.prefix}-databricks-fwpolicy"
   resource_group_name = var.hub_resource_group_name
   location            = azurerm_resource_group.this.location
 }
 
-# Define an IP group resource
-resource "azurerm_ip_group" "this" {
-  name                = "databricks-subnets"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-
-  lifecycle {
-    ignore_changes = [cidrs]
-  }
-}
-
 # Define a firewall policy rule collection group resource
 resource "azurerm_firewall_policy_rule_collection_group" "this" {
-  name               = "databricks"
-  firewall_policy_id = azurerm_firewall_policy.this.id
+  count = var.is_firewall_enabled ? 1 : 0
+
+  name               = "${local.prefix}-databricks"
+  firewall_policy_id = azurerm_firewall_policy.this[0].id
   priority           = 200
 
   # Define network rule collection within the rule collection group
   network_rule_collection {
-    name     = "databricks-network-rc"
+    name     = "${local.prefix}-databricks-network-rc"
     priority = 100
     action   = "Allow"
 
@@ -78,7 +75,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
   # Define application rule collection within the rule collection group
   application_rule_collection {
-    name     = "databricks-app-rc"
+    name     = "${local.prefix}-databricks-app-rc"
     priority = 101
     action   = "Allow"
 
@@ -129,18 +126,21 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
 # Define a firewall resource
 resource "azurerm_firewall" "this" {
+  count = var.is_firewall_enabled ? 1 : 0
+
   name                = "${azurerm_virtual_network.this.name}-firewall"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   sku_name            = "AZFW_VNet"
-  sku_tier            = "Standard"
-  firewall_policy_id  = azurerm_firewall_policy.this.id
+  sku_tier            = var.firewall_sku
+  firewall_policy_id  = azurerm_firewall_policy.this[0].id
+
 
   # Define IP configuration for the firewall
   ip_configuration {
     name                 = "firewall-public-ip-config"
-    subnet_id            = azurerm_subnet.firewall.id
-    public_ip_address_id = azurerm_public_ip.this.id
+    subnet_id            = azurerm_subnet.firewall[0].id
+    public_ip_address_id = azurerm_public_ip.this[0].id
   }
 
   depends_on = [
