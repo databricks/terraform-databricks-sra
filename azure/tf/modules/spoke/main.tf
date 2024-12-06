@@ -110,9 +110,15 @@ resource "azurerm_subnet" "host" {
 
 # Create the privatelink subnet
 resource "azurerm_subnet" "privatelink" {
+<<<<<<< HEAD:azure/tf/modules/spoke/main.tf
   name                 = "${module.naming.subnet.name}-pl"
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
+=======
+  name                                      = "${var.prefix}-privatelink"
+  resource_group_name                       = azurerm_resource_group.this.name
+  virtual_network_name                      = azurerm_virtual_network.this.name
+>>>>>>> 78672ae (fix plan errors with Azure deployment):azure/tf/modules/azure_spoke/main.tf
 
   address_prefixes = [local.subnets["privatelink"]]
 }
