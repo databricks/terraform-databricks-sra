@@ -6,7 +6,7 @@ resource "azurerm_databricks_workspace" "this" {
   sku                 = "premium"
 
   managed_disk_cmk_key_vault_key_id                   = var.is_kms_enabled ? var.managed_disk_key_id : null
-  managed_services_cmk_key_vault_key_id               = var.is_kms_enabled ? var.managed_disk_key_id : null
+  managed_services_cmk_key_vault_key_id               = var.is_kms_enabled ? var.managed_services_key_id : null
   managed_disk_cmk_rotation_to_latest_version_enabled = var.is_kms_enabled ? true : null
   customer_managed_key_enabled                        = var.is_kms_enabled
   infrastructure_encryption_enabled                   = var.is_kms_enabled
