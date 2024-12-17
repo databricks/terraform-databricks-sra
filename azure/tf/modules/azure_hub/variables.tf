@@ -4,6 +4,35 @@ variable "location" {
   description = "(Required) The location for the resources in this module"
 }
 
+variable "is_kms_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable KMS (Azure Key Vault) encryption for resources"
+  default     = true
+}
+
+variable "is_firewall_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable Firewall for resources"
+  default     = true
+}
+
+variable "is_test_vm_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable the bastion VM"
+  default     = true
+}
+
+variable "test_vm_password" {
+  type        = string
+  description = "(Required) Password for the test VM"
+}
+
+variable "is_unity_catalog_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable creation of new UC"
+  default     = true
+}
+
 # Define the variable "hub_resource_group_name" with type string and a description
 variable "hub_resource_group_name" {
   type        = string
@@ -53,5 +82,12 @@ variable "client_secret" {
 }
 
 variable "application_id" {
-	type = string
+  type        = string
+  description = "(Required) The unique identifier for the application for the service principal"
+}
+
+variable "firewall_sku" {
+  type        = string
+  description = "SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
+  default     = "Standard"
 }
