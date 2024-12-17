@@ -192,10 +192,16 @@ resource "azurerm_firewall" "this" {
 }
 
 resource "azurerm_ip_group" "this" {
+<<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name                = "${var.resource_suffix}-adb-subnets"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   tags                = var.tags
+=======
+  name                = "${local.prefix}-databricks-subnets"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+>>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf
 
   lifecycle {
     ignore_changes = [cidrs]
@@ -204,11 +210,17 @@ resource "azurerm_ip_group" "this" {
 
 # Create an Azure route table resource
 resource "azurerm_route_table" "this" {
+<<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name                = module.naming.route_table.name
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 
   tags = var.tags
+=======
+  name                = "${local.prefix}-route-table"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+>>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf
 }
 
 # Create a route in the route table to direct traffic to the firewall
@@ -220,5 +232,9 @@ resource "azurerm_route" "firewall_route" {
   route_table_name       = azurerm_route_table.this.name
   address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"
+<<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   next_hop_in_ip_address = azurerm_firewall.this[0].ip_configuration[0].private_ip_address
+=======
+  next_hop_in_ip_address = azurerm_firewall.this[0].ip_configuration.0.private_ip_address
+>>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf
 }
