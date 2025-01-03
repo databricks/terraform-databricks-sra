@@ -1,3 +1,8 @@
+variable "admin_user" {
+  description = "Email of the admin user for the workspace and workspace catalog."
+  type        = string
+}
+
 variable "availability_zones" {
   description = "List of AWS availability zones."
   type        = list(string)
@@ -24,37 +29,37 @@ variable "client_secret" {
 variable "cmk_admin_arn" {
   description = "Amazon Resource Name (ARN) of the CMK admin."
   type        = string
-}
-
-variable "compliance_security_profile_egress_ports" {
-  type        = bool
-  description = "Add 2443 to security group configuration or nitro instance"
-  nullable    = false
+  default     = null
 }
 
 variable "custom_private_subnet_ids" {
   type        = list(string)
   description = "List of custom private subnet IDs"
+  default     = null
 }
 
 variable "custom_relay_vpce_id" {
   type        = string
   description = "Custom Relay VPC Endpoint ID"
+  default     = null
 }
 
 variable "custom_sg_id" {
   type        = string
   description = "Custom security group ID"
+  default     = null
 }
 
 variable "custom_vpc_id" {
   type        = string
   description = "Custom VPC ID"
+  default     = null
 }
 
 variable "custom_workspace_vpce_id" {
   type        = string
   description = "Custom Workspace VPC Endpoint ID"
+  default     = null
 }
 
 variable "databricks_account_id" {
@@ -63,107 +68,11 @@ variable "databricks_account_id" {
   sensitive   = true
 }
 
-variable "enable_admin_configs_boolean" {
-  type        = bool
-  description = "Enable workspace configs"
-  nullable    = false
-}
-
-variable "enable_audit_log_alerting" {
-  description = "Flag to audit log alerting."
-  type        = bool
-  sensitive   = true
-  default     = false
-}
-
-variable "enable_cluster_boolean" {
-  description = "Flag to enable cluster."
-  type        = bool
-  sensitive   = true
-  default     = false
-}
-
-variable "enable_ip_boolean" {
-  description = "Flag to enable IP-related configurations."
-  type        = bool
-  sensitive   = true
-  default     = false
-}
-
-variable "enable_logging_boolean" {
-  description = "Flag to enable logging."
-  type        = bool
-  sensitive   = true
-  default     = false
-}
-
-variable "enable_read_only_external_location_boolean" {
-  description = "Flag to enable read only external location"
-  type        = bool
-  sensitive   = true
-  default     = false
-}
-
-variable "enable_restrictive_kinesis_endpoint_boolean" {
-  type        = bool
-  description = "Enable restrictive Kinesis endpoint boolean flag"
-  default     = false
-}
-
-variable "enable_restrictive_root_bucket_boolean" {
-  description = "Flag to enable restrictive root bucket settings."
-  type        = bool
-  sensitive   = true
-  default     = false
-}
-
-variable "enable_restrictive_s3_endpoint_boolean" {
-  type        = bool
-  description = "Enable restrictive S3 endpoint boolean flag"
-  default     = false
-}
-
-variable "enable_restrictive_sts_endpoint_boolean" {
-  type        = bool
-  description = "Enable restrictive STS endpoint boolean flag"
-  default     = false
-}
-
 variable "enable_sat_boolean" {
-  description = "Flag for a specific SAT (Service Access Token) configuration."
+  description = "Flag to enable the security analysis tool."
   type        = bool
   sensitive   = true
   default     = false
-}
-
-variable "enable_system_tables_schema_boolean" {
-  description = "Flag for enabling public preview system schema access"
-  type        = bool
-  sensitive   = true
-  default     = false
-}
-
-variable "firewall_allow_list" {
-  description = "List of allowed firewall rules."
-  type        = list(string)
-}
-
-variable "firewall_subnets_cidr" {
-  description = "CIDR blocks for firewall subnets."
-  type        = list(string)
-}
-
-variable "hms_fqdn" {
-  type = map(string)
-  default = {
-    "civilian" = "discovery-search-rds-prod-dbdiscoverysearch-uus7j2cyyu1m.c40ji7ukhesx.us-gov-west-1.rds.amazonaws.com"
-    "dod"      = "lineage-usgovwest1dod-prod.cpnejponioft.us-gov-west-1.rds.amazonaws.com"
-  }
-}
-
-variable "ip_addresses" {
-  description = "List of IP addresses to allow list."
-  type        = list(string)
 }
 
 variable "metastore_exists" {
@@ -171,40 +80,27 @@ variable "metastore_exists" {
   type        = bool
 }
 
-variable "operation_mode" {
+variable "network_configuration" {
   type        = string
-  description = "The type of Operation Mode for the workspace network configuration."
+  description = "The type of network set-up for the workspace network configuration."
   nullable    = false
 
   validation {
-    condition     = contains(["sandbox", "firewall", "custom", "isolated"], var.operation_mode)
-    error_message = "Invalid operation mode. Allowed values are: sandbox, firewall, custom, isolated."
+    condition     = contains(["custom", "isolated"], var.network_configuration)
+    error_message = "Invalid network configuration. Allowed values are: custom, isolated."
   }
 }
 
 variable "private_subnets_cidr" {
   description = "CIDR blocks for private subnets."
   type        = list(string)
+  nullable    = true
 }
 
 variable "privatelink_subnets_cidr" {
   description = "CIDR blocks for private link subnets."
   type        = list(string)
-}
-
-variable "public_subnets_cidr" {
-  description = "CIDR blocks for public subnets."
-  type        = list(string)
-}
-
-variable "read_only_data_bucket" {
-  description = "S3 bucket for data storage."
-  type        = string
-}
-
-variable "read_only_external_location_admin" {
-  description = "User to grant external location admin."
-  type        = string
+  nullable    = true
 }
 
 variable "region" {
@@ -214,6 +110,11 @@ variable "region" {
 
 variable "region_name" {
   description = "Name of the AWS region."
+  type        = string
+}
+
+variable "region_bucket_name" {
+  description = "Name of the AWS region for buckets."
   type        = string
 }
 
@@ -235,17 +136,6 @@ variable "sg_egress_ports" {
   type        = list(string)
 }
 
-variable "user_workspace_admin" {
-  description = "User to grant admin workspace access."
-  type        = string
-  nullable    = false
-}
-
-variable "user_workspace_catalog_admin" {
-  description = "Admin for the workspace catalog"
-  type        = string
-}
-
 variable "vpc_cidr_range" {
   description = "CIDR range for the VPC."
   type        = string
@@ -264,7 +154,6 @@ variable "databricks_gov_shard" {
   description = "Gov Shard civilian or dod"
   type        = string
 }
-
 
 variable "databricks_prod_aws_account_id" {
   description = "Databricks Prod AWS Account Id"
