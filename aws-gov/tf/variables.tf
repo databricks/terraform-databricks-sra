@@ -7,6 +7,11 @@ variable "admin_user" {
   type        = string
 }
 
+variable "admin_user" {
+  description = "Email of the admin user for the workspace and workspace catalog."
+  type        = string
+}
+
 variable "aws_account_id" {
   description = "ID of the AWS account."
   type        = string

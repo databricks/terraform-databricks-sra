@@ -13,7 +13,11 @@ resource "aws_security_group" "privatelink" {
   }
 
   ingress {
+<<<<<<< HEAD
     description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity - Compliance Security Profile"
+=======
+    description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity - CSP"
+>>>>>>> c1185b0 (aws gov simplicity update)
     from_port       = 2443
     to_port         = 2443
     protocol        = "tcp"
@@ -36,7 +40,11 @@ resource "aws_security_group" "privatelink" {
 
 # EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 
+<<<<<<< HEAD
 # Restrictive S3 endpoint policy:
+=======
+// Restrictive S3 endpoint policy:
+>>>>>>> c1185b0 (aws gov simplicity update)
 data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
 
@@ -65,7 +73,11 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
+<<<<<<< HEAD
       values   = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
+=======
+      values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
+>>>>>>> c1185b0 (aws gov simplicity update)
     }
   }
 
@@ -126,7 +138,11 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceAccount"
+<<<<<<< HEAD
       values   = ["282567162347"]
+=======
+      values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
+>>>>>>> c1185b0 (aws gov simplicity update)
     }
   }
 
@@ -153,7 +169,11 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
+<<<<<<< HEAD
       values   = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
+=======
+      values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
+>>>>>>> c1185b0 (aws gov simplicity update)
     }
   }
 
@@ -180,7 +200,11 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
+<<<<<<< HEAD
       values   = ["282567162347"]
+=======
+      values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
+>>>>>>> c1185b0 (aws gov simplicity update)
     }
   }
 
@@ -247,7 +271,11 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
   }
 }
 
+<<<<<<< HEAD
 # Restrictive Kinesis endpoint policy:
+=======
+// Restrictive Kinesis endpoint policy:
+>>>>>>> c1185b0 (aws gov simplicity update)
 data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
   statement {

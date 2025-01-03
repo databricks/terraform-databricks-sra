@@ -2,7 +2,11 @@ terraform {
   required_providers {
     databricks = {
       source  = "databricks/databricks"
+<<<<<<< HEAD
       version = "1.54.0"
+=======
+      version = " 1.54.0"
+>>>>>>> c1185b0 (aws gov simplicity update)
     }
     aws = {
       source  = "hashicorp/aws"

@@ -13,7 +13,10 @@ module "uc_catalog" {
   cmk_admin_arn                  = var.cmk_admin_arn == null ? "arn:aws-us-gov:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
   workspace_id                   = module.databricks_mws_workspace.workspace_id
   user_workspace_catalog_admin   = var.admin_user
+<<<<<<< HEAD
   databricks_account_id          = var.databricks_account_id
+=======
+>>>>>>> c1185b0 (aws gov simplicity update)
   databricks_gov_shard           = var.databricks_gov_shard
   databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
   uc_master_role_id              = var.uc_master_role_id
@@ -21,7 +24,11 @@ module "uc_catalog" {
   depends_on = [module.databricks_mws_workspace, module.uc_assignment]
 }
 
+<<<<<<< HEAD
 # System Table Schemas Enablement - Coming Soon to AWS-Gov
+=======
+// System Table Schemas Enablement - Coming Soon to AWS-Gov
+>>>>>>> c1185b0 (aws gov simplicity update)
 /*
 module "system_table" {
   source = "./databricks_workspace/system_schema"
@@ -32,7 +39,11 @@ module "system_table" {
 }
 */
 
+<<<<<<< HEAD
 # Create Create Cluster
+=======
+// Create Create Cluster
+>>>>>>> c1185b0 (aws gov simplicity update)
 module "cluster_configuration" {
   source = "./databricks_workspace/classic_cluster"
   providers = {
@@ -46,13 +57,18 @@ module "cluster_configuration" {
   ]
 }
 
+<<<<<<< HEAD
 # Restrictive DBFS bucket policy
+=======
+// Restrictive DBFS bucket policy
+>>>>>>> c1185b0 (aws gov simplicity update)
 module "restrictive_root_bucket" {
   source = "./databricks_workspace/restrictive_root_bucket"
   providers = {
     aws = aws
   }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
   databricks_gov_shard           = var.databricks_gov_shard
@@ -71,3 +87,12 @@ module "restrictive_root_bucket" {
   ]
 }
 >>>>>>> 101e277 (Adding workspace dependency for databricks_workspace.tf)
+=======
+  databricks_account_id = var.databricks_account_id
+  workspace_id          = module.databricks_mws_workspace.workspace_id
+  region_name           = var.region_name
+  root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
+
+  depends_on = [module.databricks_mws_workspace]
+}
+>>>>>>> c1185b0 (aws gov simplicity update)

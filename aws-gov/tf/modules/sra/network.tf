@@ -28,7 +28,11 @@ module "vpc" {
 }
 
 
+<<<<<<< HEAD
 # Security group - skipped in custom mode
+=======
+// Security group - skipped in custom mode
+>>>>>>> c1185b0 (aws gov simplicity update)
 resource "aws_security_group" "sg" {
   count = var.network_configuration != "custom" ? 1 : 0
 

@@ -3,12 +3,15 @@ variable "admin_user" {
   type        = string
 }
 
+<<<<<<< HEAD
 variable "audit_log_delivery_exists" {
   description = "If audit log delivery is already configured"
   type        = bool
   default     = false
 }
 
+=======
+>>>>>>> c1185b0 (aws gov simplicity update)
 variable "availability_zones" {
   description = "List of AWS availability zones."
   type        = list(string)
@@ -40,31 +43,46 @@ variable "cmk_admin_arn" {
 
 variable "custom_private_subnet_ids" {
   description = "List of custom private subnet IDs"
+<<<<<<< HEAD
   type        = list(string)
+=======
+>>>>>>> c1185b0 (aws gov simplicity update)
   default     = null
 }
 
 variable "custom_relay_vpce_id" {
   description = "Custom Relay VPC Endpoint ID"
+<<<<<<< HEAD
   type        = string
+=======
+>>>>>>> c1185b0 (aws gov simplicity update)
   default     = null
 }
 
 variable "custom_sg_id" {
   description = "Custom security group ID"
+<<<<<<< HEAD
   type        = string
+=======
+>>>>>>> c1185b0 (aws gov simplicity update)
   default     = null
 }
 
 variable "custom_vpc_id" {
   description = "Custom VPC ID"
+<<<<<<< HEAD
   type        = string
+=======
+>>>>>>> c1185b0 (aws gov simplicity update)
   default     = null
 }
 
 variable "custom_workspace_vpce_id" {
   description = "Custom Workspace VPC Endpoint ID"
+<<<<<<< HEAD
   type        = string
+=======
+>>>>>>> c1185b0 (aws gov simplicity update)
   default     = null
 }
 
@@ -74,6 +92,7 @@ variable "databricks_account_id" {
   sensitive   = true
 }
 
+<<<<<<< HEAD
 variable "deployment_name" {
   description = "Deployment name for the workspace. Must first be enabled by a Databricks representative."
   type        = string
@@ -81,6 +100,9 @@ variable "deployment_name" {
 }
 
 variable "enable_security_analysis_tool" {
+=======
+variable "enable_sat_boolean" {
+>>>>>>> c1185b0 (aws gov simplicity update)
   description = "Flag to enable the security analysis tool."
   type        = bool
   sensitive   = true
@@ -93,8 +115,13 @@ variable "metastore_exists" {
 }
 
 variable "network_configuration" {
+<<<<<<< HEAD
   description = "The type of network set-up for the workspace network configuration."
   type        = string
+=======
+  type        = string
+  description = "The type of network set-up for the workspace network configuration."
+>>>>>>> c1185b0 (aws gov simplicity update)
   nullable    = false
 
   validation {

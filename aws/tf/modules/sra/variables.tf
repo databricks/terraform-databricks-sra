@@ -127,10 +127,14 @@ variable "network_configuration" {
   validation {
     condition     = contains(["custom", "isolated"], var.network_configuration)
 <<<<<<< HEAD
+<<<<<<< HEAD
     error_message = "Invalid network configuration. Allowed values are: custom, isolated."
 =======
     error_message = "Invalid network configuration. Allowed values are: sandbox, firewall, custom, isolated."
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+    error_message = "Invalid network configuration. Allowed values are: custom, isolated."
+>>>>>>> c1185b0 (aws gov simplicity update)
   }
 }
 

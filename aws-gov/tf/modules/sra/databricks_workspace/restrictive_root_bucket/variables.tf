@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 variable "databricks_account_id" {
   description = "ID of the Databricks account."
   type        = string
@@ -26,4 +27,24 @@ variable "root_s3_bucket" {
 variable "workspace_id" {
   description = "workspace ID of deployed workspace."
   type        = string
+=======
+variable "region_name" {
+  type = string
+}
+
+variable "root_s3_bucket" {
+  type = string
+}
+
+variable "workspace_id" {
+  type = string
+}
+
+variable "databricks_gov_shard" {
+  type = string
+}
+
+variable "databricks_prod_aws_account_id" {
+  type = map(string)
+>>>>>>> c1185b0 (aws gov simplicity update)
 }

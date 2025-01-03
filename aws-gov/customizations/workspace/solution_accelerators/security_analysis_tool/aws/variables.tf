@@ -1,6 +1,8 @@
+# Databricks variables
+
 variable "account_console_id" {
+  description = "Databricks Account Console ID"
   type        = string
-  description = "Databricks Account ID"
 }
 
 variable "sqlw_id" {
@@ -13,16 +15,36 @@ variable "sqlw_id" {
   default = "new"
 }
 
-variable "secret_scope_name" {
-  description = "Name of secret scope for SAT secrets"
+# AWS Specific Variables
+
+variable "account_user" {
+  description = "Account Console Username"
   type        = string
-  default     = "sat_scope"
+  default     = " "
 }
 
-variable "notification_email" {
+variable "account_pass" {
+  description = "Account Console Password"
   type        = string
-  description = "Optional user email for notifications. If not specified, current user's email will be used"
-  default     = ""
+  default     = " "
+}
+
+variable "use_sp_auth" {
+  description = "Authenticate with Service Principal OAuth tokens instead of user and password"
+  type        = bool
+  default     = true
+}
+
+variable "client_id" {
+  description = "Service Principal Application (client) ID"
+  type        = string
+  default     = "value"
+}
+
+variable "client_secret" {
+  description = "SP Secret"
+  type        = string
+  default     = "value"
 }
 
 variable "analysis_schema_name" {
