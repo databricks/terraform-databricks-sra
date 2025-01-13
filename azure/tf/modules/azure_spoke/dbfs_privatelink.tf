@@ -29,7 +29,7 @@ resource "azurerm_private_endpoint" "dbfs_dfs" {
   # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = "private-dns-zone-dbfs"
-    private_dns_zone_ids = [azurerm_private_dns_zone.dbfs_dfs.id]
+    private_dns_zone_ids = [azurerm_private_dns_zone.dbfs_dfs[0].id]
   }
 
   tags = var.tags
@@ -42,7 +42,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_dfs" {
 
   name                  = "dbfs-dfs"
   resource_group_name   = azurerm_resource_group.this.name
-  private_dns_zone_name = azurerm_private_dns_zone.dbfs_dfs.name
+  private_dns_zone_name = azurerm_private_dns_zone.dbfs_dfs[0].name
   virtual_network_id    = azurerm_virtual_network.this.id
 
   tags = var.tags
@@ -69,7 +69,7 @@ resource "azurerm_private_endpoint" "dbfspe_blob" {
   # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = "private-dns-zone-dbfs"
-    private_dns_zone_ids = [azurerm_private_dns_zone.dbfs_blob.id]
+    private_dns_zone_ids = [azurerm_private_dns_zone.dbfs_blob[0].id]
   }
 
   tags = var.tags
@@ -93,7 +93,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_blob" {
 
   name                  = "dbfs-blob"
   resource_group_name   = azurerm_resource_group.this.name
-  private_dns_zone_name = azurerm_private_dns_zone.dbfs_blob.name
+  private_dns_zone_name = azurerm_private_dns_zone.dbfs_blob[0].name
   virtual_network_id    = azurerm_virtual_network.this.id
 
   tags = var.tags

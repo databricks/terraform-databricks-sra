@@ -4,6 +4,25 @@ variable "is_storage_private_endpoint_enabled" {
   default     = false
 }
 
+variable "is_kms_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable KMS (Azure Key Vault) encryption for resources"
+  default     = true
+}
+
+variable "is_frontend_private_link_enabled" {
+  type        = bool
+  description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
+  default     = false
+}
+
+# Resource placeholder that checks to see if private_dbfs should be created
+variable "boolean_create_private_dbfs" {
+  description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
+  type        = bool
+  default     = true
+}
+
 variable "location" {
   type        = string
   description = "(Required) The location for the spoke deployment"
@@ -105,11 +124,4 @@ variable "hub_private_link_info" {
 variable "tenant_id" {
   type        = string
   description = "(Required) The tenant ID for the Azure subscription"
-}
-
-# Resource placeholder that checks to see if private_dbfs should be created
-variable "boolean_create_private_dbfs" {
-  description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
-  type        = bool
-  default     = true
 }
