@@ -87,7 +87,7 @@ variable "network_configuration" {
 
   validation {
     condition     = contains(["custom", "isolated"], var.network_configuration)
-    error_message = "Invalid network configuration. Allowed values are: sandbox, firewall, custom, isolated."
+    error_message = "Invalid network configuration. Allowed values are: custom, isolated."
   }
 }
 

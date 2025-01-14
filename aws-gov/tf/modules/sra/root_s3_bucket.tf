@@ -18,7 +18,6 @@ resource "aws_s3_bucket_versioning" "root_bucket_versioning" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "root_storage_bucket" {
   bucket = aws_s3_bucket.root_storage_bucket.bucket
-
   rule {
     bucket_key_enabled = true
     apply_server_side_encryption_by_default {
@@ -66,19 +65,7 @@ data "aws_iam_policy_document" "this" {
   }
 }
 
-# Bucket policy to use if the restrictive root bucket is set to false
 resource "aws_s3_bucket_policy" "root_bucket_policy" {
-  count = var.enable_restrictive_root_bucket_boolean ? 0 : 1
-
-  bucket     = aws_s3_bucket.root_storage_bucket.id
-  policy     = data.aws_iam_policy_document.this.json
-  depends_on = [aws_s3_bucket_public_access_block.root_storage_bucket]
-}
-
-# Bucket policy to use if the restrictive root bucket is set to true
-resource "aws_s3_bucket_policy" "root_bucket_policy_ignore" {
-  count = var.enable_restrictive_root_bucket_boolean ? 1 : 0
-
   bucket     = aws_s3_bucket.root_storage_bucket.id
   policy     = data.aws_iam_policy_document.this.json
   depends_on = [aws_s3_bucket_public_access_block.root_storage_bucket]
