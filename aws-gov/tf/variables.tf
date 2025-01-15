@@ -1,10 +1,13 @@
 data "aws_availability_zones" "available" {
   state = "available" 
+<<<<<<< HEAD
 }
 
 variable "admin_user" {
   description = "Email of the admin user for the workspace and workspace catalog."
   type        = string
+=======
+>>>>>>> bbf3154 (Re-run tests)
 }
 
 variable "admin_user" {
