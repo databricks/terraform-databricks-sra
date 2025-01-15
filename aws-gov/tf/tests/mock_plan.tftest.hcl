@@ -82,10 +82,14 @@ variables {
   ip_addresses                             = ["203.0.113.1", "198.51.100.2"]
   metastore_exists                         = false
 <<<<<<< HEAD
+<<<<<<< HEAD
   network_configuration                    = "isolated"
 =======
   operation_mode                           = "isolated"
 >>>>>>> 44b5650 (tests(aws-gov): Add default test for aws-gov)
+=======
+  network_configuration                    = "isolated"
+>>>>>>> 5c0576f (Fix tests for new simplification)
   private_subnets_cidr                     = ["10.0.3.0/24", "10.0.4.0/24"]
   privatelink_subnets_cidr                 = ["10.0.5.0/24", "10.0.6.0/24"]
   public_subnets_cidr                      = ["10.0.7.0/24", "10.0.8.0/24"]
@@ -105,11 +109,14 @@ variables {
   region_name                              = "US West (N. California)"
   resource_prefix                          = "my-resource-prefix"
   sg_egress_ports                          = ["443", "80"]
-  user_workspace_admin                     = "workspace-admin-user@example.com"
-  user_workspace_catalog_admin             = "catalog-admin-user@example.com"
+  admin_user                               = "workspace-admin-user@example.com"
   vpc_cidr_range                           = "10.0.0.0/16"
   databricks_gov_shard                     = "civilian"
+<<<<<<< HEAD
 >>>>>>> 44b5650 (tests(aws-gov): Add default test for aws-gov)
+=======
+  region_bucket_name                       = "pendleton"
+>>>>>>> 5c0576f (Fix tests for new simplification)
 }
 
 # -------
