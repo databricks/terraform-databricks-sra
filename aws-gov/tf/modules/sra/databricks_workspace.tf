@@ -70,6 +70,7 @@ module "restrictive_root_bucket" {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
   databricks_gov_shard           = var.databricks_gov_shard
   workspace_id          = module.databricks_mws_workspace.workspace_id
@@ -89,6 +90,10 @@ module "restrictive_root_bucket" {
 >>>>>>> 101e277 (Adding workspace dependency for databricks_workspace.tf)
 =======
   databricks_account_id = var.databricks_account_id
+=======
+  databricks_prod_aws_account_id = var.databricks_account_id
+  databricks_gov_shard           = var.databricks_gov_shard
+>>>>>>> 84e6031 (fix errors)
   workspace_id          = module.databricks_mws_workspace.workspace_id
   region_name           = var.region_name
   root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
