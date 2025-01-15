@@ -1,5 +1,10 @@
 data "aws_availability_zones" "available" {
-  state = "available"
+  state = "available" 
+}
+
+variable "admin_user" {
+  description = "Email of the admin user for the workspace and workspace catalog."
+  type        = string
 }
 
 variable "aws_account_id" {
@@ -35,11 +40,20 @@ variable "region" {
 }
 
 variable "region_name" {
-  description = "Name of the AWS region. (e.g. pendleton)"
-  type        = map(string)
+  description  = "Name of the AWS region. (e.g. pendleton)"
+  type         = map(string)
   default = {
     "civilian" = "pendleton"
-    "dod" = "pendleton-dod"
+    "dod"      = "pendleton-dod"
+  }
+}
+
+variable "region_bucket_name" {
+  description  = "Name of the AWS region. (e.g. pendleton)"
+  type         = map(string)
+  default = {
+    "civilian" = "pendleton"
+    "dod"      = "pendleton-dod"
   }
 }
 
