@@ -53,7 +53,7 @@ module "restrictive_root_bucket" {
     aws = aws
   }
 
-  databricks_prod_aws_account_id = var.databricks_account_id
+  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
   databricks_gov_shard           = var.databricks_gov_shard
   workspace_id          = module.databricks_mws_workspace.workspace_id
   region_name           = var.region_name
