@@ -14,10 +14,14 @@ resource "aws_security_group" "privatelink" {
 
   ingress {
 <<<<<<< HEAD
+<<<<<<< HEAD
     description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity - Compliance Security Profile"
 =======
     description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity - CSP"
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+    description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity - Compliance Security Profile"
+>>>>>>> 54097e5 (Added support for CSP in AWS/AWS-Gov)
     from_port       = 2443
     to_port         = 2443
     protocol        = "tcp"
