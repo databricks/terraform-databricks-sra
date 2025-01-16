@@ -13,7 +13,7 @@ resource "aws_security_group" "privatelink" {
   }
 
   ingress {
-    description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity - CSP"
+    description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity - Compliance Security Profile"
     from_port       = 2443
     to_port         = 2443
     protocol        = "tcp"
