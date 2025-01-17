@@ -80,7 +80,11 @@ variable "account_console" {
   type = map(string)
   default = {
     "civilian" = "https://accounts.cloud.databricks.us/"
+<<<<<<< HEAD
     "dod"      = "https://accounts-dod.cloud.databricks.mil/"
+=======
+    "dod"      = "https://accounts.cloud.databricks.mil/"
+>>>>>>> 8f65e23 (Update Account Console for DoD)
   }
 }
 
