@@ -67,7 +67,7 @@ variable "account_console" {
   type = map(string)
   default = {
     "civilian" = "https://accounts.cloud.databricks.us/"
-    "dod"      = "https://accounts-dod.cloud.databricks.us/"
+    "dod"      = "https://accounts.cloud.databricks.mil/"
   }
 }
 
