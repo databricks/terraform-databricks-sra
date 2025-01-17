@@ -81,10 +81,14 @@ variable "account_console" {
   default = {
     "civilian" = "https://accounts.cloud.databricks.us/"
 <<<<<<< HEAD
+<<<<<<< HEAD
     "dod"      = "https://accounts-dod.cloud.databricks.mil/"
 =======
     "dod"      = "https://accounts.cloud.databricks.mil/"
 >>>>>>> 8f65e23 (Update Account Console for DoD)
+=======
+    "dod"      = "https://accounts-dod.cloud.databricks.mil/"
+>>>>>>> b6ffcbe (Update Account Console for DoD)
   }
 }
 
