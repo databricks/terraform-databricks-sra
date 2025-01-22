@@ -62,8 +62,8 @@ variable "resource_prefix" {
   type        = string
 
   validation {
-    condition     = can(regex("^[a-z0-9-]+$", var.resource_prefix))
-    error_message = "Invalid resource prefix. Allowed characters are a-z, 0-9, -"
+    condition     = can(regex("^[a-z0-9-.]{1,40}$", var.resource_prefix))
+    error_message = "Invalid resource prefix. Allowed characters are a-z, 0-9, -, ."
   }
 }
 
