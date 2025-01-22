@@ -60,6 +60,11 @@ variable "region_bucket_name" {
 variable "resource_prefix" {
   description = "Prefix for the resource names."
   type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]+$", var.resource_prefix))
+    error_message = "Invalid resource prefix. Allowed characters are a-z, 0-9, -"
+  }
 }
 
 // AWS Gov Only Variables
