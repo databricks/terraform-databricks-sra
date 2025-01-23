@@ -63,7 +63,7 @@ variable "resource_prefix" {
 
   validation {
     condition     = can(regex("^[a-z0-9-.]{1,40}$", var.resource_prefix))
-    error_message = "Invalid resource prefix. Allowed characters are a-z, 0-9, -, ."
+    error_message = "Invalid resource prefix. Allowed 40 characters containing only a-z, 0-9, -, ."
   }
 }
 
