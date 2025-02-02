@@ -1,3 +1,22 @@
+# ----- Terraform Provider Variables ------
+variable "tenant_id" {
+  type = string
+  description = "(Required) Tenant ID in providers.tf"
+}
+
+variable "subscription_id" {
+  type = string
+  description = "(Required) Subscription ID in providers.tf"
+} 
+
+variable "client_id" {
+  type = string
+  description = "(Required) Client ID in providers.tf"
+}
+
+
+# ------ Azure Databrick SRA Variables ------
+
 variable "application_id" {
 	type = string
 	description = "(Required) Application ID in Hub unitycatalog.tf"
