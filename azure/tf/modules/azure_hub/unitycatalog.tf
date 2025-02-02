@@ -35,7 +35,8 @@ resource "azurerm_storage_account" "unity_catalog" {
 # Define an Azure Storage Container resource
 resource "azurerm_storage_container" "unity_catalog" {
   name                  = "${local.prefix}-container"
-  storage_account_name  = azurerm_storage_account.unity_catalog.name
+  # storage_account_name  = azurerm_storage_account.unity_catalog.name # deprecated in future versions in favour of storage_account_id
+  storage_account_id  = azurerm_storage_account.unity_catalog.id
   container_access_type = "private"
 }
 

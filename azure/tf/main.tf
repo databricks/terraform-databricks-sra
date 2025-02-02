@@ -47,6 +47,7 @@ module "hub" {
   test_vm_password        = var.test_vm_password
   client_secret           = var.client_secret
   tags                    = var.tags
+  application_id          = var.application_id # Added manually by myself to the original codebase
 }
 
 # Define module "spoke" with a for_each loop to iterate over each spoke configuration
