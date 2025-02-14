@@ -16,12 +16,41 @@ variable "is_firewall_enabled" {
   default     = true
 }
 
+<<<<<<< HEAD
+=======
+variable "is_test_vm_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable the bastion VM"
+  default     = true
+}
+
+variable "test_vm_password" {
+  type        = string
+  description = "(Required) Password for the test VM"
+}
+
+>>>>>>> 60cc2bc (remove redundant module naming)
 variable "is_unity_catalog_enabled" {
   type        = bool
   description = "(Optional - default to true) Enable creation of new UC"
   default     = true
 }
 
+<<<<<<< HEAD
+=======
+# Define the variable "hub_resource_group_name" with type string and a description
+variable "hub_resource_group_name" {
+  type        = string
+  description = "(Required) The name for the hub Resource Group"
+}
+
+# Define the variable "hub_vnet_name" with type string and a description
+variable "hub_vnet_name" {
+  type        = string
+  description = "(Required) The name for the hub Virtual Network"
+}
+
+>>>>>>> 60cc2bc (remove redundant module naming)
 # Define the variable "hub_vnet_cidr" with type string and a description
 variable "hub_vnet_cidr" {
 
@@ -53,6 +82,7 @@ variable "tags" {
   default     = {}
 }
 
+<<<<<<< HEAD
 variable "firewall_sku" {
   type        = string
   description = "(Optional) SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
@@ -86,3 +116,20 @@ variable "is_frontend_private_link_enabled" {
   description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
   default     = false
 }
+=======
+variable "client_secret" {
+  type        = string
+  description = "(Required) The client secret for the service principal"
+}
+
+variable "application_id" {
+  type        = string
+  description = "(Required) The unique identifier for the application for the service principal"
+}
+
+variable "firewall_sku" {
+  type        = string
+  description = "SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
+  default     = "Standard"
+}
+>>>>>>> 60cc2bc (remove redundant module naming)

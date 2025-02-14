@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+output "client_config" {
+  value       = data.azurerm_client_config.current
+  description = "The client configuration for the current Azure session, including subscription and authentication details."
+}
+
+>>>>>>> 60cc2bc (remove redundant module naming)
 output "firewall_name" {
   value       = length(azurerm_firewall.this) > 0 ? azurerm_firewall.this[0].name : ""
   description = "The name of the Azure Firewall resource."
@@ -39,15 +47,27 @@ output "vnet_name" {
 }
 
 output "metastore_id" {
+<<<<<<< HEAD
   value       = length(databricks_metastore.this) > 0 ? databricks_metastore.this[0].id : null
+=======
+  value = length(databricks_metastore.this) > 0 ? databricks_metastore.this[0].id : null
+>>>>>>> 60cc2bc (remove redundant module naming)
   description = "The unique ID of the Databricks Metastore."
 }
 
 output "is_unity_catalog_enabled" {
+<<<<<<< HEAD
   value       = var.is_unity_catalog_enabled
   description = "If UC creation is enabled"
 }
 
+=======
+  value = var.is_unity_catalog_enabled
+  description = "If UC creation is enabled"
+}
+
+
+>>>>>>> 60cc2bc (remove redundant module naming)
 output "resource_group_name" {
   value       = azurerm_resource_group.this.name
   description = "The name of the Azure Resource Group."
@@ -61,6 +81,7 @@ output "private_link_info" {
   description = "Information related to the Private Link, including DNS Zone ID and Subnet ID for Private Link connectivity."
 }
 
+<<<<<<< HEAD
 output "dns_zone_ids" {
   description = "Private DNS Zone IDs"
   value = {
@@ -102,4 +123,17 @@ output "workspace_id" {
 output "resource_suffix" {
   description = "Resource suffix to use for naming down stream resources"
   value       = var.resource_suffix
+=======
+output "tenant_id" {
+  value       = local.tenant_id
+  description = "The tenant ID of the Azure subscription, identifying the Azure AD instance."
+}
+
+output "test_vm_public_ip" {
+  value = length(azurerm_public_ip.testvmpublicip) > 0 ? azurerm_public_ip.testvmpublicip[0].ip_address : ""
+}
+
+output "my_ip_addr" {
+  value = local.ifconfig_co_json.ip
+>>>>>>> 60cc2bc (remove redundant module naming)
 }

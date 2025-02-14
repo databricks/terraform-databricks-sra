@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Generate a random string for dbfsnaming
 resource "random_string" "dbfsnaming" {
   special = false
@@ -16,24 +17,47 @@ module "naming" {
   source  = "Azure/naming/azurerm"
   version = "~>0.4"
   suffix  = [var.resource_suffix]
+=======
+# Generate a random string for naming resources
+resource "random_string" "naming" {
+  special = false
+  upper   = false
+  length  = 6
+>>>>>>> 60cc2bc (remove redundant module naming)
 }
 
 # Create the hub resource group
 resource "azurerm_resource_group" "this" {
+<<<<<<< HEAD
   name     = module.naming.resource_group.name
   location = var.location
 
   tags = var.tags
+=======
+  name     = var.hub_resource_group_name
+  location = var.location
+  tags     = var.tags
+>>>>>>> 60cc2bc (remove redundant module naming)
 }
 
 # Create the hub virtual network
 resource "azurerm_virtual_network" "this" {
+<<<<<<< HEAD
   name                = module.naming.virtual_network.name
+=======
+  name                = var.hub_vnet_name
+>>>>>>> 60cc2bc (remove redundant module naming)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.hub_vnet_cidr]
 
+<<<<<<< HEAD
   tags = var.tags
+=======
+  lifecycle {
+    ignore_changes = [tags]
+  }
+>>>>>>> 60cc2bc (remove redundant module naming)
 }
 
 # Create the privatelink subnet
@@ -42,5 +66,9 @@ resource "azurerm_subnet" "privatelink" {
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
 
+<<<<<<< HEAD
   address_prefixes = [var.subnet_map["privatelink"]]
+=======
+  address_prefixes = [local.subnet_map["privatelink"]]
+>>>>>>> 60cc2bc (remove redundant module naming)
 }

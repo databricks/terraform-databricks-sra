@@ -1,5 +1,6 @@
 # The value of the "workspace_url" property represents the URL of the Databricks workspace
 output "workspace_url" {
+<<<<<<< HEAD
   description = "The URL of the Databricks workspace, used to access the Databricks environment."
   value       = azurerm_databricks_workspace.this.workspace_url
 }
@@ -21,10 +22,18 @@ output "workspace" {
 
 output "ipgroup_cidrs" {
   description = "A map containing the CIDRs for the host and container IP groups, used for network segmentation in Azure."
+=======
+  value       = azurerm_databricks_workspace.this.workspace_url
+  description = "The URL of the Databricks workspace, used to access the Databricks environment."
+}
+
+output "ipgroup_cidrs" {
+>>>>>>> 60cc2bc (remove redundant module naming)
   value = {
     ipgroup_host_cidr      = azurerm_ip_group_cidr.host.cidr
     ipgroup_container_cidr = azurerm_ip_group_cidr.container.cidr
   }
+<<<<<<< HEAD
 }
 
 output "resource_group_name" {
@@ -68,4 +77,7 @@ output "resource_suffix" {
 output "tags" {
   description = "Tags of this spoke"
   value       = var.tags
+=======
+  description = "A map containing the CIDRs for the host and container IP groups, used for network segmentation in Azure."
+>>>>>>> 60cc2bc (remove redundant module naming)
 }
