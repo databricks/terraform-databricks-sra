@@ -13,7 +13,8 @@ resource "azurerm_subnet" "firewall" {
 resource "azurerm_public_ip" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
-  name                = "${local.prefix}-fw-public-ip"
+  #name                = "${local.resource_suffix}-fw-public-ip"
+  name                = module.naming.public_ip
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
@@ -28,7 +29,7 @@ resource "azurerm_public_ip" "this" {
 resource "azurerm_firewall_policy" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
-  name                = "${local.prefix}-databricks-fwpolicy"
+  name                = module.naming.firewall_policy
   resource_group_name = var.hub_resource_group_name
   location            = azurerm_resource_group.this.location
 }
@@ -37,13 +38,13 @@ resource "azurerm_firewall_policy" "this" {
 resource "azurerm_firewall_policy_rule_collection_group" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
-  name               = "${local.prefix}-databricks"
+  name               = "${var.resource_suffix}-databricks"
   firewall_policy_id = azurerm_firewall_policy.this[0].id
   priority           = 200
 
   # Define network rule collection within the rule collection group
   network_rule_collection {
-    name     = "${local.prefix}-databricks-network-rc"
+    name     = "${var.resource_suffix}-databricks-network-rc"
     priority = 100
     action   = "Allow"
 
@@ -75,7 +76,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
   # Define application rule collection within the rule collection group
   application_rule_collection {
-    name     = "${local.prefix}-databricks-app-rc"
+    name     = "${var.resource_suffix}-databricks-app-rc"
     priority = 101
     action   = "Allow"
 
@@ -128,7 +129,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 resource "azurerm_firewall" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
-  name                = "${azurerm_virtual_network.this.name}-firewall"
+  name                = module.naming.firewall
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   sku_name            = "AZFW_VNet"
@@ -149,7 +150,7 @@ resource "azurerm_firewall" "this" {
 }
 
 resource "azurerm_ip_group" "this" {
-  name                = "${local.prefix}-databricks-subnets"
+  name                = "${var.resource_suffix}-adb-subnets"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
@@ -160,7 +161,7 @@ resource "azurerm_ip_group" "this" {
 
 # Create an Azure route table resource
 resource "azurerm_route_table" "this" {
-  name                = "${local.prefix}-route-table"
+  name                = module.naming.route_table
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 }

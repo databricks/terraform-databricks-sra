@@ -1,13 +1,13 @@
 # Define a private endpoint resource for the backend
 resource "azurerm_private_endpoint" "backend" {
-  name                = "${var.prefix}-backend"
+  name                = "${module.naming.private_endpoint}-backend"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
 
   # Configure the private service connection
   private_service_connection {
-    name                           = "ple-${var.prefix}-backend"
+    name                           = "ple-${var.resource_suffix}-backend"
     private_connection_resource_id = azurerm_databricks_workspace.this.id
     is_manual_connection           = false
     subresource_names              = ["databricks_ui_api"]

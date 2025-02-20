@@ -36,7 +36,7 @@ module "subnet_addrs" {
 # Define module "hub" with the source "./modules/azure_hub"
 # Pass the required variables to the module
 module "hub" {
-  source = "./modules/azure_hub"
+  source = "./modules/hub"
 
   location                = var.location
   hub_vnet_name           = var.hub_vnet_name
@@ -59,15 +59,15 @@ module "hub" {
 # Define module "spoke" with a for_each loop to iterate over each spoke configuration
 module "spoke" {
   for_each = {
-    for index, spoke in var.spoke_config : spoke.prefix => spoke
+    for index, spoke in var.spoke_config : spoke.resource_suffix => spoke
   }
 
-  source = "./modules/azure_spoke"
+  source = "./modules/spoke"
 
   # Pass the required variables to the module
-  prefix    = each.value.prefix
-  vnet_cidr = each.value.cidr
-  tags      = each.value.tags
+  resource_suffix = each.value.resource_suffix
+  vnet_cidr       = each.value.cidr
+  tags            = each.value.tags
 
   location                 = var.location
   route_table_id           = module.hub.route_table_id

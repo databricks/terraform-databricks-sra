@@ -97,9 +97,9 @@ variable "managed_services_key_id" {
   default = "(Required) The key for the managed services encryption"
 }
 
-variable "prefix" {
+variable "resource_suffix" {
   type        = string
-  description = "(Required) Naming prefix for resources"
+  description = "(Required) Naming resource_suffix for resources"
 }
 
 variable "tags" {

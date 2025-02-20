@@ -1,6 +1,7 @@
 # Define an Azure Databricks workspace resource
 resource "azurerm_databricks_workspace" "this" {
-  name                = "${var.prefix}-adb-workspace"
+  # name                = "${var.resource_suffix}-adb-workspace"
+  name                = module.naming.databricks_workspace
   resource_group_name = azurerm_resource_group.this.name
   location            = var.location
   sku                 = "premium"
