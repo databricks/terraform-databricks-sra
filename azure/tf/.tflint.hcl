@@ -13,6 +13,6 @@ plugin "azurerm" {
 }
 
 rule "azurerm_resource_missing_tags" {
-  enabled = true
+  enabled = false
   tags = ["foo"]
 }

@@ -37,6 +37,7 @@ module "subnet_addrs" {
 # Define module "hub" with the source "./modules/azure_hub"
 # Pass the required variables to the module
 module "hub" {
+<<<<<<< HEAD
   source             = "./modules/hub"
   location           = var.location
   hub_vnet_cidr      = var.hub_vnet_cidr
@@ -46,6 +47,9 @@ module "hub" {
   public_repos       = var.public_repos
   tags               = var.tags
   resource_suffix    = var.hub_resource_suffix
+=======
+  source = "./modules/hub"
+>>>>>>> 900395d (naming)
 
 <<<<<<< HEAD
   #options
@@ -90,6 +94,7 @@ module "hub" {
 >>>>>>> 58ad671 (make uc creation optional)
 }
 
+<<<<<<< HEAD
 module "hub_catalog" {
   source = "./modules/catalog"
 
@@ -108,16 +113,22 @@ module "hub_catalog" {
 
   providers = {
     databricks.workspace = databricks.hub
+=======
+# Define module "spoke" with a for_each loop to iterate over each spoke configuration
+module "spoke" {
+  for_each = {
+    for index, spoke in var.spoke_config : spoke.resource_suffix => spoke
+>>>>>>> 900395d (naming)
   }
 <<<<<<< HEAD
 =======
 
-  source = "./modules/azure_spoke"
+  source = "./modules/spoke"
 
   # Pass the required variables to the module
-  prefix    = each.value.prefix
-  vnet_cidr = each.value.cidr
-  tags      = each.value.tags
+  resource_suffix = each.value.resource_suffix
+  vnet_cidr       = each.value.cidr
+  tags            = each.value.tags
 
   location                 = var.location
   route_table_id           = module.hub.route_table_id

@@ -13,5 +13,9 @@ terraform {
       version = ">=3.0"
     }
   }
+<<<<<<< HEAD
   required_version = ">=1.9.8"
+=======
+  required_version = "~>1.9.8"
+>>>>>>> 900395d (naming)
 }

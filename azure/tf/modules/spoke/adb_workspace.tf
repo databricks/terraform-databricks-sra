@@ -1,6 +1,7 @@
 # Define an Azure Databricks workspace resource
 resource "azurerm_databricks_workspace" "this" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   name                        = module.naming.databricks_workspace.name
   resource_group_name         = azurerm_resource_group.this.name
   managed_resource_group_name = local.managed_rg_name
@@ -20,6 +21,10 @@ resource "azurerm_databricks_workspace" "this" {
     no_public_ip                                         = true
 =======
   name                = "${var.prefix}-adb-workspace"
+=======
+  # name                = "${var.resource_suffix}-adb-workspace"
+  name                = module.naming.databricks_workspace
+>>>>>>> 900395d (naming)
   resource_group_name = azurerm_resource_group.this.name
   location            = var.location
   sku                 = "premium"

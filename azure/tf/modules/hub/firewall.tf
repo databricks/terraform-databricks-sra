@@ -13,11 +13,16 @@ resource "azurerm_subnet" "firewall" {
 resource "azurerm_public_ip" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name                = module.naming.public_ip.name_unique
 =======
   name                = "${local.prefix}-fw-public-ip"
 >>>>>>> 8af490c (make firewall optional):azure/tf/modules/azure_hub/firewall.tf
+=======
+  #name                = "${local.resource_suffix}-fw-public-ip"
+  name                = module.naming.public_ip
+>>>>>>> 900395d (naming)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
@@ -45,7 +50,7 @@ resource "azurerm_firewall_policy" "this" {
 
 =======
 
-  name                = "${local.prefix}-databricks-fwpolicy"
+  name                = module.naming.firewall_policy
   resource_group_name = var.hub_resource_group_name
   location            = azurerm_resource_group.this.location
 }
@@ -55,21 +60,29 @@ resource "azurerm_firewall_policy" "this" {
 resource "azurerm_firewall_policy_rule_collection_group" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name               = "${var.resource_suffix}-databricks"
 =======
   name               = "${local.prefix}-databricks"
 >>>>>>> 8af490c (make firewall optional):azure/tf/modules/azure_hub/firewall.tf
+=======
+  name               = "${var.resource_suffix}-databricks"
+>>>>>>> 900395d (naming)
   firewall_policy_id = azurerm_firewall_policy.this[0].id
   priority           = 200
 
   # Define network rule collection within the rule collection group
   network_rule_collection {
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
     name     = "${var.resource_suffix}-databricks-network-rc"
 =======
     name     = "${local.prefix}-databricks-network-rc"
 >>>>>>> 8af490c (make firewall optional):azure/tf/modules/azure_hub/firewall.tf
+=======
+    name     = "${var.resource_suffix}-databricks-network-rc"
+>>>>>>> 900395d (naming)
     priority = 100
     action   = "Allow"
 
@@ -108,11 +121,15 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
   # Define application rule collection within the rule collection group
   application_rule_collection {
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
     name     = "${var.resource_suffix}-databricks-app-rc"
 =======
     name     = "${local.prefix}-databricks-app-rc"
 >>>>>>> 8af490c (make firewall optional):azure/tf/modules/azure_hub/firewall.tf
+=======
+    name     = "${var.resource_suffix}-databricks-app-rc"
+>>>>>>> 900395d (naming)
     priority = 101
     action   = "Allow"
 
@@ -165,11 +182,15 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 resource "azurerm_firewall" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name                = module.naming.firewall.name
 =======
   name                = "${azurerm_virtual_network.this.name}-firewall"
 >>>>>>> 8af490c (make firewall optional):azure/tf/modules/azure_hub/firewall.tf
+=======
+  name                = module.naming.firewall
+>>>>>>> 900395d (naming)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   sku_name            = "AZFW_VNet"
@@ -192,6 +213,7 @@ resource "azurerm_firewall" "this" {
 }
 
 resource "azurerm_ip_group" "this" {
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name                = "${var.resource_suffix}-adb-subnets"
   resource_group_name = azurerm_resource_group.this.name
@@ -199,6 +221,9 @@ resource "azurerm_ip_group" "this" {
   tags                = var.tags
 =======
   name                = "${local.prefix}-databricks-subnets"
+=======
+  name                = "${var.resource_suffix}-adb-subnets"
+>>>>>>> 900395d (naming)
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 >>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf
@@ -210,6 +235,7 @@ resource "azurerm_ip_group" "this" {
 
 # Create an Azure route table resource
 resource "azurerm_route_table" "this" {
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name                = module.naming.route_table.name
   location            = azurerm_resource_group.this.location
@@ -218,6 +244,9 @@ resource "azurerm_route_table" "this" {
   tags = var.tags
 =======
   name                = "${local.prefix}-route-table"
+=======
+  name                = module.naming.route_table
+>>>>>>> 900395d (naming)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 >>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf

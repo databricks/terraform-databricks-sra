@@ -48,14 +48,19 @@ output "vnet_name" {
 
 output "metastore_id" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   value       = length(databricks_metastore.this) > 0 ? databricks_metastore.this[0].id : null
 =======
   value = length(databricks_metastore.this) > 0 ? databricks_metastore.this[0].id : null
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+  value       = length(databricks_metastore.this) > 0 ? databricks_metastore.this[0].id : null
+>>>>>>> 900395d (naming)
   description = "The unique ID of the Databricks Metastore."
 }
 
 output "is_unity_catalog_enabled" {
+<<<<<<< HEAD
 <<<<<<< HEAD
   value       = var.is_unity_catalog_enabled
   description = "If UC creation is enabled"
@@ -63,6 +68,9 @@ output "is_unity_catalog_enabled" {
 
 =======
   value = var.is_unity_catalog_enabled
+=======
+  value       = var.is_unity_catalog_enabled
+>>>>>>> 900395d (naming)
   description = "If UC creation is enabled"
 }
 
@@ -127,10 +135,6 @@ output "resource_suffix" {
 output "tenant_id" {
   value       = local.tenant_id
   description = "The tenant ID of the Azure subscription, identifying the Azure AD instance."
-}
-
-output "test_vm_public_ip" {
-  value = length(azurerm_public_ip.testvmpublicip) > 0 ? azurerm_public_ip.testvmpublicip[0].ip_address : ""
 }
 
 output "my_ip_addr" {

@@ -9,8 +9,12 @@ resource "azurerm_key_vault" "this" {
 resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD
   name                     = "${local.prefix}-kv"
 >>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
+=======
+  name                     = module.naming.key_vault
+>>>>>>> 900395d (naming)
   location                 = azurerm_resource_group.this.location
   resource_group_name      = azurerm_resource_group.this.name
   tenant_id                = var.client_config.tenant_id
@@ -30,11 +34,15 @@ resource "azurerm_key_vault" "this" {
 resource "azurerm_key_vault_key" "managed_services" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   name         = "${module.naming.key_vault_key.name}-adb-services"
 =======
   name         = "${local.prefix}-adb-services"
 >>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
+=======
+  name         = "${module.naming.key_vault_key}-adb-services"
+>>>>>>> 900395d (naming)
   key_vault_id = azurerm_key_vault.this[0].id
   key_type     = "RSA"
   key_size     = 2048
@@ -61,11 +69,15 @@ resource "azurerm_key_vault_key" "managed_services" {
 resource "azurerm_key_vault_key" "managed_disk" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   name         = "${module.naming.key_vault_key.name}-adb-disk"
 =======
   name         = "${local.prefix}-adb-disk"
 >>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
+=======
+  name         = "${module.naming.key_vault_key}-adb-disk"
+>>>>>>> 900395d (naming)
   key_vault_id = azurerm_key_vault.this[0].id
   key_type     = "RSA"
   key_size     = 2048
@@ -145,11 +157,15 @@ resource "azurerm_private_dns_zone" "key_vault" {
 resource "azurerm_private_endpoint" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   name                = "${module.naming.private_endpoint.name}-kv"
 =======
   name                = "${local.prefix}-kv-pe"
 >>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
+=======
+  name                = "${module.naming.private_endpoint}-kv"
+>>>>>>> 900395d (naming)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
@@ -172,11 +188,15 @@ resource "azurerm_private_endpoint" "key_vault" {
 resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   name                  = "${var.resource_suffix}-keyvault-vnetlink"
 =======
   name                  = "${local.prefix}-keyvault-vnetlink"
 >>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
+=======
+  name                  = "${var.resource_suffix}-keyvault-vnetlink"
+>>>>>>> 900395d (naming)
   resource_group_name   = azurerm_resource_group.this.name
   private_dns_zone_name = azurerm_private_dns_zone.key_vault[0].name
   virtual_network_id    = azurerm_virtual_network.this.id

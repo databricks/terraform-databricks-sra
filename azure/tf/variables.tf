@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+variable "application_id" {
+  type        = string
+  description = "(Required) Application ID in Hub unitycatalog.tf"
+}
+>>>>>>> 900395d (naming)
 variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
@@ -26,11 +33,17 @@ variable "public_repos" {
 variable "spoke_config" {
   type = map(object(
     {
+<<<<<<< HEAD
       resource_suffix          = string
       cidr                     = string
       tags                     = map(string)
       is_unity_catalog_enabled = optional(bool, true)
       storage_account_name     = optional(string, null)
+=======
+      resource_suffix = string
+      cidr            = string
+      tags            = map(string)
+>>>>>>> 900395d (naming)
     }
   ))
   description = "(Required) List of spoke configurations"
@@ -84,5 +97,5 @@ variable "sat_service_principal" {
 variable "databricks_metastore_id" {
   type        = string
   default     = ""
-  description = "Required if is_unity_catalog_enabled = false"  
+  description = "Required if is_unity_catalog_enabled = false"
 }

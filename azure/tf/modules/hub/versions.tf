@@ -8,10 +8,15 @@ terraform {
       source  = "databricks/databricks"
       version = ">=1.24.1"
     }
+<<<<<<< HEAD
     random = {
       source  = "hashicorp/random"
       version = ">=3.0"
     }
   }
   required_version = ">=1.9.8"
+=======
+  }
+  required_version = "~>1.9.8"
+>>>>>>> 900395d (naming)
 }

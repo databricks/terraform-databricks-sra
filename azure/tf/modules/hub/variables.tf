@@ -129,7 +129,16 @@ variable "application_id" {
 
 variable "firewall_sku" {
   type        = string
-  description = "SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
+  description = "(Optional) SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
   default     = "Standard"
 }
+<<<<<<< HEAD
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+
+variable "resource_suffix" {
+  type        = string
+  description = "(Optional) Naming resource_suffix for resources"
+  default     = "hub"
+}
+>>>>>>> 900395d (naming)

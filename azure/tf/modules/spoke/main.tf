@@ -20,14 +20,22 @@ locals {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
+<<<<<<< HEAD
   version = "~>0.4"
+=======
+  version = "0.4.1"
+>>>>>>> 900395d (naming)
   suffix  = [var.resource_suffix]
 }
 
 
 # Create a resource group
 resource "azurerm_resource_group" "this" {
+<<<<<<< HEAD
   name     = module.naming.resource_group.name
+=======
+  name     = module.naming.resource_group
+>>>>>>> 900395d (naming)
   location = var.location
 
   tags = var.tags
@@ -35,7 +43,11 @@ resource "azurerm_resource_group" "this" {
 
 # Create a virtual network
 resource "azurerm_virtual_network" "this" {
+<<<<<<< HEAD
   name                = module.naming.virtual_network.name
+=======
+  name                = module.naming.virtual_network
+>>>>>>> 900395d (naming)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.vnet_cidr]
@@ -45,7 +57,11 @@ resource "azurerm_virtual_network" "this" {
 
 # Create a network security group
 resource "azurerm_network_security_group" "this" {
+<<<<<<< HEAD
   name                = module.naming.network_security_group.name
+=======
+  name                = module.naming.network_security_group
+>>>>>>> 900395d (naming)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 
@@ -66,7 +82,11 @@ resource "azurerm_subnet_network_security_group_association" "host" {
 
 # Create the container subnet
 resource "azurerm_subnet" "container" {
+<<<<<<< HEAD
   name                 = "${module.naming.subnet.name}-container"
+=======
+  name                 = "${module.naming.subnet}-container"
+>>>>>>> 900395d (naming)
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
 
@@ -88,7 +108,11 @@ resource "azurerm_subnet" "container" {
 
 # Create the host subnet
 resource "azurerm_subnet" "host" {
+<<<<<<< HEAD
   name                 = "${module.naming.subnet.name}-host"
+=======
+  name                 = "${module.naming.subnet}-host"
+>>>>>>> 900395d (naming)
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
 
@@ -110,6 +134,7 @@ resource "azurerm_subnet" "host" {
 
 # Create the privatelink subnet
 resource "azurerm_subnet" "privatelink" {
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/spoke/main.tf
   name                 = "${module.naming.subnet.name}-pl"
   resource_group_name  = azurerm_resource_group.this.name
@@ -119,6 +144,11 @@ resource "azurerm_subnet" "privatelink" {
   resource_group_name                       = azurerm_resource_group.this.name
   virtual_network_name                      = azurerm_virtual_network.this.name
 >>>>>>> 78672ae (fix plan errors with Azure deployment):azure/tf/modules/azure_spoke/main.tf
+=======
+  name                 = "${module.naming.subnet}-pl"
+  resource_group_name  = azurerm_resource_group.this.name
+  virtual_network_name = azurerm_virtual_network.this.name
+>>>>>>> 900395d (naming)
 
   address_prefixes = [local.subnets["privatelink"]]
 }
