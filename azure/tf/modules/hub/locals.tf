@@ -21,9 +21,6 @@ locals {
   # Get the tenant ID from the current Azure client configuration
   tenant_id = data.azurerm_client_config.current.tenant_id
 
-  # Generate a prefix for naming resources by combining the hub resource group name and a random string
-  prefix = replace(replace(lower("${var.hub_resource_group_name}${random_string.naming.result}"), "rg", ""), "-", "")
-
   subnet_map = var.subnet_map
 
   ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)

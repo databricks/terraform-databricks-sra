@@ -1,6 +1,6 @@
 variable "application_id" {
-	type = string
-	description = "(Required) Application ID in Hub unitycatalog.tf"
+  type        = string
+  description = "(Required) Application ID in Hub unitycatalog.tf"
 }
 variable "databricks_account_id" {
   type        = string
@@ -35,9 +35,9 @@ variable "public_repos" {
 variable "spoke_config" {
   type = list(object(
     {
-      prefix = string
-      cidr   = string
-      tags   = map(string)
+      resource_suffix = string
+      cidr            = string
+      tags            = map(string)
     }
   ))
   description = "(Required) List of spoke configurations"
@@ -67,5 +67,5 @@ variable "databricks_app_object_id" {
 variable "databricks_metastore_id" {
   type        = string
   default     = ""
-  description = "Required if is_unity_catalog_enabled = false"  
+  description = "Required if is_unity_catalog_enabled = false"
 }
