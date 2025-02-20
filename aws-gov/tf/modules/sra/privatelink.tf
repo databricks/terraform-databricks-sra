@@ -243,7 +243,7 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
     principals {
       type = "AWS"
       identifiers = [
-      "*" // "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:user/databricks-datasets-readonly-user-prod", "${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"
+      "${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}" // "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:user/databricks-datasets-readonly-user-prod", "${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"
       ]
     }
   }
