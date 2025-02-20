@@ -1,21 +1,14 @@
-# Why do `key_opts` and `key_permissions` differ in terms of required capitalization?
-# Define the Azure Key Vault resource
 resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
   name                     = module.naming.key_vault
   location                 = azurerm_resource_group.this.location
   resource_group_name      = azurerm_resource_group.this.name
-  tenant_id                = local.tenant_id
+  tenant_id                = data.azurerm_client_config.current.tenant_id
   purge_protection_enabled = true
-  # enable_rbac_authorization = true
 
   sku_name                   = "premium"
   soft_delete_retention_days = 7
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
 }
 
 # Define a key in the Azure Key Vault for managed services

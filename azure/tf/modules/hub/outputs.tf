@@ -71,7 +71,3 @@ output "tenant_id" {
   value       = local.tenant_id
   description = "The tenant ID of the Azure subscription, identifying the Azure AD instance."
 }
-
-output "my_ip_addr" {
-  value = local.ifconfig_co_json.ip
-}

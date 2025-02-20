@@ -1,7 +1,7 @@
 # Define an Azure Databricks workspace resource
 resource "azurerm_databricks_workspace" "this" {
   # name                = "${var.resource_suffix}-adb-workspace"
-  name                = module.naming.databricks_workspace
+  name                = module.naming.databricks_workspace.name
   resource_group_name = azurerm_resource_group.this.name
   location            = var.location
   sku                 = "premium"
@@ -44,23 +44,8 @@ resource "azurerm_key_vault_access_policy" "databricks" {
   count = var.is_kms_enabled ? 1 : 0
 
   key_vault_id = var.key_vault_id
-  tenant_id    = azurerm_databricks_workspace.this.storage_account_identity.0.tenant_id
-  object_id    = azurerm_databricks_workspace.this.storage_account_identity.0.principal_id
-
-  key_permissions = [
-    "Get",
-    "UnwrapKey",
-    "WrapKey",
-  ]
-}
-
-# Define an Azure Key Vault access policy for managed disks
-resource "azurerm_key_vault_access_policy" "managed" {
-  count = var.is_kms_enabled ? 1 : 0
-
-  key_vault_id = var.key_vault_id
-  tenant_id    = var.tenant_id
-  object_id    = var.databricks_app_object_id
+  tenant_id    = azurerm_databricks_workspace.this.storage_account_identity[0].tenant_id
+  object_id    = azurerm_databricks_workspace.this.storage_account_identity[0].principal_id
 
   key_permissions = [
     "Get",
@@ -71,6 +56,7 @@ resource "azurerm_key_vault_access_policy" "managed" {
 
 # Define a Databricks metastore assignment
 resource "databricks_metastore_assignment" "this" {
+  count = var.is_kms_enabled ? 1 : 0
   # may need to use an explicit workspace-authenticated provider here
   # provider = databricks.workspace
   workspace_id = azurerm_databricks_workspace.this.workspace_id
