@@ -16,7 +16,7 @@ resource "azurerm_databricks_access_connector" "unity_catalog" {
 resource "azurerm_storage_account" "unity_catalog" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 
-  name                          = "${module.naming.storage_account}-uc"
+  name                          = "${module.naming.storage_account.name}uc"
   resource_group_name           = azurerm_resource_group.this.name
   location                      = azurerm_resource_group.this.location
   account_tier                  = "Standard"
@@ -41,7 +41,7 @@ resource "azurerm_storage_container" "unity_catalog" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 
   name                  = "default"
-  storage_account_id    = azurerm_storage_account.unity_catalog[0].name
+  storage_account_id    = azurerm_storage_account.unity_catalog[0].id
   container_access_type = "private"
 }
 
@@ -92,6 +92,8 @@ resource "databricks_metastore_data_access" "this" {
   azure_managed_identity {
     access_connector_id = azurerm_databricks_access_connector.unity_catalog[0].id
   }
+
+  force_destroy = true
 
   is_default = true
 

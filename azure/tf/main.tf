@@ -86,9 +86,13 @@ module "hub" {
   is_kms_enabled           = false
   is_firewall_enabled      = false
   is_test_vm_enabled       = false
+<<<<<<< HEAD
 >>>>>>> 721eaf9 (fix linting)
   is_unity_catalog_enabled = false
 >>>>>>> 58ad671 (make uc creation optional)
+=======
+  is_unity_catalog_enabled = true
+>>>>>>> 6a026d7 (UC force-destroy)
 }
 
 <<<<<<< HEAD
