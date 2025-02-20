@@ -136,8 +136,11 @@ output "tenant_id" {
   value       = local.tenant_id
   description = "The tenant ID of the Azure subscription, identifying the Azure AD instance."
 }
+<<<<<<< HEAD
 
 output "my_ip_addr" {
   value = local.ifconfig_co_json.ip
 >>>>>>> 60cc2bc (remove redundant module naming)
 }
+=======
+>>>>>>> 6df143a (deployed without UC)

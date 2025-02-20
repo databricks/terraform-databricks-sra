@@ -23,8 +23,12 @@ resource "azurerm_databricks_workspace" "this" {
   name                = "${var.prefix}-adb-workspace"
 =======
   # name                = "${var.resource_suffix}-adb-workspace"
+<<<<<<< HEAD
   name                = module.naming.databricks_workspace
 >>>>>>> 900395d (naming)
+=======
+  name                = module.naming.databricks_workspace.name
+>>>>>>> 6df143a (deployed without UC)
   resource_group_name = azurerm_resource_group.this.name
   location            = var.location
   sku                 = "premium"
@@ -81,6 +85,7 @@ resource "azurerm_key_vault_access_policy" "databricks" {
   count = var.is_kms_enabled ? 1 : 0
 
   key_vault_id = var.key_vault_id
+<<<<<<< HEAD
   tenant_id    = azurerm_databricks_workspace.this.storage_account_identity.0.tenant_id
   object_id    = azurerm_databricks_workspace.this.storage_account_identity.0.principal_id
 >>>>>>> 60cc2bc (remove redundant module naming)
@@ -106,6 +111,10 @@ resource "azurerm_key_vault_access_policy" "managed" {
   tenant_id    = var.tenant_id
   object_id    = var.databricks_app_object_id
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+  tenant_id    = azurerm_databricks_workspace.this.storage_account_identity[0].tenant_id
+  object_id    = azurerm_databricks_workspace.this.storage_account_identity[0].principal_id
+>>>>>>> 6df143a (deployed without UC)
 
   key_permissions = [
     "Get",
@@ -117,6 +126,7 @@ resource "azurerm_key_vault_access_policy" "managed" {
 # Define a Databricks metastore assignment
 resource "databricks_metastore_assignment" "this" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   count        = var.is_kms_enabled ? 1 : 0
   workspace_id = azurerm_databricks_workspace.this.workspace_id
   metastore_id = var.metastore_id
@@ -127,6 +137,9 @@ resource "databricks_mws_ncc_binding" "this" {
   workspace_id                   = azurerm_databricks_workspace.this.workspace_id
 }
 =======
+=======
+  count = var.is_kms_enabled ? 1 : 0
+>>>>>>> 6df143a (deployed without UC)
   # may need to use an explicit workspace-authenticated provider here
   # provider = databricks.workspace
   workspace_id = azurerm_databricks_workspace.this.workspace_id

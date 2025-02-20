@@ -16,12 +16,20 @@ resource "azurerm_databricks_access_connector" "unity_catalog" {
 resource "azurerm_storage_account" "unity_catalog" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 
-  name                     = "${module.naming.storage_account}-uc"
-  resource_group_name      = azurerm_resource_group.this.name
-  location                 = azurerm_resource_group.this.location
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
-  is_hns_enabled           = true
+  name                          = "${module.naming.storage_account}-uc"
+  resource_group_name           = azurerm_resource_group.this.name
+  location                      = azurerm_resource_group.this.location
+  account_tier                  = "Standard"
+  account_replication_type      = "GRS"
+  is_hns_enabled                = true
+  public_network_access_enabled = false
+  network_rules {
+    default_action = "Deny"
+    bypass         = ["None"]
+    private_link_access {
+      endpoint_resource_id = azurerm_databricks_access_connector.unity_catalog[0].id
+    }
+  }
 
   lifecycle {
     ignore_changes = [tags]
@@ -81,10 +89,8 @@ resource "databricks_metastore_data_access" "this" {
 
   metastore_id = databricks_metastore.this[0].id
   name         = "${var.resource_suffix}-dac"
-  azure_service_principal {
-    directory_id   = local.tenant_id
-    application_id = var.application_id
-    client_secret  = var.client_secret
+  azure_managed_identity {
+    access_connector_id = azurerm_databricks_access_connector.unity_catalog[0].id
   }
 
   is_default = true

@@ -24,12 +24,15 @@ variable "is_test_vm_enabled" {
   default     = true
 }
 
+<<<<<<< HEAD
 variable "test_vm_password" {
   type        = string
   description = "(Required) Password for the test VM"
 }
 
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> 6df143a (deployed without UC)
 variable "is_unity_catalog_enabled" {
   type        = bool
   description = "(Optional - default to true) Enable creation of new UC"
@@ -83,6 +86,7 @@ variable "tags" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 variable "firewall_sku" {
   type        = string
   description = "(Optional) SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
@@ -127,6 +131,8 @@ variable "application_id" {
   description = "(Required) The unique identifier for the application for the service principal"
 }
 
+=======
+>>>>>>> 6df143a (deployed without UC)
 variable "firewall_sku" {
   type        = string
   description = "(Optional) SKU tier of the Firewall. Possible values are Premium, Standard and Basic"

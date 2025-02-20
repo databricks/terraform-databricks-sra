@@ -1,10 +1,14 @@
 # Define a private endpoint resource for the backend
 resource "azurerm_private_endpoint" "backend" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   name                = "${module.naming.private_endpoint.name_unique}-backend"
 =======
   name                = "${module.naming.private_endpoint}-backend"
 >>>>>>> 900395d (naming)
+=======
+  name                = "${module.naming.private_endpoint.name_unique}-backend"
+>>>>>>> 6df143a (deployed without UC)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id

@@ -12,19 +12,22 @@ locals {
 =======
 
   # Define a regular expression pattern to extract subscription ID and resource group from the resource group ID
-  resource_regex = "/subscriptions/(.+)/resourceGroups/(.+)"
+  # resource_regex = "/subscriptions/(.+)/resourceGroups/(.+)"
 
   # Extract the subscription ID using the regular expression pattern
-  subscription_id = regex(local.resource_regex, azurerm_resource_group.this.id)[0]
+  # subscription_id = regex(local.resource_regex, azurerm_resource_group.this.id)[0]
 
   # Extract the resource group using the regular expression pattern
-  resource_group = regex(local.resource_regex, azurerm_resource_group.this.id)[1]
+  # resource_group = regex(local.resource_regex, azurerm_resource_group.this.id)[1]
 
   # Get the tenant ID from the current Azure client configuration
   tenant_id = data.azurerm_client_config.current.tenant_id
 
   subnet_map = var.subnet_map
 
+<<<<<<< HEAD
   ifconfig_co_json = jsondecode(data.http.my_public_ip.response_body)
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> 6df143a (deployed without UC)
 }

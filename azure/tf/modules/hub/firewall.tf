@@ -236,7 +236,10 @@ resource "azurerm_ip_group" "this" {
 # Create an Azure route table resource
 resource "azurerm_route_table" "this" {
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
+=======
+>>>>>>> 6df143a (deployed without UC)
   name                = module.naming.route_table.name
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name

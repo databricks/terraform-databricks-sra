@@ -17,6 +17,10 @@ terraform {
   required_version = ">=1.9.8"
 =======
   }
+<<<<<<< HEAD
   required_version = "~>1.9.8"
 >>>>>>> 900395d (naming)
+=======
+  required_version = ">=1.9.8"
+>>>>>>> 6df143a (deployed without UC)
 }

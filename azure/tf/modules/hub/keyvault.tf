@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
 resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
@@ -6,6 +7,8 @@ resource "azurerm_key_vault" "this" {
 =======
 # Why do `key_opts` and `key_permissions` differ in terms of required capitalization?
 # Define the Azure Key Vault resource
+=======
+>>>>>>> 6df143a (deployed without UC)
 resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
@@ -17,6 +20,7 @@ resource "azurerm_key_vault" "this" {
 >>>>>>> 900395d (naming)
   location                 = azurerm_resource_group.this.location
   resource_group_name      = azurerm_resource_group.this.name
+<<<<<<< HEAD
   tenant_id                = var.client_config.tenant_id
   purge_protection_enabled = true
 <<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
@@ -28,6 +32,13 @@ resource "azurerm_key_vault" "this" {
   soft_delete_retention_days = 7
 
   tags = var.tags
+=======
+  tenant_id                = data.azurerm_client_config.current.tenant_id
+  purge_protection_enabled = true
+
+  sku_name                   = "premium"
+  soft_delete_retention_days = 7
+>>>>>>> 6df143a (deployed without UC)
 }
 
 # Define a key in the Azure Key Vault for managed services

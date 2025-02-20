@@ -1,10 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 variable "application_id" {
   type        = string
   description = "(Required) Application ID in Hub unitycatalog.tf"
 }
 >>>>>>> 900395d (naming)
+=======
+# variable "application_id" {
+#   type        = string
+#   description = "(Required) Application ID in Hub unitycatalog.tf"
+# }
+>>>>>>> 6df143a (deployed without UC)
 variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
@@ -55,6 +62,7 @@ variable "tags" {
   default     = {}
 }
 
+<<<<<<< HEAD
 variable "databricks_metastore_id" {
   type        = string
   default     = ""
@@ -93,9 +101,25 @@ variable "sat_service_principal" {
   description = "(Optional) Service principal configuration for running SAT. If this is not provided, a service principal will be created. The created service principal name can be configured with the name field in this variable."
   sensitive   = true
 }
+=======
+# variable "client_secret" {
+#   type        = string
+#   description = "(Required) The client secret for the service principal"
+# }
+#
+# variable "databricks_app_object_id" {
+#   type        = string
+#   description = "(Required) The object ID of the AzureDatabricks App Registration"
+# }
+>>>>>>> 6df143a (deployed without UC)
 
 variable "databricks_metastore_id" {
   type        = string
   default     = ""
   description = "Required if is_unity_catalog_enabled = false"
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "(Required) Azure Subscription ID to deploy into"
 }
