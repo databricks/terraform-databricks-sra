@@ -270,7 +270,13 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
 
     principals {
       type = "AWS"
+<<<<<<< HEAD
       identifiers = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
+=======
+      identifiers = [
+      "*" // "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:user/databricks-datasets-readonly-user-prod", "${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"
+      ]
+>>>>>>> 267f853 (Update privatelink.tf)
     }
   }
 }
