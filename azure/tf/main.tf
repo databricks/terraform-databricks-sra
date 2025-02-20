@@ -50,7 +50,7 @@ module "hub" {
   is_kms_enabled           = false
   is_firewall_enabled      = false
   is_test_vm_enabled       = false
-  is_unity_catalog_enabled = false
+  is_unity_catalog_enabled = true
 }
 
 # Define module "spoke" with a for_each loop to iterate over each spoke configuration
