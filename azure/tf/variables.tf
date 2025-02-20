@@ -1,7 +1,7 @@
-variable "application_id" {
-  type        = string
-  description = "(Required) Application ID in Hub unitycatalog.tf"
-}
+# variable "application_id" {
+#   type        = string
+#   description = "(Required) Application ID in Hub unitycatalog.tf"
+# }
 variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
@@ -33,7 +33,7 @@ variable "public_repos" {
 }
 
 variable "spoke_config" {
-  type = list(object(
+  type = map(object(
     {
       resource_suffix = string
       cidr            = string
@@ -43,29 +43,29 @@ variable "spoke_config" {
   description = "(Required) List of spoke configurations"
 }
 
-variable "test_vm_password" {
-  type        = string
-  description = "(Required) Password for the VM to be deployed in the hub for testing (in the absence of ExpressRoute etc.)"
-}
-
 variable "tags" {
   type        = map(string)
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
 }
 
-variable "client_secret" {
-  type        = string
-  description = "(Required) The client secret for the service principal"
-}
-
-variable "databricks_app_object_id" {
-  type        = string
-  description = "(Required) The object ID of the AzureDatabricks App Registration"
-}
+# variable "client_secret" {
+#   type        = string
+#   description = "(Required) The client secret for the service principal"
+# }
+#
+# variable "databricks_app_object_id" {
+#   type        = string
+#   description = "(Required) The object ID of the AzureDatabricks App Registration"
+# }
 
 variable "databricks_metastore_id" {
   type        = string
   default     = ""
   description = "Required if is_unity_catalog_enabled = false"
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "(Required) Azure Subscription ID to deploy into"
 }

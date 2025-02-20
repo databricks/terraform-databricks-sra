@@ -22,11 +22,6 @@ variable "is_test_vm_enabled" {
   default     = true
 }
 
-variable "test_vm_password" {
-  type        = string
-  description = "(Required) Password for the test VM"
-}
-
 variable "is_unity_catalog_enabled" {
   type        = bool
   description = "(Optional - default to true) Enable creation of new UC"
@@ -74,16 +69,6 @@ variable "tags" {
   type        = map(string)
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
-}
-
-variable "client_secret" {
-  type        = string
-  description = "(Required) The client secret for the service principal"
-}
-
-variable "application_id" {
-  type        = string
-  description = "(Required) The unique identifier for the application for the service principal"
 }
 
 variable "firewall_sku" {

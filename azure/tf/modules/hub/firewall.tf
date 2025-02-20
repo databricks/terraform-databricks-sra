@@ -161,7 +161,7 @@ resource "azurerm_ip_group" "this" {
 
 # Create an Azure route table resource
 resource "azurerm_route_table" "this" {
-  name                = module.naming.route_table
+  name                = module.naming.route_table.name
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 }
