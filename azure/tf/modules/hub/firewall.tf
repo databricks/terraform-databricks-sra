@@ -6,15 +6,14 @@ resource "azurerm_subnet" "firewall" {
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
 
-  address_prefixes = [local.subnet_map["firewall"]]
+  address_prefixes = [var.subnet_map["firewall"]]
 }
 
 # Define a public IP resource for the Azure Firewall
 resource "azurerm_public_ip" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
-  #name                = "${local.resource_suffix}-fw-public-ip"
-  name                = module.naming.public_ip
+  name                = module.naming.public_ip.name_unique
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
@@ -29,9 +28,13 @@ resource "azurerm_public_ip" "this" {
 resource "azurerm_firewall_policy" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
-  name                = module.naming.firewall_policy
+  name                = module.naming.firewall_policy.name_unique
   resource_group_name = var.hub_resource_group_name
   location            = azurerm_resource_group.this.location
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Define a firewall policy rule collection group resource
@@ -49,6 +52,13 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
     action   = "Allow"
 
     # Define rules within the network rule collection
+    rule {
+      name                  = "adb-services"
+      protocols             = ["TCP", "UDP"]
+      source_ip_groups      = [azurerm_ip_group.this.id]
+      destination_addresses = ["AzureDatabricks"]
+      destination_ports     = ["443"]
+    }
     rule {
       name                  = "adb-storage"
       protocols             = ["TCP", "UDP"]
@@ -129,7 +139,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 resource "azurerm_firewall" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
-  name                = module.naming.firewall
+  name                = module.naming.firewall.name
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   sku_name            = "AZFW_VNet"
@@ -144,6 +154,10 @@ resource "azurerm_firewall" "this" {
     public_ip_address_id = azurerm_public_ip.this[0].id
   }
 
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
   depends_on = [
     resource.azurerm_firewall_policy_rule_collection_group.this
   ]
@@ -155,7 +169,7 @@ resource "azurerm_ip_group" "this" {
   location            = azurerm_resource_group.this.location
 
   lifecycle {
-    ignore_changes = [cidrs]
+    ignore_changes = [cidrs, tags]
   }
 }
 
@@ -164,6 +178,10 @@ resource "azurerm_route_table" "this" {
   name                = module.naming.route_table.name
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Create a route in the route table to direct traffic to the firewall

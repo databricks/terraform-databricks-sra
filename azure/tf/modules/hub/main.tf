@@ -36,5 +36,5 @@ resource "azurerm_subnet" "privatelink" {
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
 
-  address_prefixes = [local.subnet_map["privatelink"]]
+  address_prefixes = [var.subnet_map["privatelink"]]
 }
