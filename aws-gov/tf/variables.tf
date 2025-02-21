@@ -1,5 +1,10 @@
 data "aws_availability_zones" "available" {
-  state = "available"
+  state = "available" 
+}
+
+variable "admin_user" {
+  description = "Email of the admin user for the workspace and workspace catalog."
+  type        = string
 }
 
 variable "aws_account_id" {
@@ -35,17 +40,31 @@ variable "region" {
 }
 
 variable "region_name" {
-  description = "Name of the AWS region. (e.g. pendleton)"
-  type        = map(string)
+  description  = "Name of the AWS region. (e.g. pendleton)"
+  type         = map(string)
   default = {
     "civilian" = "pendleton"
-    "dod" = "pendleton-dod"
+    "dod"      = "pendleton-dod"
+  }
+}
+
+variable "region_bucket_name" {
+  description  = "Name of the AWS region. (e.g. pendleton)"
+  type         = map(string)
+  default = {
+    "civilian" = "pendleton"
+    "dod"      = "pendleton-dod"
   }
 }
 
 variable "resource_prefix" {
   description = "Prefix for the resource names."
   type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9-.]{1,40}$", var.resource_prefix))
+    error_message = "Invalid resource prefix. Allowed 40 characters containing only a-z, 0-9, -, ."
+  }
 }
 
 // AWS Gov Only Variables
@@ -53,7 +72,7 @@ variable "account_console" {
   type = map(string)
   default = {
     "civilian" = "https://accounts.cloud.databricks.us/"
-    "dod"      = "https://accounts-dod.cloud.databricks.us/"
+    "dod"      = "https://accounts-dod.cloud.databricks.mil/"
   }
 }
 
