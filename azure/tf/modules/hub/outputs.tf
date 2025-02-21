@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 output "client_config" {
   value       = data.azurerm_client_config.current
@@ -6,6 +7,8 @@ output "client_config" {
 }
 
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> 8d44021 (serverless and classic compute working)
 output "firewall_name" {
   value       = length(azurerm_firewall.this) > 0 ? azurerm_firewall.this[0].name : ""
   description = "The name of the Azure Firewall resource."
@@ -90,6 +93,7 @@ output "private_link_info" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 output "dns_zone_ids" {
   description = "Private DNS Zone IDs"
   value = {
@@ -135,6 +139,11 @@ output "resource_suffix" {
 output "tenant_id" {
   value       = local.tenant_id
   description = "The tenant ID of the Azure subscription, identifying the Azure AD instance."
+=======
+output "ncc_id" {
+  value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  description = "The ID of the hub regional Network Connectivity Config."
+>>>>>>> 8d44021 (serverless and classic compute working)
 }
 <<<<<<< HEAD
 

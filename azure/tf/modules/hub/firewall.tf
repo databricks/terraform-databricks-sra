@@ -14,6 +14,7 @@ resource "azurerm_public_ip" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name                = module.naming.public_ip.name_unique
 =======
@@ -23,6 +24,9 @@ resource "azurerm_public_ip" "this" {
   #name                = "${local.resource_suffix}-fw-public-ip"
   name                = module.naming.public_ip
 >>>>>>> 900395d (naming)
+=======
+  name                = module.naming.public_ip.name_unique
+>>>>>>> 8d44021 (serverless and classic compute working)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
@@ -50,9 +54,13 @@ resource "azurerm_firewall_policy" "this" {
 
 =======
 
-  name                = module.naming.firewall_policy
+  name                = module.naming.firewall_policy.name_unique
   resource_group_name = var.hub_resource_group_name
   location            = azurerm_resource_group.this.location
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 >>>>>>> 8af490c (make firewall optional):azure/tf/modules/azure_hub/firewall.tf
@@ -183,6 +191,7 @@ resource "azurerm_firewall" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   name                = module.naming.firewall.name
 =======
@@ -191,6 +200,9 @@ resource "azurerm_firewall" "this" {
 =======
   name                = module.naming.firewall
 >>>>>>> 900395d (naming)
+=======
+  name                = module.naming.firewall.name
+>>>>>>> 8d44021 (serverless and classic compute working)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   sku_name            = "AZFW_VNet"
@@ -205,7 +217,13 @@ resource "azurerm_firewall" "this" {
     public_ip_address_id = azurerm_public_ip.this[0].id
   }
 
+<<<<<<< HEAD
   tags = var.tags
+=======
+  lifecycle {
+    ignore_changes = [tags]
+  }
+>>>>>>> 8d44021 (serverless and classic compute working)
 
   depends_on = [
     azurerm_firewall_policy_rule_collection_group.this
@@ -229,7 +247,7 @@ resource "azurerm_ip_group" "this" {
 >>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf
 
   lifecycle {
-    ignore_changes = [cidrs]
+    ignore_changes = [cidrs, tags]
   }
 }
 
@@ -244,6 +262,7 @@ resource "azurerm_route_table" "this" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 
+<<<<<<< HEAD
   tags = var.tags
 =======
   name                = "${local.prefix}-route-table"
@@ -253,6 +272,11 @@ resource "azurerm_route_table" "this" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 >>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf
+=======
+  lifecycle {
+    ignore_changes = [tags]
+  }
+>>>>>>> 8d44021 (serverless and classic compute working)
 }
 
 # Create a route in the route table to direct traffic to the firewall

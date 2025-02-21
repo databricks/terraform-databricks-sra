@@ -9,6 +9,7 @@ locals {
     "eventhub" : "EventHub.${local.title_cased_location}"
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
   # Define a regular expression pattern to extract subscription ID and resource group from the resource group ID
@@ -30,4 +31,6 @@ locals {
 >>>>>>> 60cc2bc (remove redundant module naming)
 =======
 >>>>>>> 6df143a (deployed without UC)
+=======
+>>>>>>> 8d44021 (serverless and classic compute working)
 }

@@ -63,6 +63,7 @@ variable "tags" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 variable "databricks_metastore_id" {
   type        = string
   default     = ""
@@ -113,6 +114,8 @@ variable "sat_service_principal" {
 # }
 >>>>>>> 6df143a (deployed without UC)
 
+=======
+>>>>>>> 8d44021 (serverless and classic compute working)
 variable "databricks_metastore_id" {
   type        = string
   default     = ""

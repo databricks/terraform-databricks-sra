@@ -100,11 +100,15 @@ variable "resource_suffix" {
 }
 
 variable "client_config" {
+<<<<<<< HEAD
   type        = any
+=======
+>>>>>>> 8d44021 (serverless and classic compute working)
   description = "(Required) Result of data block `azurerm_client_config current`"
 }
 
 variable "databricks_app_reg" {
+<<<<<<< HEAD
   type        = any
   description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
 }
@@ -148,3 +152,7 @@ variable "resource_suffix" {
   default     = "hub"
 }
 >>>>>>> 900395d (naming)
+=======
+  description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
+}
+>>>>>>> 8d44021 (serverless and classic compute working)

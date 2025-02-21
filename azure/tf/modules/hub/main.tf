@@ -80,8 +80,12 @@ resource "azurerm_subnet" "privatelink" {
   virtual_network_name = azurerm_virtual_network.this.name
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   address_prefixes = [var.subnet_map["privatelink"]]
 =======
   address_prefixes = [local.subnet_map["privatelink"]]
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+  address_prefixes = [var.subnet_map["privatelink"]]
+>>>>>>> 8d44021 (serverless and classic compute working)
 }

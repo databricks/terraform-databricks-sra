@@ -156,7 +156,13 @@ resource "azurerm_private_dns_zone" "auth_front" {
   name                = "privatelink.azuredatabricks.net"
   resource_group_name = azurerm_resource_group.this.name
 
+<<<<<<< HEAD
   tags = var.tags
+=======
+  lifecycle {
+    ignore_changes = [tags]
+  }
+>>>>>>> 8d44021 (serverless and classic compute working)
 }
 
 # This resource block defines a private endpoint for webauth
@@ -166,9 +172,17 @@ resource "azurerm_private_endpoint" "webauth" {
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
 
+<<<<<<< HEAD
   tags = var.tags
 
   depends_on = [azurerm_subnet.privatelink, azurerm_private_endpoint.backend] # for proper destruction order and creation of only one PE at a time
+=======
+  lifecycle {
+    ignore_changes = [tags]
+  }
+
+  depends_on = [azurerm_subnet.privatelink] # for proper destruction order
+>>>>>>> 8d44021 (serverless and classic compute working)
 
   # This private_service_connection block specifies the connection details for the private endpoint
   private_service_connection {

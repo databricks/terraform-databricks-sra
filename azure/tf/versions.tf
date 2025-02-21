@@ -15,6 +15,7 @@ terraform {
     databricks = {
       source  = "databricks/databricks"
 <<<<<<< HEAD
+<<<<<<< HEAD
       version = "~>1.66"
     }
     azuread = {
@@ -23,6 +24,9 @@ terraform {
 =======
       version = "~>1.29"
 >>>>>>> 6df143a (deployed without UC)
+=======
+      version = "~>1.66"
+>>>>>>> 8d44021 (serverless and classic compute working)
     }
   }
   required_version = "~>1.9"

@@ -62,6 +62,8 @@ module "hub" {
   hub_resource_group_name = var.hub_resource_group_name
   hub_vnet_cidr           = var.hub_vnet_cidr
   subnet_map              = module.subnet_addrs.network_cidr_blocks
+  client_config           = data.azurerm_client_config.current
+  databricks_app_reg      = data.azuread_service_principal.this
   public_repos            = var.public_repos
   tags                    = var.tags
 <<<<<<< HEAD
@@ -69,6 +71,7 @@ module "hub" {
 =======
 
   #options
+<<<<<<< HEAD
 <<<<<<< HEAD
   is_kms_enabled = false
 <<<<<<< HEAD
@@ -85,6 +88,10 @@ module "hub" {
 =======
   is_kms_enabled           = false
   is_firewall_enabled      = false
+=======
+  is_kms_enabled           = true
+  is_firewall_enabled      = true
+>>>>>>> 8d44021 (serverless and classic compute working)
   is_test_vm_enabled       = false
 <<<<<<< HEAD
 >>>>>>> 721eaf9 (fix linting)
@@ -147,13 +154,15 @@ module "spoke" {
   managed_disk_key_id     = module.hub.managed_disk_key_id
   managed_services_key_id = module.hub.managed_services_key_id
   hub_private_link_info   = module.hub.private_link_info
-  tenant_id               = module.hub.tenant_id
+  client_config           = data.azurerm_client_config.current
+  databricks_app_reg      = data.azuread_service_principal.this
+  ncc_id                  = module.hub.ncc_id
 
   #options
-  is_kms_enabled                      = false
+  is_kms_enabled                      = true
   is_frontend_private_link_enabled    = false
   is_storage_private_endpoint_enabled = true
-  boolean_create_private_dbfs         = false
+  boolean_create_private_dbfs         = true
 
   depends_on = [module.hub]
 >>>>>>> d243d1c (make key vault optional on Azure)
