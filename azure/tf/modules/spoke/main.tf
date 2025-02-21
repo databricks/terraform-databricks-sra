@@ -14,7 +14,8 @@ locals {
   }
 
   # Generate a random string for dbfs_name
-  dbfs_name = join("", ["dbstorage", random_string.dbfsnaming.result])
+  dbfs_name       = join("", ["dbstorage", random_string.dbfsnaming.result])
+  managed_rg_name = join("", [module.naming.resource_group.name_unique, "adbmanaged"])
 }
 
 module "naming" {

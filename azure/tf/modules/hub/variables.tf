@@ -82,3 +82,11 @@ variable "resource_suffix" {
   description = "(Optional) Naming resource_suffix for resources"
   default     = "hub"
 }
+
+variable "client_config" {
+  description = "(Required) Result of data block `azurerm_client_config current`"
+}
+
+variable "databricks_app_reg" {
+  description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
+}
