@@ -1,21 +1,25 @@
 resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
-  name                     = module.naming.key_vault
+  name                     = module.naming.key_vault.name_unique
   location                 = azurerm_resource_group.this.location
   resource_group_name      = azurerm_resource_group.this.name
-  tenant_id                = data.azurerm_client_config.current.tenant_id
+  tenant_id                = var.client_config.tenant_id
   purge_protection_enabled = true
 
   sku_name                   = "premium"
   soft_delete_retention_days = 7
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Define a key in the Azure Key Vault for managed services
 resource "azurerm_key_vault_key" "managed_services" {
   count = var.is_kms_enabled ? 1 : 0
 
-  name         = "${module.naming.key_vault_key}-adb-services"
+  name         = "${module.naming.key_vault_key.name}-adb-services"
   key_vault_id = azurerm_key_vault.this[0].id
   key_type     = "RSA"
   key_size     = 2048
@@ -37,7 +41,7 @@ resource "azurerm_key_vault_key" "managed_services" {
 resource "azurerm_key_vault_key" "managed_disk" {
   count = var.is_kms_enabled ? 1 : 0
 
-  name         = "${module.naming.key_vault_key}-adb-disk"
+  name         = "${module.naming.key_vault_key.name}-adb-disk"
   key_vault_id = azurerm_key_vault.this[0].id
   key_type     = "RSA"
   key_size     = 2048
@@ -61,7 +65,7 @@ resource "azurerm_key_vault_access_policy" "terraform" {
 
   key_vault_id = azurerm_key_vault.this[0].id
   tenant_id    = azurerm_key_vault.this[0].tenant_id
-  object_id    = data.azurerm_client_config.current.object_id
+  object_id    = var.client_config.object_id
 
   key_permissions = [
     "Get",
@@ -82,17 +86,35 @@ resource "azurerm_key_vault_access_policy" "terraform" {
   ]
 }
 
+resource "azurerm_key_vault_access_policy" "databricks" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  key_vault_id = azurerm_key_vault.this[0].id
+  tenant_id    = var.client_config.tenant_id
+  object_id    = var.databricks_app_reg.object_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
 resource "azurerm_private_dns_zone" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
   name                = "privatelink.vaultcore.azure.net"
   resource_group_name = azurerm_resource_group.this.name
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 resource "azurerm_private_endpoint" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
-  name                = "${module.naming.private_endpoint}-kv"
+  name                = "${module.naming.private_endpoint.name}-kv"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
@@ -109,6 +131,9 @@ resource "azurerm_private_endpoint" "key_vault" {
     private_dns_zone_ids = [azurerm_private_dns_zone.key_vault[0].id]
   }
 
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
@@ -118,4 +143,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
   resource_group_name   = azurerm_resource_group.this.name
   private_dns_zone_name = azurerm_private_dns_zone.key_vault[0].name
   virtual_network_id    = azurerm_virtual_network.this.id
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }

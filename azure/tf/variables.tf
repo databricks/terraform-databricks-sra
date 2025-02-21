@@ -49,16 +49,6 @@ variable "tags" {
   default     = {}
 }
 
-# variable "client_secret" {
-#   type        = string
-#   description = "(Required) The client secret for the service principal"
-# }
-#
-# variable "databricks_app_object_id" {
-#   type        = string
-#   description = "(Required) The object ID of the AzureDatabricks App Registration"
-# }
-
 variable "databricks_metastore_id" {
   type        = string
   default     = ""

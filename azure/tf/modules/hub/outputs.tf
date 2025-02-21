@@ -1,8 +1,3 @@
-output "client_config" {
-  value       = data.azurerm_client_config.current
-  description = "The client configuration for the current Azure session, including subscription and authentication details."
-}
-
 output "firewall_name" {
   value       = length(azurerm_firewall.this) > 0 ? azurerm_firewall.this[0].name : ""
   description = "The name of the Azure Firewall resource."
@@ -67,7 +62,7 @@ output "private_link_info" {
   description = "Information related to the Private Link, including DNS Zone ID and Subnet ID for Private Link connectivity."
 }
 
-output "tenant_id" {
-  value       = local.tenant_id
-  description = "The tenant ID of the Azure subscription, identifying the Azure AD instance."
+output "ncc_id" {
+  value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  description = "The ID of the hub regional Network Connectivity Config."
 }

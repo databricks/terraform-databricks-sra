@@ -116,7 +116,15 @@ variable "hub_private_link_info" {
   description = "(Required) Hub Private link information"
 }
 
-variable "tenant_id" {
+variable "ncc_id" {
   type        = string
-  description = "(Required) The tenant ID for the Azure subscription"
+  description = "(Required) The ID of the regional hub Network Connectivity Config object to bind to ADB Workspace."
+}
+
+variable "client_config" {
+  description = "(Required) output of data block `azurerm_client_config current`"
+}
+
+variable "databricks_app_reg" {
+  description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
 }
