@@ -60,7 +60,7 @@ resource "aws_security_group" "sg" {
   dynamic "egress" {
     for_each = var.sg_egress_ports
     content {
-      description = "Databricks - Workspace SG - REST (443), Secure Cluster Connectivity (6666), Future Extendability (8443-8451)"
+      description = "Databricks - Workspace SG - REST (443), Secure Cluster Connectivity (2443/6666), Future Extendability (8443-8451)"
       from_port   = egress.value
       to_port     = egress.value
       protocol    = "tcp"

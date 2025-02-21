@@ -12,6 +12,10 @@ module "subnet_addrs" {
   base_cidr_block = var.hub_vnet_cidr
   networks = [
     {
+      name     = "privatelink"
+      new_bits = local.privatelink_newbits
+    },
+    {
       name     = "firewall"
       new_bits = local.firewall_newbits
     },
@@ -22,10 +26,6 @@ module "subnet_addrs" {
     {
       name     = "webauth-container"
       new_bits = local.webauth_newbits
-    },
-    {
-      name     = "privatelink"
-      new_bits = local.privatelink_newbits
     },
     {
       name     = "testvm"
