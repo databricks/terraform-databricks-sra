@@ -18,10 +18,7 @@ resource "azurerm_public_ip" "this" {
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
   sku                 = var.firewall_sku
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags                = var.tags
 }
 
 # Define a firewall policy resource
@@ -31,10 +28,7 @@ resource "azurerm_firewall_policy" "this" {
   name                = module.naming.firewall_policy.name_unique
   resource_group_name = var.hub_resource_group_name
   location            = azurerm_resource_group.this.location
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags                = var.tags
 }
 
 # Define a firewall policy rule collection group resource
@@ -154,9 +148,7 @@ resource "azurerm_firewall" "this" {
     public_ip_address_id = azurerm_public_ip.this[0].id
   }
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 
   depends_on = [
     resource.azurerm_firewall_policy_rule_collection_group.this
@@ -167,9 +159,10 @@ resource "azurerm_ip_group" "this" {
   name                = "${var.resource_suffix}-adb-subnets"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
+  tags                = var.tags
 
   lifecycle {
-    ignore_changes = [cidrs, tags]
+    ignore_changes = [cidrs]
   }
 }
 
@@ -179,9 +172,7 @@ resource "azurerm_route_table" "this" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }
 
 # Create a route in the route table to direct traffic to the firewall

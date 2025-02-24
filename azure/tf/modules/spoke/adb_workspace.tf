@@ -25,10 +25,6 @@ resource "azurerm_databricks_workspace" "this" {
   }
 
   tags = var.tags
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
 }
 
 resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
