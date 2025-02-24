@@ -1,10 +1,3 @@
-# Generate a random string for naming resources
-# resource "random_string" "naming" {
-#   special = false
-#   upper   = false
-#   length  = 6
-# }
-
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.1"
