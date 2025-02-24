@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Generate a random string for dbfsnaming
 resource "random_string" "dbfsnaming" {
   special = false
@@ -32,6 +33,8 @@ resource "random_string" "naming" {
 #   length  = 6
 # }
 
+=======
+>>>>>>> 2531551 (chore: Remove commented code)
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.1"

@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 variable "application_id" {
   type        = string
@@ -12,6 +13,8 @@ variable "application_id" {
 #   description = "(Required) Application ID in Hub unitycatalog.tf"
 # }
 >>>>>>> 6df143a (deployed without UC)
+=======
+>>>>>>> 2531551 (chore: Remove commented code)
 variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
