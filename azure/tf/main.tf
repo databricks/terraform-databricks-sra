@@ -91,6 +91,7 @@ module "hub" {
 =======
   is_kms_enabled           = true
   is_firewall_enabled      = true
+<<<<<<< HEAD
 >>>>>>> 8d44021 (serverless and classic compute working)
   is_test_vm_enabled       = false
 <<<<<<< HEAD
@@ -98,6 +99,8 @@ module "hub" {
   is_unity_catalog_enabled = false
 >>>>>>> 58ad671 (make uc creation optional)
 =======
+=======
+>>>>>>> 795c8e1 (chore: Remove unused variables)
   is_unity_catalog_enabled = true
 >>>>>>> 6a026d7 (UC force-destroy)
 }
@@ -153,16 +156,12 @@ module "spoke" {
   ipgroup_id              = module.hub.ipgroup_id
   managed_disk_key_id     = module.hub.managed_disk_key_id
   managed_services_key_id = module.hub.managed_services_key_id
-  hub_private_link_info   = module.hub.private_link_info
-  client_config           = data.azurerm_client_config.current
-  databricks_app_reg      = data.azuread_service_principal.this
   ncc_id                  = module.hub.ncc_id
 
   #options
-  is_kms_enabled                      = true
-  is_frontend_private_link_enabled    = false
-  is_storage_private_endpoint_enabled = true
-  boolean_create_private_dbfs         = true
+  is_kms_enabled                   = true
+  is_frontend_private_link_enabled = false
+  boolean_create_private_dbfs      = true
 
   depends_on = [module.hub]
 >>>>>>> d243d1c (make key vault optional on Azure)

@@ -17,6 +17,7 @@ variable "is_firewall_enabled" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 variable "is_test_vm_enabled" {
   type        = bool
@@ -33,6 +34,8 @@ variable "test_vm_password" {
 >>>>>>> 60cc2bc (remove redundant module naming)
 =======
 >>>>>>> 6df143a (deployed without UC)
+=======
+>>>>>>> 795c8e1 (chore: Remove unused variables)
 variable "is_unity_catalog_enabled" {
   type        = bool
   description = "(Optional - default to true) Enable creation of new UC"

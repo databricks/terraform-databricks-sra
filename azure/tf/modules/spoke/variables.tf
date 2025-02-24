@@ -125,18 +125,11 @@ variable "tags" {
 <<<<<<< HEAD:azure/tf/modules/spoke/variables.tf
 =======
 
-variable "hub_private_link_info" {
-  type = object({
-    dns_zone_id = string
-    subnet_id   = string
-  })
-  description = "(Required) Hub Private link information"
-}
-
 variable "ncc_id" {
   type        = string
   description = "(Required) The ID of the regional hub Network Connectivity Config object to bind to ADB Workspace."
 }
+<<<<<<< HEAD
 
 variable "client_config" {
   description = "(Required) output of data block `azurerm_client_config current`"
@@ -146,3 +139,5 @@ variable "databricks_app_reg" {
   description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
 }
 >>>>>>> 721eaf9 (fix linting):azure/tf/modules/azure_spoke/variables.tf
+=======
+>>>>>>> 795c8e1 (chore: Remove unused variables)
