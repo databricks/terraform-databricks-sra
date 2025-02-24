@@ -7,7 +7,8 @@ locals {
 }
 
 module "subnet_addrs" {
-  source = "hashicorp/subnets/cidr"
+  source  = "hashicorp/subnets/cidr"
+  version = "~>1.0"
 
   base_cidr_block = var.hub_vnet_cidr
   networks = [
