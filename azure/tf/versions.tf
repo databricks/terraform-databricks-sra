@@ -21,12 +21,15 @@ terraform {
     azuread = {
       source  = "hashicorp/azuread"
       version = "~>3.0"
+<<<<<<< HEAD
 =======
       version = "~>1.29"
 >>>>>>> 6df143a (deployed without UC)
 =======
       version = "~>1.66"
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+>>>>>>> 4c4551a (fix: Add missing version constraints to versions.tf)
     }
   }
   required_version = "~>1.9"
