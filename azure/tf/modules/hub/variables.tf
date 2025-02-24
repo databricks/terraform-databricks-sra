@@ -104,14 +104,21 @@ variable "resource_suffix" {
 
 variable "client_config" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = any
 =======
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+  type        = any
+>>>>>>> 3b1a557 (chore: Add missing descriptions and types to outputs and variables)
   description = "(Required) Result of data block `azurerm_client_config current`"
 }
 
 variable "databricks_app_reg" {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3b1a557 (chore: Add missing descriptions and types to outputs and variables)
   type        = any
   description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
 }
