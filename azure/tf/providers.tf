@@ -5,6 +5,7 @@ provider "azurerm" {
 
 provider "databricks" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   host       = "https://accounts.azuredatabricks.net"
   account_id = var.databricks_account_id
 }
@@ -32,4 +33,14 @@ provider "databricks" {
   azure_tenant_id = "***REMOVED***"
   # auth_type  = "azure-cli"
 >>>>>>> 6df143a (deployed without UC)
+=======
+  alias      = "accounts"
+  host       = "https://accounts.azuredatabricks.net"
+  account_id = var.databricks_account_id
+}
+
+provider "databricks" {
+  host       = "https://accounts.azuredatabricks.net"
+  account_id = var.databricks_account_id
+>>>>>>> dfb2809 (fix: Remove defaulted auth info on Databricks providers)
 }
