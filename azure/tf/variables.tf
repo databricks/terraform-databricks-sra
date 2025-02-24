@@ -1,7 +1,3 @@
-# variable "application_id" {
-#   type        = string
-#   description = "(Required) Application ID in Hub unitycatalog.tf"
-# }
 variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
