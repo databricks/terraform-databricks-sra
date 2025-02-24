@@ -25,9 +25,7 @@ resource "azurerm_virtual_network" "this" {
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.hub_vnet_cidr]
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }
 
 # Create the privatelink subnet
