@@ -82,13 +82,13 @@ variable "hub_vnet_id" {
 }
 
 variable "managed_disk_key_id" {
-  type    = string
-  default = "(Required) The key for managed disk encryption"
+  type        = string
+  description = "(Required) The key for managed disk encryption"
 }
 
 variable "managed_services_key_id" {
-  type    = string
-  default = "(Required) The key for the managed services encryption"
+  type        = string
+  description = "(Required) The key for the managed services encryption"
 }
 
 variable "resource_suffix" {
