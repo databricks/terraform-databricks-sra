@@ -300,9 +300,13 @@ resource "azurerm_route" "firewall_route" {
   route_table_name       = azurerm_route_table.this.name
   address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   next_hop_in_ip_address = azurerm_firewall.this[0].ip_configuration[0].private_ip_address
 =======
   next_hop_in_ip_address = azurerm_firewall.this[0].ip_configuration.0.private_ip_address
 >>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf
+=======
+  next_hop_in_ip_address = azurerm_firewall.this[0].ip_configuration[0].private_ip_address
+>>>>>>> 1f7336f (style: Access list index using bracket notation in route)
 }
