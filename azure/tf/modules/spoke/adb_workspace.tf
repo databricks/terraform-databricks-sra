@@ -64,12 +64,15 @@ resource "azurerm_databricks_workspace" "this" {
 
   tags = var.tags
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
   lifecycle {
     ignore_changes = [tags]
   }
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {

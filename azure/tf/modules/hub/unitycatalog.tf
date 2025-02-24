@@ -10,9 +10,8 @@ resource "azurerm_databricks_access_connector" "unity_catalog" {
   identity {
     type = "SystemAssigned"
   }
-  lifecycle {
-    ignore_changes = [tags]
-  }
+
+  tags = var.tags
 }
 
 # Define an Azure Storage Account resource
@@ -34,9 +33,7 @@ resource "azurerm_storage_account" "unity_catalog" {
     }
   }
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }
 
 # Define an Azure Storage Container resource

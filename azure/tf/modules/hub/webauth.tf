@@ -104,6 +104,7 @@ resource "azurerm_databricks_workspace" "webauth" {
   }
 
   tags = var.tags
+<<<<<<< HEAD
 }
 
 resource "azurerm_management_lock" "webauth" {
@@ -149,6 +150,8 @@ resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
   key_vault_key_id = azurerm_key_vault_key.managed_disk[0].id
 
   depends_on = [azurerm_key_vault_access_policy.databricks, azurerm_key_vault_access_policy.dbstorage]
+=======
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 # This resource block defines a private DNS zone Databricks
@@ -157,12 +160,16 @@ resource "azurerm_private_dns_zone" "auth_front" {
   resource_group_name = azurerm_resource_group.this.name
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags = var.tags
 =======
   lifecycle {
     ignore_changes = [tags]
   }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+  tags = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 # This resource block defines a private endpoint for webauth
@@ -173,6 +180,7 @@ resource "azurerm_private_endpoint" "webauth" {
   subnet_id           = azurerm_subnet.privatelink.id
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags = var.tags
 
   depends_on = [azurerm_subnet.privatelink, azurerm_private_endpoint.backend] # for proper destruction order and creation of only one PE at a time
@@ -180,6 +188,9 @@ resource "azurerm_private_endpoint" "webauth" {
   lifecycle {
     ignore_changes = [tags]
   }
+=======
+  tags = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 
   depends_on = [azurerm_subnet.privatelink] # for proper destruction order
 >>>>>>> 8d44021 (serverless and classic compute working)

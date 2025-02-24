@@ -65,12 +65,16 @@ resource "azurerm_virtual_network" "this" {
   address_space       = [var.hub_vnet_cidr]
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags = var.tags
 =======
   lifecycle {
     ignore_changes = [tags]
   }
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+  tags = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 # Create the privatelink subnet

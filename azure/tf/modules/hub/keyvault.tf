@@ -33,6 +33,7 @@ resource "azurerm_key_vault" "this" {
   soft_delete_retention_days = 7
 
   tags = var.tags
+<<<<<<< HEAD
 =======
   tenant_id                = data.azurerm_client_config.current.tenant_id
 =======
@@ -52,6 +53,8 @@ resource "azurerm_key_vault" "this" {
     ignore_changes = [tags]
   }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 # Define a key in the Azure Key Vault for managed services
@@ -188,12 +191,16 @@ resource "azurerm_private_dns_zone" "key_vault" {
   resource_group_name = azurerm_resource_group.this.name
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags = var.tags
 =======
   lifecycle {
     ignore_changes = [tags]
   }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+  tags = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 resource "azurerm_private_endpoint" "key_vault" {
@@ -229,12 +236,16 @@ resource "azurerm_private_endpoint" "key_vault" {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags = var.tags
 =======
   lifecycle {
     ignore_changes = [tags]
   }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+  tags = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
@@ -254,10 +265,14 @@ resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
   virtual_network_id    = azurerm_virtual_network.this.id
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags = var.tags
 =======
   lifecycle {
     ignore_changes = [tags]
   }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+  tags = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }

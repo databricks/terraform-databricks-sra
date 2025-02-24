@@ -31,6 +31,7 @@ resource "azurerm_public_ip" "this" {
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
   sku                 = var.firewall_sku
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/firewall.tf
   tags                = var.tags
 =======
@@ -39,6 +40,9 @@ resource "azurerm_public_ip" "this" {
     ignore_changes = [tags]
   }
 >>>>>>> 8af490c (make firewall optional):azure/tf/modules/azure_hub/firewall.tf
+=======
+  tags                = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 # Define a firewall policy resource
@@ -57,10 +61,7 @@ resource "azurerm_firewall_policy" "this" {
   name                = module.naming.firewall_policy.name_unique
   resource_group_name = var.hub_resource_group_name
   location            = azurerm_resource_group.this.location
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags                = var.tags
 }
 
 >>>>>>> 8af490c (make firewall optional):azure/tf/modules/azure_hub/firewall.tf
@@ -218,12 +219,16 @@ resource "azurerm_firewall" "this" {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags = var.tags
 =======
   lifecycle {
     ignore_changes = [tags]
   }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+  tags = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 
   depends_on = [
     azurerm_firewall_policy_rule_collection_group.this
@@ -237,6 +242,7 @@ resource "azurerm_ip_group" "this" {
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   tags                = var.tags
+<<<<<<< HEAD
 =======
   name                = "${local.prefix}-databricks-subnets"
 =======
@@ -245,9 +251,11 @@ resource "azurerm_ip_group" "this" {
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 >>>>>>> 7569a22 (moved route table changes back to firewall.tf):azure/tf/modules/azure_hub/firewall.tf
+=======
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 
   lifecycle {
-    ignore_changes = [cidrs, tags]
+    ignore_changes = [cidrs]
   }
 }
 
@@ -263,6 +271,7 @@ resource "azurerm_route_table" "this" {
   resource_group_name = azurerm_resource_group.this.name
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   tags = var.tags
 =======
   name                = "${local.prefix}-route-table"
@@ -277,6 +286,9 @@ resource "azurerm_route_table" "this" {
     ignore_changes = [tags]
   }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+  tags = var.tags
+>>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
 # Create a route in the route table to direct traffic to the firewall
