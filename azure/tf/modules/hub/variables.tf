@@ -78,9 +78,11 @@ variable "resource_suffix" {
 }
 
 variable "client_config" {
+  type        = any
   description = "(Required) Result of data block `azurerm_client_config current`"
 }
 
 variable "databricks_app_reg" {
+  type        = any
   description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
 }
