@@ -10,9 +10,7 @@ resource "azurerm_key_vault" "this" {
   sku_name                   = "premium"
   soft_delete_retention_days = 7
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }
 
 # Define a key in the Azure Key Vault for managed services
@@ -106,9 +104,7 @@ resource "azurerm_private_dns_zone" "key_vault" {
   name                = "privatelink.vaultcore.azure.net"
   resource_group_name = azurerm_resource_group.this.name
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }
 
 resource "azurerm_private_endpoint" "key_vault" {
@@ -131,9 +127,7 @@ resource "azurerm_private_endpoint" "key_vault" {
     private_dns_zone_ids = [azurerm_private_dns_zone.key_vault[0].id]
   }
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
@@ -144,7 +138,5 @@ resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
   private_dns_zone_name = azurerm_private_dns_zone.key_vault[0].name
   virtual_network_id    = azurerm_virtual_network.this.id
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }

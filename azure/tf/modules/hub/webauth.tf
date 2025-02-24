@@ -50,9 +50,7 @@ resource "azurerm_network_security_group" "webauth" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }
 
 # This resource block associates the container subnet with the webauth network security group
@@ -87,10 +85,6 @@ resource "azurerm_databricks_workspace" "webauth" {
   }
 
   tags = var.tags
-
-  lifecycle {
-    ignore_changes = [tags]
-  }
 }
 
 # This resource block defines a private DNS zone Databricks
@@ -98,9 +92,7 @@ resource "azurerm_private_dns_zone" "auth_front" {
   name                = "privatelink.azuredatabricks.net"
   resource_group_name = azurerm_resource_group.this.name
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 }
 
 # This resource block defines a private endpoint for webauth
@@ -110,9 +102,7 @@ resource "azurerm_private_endpoint" "webauth" {
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.privatelink.id
 
-  lifecycle {
-    ignore_changes = [tags]
-  }
+  tags = var.tags
 
   depends_on = [azurerm_subnet.privatelink] # for proper destruction order
 
