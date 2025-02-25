@@ -7,9 +7,25 @@ mock_provider "azurerm" {
       object_id = "00000000-0000-0000-0000-000000000000"
     }
   }
+<<<<<<< HEAD
   mock_data "azurerm_subscription" {
     defaults = {
       id = "/subscriptions/00000000-0000-0000-0000-000000000000"
+=======
+}
+
+mock_provider "azuread" {
+  mock_data "azuread_application_published_app_ids" {
+    defaults = {
+      result = {
+        AzureDataBricks = "00000000-0000-0000-0000-000000000000"
+      }
+    }
+  }
+  mock_data "azuread_service_principal" {
+    defaults = {
+      object_id = "00000000-0000-0000-0000-000000000000"
+>>>>>>> 9ec052c (tests(azure): Update test to include new requirements)
     }
   }
 }
@@ -39,6 +55,7 @@ run "plan_test_defaults" {
   command = plan
 }
 
+<<<<<<< HEAD
 run "plan_test_no_sat" {
   command = plan
   variables {
@@ -69,4 +86,22 @@ run "plan_test_sat_nondefaults" {
       catalog_name      = "notsat"
     }
   }
+=======
+variables {
+  databricks_account_id   = "databricks-account-id"
+  location                = "eastus2"
+  hub_vnet_cidr           = "10.0.0.0/23"
+  hub_resource_group_name = "rg-hub"
+  hub_vnet_name           = "vnet-hub"
+  spoke_config = {
+    spoke_a = {
+      resource_suffix = "spokea"
+      cidr            = "10.0.2.0/24"
+      tags = {
+        example = "value"
+      }
+    }
+  }
+  subscription_id = "00000"
+>>>>>>> 9ec052c (tests(azure): Update test to include new requirements)
 }
