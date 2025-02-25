@@ -19,6 +19,11 @@ resource "azurerm_private_endpoint" "backend" {
     private_dns_zone_ids = [azurerm_private_dns_zone.backend.id]
   }
 
+  # This resource does not literally depend on the CMK. However, if both the CMK and the PE are created at the same time
+  # one of them will fail. This is because the workspace is put in an "updating" state during either operation, blocking
+  # the other operation.
+  depends_on = [azurerm_databricks_workspace_root_dbfs_customer_managed_key.this]
+
   tags = var.tags
 }
 
