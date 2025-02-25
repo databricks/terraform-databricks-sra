@@ -67,8 +67,13 @@ module "hub" {
   public_repos            = var.public_repos
   tags                    = var.tags
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 55184a6 (fix missing application_id for sp)
 =======
+=======
+  storage_account_name    = var.hub_storage_account_name
+  resource_suffix         = var.hub_resource_suffix
+>>>>>>> 2c65617 (feat: Allow users to specify hub_storage_account_name and hub_resource_suffix variables to avoid name collision on hub SA)
 
   #options
 <<<<<<< HEAD

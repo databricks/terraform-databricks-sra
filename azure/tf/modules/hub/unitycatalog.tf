@@ -1,5 +1,13 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+locals {
+  # If the user provides a storage account name, use it. If they do not, check if the resource_suffix was left defaulted. If it was, generate a unique storage account name, else use a non-unique storage account name (assuming the resource suffix is unique).
+  storage_account_name = coalesce(var.storage_account_name, var.resource_suffix == "hub" ? "${module.naming.storage_account.name_unique}uc" : "${module.naming.storage_account.name}uc")
+}
+
+>>>>>>> 2c65617 (feat: Allow users to specify hub_storage_account_name and hub_resource_suffix variables to avoid name collision on hub SA)
 # Define an Azure Databricks access connector resource
 resource "azurerm_databricks_access_connector" "unity_catalog" {
   count = var.is_unity_catalog_enabled ? 1 : 0
@@ -18,7 +26,7 @@ resource "azurerm_databricks_access_connector" "unity_catalog" {
 resource "azurerm_storage_account" "unity_catalog" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 
-  name                          = "${module.naming.storage_account.name}uc"
+  name                          = local.storage_account_name
   resource_group_name           = azurerm_resource_group.this.name
   location                      = azurerm_resource_group.this.location
   account_tier                  = "Standard"
