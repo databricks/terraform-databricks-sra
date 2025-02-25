@@ -22,6 +22,18 @@ variable "hub_vnet_name" {
   description = "(Required) The name for the hub Virtual Network"
 }
 
+variable "hub_storage_account_name" {
+  type        = string
+  description = "(Optional) Name of the storage account created in hub (the metastore root storage account), will be generated if not provided"
+  default     = null
+}
+
+variable "hub_resource_suffix" {
+  type        = string
+  description = "(Optional} Resource suffix for naming resources in hub, 'hub' is used if not provided"
+  default     = "hub"
+}
+
 variable "public_repos" {
   type        = list(string)
   description = "(Optional) List of public repository IP addresses to allow access to."

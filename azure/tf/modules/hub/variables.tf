@@ -77,6 +77,12 @@ variable "resource_suffix" {
   default     = "hub"
 }
 
+variable "storage_account_name" {
+  type        = string
+  description = "(Optional) Name of the storage account created (the metastore root storage account), if not provided - a random name will be generated"
+  default     = null
+}
+
 variable "client_config" {
   type        = any
   description = "(Required) Result of data block `azurerm_client_config current`"
