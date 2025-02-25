@@ -48,6 +48,8 @@ module "hub" {
   databricks_app_reg      = data.azuread_service_principal.this
   public_repos            = var.public_repos
   tags                    = var.tags
+  storage_account_name    = var.hub_storage_account_name
+  resource_suffix         = var.hub_resource_suffix
 
   #options
   is_kms_enabled           = true
