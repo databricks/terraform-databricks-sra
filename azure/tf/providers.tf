@@ -6,6 +6,7 @@ provider "azurerm" {
 provider "databricks" {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   host       = "https://accounts.azuredatabricks.net"
   account_id = var.databricks_account_id
 }
@@ -40,6 +41,8 @@ provider "databricks" {
 }
 
 provider "databricks" {
+=======
+>>>>>>> 8c62cee (chore: Remove unused accounts provider)
   host       = "https://accounts.azuredatabricks.net"
   account_id = var.databricks_account_id
 >>>>>>> dfb2809 (fix: Remove defaulted auth info on Databricks providers)
