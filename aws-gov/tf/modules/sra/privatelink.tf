@@ -126,7 +126,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceAccount"
-      values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
+      values   = ["282567162347"]
     }
   }
 
@@ -180,7 +180,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
-      values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
+      values   = ["282567162347"]
     }
   }
 
