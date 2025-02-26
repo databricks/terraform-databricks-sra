@@ -143,10 +143,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       test     = "StringEquals"
       variable = "aws:ResourceAccount"
 <<<<<<< HEAD
+<<<<<<< HEAD
       values   = ["282567162347"]
 =======
       values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+      values   = ["282567162347"]
+>>>>>>> 2fb1e2f (Update privatelink.tf (aws-gov))
     }
   }
 
@@ -205,10 +209,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
 <<<<<<< HEAD
+<<<<<<< HEAD
       values   = ["282567162347"]
 =======
       values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+      values   = ["282567162347"]
+>>>>>>> 2fb1e2f (Update privatelink.tf (aws-gov))
     }
   }
 
