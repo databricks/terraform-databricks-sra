@@ -24,6 +24,12 @@ mock_provider "azuread" {
   }
 }
 
+mock_provider "databricks" {}
+
+mock_provider "databricks" {
+  alias = "SAT"
+}
+
 run "plan_test" {
   command = plan
 }
