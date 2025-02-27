@@ -44,4 +44,10 @@ variables {
     }
   }
   subscription_id = "00000"
+  sat_configuration = {
+    enabled                = true
+    service_principal_name = "sattst"
+    spoke                  = "spoke_a"
+    schema_name            = "sat"
+  }
 }
