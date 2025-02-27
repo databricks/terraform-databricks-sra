@@ -67,3 +67,23 @@ variable "subscription_id" {
   type        = string
   description = "(Required) Azure Subscription ID to deploy into"
 }
+
+variable "sat_configuration" {
+  type = object({
+    enabled                = optional(bool, false)
+    service_principal_name = string
+    spoke                  = optional(string, "")
+    schema_name            = string
+    proxies                = optional(map(any), {})
+    run_on_serverless      = optional(bool, false)
+  })
+  default = {
+    service_principal_name = ""
+    schema_name            = ""
+  }
+  validation {
+    condition     = var.sat_configuration.spoke == "" || contains(keys(var.spoke_config), var.sat_configuration.spoke)
+    error_message = "SAT spoke must be a spoke in the spoke_config variable"
+  }
+  description = "(Optional) Configuration for the SAT customization"
+}
