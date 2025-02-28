@@ -26,7 +26,7 @@ resource "azurerm_firewall_policy" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
   name                = module.naming.firewall_policy.name_unique
-  resource_group_name = var.hub_resource_group_name
+  resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   tags                = var.tags
 }

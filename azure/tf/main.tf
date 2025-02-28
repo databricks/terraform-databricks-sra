@@ -38,9 +38,7 @@ module "subnet_addrs" {
 # Pass the required variables to the module
 module "hub" {
   source = "./modules/hub"
-
   location                = var.location
-  hub_resource_group_name = var.hub_resource_group_name
   hub_vnet_cidr           = var.hub_vnet_cidr
   subnet_map              = module.subnet_addrs.network_cidr_blocks
   client_config           = data.azurerm_client_config.current

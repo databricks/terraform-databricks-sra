@@ -6,7 +6,7 @@ module "naming" {
 
 # Create the hub resource group
 resource "azurerm_resource_group" "this" {
-  name     = var.hub_resource_group_name
+  name     = module.naming.resource_group.name
   location = var.location
   tags     = var.tags
 }
