@@ -11,6 +11,7 @@
 7. From `tf` directory, run `terraform plan -var-file <YOUR_VAR_FILE>`, if edited directly, the command would be `terraform plan -var-file template.tfvars.example`
 8. Run `terraform apply -var-file <YOUR_VAR_FILE`
 
+<<<<<<< HEAD
 ## Note on provider initialization with Azure CLI
 If you are using [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli),
 you may encounter an error like the below:
@@ -45,6 +46,8 @@ To fix this error, log in to the newly created spoke workspace by clicking on th
 portal. This must be done as the user who is running this Terraform, or the user running this Terraform must be granted
 workspace admin after the first user launches the workspace.
 
+=======
+>>>>>>> b9834b2 (remove make items, doc update.)
 # Introduction
 
 Databricks has worked with thousands of customers to securely deploy the Databricks platform with appropriate security features to meet their architecture requirements.
@@ -84,6 +87,7 @@ can be controlled to reduce your threat vector. The AWS directory contains examp
 monitor cost and accurately attribute Databricks usage to your organization's business unit and teams (for chargebacks, for examples). These tags propagate to detailed
 DBU usage reports for cost analysis.
 
+<<<<<<< HEAD
 ## Security Analysis Tool
 Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
 By default, SAT is installed in the hub workspace, also called the "WEB_AUTH" workspace.
@@ -286,6 +290,8 @@ module "spoke_b_catalog" {
 
 5. Run `terraform apply` to create the new spoke
 
+=======
+>>>>>>> b9834b2 (remove make items, doc update.)
 # Additional Security Recommendations and Opportunities
 
 In this section, we break down additional security recommendations and opportunities to maintain a strong security posture that either cannot be configured into this
