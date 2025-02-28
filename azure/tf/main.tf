@@ -38,6 +38,7 @@ module "subnet_addrs" {
 # Pass the required variables to the module
 module "hub" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   source             = "./modules/hub"
   location           = var.location
   hub_vnet_cidr      = var.hub_vnet_cidr
@@ -75,6 +76,18 @@ module "hub" {
   storage_account_name    = var.hub_storage_account_name
   resource_suffix         = var.hub_resource_suffix
 >>>>>>> 2c65617 (feat: Allow users to specify hub_storage_account_name and hub_resource_suffix variables to avoid name collision on hub SA)
+=======
+  source               = "./modules/hub"
+  location             = var.location
+  hub_vnet_cidr        = var.hub_vnet_cidr
+  subnet_map           = module.subnet_addrs.network_cidr_blocks
+  client_config        = data.azurerm_client_config.current
+  databricks_app_reg   = data.azuread_service_principal.this
+  public_repos         = var.public_repos
+  tags                 = var.tags
+  storage_account_name = var.hub_storage_account_name
+  resource_suffix      = var.hub_resource_suffix
+>>>>>>> 5a2b623 (formatting)
 
   #options
 <<<<<<< HEAD
