@@ -49,6 +49,7 @@ module "hub" {
   resource_suffix    = var.hub_resource_suffix
 =======
   source = "./modules/hub"
+<<<<<<< HEAD
 >>>>>>> 900395d (naming)
 
 <<<<<<< HEAD
@@ -57,8 +58,9 @@ module "hub" {
   is_firewall_enabled      = true
   is_unity_catalog_enabled = true
 =======
+=======
+>>>>>>> ad6dd10 (outputs, naming variables)
   location                = var.location
-  hub_resource_group_name = var.hub_resource_group_name
   hub_vnet_cidr           = var.hub_vnet_cidr
   subnet_map              = module.subnet_addrs.network_cidr_blocks
   client_config           = data.azurerm_client_config.current

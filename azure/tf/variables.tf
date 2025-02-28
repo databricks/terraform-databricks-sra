@@ -29,6 +29,7 @@ variable "hub_vnet_cidr" {
   description = "(Required) The CIDR block for the hub Virtual Network"
 }
 
+<<<<<<< HEAD
 variable "hub_resource_suffix" {
   type        = string
 <<<<<<< HEAD
@@ -38,6 +39,8 @@ variable "hub_resource_suffix" {
 >>>>>>> bba9fc9 (remove vnet naming option in the hub to standardize approach, add example tfvars)
 }
 
+=======
+>>>>>>> ad6dd10 (outputs, naming variables)
 variable "hub_storage_account_name" {
   type        = string
   description = "(Optional) Name of the storage account created in hub (the metastore root storage account), will be generated if not provided"
@@ -46,8 +49,7 @@ variable "hub_storage_account_name" {
 
 variable "hub_resource_suffix" {
   type        = string
-  description = "(Optional} Resource suffix for naming resources in hub, 'hub' is used if not provided"
-  default     = "hub"
+  description = "(Required) Resource suffix for naming resources in hub, 'hub' is used if not provided"
 }
 
 variable "public_repos" {

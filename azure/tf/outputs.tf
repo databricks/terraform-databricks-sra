@@ -3,15 +3,26 @@ output "hub_network_subnets" {
   value       = module.subnet_addrs.network_cidr_blocks
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ad6dd10 (outputs, naming variables)
 
 output "hub_resource_group_name" {
   description = "Name of created hub resource group"
   value       = module.hub.resource_group_name
 }
 
+<<<<<<< HEAD
 output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
   value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
 }
 =======
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+output "spoke_workspace_urls" {
+  description = "URLs for the one (or more) deployed Databricks Workspaces"
+  # value       = values(module.spoke)[*].workspace_url
+  value = { for k, v in module.spoke : k => v.workspace_url }
+}
+>>>>>>> ad6dd10 (outputs, naming variables)

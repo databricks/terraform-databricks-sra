@@ -43,6 +43,7 @@ variable "is_unity_catalog_enabled" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 # Define the variable "hub_resource_group_name" with type string and a description
 variable "hub_resource_group_name" {
@@ -60,6 +61,8 @@ variable "hub_vnet_name" {
 >>>>>>> 60cc2bc (remove redundant module naming)
 =======
 >>>>>>> bba9fc9 (remove vnet naming option in the hub to standardize approach, add example tfvars)
+=======
+>>>>>>> ad6dd10 (outputs, naming variables)
 # Define the variable "hub_vnet_cidr" with type string and a description
 variable "hub_vnet_cidr" {
 

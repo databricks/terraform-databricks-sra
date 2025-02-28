@@ -59,7 +59,7 @@ resource "azurerm_firewall_policy" "this" {
 =======
 
   name                = module.naming.firewall_policy.name_unique
-  resource_group_name = var.hub_resource_group_name
+  resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   tags                = var.tags
 }
