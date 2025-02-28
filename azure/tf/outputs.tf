@@ -13,6 +13,7 @@ output "hub_resource_group_name" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
   value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
@@ -21,8 +22,11 @@ output "spoke_workspace_info" {
 >>>>>>> 8d44021 (serverless and classic compute working)
 =======
 output "spoke_workspace_urls" {
+=======
+output "spoke_workspace_info" {
+>>>>>>> b87392d (including spoke rg name in outputs)
   description = "URLs for the one (or more) deployed Databricks Workspaces"
   # value       = values(module.spoke)[*].workspace_url
-  value = { for k, v in module.spoke : k => v.workspace_url }
+  value = { for k, v in module.spoke : k => [v.resource_group_name, v.workspace_url] }
 }
 >>>>>>> ad6dd10 (outputs, naming variables)
