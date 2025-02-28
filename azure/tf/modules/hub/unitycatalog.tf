@@ -7,7 +7,7 @@ locals {
 resource "azurerm_databricks_access_connector" "unity_catalog" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 
-  name                = "${var.resource_suffix}-databricks-mi"
+  name                = "databricks-mi-${var.resource_suffix}"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   identity {
@@ -61,7 +61,7 @@ resource "azurerm_role_assignment" "this" {
 resource "databricks_metastore" "this" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 
-  name = "${var.resource_suffix}-uc-metastore"
+  name = "uc-metastore-${var.resource_suffix}"
   storage_root = format("abfss://%s@%s.dfs.core.windows.net/",
     azurerm_storage_container.unity_catalog[0].name,
   azurerm_storage_account.unity_catalog[0].name)
@@ -76,7 +76,7 @@ resource "databricks_metastore_data_access" "this" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 
   metastore_id = databricks_metastore.this[0].id
-  name         = "${var.resource_suffix}-dac"
+  name         = "dac-${var.resource_suffix}"
   azure_managed_identity {
     access_connector_id = azurerm_databricks_access_connector.unity_catalog[0].id
   }
