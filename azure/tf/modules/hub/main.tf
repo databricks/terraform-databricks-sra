@@ -59,10 +59,14 @@ resource "azurerm_resource_group" "this" {
 # Create the hub virtual network
 resource "azurerm_virtual_network" "this" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   name                = module.naming.virtual_network.name
 =======
   name                = var.hub_vnet_name
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+  name                = module.naming.virtual_network.name
+>>>>>>> bba9fc9 (remove vnet naming option in the hub to standardize approach, add example tfvars)
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.hub_vnet_cidr]

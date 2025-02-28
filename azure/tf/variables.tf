@@ -31,7 +31,11 @@ variable "hub_vnet_cidr" {
 
 variable "hub_resource_suffix" {
   type        = string
+<<<<<<< HEAD
   description = "(Required) Resource suffix for naming resources in hub"
+=======
+  description = "(Required) The name for the hub Resource Group"
+>>>>>>> bba9fc9 (remove vnet naming option in the hub to standardize approach, add example tfvars)
 }
 
 variable "hub_storage_account_name" {

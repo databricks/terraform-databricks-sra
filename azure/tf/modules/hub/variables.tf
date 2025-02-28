@@ -50,6 +50,7 @@ variable "hub_resource_group_name" {
   description = "(Required) The name for the hub Resource Group"
 }
 
+<<<<<<< HEAD
 # Define the variable "hub_vnet_name" with type string and a description
 variable "hub_vnet_name" {
   type        = string
@@ -57,6 +58,8 @@ variable "hub_vnet_name" {
 }
 
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> bba9fc9 (remove vnet naming option in the hub to standardize approach, add example tfvars)
 # Define the variable "hub_vnet_cidr" with type string and a description
 variable "hub_vnet_cidr" {
 
