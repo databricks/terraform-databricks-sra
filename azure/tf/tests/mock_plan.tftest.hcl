@@ -33,7 +33,7 @@ variables {
   location                = "eastus2"
   hub_vnet_cidr           = "10.0.0.0/23"
   hub_resource_group_name = "rg-hub"
-  hub_vnet_name           = "vnet-hub"
+  hub_resource_suffix     = "test"
   spoke_config = {
     spoke_a = {
       resource_suffix = "spokea"
