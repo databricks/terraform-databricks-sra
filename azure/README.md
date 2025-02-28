@@ -12,7 +12,11 @@
 8. Run `terraform apply -var-file <YOUR_VAR_FILE`
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Note on provider initialization with Azure CLI
+=======
+## Note on provider initialization
+>>>>>>> f715e43 (docs(azure): Add note on iss claim error)
 If you are using [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli),
 you may encounter an error like the below:
 
@@ -29,6 +33,7 @@ export ARM_TENANT_ID="00000000-0000-0000-0000-000000000000"
 
 Alternatively, you can set the tenant ID in the databricks provider configurations (see the provider [doc](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure) for more info.)
 
+<<<<<<< HEAD
 You may also encounter errors like the below when Terraform begins provisioning workspace resources:
 
 ```shell
@@ -48,6 +53,8 @@ workspace admin after the first user launches the workspace.
 
 =======
 >>>>>>> b9834b2 (remove make items, doc update.)
+=======
+>>>>>>> f715e43 (docs(azure): Add note on iss claim error)
 # Introduction
 
 Databricks has worked with thousands of customers to securely deploy the Databricks platform with appropriate security features to meet their architecture requirements.
