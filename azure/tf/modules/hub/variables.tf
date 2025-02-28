@@ -28,12 +28,6 @@ variable "hub_resource_group_name" {
   description = "(Required) The name for the hub Resource Group"
 }
 
-# Define the variable "hub_vnet_name" with type string and a description
-variable "hub_vnet_name" {
-  type        = string
-  description = "(Required) The name for the hub Virtual Network"
-}
-
 # Define the variable "hub_vnet_cidr" with type string and a description
 variable "hub_vnet_cidr" {
 

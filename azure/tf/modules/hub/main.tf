@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "this" {
 
 # Create the hub virtual network
 resource "azurerm_virtual_network" "this" {
-  name                = var.hub_vnet_name
+  name                = module.naming.virtual_network.name
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.hub_vnet_cidr]

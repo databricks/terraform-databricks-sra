@@ -4,7 +4,7 @@ variable "databricks_account_id" {
 }
 variable "location" {
   type        = string
-  description = "(Required) The location for the hub and spoke deployment"
+  description = "(Required) The Azure region for the hub and spoke deployment"
 }
 
 variable "hub_vnet_cidr" {
@@ -15,11 +15,6 @@ variable "hub_vnet_cidr" {
 variable "hub_resource_group_name" {
   type        = string
   description = "(Required) The name for the hub Resource Group"
-}
-
-variable "hub_vnet_name" {
-  type        = string
-  description = "(Required) The name for the hub Virtual Network"
 }
 
 variable "hub_storage_account_name" {

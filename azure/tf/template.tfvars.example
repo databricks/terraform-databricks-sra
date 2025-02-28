@@ -1,0 +1,18 @@
+databricks_account_id   = "00000000-0000-0000-0000-000000000000"
+hub_resource_group_name = "sra-azure-hub"
+hub_vnet_cidr           = "10.0.0.0/22"
+location                = "westus2"
+tags = {
+  Owner = "john.smith@company.com"
+}
+spoke_config = {
+  spoke1 = {
+    resource_suffix = "spoke1"
+    cidr            = "10.1.0.0/20"
+    tags = {
+      environment       = "test"
+    }
+  }
+}
+
+subscription_id = "ffffffff-ffff-ffff-ffff-ffffffffffff"

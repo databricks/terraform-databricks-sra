@@ -40,7 +40,6 @@ module "hub" {
   source = "./modules/hub"
 
   location                = var.location
-  hub_vnet_name           = var.hub_vnet_name
   hub_resource_group_name = var.hub_resource_group_name
   hub_vnet_cidr           = var.hub_vnet_cidr
   subnet_map              = module.subnet_addrs.network_cidr_blocks
