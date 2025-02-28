@@ -20,7 +20,7 @@ variable "hub_storage_account_name" {
 
 variable "hub_resource_suffix" {
   type        = string
-  description = "(Required) Resource suffix for naming resources in hub, 'hub' is used if not provided"
+  description = "(Required) Resource suffix for naming resources in hub"
 }
 
 variable "public_repos" {
