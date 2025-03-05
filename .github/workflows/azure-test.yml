@@ -17,4 +17,4 @@ jobs:
     uses: ./.github/workflows/terraform-ruw.yml
     with:
       working_directory: azure/tf
-      tflint_args: "--config=$(pwd)/.tflint.hcl"
+      terraform_fmt_check: true
