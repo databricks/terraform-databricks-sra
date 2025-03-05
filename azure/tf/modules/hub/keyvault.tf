@@ -32,6 +32,8 @@ resource "azurerm_key_vault_key" "managed_services" {
     "wrapKey",
   ]
 
+  tags = var.tags
+
   depends_on = [azurerm_key_vault_access_policy.terraform]
 }
 
@@ -53,6 +55,8 @@ resource "azurerm_key_vault_key" "managed_disk" {
     "verify",
     "wrapKey",
   ]
+
+  tags = var.tags
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 }
