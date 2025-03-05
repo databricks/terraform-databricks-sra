@@ -8,7 +8,8 @@ module "naming" {
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name
   location = var.location
-  tags     = var.tags
+
+  tags = var.tags
 }
 
 # Create the hub virtual network
