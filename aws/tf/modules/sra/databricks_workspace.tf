@@ -18,10 +18,14 @@ module "uc_catalog" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # System Table Schemas Enablement
 =======
 // System Table Schemas Enablement
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+# System Table Schemas Enablement
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 module "system_table" {
   source = "./databricks_workspace/system_schema"
   providers = {
@@ -31,10 +35,14 @@ module "system_table" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Create Create Cluster
 =======
 // Create Create Cluster
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+# Create Create Cluster
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 module "cluster_configuration" {
   source = "./databricks_workspace/classic_cluster"
   providers = {
@@ -50,6 +58,7 @@ module "cluster_configuration" {
 }
 
 # Restrictive DBFS bucket policy
+<<<<<<< HEAD
 module "restrictive_root_bucket" {
   source = "./databricks_workspace/restrictive_root_bucket"
   providers = {
@@ -78,6 +87,8 @@ module "restrictive_root_bucket" {
 }
 
 // Restrictive DBFS bucket policy
+=======
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 module "restrictive_root_bucket" {
   source = "./databricks_workspace/restrictive_root_bucket"
   providers = {
@@ -90,6 +101,10 @@ module "restrictive_root_bucket" {
   root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
 
   depends_on = [module.databricks_mws_workspace]
+<<<<<<< HEAD
 }
 
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+}
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)

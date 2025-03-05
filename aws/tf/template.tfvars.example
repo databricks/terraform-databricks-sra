@@ -1,4 +1,5 @@
 # Configuration Variables for AWS and Databricks
+<<<<<<< HEAD
  
 // Databricks Variables
 admin_user            = "" // Admin user email.
@@ -6,7 +7,28 @@ client_id             = "" // Service principal ID for Databricks with admin per
 client_secret         = "" // Secret for the corresponding service principal.
 databricks_account_id = "" // Databricks account ID.
 resource_prefix       = "" // Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles).
+=======
 
-// AWS Variables
-aws_account_id = "" // AWS account ID where resources will be deployed.
-region         = "" // AWS and Databricks region (e.g., us-west-2).
+# Databricks Variables
+# Admin user email.
+admin_user            = "" 
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
+
+# Service principal ID for Databricks with admin permissions.
+client_id             = "" 
+
+# Secret for the corresponding service principal.
+client_secret         = "" 
+
+# Databricks account ID.
+databricks_account_id = "" 
+
+# Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles).
+resource_prefix       = "" 
+
+# AWS Variables
+# AWS account ID where resources will be deployed.
+aws_account_id = "" 
+
+# AWS and Databricks region (e.g., us-west-2).
+region         = "" 

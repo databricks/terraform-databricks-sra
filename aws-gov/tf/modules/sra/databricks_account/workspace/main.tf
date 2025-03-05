@@ -2,7 +2,11 @@
 
 
 # Wait on Credential Due to Race Condition
+<<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_account/workspace/main.tf
 # https://kb.databricks.com/en_US/terraform/failed-credential-validation-checks-error-with-terraform
+=======
+# https://kb.databricks.com/en_US/terraform/failed-credential-validation-checks-error-with-terraform 
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update):aws/tf/modules/sra/databricks_account/workspace/workspace.tf
 resource "null_resource" "previous" {}
 
 resource "time_sleep" "wait_30_seconds" {
@@ -83,6 +87,7 @@ resource "databricks_mws_private_access_settings" "pas" {
 }
 
 # Workspace Configuration with Deployment Name
+<<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_account/workspace/main.tf
 resource "databricks_mws_workspaces" "workspace" {
   account_id                               = var.databricks_account_id
   aws_region                               = var.region
@@ -97,4 +102,40 @@ resource "databricks_mws_workspaces" "workspace" {
   pricing_tier                             = "ENTERPRISE"
 
   depends_on                               = [databricks_mws_networks.this]
+=======
+resource "databricks_mws_workspaces" "this_with_deployment_name" {
+  count = var.deployment_name != null ? 1 : 0
+
+  account_id     = var.databricks_account_id
+  aws_region     = var.region
+  workspace_name = var.resource_prefix
+  deployment_name = var.deployment_name 
+  credentials_id = databricks_mws_credentials.this.credentials_id
+  storage_configuration_id = databricks_mws_storage_configurations.this.storage_configuration_id
+  network_id = databricks_mws_networks.this.network_id
+  private_access_settings_id = databricks_mws_private_access_settings.pas.private_access_settings_id
+  managed_services_customer_managed_key_id = databricks_mws_customer_managed_keys.managed_storage.customer_managed_key_id
+  storage_customer_managed_key_id = databricks_mws_customer_managed_keys.workspace_storage.customer_managed_key_id
+  pricing_tier = "ENTERPRISE"
+
+  depends_on = [databricks_mws_networks.this]
+}
+
+# Workspace Configuration without Deployment Name
+resource "databricks_mws_workspaces" "this_without_deployment_name" {
+  count = var.deployment_name == null ? 1 : 0
+
+  account_id     = var.databricks_account_id
+  aws_region     = var.region
+  workspace_name = var.resource_prefix
+  credentials_id = databricks_mws_credentials.this.credentials_id
+  storage_configuration_id = databricks_mws_storage_configurations.this.storage_configuration_id
+  network_id = databricks_mws_networks.this.network_id
+  private_access_settings_id = databricks_mws_private_access_settings.pas.private_access_settings_id
+  managed_services_customer_managed_key_id = databricks_mws_customer_managed_keys.managed_storage.customer_managed_key_id
+  storage_customer_managed_key_id = databricks_mws_customer_managed_keys.workspace_storage.customer_managed_key_id
+  pricing_tier = "ENTERPRISE"
+
+  depends_on = [databricks_mws_networks.this]
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update):aws/tf/modules/sra/databricks_account/workspace/workspace.tf
 }

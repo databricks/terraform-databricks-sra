@@ -78,7 +78,13 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Cluster Example**: An example of a cluster and a cluster policy has been included. **NOTE:** Please be aware this will create a cluster within your Databricks workspace including the underlying EC2 instance.
 
+<<<<<<< HEAD
 - **IP Access Lists**: IP Access can be enabled to only allow a subset of IPs to access the Databricks workspace console. **NOTE:** Please verify all of the IPs are correct prior to enabling this feature to prevent a lockout scenario.
+=======
+- **Audit Log Delivery**: Low-latency delivery of Databricks logs to a S3 bucket in your AWS account. [Audit logs](https://docs.databricks.com/aws/en/admin/account-settings/audit-log-delivery) contain two levels of events: workspace-level audit logs with workspace-level events, and account-level audit logs with account-level events. Additionally, you can generate more detailed events by enabling verbose audit logs. 
+
+---
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 
 - **Read Only External Location**: This creates a read-only external location in Unity Catalog for a given bucket as well as the corresponding AWS IAM role.
 
@@ -97,6 +103,12 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Audit Log Alerting**: Audit Log Alerting, based on this [blog post](https://www.databricks.com/blog/improve-lakehouse-security-monitoring-using-system-tables-databricks-unity-catalog), creates 40+ SQL alerts to monitor for incidents based on a Zero Trust Architecture (ZTA) model. **NOTE:** Please be aware this creates a cluster, a job, and queries within your environment. 
 
+<<<<<<< HEAD
+=======
+- **Implement Restrictive Serverless Network Policy**: Serverless network policies can be found under Cloud resources, Network, in the account console. A network policy implements an egress firewall for your serverless compute. If you're using the Security Analysis Tool, be sure to allow list the Databricks account console and relevant Databricks workspace endpoints.
+
+---
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 
 ## Additional Security Recommendations
 

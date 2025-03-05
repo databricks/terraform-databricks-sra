@@ -25,13 +25,26 @@ variable "notification_email" {
   default     = ""
 }
 
+<<<<<<< HEAD
+=======
+variable "gcp_impersonate_service_account" {
+  type        = string
+  description = "GCP Service Account to impersonate (e.g. xyz-sa-2@project.iam.gserviceaccount.com)"
+  default     = ""
+}
+
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 variable "analysis_schema_name" {
   type        = string
   description = "Name of the schema to be used for analysis"
 }
 
 variable "proxies" {
+<<<<<<< HEAD
   type        = map
+=======
+  type        = map(any)
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   description = "Proxies to be used for Databricks API calls"
 }
 

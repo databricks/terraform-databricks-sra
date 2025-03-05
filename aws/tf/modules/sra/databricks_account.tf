@@ -1,11 +1,15 @@
 # EXPLANATION: All modules that reside at the account level
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Create Unity Catalog Metastore - No Root Storage
 =======
 
 // Create Unity Catalog Metastore - No Root Storage
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+# Create Unity Catalog Metastore - No Root Storage
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 module "uc_init" {
   source = "./databricks_account/uc_init"
   providers = {
@@ -61,6 +65,9 @@ module "user_assignment" {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   workspace_id     = module.databricks_mws_workspace.workspace_id
   workspace_access = var.admin_user
   depends_on       = [module.uc_assignment, module.databricks_mws_workspace]
@@ -68,12 +75,16 @@ module "user_assignment" {
 
 # Audit log delivery
 module "log_delivery" {
+<<<<<<< HEAD
   count = var.audit_log_delivery_exists ? 0 : 1
+=======
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   source = "./databricks_account/audit_log_delivery"
   providers = {
     databricks = databricks.mws
   }
 
+<<<<<<< HEAD
   audit_log_delivery_exists = var.audit_log_delivery_exists
   databricks_account_id     = var.databricks_account_id
   resource_prefix           = var.resource_prefix
@@ -82,4 +93,8 @@ module "log_delivery" {
   workspace_access     = var.admin_user
   depends_on           = [module.uc_assignment, module.databricks_mws_workspace]
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+  databricks_account_id = var.databricks_account_id
+  resource_prefix       = var.resource_prefix
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 }

@@ -44,45 +44,65 @@ variable "cmk_admin_arn" {
 variable "custom_private_subnet_ids" {
   description = "List of custom private subnet IDs"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = list(string)
 =======
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+  type        = list(string)
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   default     = null
 }
 
 variable "custom_relay_vpce_id" {
   description = "Custom Relay VPC Endpoint ID"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = string
 =======
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+  type        = string
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   default     = null
 }
 
 variable "custom_sg_id" {
   description = "Custom security group ID"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = string
 =======
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+  type        = string
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   default     = null
 }
 
 variable "custom_vpc_id" {
   description = "Custom VPC ID"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = string
 =======
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+  type        = string
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   default     = null
 }
 
 variable "custom_workspace_vpce_id" {
   description = "Custom Workspace VPC Endpoint ID"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = string
 =======
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+  type        = string
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   default     = null
 }
 
@@ -93,16 +113,25 @@ variable "databricks_account_id" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 variable "deployment_name" {
   description = "Deployment name for the workspace. Must first be enabled by a Databricks representative."
   default     = null
+=======
+variable "deployment_name" {
+  description = "Deployment name for the workspace. Must first be enabled by a Databricks representative."
+  type        = string
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   nullable    = true
 }
 
 variable "enable_security_analysis_tool" {
+<<<<<<< HEAD
 =======
 variable "enable_sat_boolean" {
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   description = "Flag to enable the security analysis tool."
   type        = bool
   sensitive   = true
@@ -116,12 +145,17 @@ variable "metastore_exists" {
 
 variable "network_configuration" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   description = "The type of network set-up for the workspace network configuration."
   type        = string
 =======
   type        = string
   description = "The type of network set-up for the workspace network configuration."
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+  description = "The type of network set-up for the workspace network configuration."
+  type        = string
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   nullable    = false
 
   validation {

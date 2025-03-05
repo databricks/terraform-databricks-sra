@@ -1,4 +1,20 @@
 # Databricks variables
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:aws/customizations/workspace/solution_accelerators/security_analysis_tool/aws/variables.tf
+========
+
+variable "databricks_url" {
+  description = "Should look like https://<workspace>.cloud.databricks.com"
+  type        = string
+}
+
+variable "workspace_id" {
+  description = "Should be the string of numbers in the workspace URL arg (e.g. https://<workspace>.cloud.databricks.com/?o=1234567890123456)"
+  type        = string
+}
+>>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update):aws/tf/modules/sra/security_analysis_tool/aws/variables.tf
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 
 variable "account_console_id" {
   description = "Databricks Account Console ID"
@@ -53,7 +69,11 @@ variable "analysis_schema_name" {
 }
 
 variable "proxies" {
+<<<<<<< HEAD
   type        = map
+=======
+  type        = map(any)
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
   description = "Proxies to be used for Databricks API calls"
 }
 

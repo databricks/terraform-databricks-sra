@@ -6,7 +6,11 @@ terraform {
     }
     aws = {
       source  = "hashicorp/aws"
+<<<<<<< HEAD
       version = "5.76.0"
+=======
+      version = " 5.76.0"
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
     }
   }
   required_version = "~>1.0"
