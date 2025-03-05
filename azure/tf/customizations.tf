@@ -2,15 +2,22 @@ locals {
   create_sat_sp     = var.sat_configuration.enabled && var.sat_service_principal.client_id == ""
   sat_client_id     = local.create_sat_sp ? azuread_service_principal.sat[0].client_id : var.sat_service_principal.client_id
   sat_client_secret = local.create_sat_sp ? azuread_service_principal_password.sat[0].value : var.sat_service_principal.client_secret
+<<<<<<< HEAD
   sat_workspace     = module.hub
   sat_catalog       = var.sat_configuration.enabled ? module.hub_catalog[0] : {}
+=======
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Service Principal for SAT
+<<<<<<< HEAD
 # Note: This is separated from the SAT module to allow for a BYO-SP pattern. If the user supplies values for the
 # sat_service principal variable, creation will be skipped.
 
+=======
+# Note: This is separated from the SAT module to allow for a BYO-SP pattern. If the user supplies values for the sat_service principal variable, creation will be skipped.
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 resource "azuread_application_registration" "sat" {
   count = local.create_sat_sp ? 1 : 0
 
@@ -45,11 +52,16 @@ resource "azurerm_role_assignment" "sat_can_read_subscription" {
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
+<<<<<<< HEAD
+=======
+
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 # This is modularized to allow for easy count and provider arguments
 module "sat" {
   source = "./modules/sat"
   count  = var.sat_configuration.enabled ? 1 : 0
 
+<<<<<<< HEAD
   # Update this as needed
   catalog_name = local.sat_catalog.catalog_name
 
@@ -68,6 +80,23 @@ module "sat" {
   # Change the provider if needed
   providers = {
     databricks = databricks.hub
+=======
+  databricks_account_id           = var.databricks_account_id
+  schema_name                     = var.sat_configuration.schema_name
+  catalog_name                    = var.sat_configuration.catalog_name
+  service_principal_client_id     = local.sat_client_id
+  service_principal_client_secret = local.sat_client_secret
+  subscription_id                 = var.subscription_id
+  tenant_id                       = data.azurerm_client_config.current.tenant_id
+  workspace_id                    = module.spoke[local.sat_spoke].workspace_id
+  proxies                         = var.sat_configuration.proxies
+  run_on_serverless               = var.sat_configuration.run_on_serverless
+
+  depends_on = [module.spoke]
+
+  providers = {
+    databricks = databricks.SAT
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
   }
 }
 
@@ -85,5 +114,9 @@ resource "databricks_permission_assignment" "sat_workspace_admin" {
   permissions  = ["ADMIN"]
   principal_id = module.sat[0].service_principal_id
 
+<<<<<<< HEAD
   provider = databricks.hub
+=======
+  provider = databricks.SAT
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 }

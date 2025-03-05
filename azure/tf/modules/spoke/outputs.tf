@@ -31,6 +31,21 @@ output "ipgroup_cidrs" {
   value       = azurerm_databricks_workspace.this.workspace_url
 }
 
+output "workspace_id" {
+  value       = azurerm_databricks_workspace.this.workspace_id
+  description = "Workspace ID of the created workspace, according to the Databricks account console"
+}
+
+output "id" {
+  value       = azurerm_databricks_workspace.this.id
+  description = "Azure ID of the created workspace"
+}
+
+output "workspace" {
+  value       = azurerm_databricks_workspace.this
+  description = "Full workspace object"
+}
+
 output "ipgroup_cidrs" {
 <<<<<<< HEAD
 >>>>>>> 60cc2bc (remove redundant module naming)

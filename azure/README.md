@@ -13,10 +13,14 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Note on provider initialization with Azure CLI
 =======
 ## Note on provider initialization
 >>>>>>> f715e43 (docs(azure): Add note on iss claim error)
+=======
+## Note on provider initialization with Azure CLI
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 If you are using [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli),
 you may encounter an error like the below:
 
@@ -34,7 +38,11 @@ export ARM_TENANT_ID="00000000-0000-0000-0000-000000000000"
 Alternatively, you can set the tenant ID in the databricks provider configurations (see the provider [doc](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure) for more info.)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 You may also encounter errors like the below when Terraform begins provisioning workspace resources:
+=======
+You may also encounter errors like the below when Terraform begins provisioning SAT resources:
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 
 ```shell
 ╷
@@ -51,10 +59,13 @@ To fix this error, log in to the newly created spoke workspace by clicking on th
 portal. This must be done as the user who is running this Terraform, or the user running this Terraform must be granted
 workspace admin after the first user launches the workspace.
 
+<<<<<<< HEAD
 =======
 >>>>>>> b9834b2 (remove make items, doc update.)
 =======
 >>>>>>> f715e43 (docs(azure): Add note on iss claim error)
+=======
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 # Introduction
 
 Databricks has worked with thousands of customers to securely deploy the Databricks platform with appropriate security features to meet their architecture requirements.
@@ -94,6 +105,7 @@ can be controlled to reduce your threat vector. The AWS directory contains examp
 monitor cost and accurately attribute Databricks usage to your organization's business unit and teams (for chargebacks, for examples). These tags propagate to detailed
 DBU usage reports for cost analysis.
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 ## Security Analysis Tool
 Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
@@ -156,6 +168,39 @@ resource "databricks_permission_assignment" "sat_workspace_admin" {
 Note that SAT is designed to be deployed _once per Azure subscription_. If needed, SAT can be deployed multiple times in
 different regions using this terraform configuration. This requires provisioning SAT in multiple spokes. Reference the 
 above modifications to deploy to multiple spokes.
+=======
+## Security Analysis Tool
+Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
+SAT will be installed in the first `spoke` workspace in the `spoke_config` variable by default, but If you would like to 
+customize which of the spoke workspaces SAT is installed in, you can do so by changing the `sat_configuration.spoke` 
+variable like so:
+
+```hcl
+# example.tfvars
+spoke_config = {
+  spokeA = {
+    resource_suffix = "spoke-a",
+    cidr            = "10.0.1.0/24",
+    tags = {
+      "Owner" = "some.user@databricks.com"
+    }
+  }
+  spokeB = {
+    resource_suffix = "spoke-b",
+    cidr            = "10.0.0.0/24",
+    tags = {
+      "Owner" = "some.user@databricks.com"
+    }
+  }
+}
+
+sat_configuration = {
+  spoke = "spokeB"
+}
+```
+Note that SAT is designed to be deployed _once per Azure subscription_. SAT is deployed to a spoke to more easily permit
+users of this Terraform to deploy SAT to multiple subscriptions if needed.
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 
 ### SAT Service Principal
 Some users of SRA may not have permissions to create Entra ID service principals. If this is the case, you can choose to
@@ -183,6 +228,7 @@ sat_service_principal = {
 SAT is installed using serverless compute by default. Before running the [required jobs](https://github.com/databricks-industry-solutions/security-analysis-tool/blob/v0.3.3/terraform/azure/TERRAFORM_Azure.md#step-7-run-databricks-jobs)
 in Databricks, the private endpoints on your hub storage account must be approved.
 
+<<<<<<< HEAD
 ## Adding additional spokes
 
 To add additional spokes to this configuration, follow the below steps.
@@ -299,6 +345,8 @@ module "spoke_b_catalog" {
 
 =======
 >>>>>>> b9834b2 (remove make items, doc update.)
+=======
+>>>>>>> d83f047 (feat(azure): Add support for SAT)
 # Additional Security Recommendations and Opportunities
 
 In this section, we break down additional security recommendations and opportunities to maintain a strong security posture that either cannot be configured into this
