@@ -17,3 +17,7 @@ variable "databricks_gov_shard" {
 variable "databricks_prod_aws_account_id" {
   type = map(string)
 }
+
+variable "databricks_account_id" {
+  type        = string
+}
