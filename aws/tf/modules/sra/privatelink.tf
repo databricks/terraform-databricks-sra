@@ -45,12 +45,16 @@ resource "aws_security_group" "privatelink" {
 # EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Restrictive S3 endpoint policy:
 data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
 
 =======
 // Restrictive S3 endpoint policy:
+=======
+# Restrictive S3 endpoint policy:
+>>>>>>> 2615071 (further formatting and linting)
 data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
 
@@ -226,10 +230,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Restrictive STS endpoint policy:
 =======
 // Restrictive STS endpoint policy:
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+# Restrictive STS endpoint policy:
+>>>>>>> 2615071 (further formatting and linting)
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
   statement {
@@ -269,10 +277,14 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Restrictive Kinesis endpoint policy:
 =======
 // Restrictive Kinesis endpoint policy:
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+# Restrictive Kinesis endpoint policy:
+>>>>>>> 2615071 (further formatting and linting)
 data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
   statement {
