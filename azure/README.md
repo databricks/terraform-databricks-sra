@@ -11,7 +11,7 @@
 7. From `tf` directory, run `terraform plan -var-file <YOUR_VAR_FILE>`, if edited directly, the command would be `terraform plan -var-file template.tfvars.example`
 8. Run `terraform apply -var-file <YOUR_VAR_FILE`
 
-## Note on provider initialization
+## Note on provider initialization with Azure CLI
 If you are using [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli),
 you may encounter an error like the below:
 
@@ -27,6 +27,23 @@ export ARM_TENANT_ID="00000000-0000-0000-0000-000000000000"
 ```
 
 Alternatively, you can set the tenant ID in the databricks provider configurations (see the provider [doc](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure) for more info.)
+
+You may also encounter errors like the below when Terraform begins provisioning SAT resources:
+
+```shell
+╷
+│ Error: cannot read current user: Unauthorized access to Org: 0000000000000000
+│ 
+│   with module.sat[0].module.sat.data.databricks_current_user.me,
+│   on .terraform/modules/sat.sat/terraform/common/data.tf line 1, in data "databricks_current_user" "me":
+│    1: data "databricks_current_user" "me" {}
+│ 
+╵
+```
+
+To fix this error, log in to the newly created spoke workspace by clicking on the "Launch Workspace" button in the Azure
+portal. This must be done as the user who is running this Terraform, or the user running this Terraform must be granted
+workspace admin after the first user launches the workspace.
 
 # Introduction
 
@@ -66,6 +83,64 @@ can be controlled to reduce your threat vector. The AWS directory contains examp
 - **Cluster Tags and Pool Tags**: [Cluster and pool tags](https://learn.microsoft.com/en-us/azure/databricks/administration-guide/account-settings/usage-detail-tags) allow customers to
 monitor cost and accurately attribute Databricks usage to your organization's business unit and teams (for chargebacks, for examples). These tags propagate to detailed
 DBU usage reports for cost analysis.
+
+## Security Analysis Tool
+Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
+SAT will be installed in the first `spoke` workspace in the `spoke_config` variable by default, but If you would like to 
+customize which of the spoke workspaces SAT is installed in, you can do so by changing the `sat_configuration.spoke` 
+variable like so:
+
+```hcl
+# example.tfvars
+spoke_config = {
+  spokeA = {
+    resource_suffix = "spoke-a",
+    cidr            = "10.0.1.0/24",
+    tags = {
+      "Owner" = "some.user@databricks.com"
+    }
+  }
+  spokeB = {
+    resource_suffix = "spoke-b",
+    cidr            = "10.0.0.0/24",
+    tags = {
+      "Owner" = "some.user@databricks.com"
+    }
+  }
+}
+
+sat_configuration = {
+  spoke = "spokeB"
+}
+```
+Note that SAT is designed to be deployed _once per Azure subscription_. SAT is deployed to a spoke to more easily permit
+users of this Terraform to deploy SAT to multiple subscriptions if needed.
+
+### SAT Service Principal
+Some users of SRA may not have permissions to create Entra ID service principals. If this is the case, you can choose to
+bring-your-own service principal. To configure a pre-existing Entra ID service principal to be used for SAT, configure 
+the `sat_service_principal` variable like the example below:
+
+```hcl
+# example.tfvars
+sat_service_principal = {
+  client_id     = "00000000-0000-0000-0000-000000000000"
+  client_secret = "some-secret"
+}
+```
+
+If you do not bring-your-own service principal, an Entra ID service principal will be created for you with a default
+name of `spSAT`. This name can be customized by modifying the `sat_service_principal` variable like so:
+```hcl
+# example.tfvars
+sat_service_principal = {
+  name = "spSATDev"
+}
+```
+
+### SAT Serverless Compute
+SAT is installed using serverless compute by default. Before running the [required jobs](https://github.com/databricks-industry-solutions/security-analysis-tool/blob/v0.3.3/terraform/azure/TERRAFORM_Azure.md#step-7-run-databricks-jobs)
+in Databricks, the private endpoints on your hub storage account must be approved.
 
 # Additional Security Recommendations and Opportunities
 
