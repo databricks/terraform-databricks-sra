@@ -43,7 +43,7 @@ resource "aws_s3_bucket_policy" "log_delivery" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : ["${aws_iam_role.log_delivery.arn}"]
+          "AWS" : [aws_iam_role.log_delivery.arn]
         },
         "Action" : "s3:GetBucketLocation",
         "Resource" : "arn:aws:s3:::${var.resource_prefix}-log-delivery"
@@ -51,7 +51,7 @@ resource "aws_s3_bucket_policy" "log_delivery" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : ["${aws_iam_role.log_delivery.arn}"]
+          "AWS" : [aws_iam_role.log_delivery.arn]
         },
         "Action" : [
           "s3:PutObject",
@@ -69,7 +69,7 @@ resource "aws_s3_bucket_policy" "log_delivery" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : ["${aws_iam_role.log_delivery.arn}"]
+          "AWS" : [aws_iam_role.log_delivery.arn]
         },
         "Action" : "s3:ListBucket",
         "Resource" : "arn:aws:s3:::${var.resource_prefix}-log-delivery"

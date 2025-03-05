@@ -4,6 +4,7 @@ variable "account_console_id" {
 }
 
 variable "workspace_id" {
+  type        = string
   description = "Should be the string of numbers in the workspace URL arg (e.g. https://<workspace>.azuredatabricks.net/?o=1234567890123456)"
 }
 
