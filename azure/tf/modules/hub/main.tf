@@ -50,6 +50,7 @@ resource "azurerm_resource_group" "this" {
   location = var.location
 
   tags = var.tags
+<<<<<<< HEAD
 =======
   name     = var.hub_resource_group_name
 =======
@@ -58,6 +59,8 @@ resource "azurerm_resource_group" "this" {
   location = var.location
   tags     = var.tags
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> 82d53f8 (fix(azure): Add various missing tags)
 }
 
 # Create the hub virtual network

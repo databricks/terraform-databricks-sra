@@ -88,11 +88,16 @@ resource "azurerm_key_vault_key" "managed_services" {
     "wrapKey",
   ]
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   tags = var.tags
 
 =======
 >>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
+=======
+  tags = var.tags
+
+>>>>>>> 82d53f8 (fix(azure): Add various missing tags)
   depends_on = [azurerm_key_vault_access_policy.terraform]
 }
 
@@ -127,11 +132,16 @@ resource "azurerm_key_vault_key" "managed_disk" {
     "wrapKey",
   ]
 
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/hub/keyvault.tf
   tags = var.tags
 
 =======
 >>>>>>> d243d1c (make key vault optional on Azure):azure/tf/modules/azure_hub/keyvault.tf
+=======
+  tags = var.tags
+
+>>>>>>> 82d53f8 (fix(azure): Add various missing tags)
   depends_on = [azurerm_key_vault_access_policy.terraform]
 }
 
