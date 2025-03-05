@@ -46,5 +46,12 @@ variable "databricks_gov_shard" {
 
 variable "databricks_prod_aws_account_id" {
   type = map(string)
+<<<<<<< HEAD
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+}
+
+variable "databricks_account_id" {
+  type        = string
+>>>>>>> 424b1c9 ([aws-gov] updated restrictive root bucket policy)
 }
