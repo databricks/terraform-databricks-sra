@@ -1,5 +1,5 @@
 config {
-  varfile = ["tests/terraform.tfvars"]
+  variables = ["tags={\"example\"=\"value\"}"]
 }
 
 plugin "terraform" {
