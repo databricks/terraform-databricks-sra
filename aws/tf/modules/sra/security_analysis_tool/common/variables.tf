@@ -41,6 +41,11 @@ variable "analysis_schema_name" {
 }
 
 variable "proxies" {
-  type        = map
+  type        = map(any)
   description = "Proxies to be used for Databricks API calls"
+}
+
+variable "run_on_serverless" {
+  type        = bool
+  description = "Flag to run SAT initializer/Driver on Serverless"
 }

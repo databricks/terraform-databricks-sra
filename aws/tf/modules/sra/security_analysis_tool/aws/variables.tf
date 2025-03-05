@@ -1,3 +1,5 @@
+# Databricks variables
+
 variable "databricks_url" {
   description = "Should look like https://<workspace>.cloud.databricks.com"
   type        = string
@@ -23,7 +25,7 @@ variable "sqlw_id" {
   default = "new"
 }
 
-### AWS Specific Variables
+# AWS Specific Variables
 
 variable "account_user" {
   description = "Account Console Username"
@@ -61,6 +63,11 @@ variable "analysis_schema_name" {
 }
 
 variable "proxies" {
-  type        = map
+  type        = map(any)
   description = "Proxies to be used for Databricks API calls"
+}
+
+variable "run_on_serverless" {
+  type        = bool
+  description = "Flag to run SAT initializer/Driver on Serverless"
 }

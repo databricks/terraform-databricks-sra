@@ -235,7 +235,7 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${var.aws_account_id}"]
+      identifiers = [var.aws_account_id]
     }
   }
 

@@ -33,32 +33,32 @@ variable "cmk_admin_arn" {
 }
 
 variable "custom_private_subnet_ids" {
-  type        = list(string)
   description = "List of custom private subnet IDs"
+  type        = list(string)
   default     = null
 }
 
 variable "custom_relay_vpce_id" {
-  type        = string
   description = "Custom Relay VPC Endpoint ID"
+  type        = string
   default     = null
 }
 
 variable "custom_sg_id" {
-  type        = string
   description = "Custom security group ID"
+  type        = string
   default     = null
 }
 
 variable "custom_vpc_id" {
-  type        = string
   description = "Custom VPC ID"
+  type        = string
   default     = null
 }
 
 variable "custom_workspace_vpce_id" {
-  type        = string
   description = "Custom Workspace VPC Endpoint ID"
+  type        = string
   default     = null
 }
 
@@ -68,7 +68,13 @@ variable "databricks_account_id" {
   sensitive   = true
 }
 
-variable "enable_sat_boolean" {
+variable "deployment_name" {
+  description = "Deployment name for the workspace. Must first be enabled by a Databricks representative."
+  type        = string
+  nullable    = true
+}
+
+variable "enable_security_analysis_tool" {
   description = "Flag to enable the security analysis tool."
   type        = bool
   sensitive   = true
@@ -81,8 +87,8 @@ variable "metastore_exists" {
 }
 
 variable "network_configuration" {
-  type        = string
   description = "The type of network set-up for the workspace network configuration."
+  type        = string
   nullable    = false
 
   validation {
@@ -124,7 +130,8 @@ variable "resource_prefix" {
 }
 
 variable "scc_relay" {
-  type = map(string)
+  description = "Secure Cluster Connectivity Relay PrivateLink Endpoint Map"
+  type        = map(string)
   default = {
     "ap-northeast-1" = "com.amazonaws.vpce.ap-northeast-1.vpce-svc-02aa633bda3edbec0"
     "ap-northeast-2" = "com.amazonaws.vpce.ap-northeast-2.vpce-svc-0dc0e98a5800db5c4"
@@ -154,7 +161,8 @@ variable "vpc_cidr_range" {
 }
 
 variable "workspace" {
-  type = map(string)
+  description = "Workspace API PrivateLink Endpoint Map"
+  type        = map(string)
   default = {
     "ap-northeast-1" = "com.amazonaws.vpce.ap-northeast-1.vpce-svc-02691fd610d24fd64"
     "ap-northeast-2" = "com.amazonaws.vpce.ap-northeast-2.vpce-svc-0babb9bde64f34d7e"

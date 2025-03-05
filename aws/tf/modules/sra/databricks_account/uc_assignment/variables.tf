@@ -1,11 +1,9 @@
 variable "metastore_id" {
-  type = string
-}
-
-variable "region" {
-  type = string
+  description = "ID of the deployed metastore."
+  type        = string
 }
 
 variable "workspace_id" {
-  type = string
+  description = "workspace ID of deployed workspace."
+  type        = string
 }

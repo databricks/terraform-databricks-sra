@@ -1,6 +1,6 @@
-// EXPLANATION: Creates a restrictive root bucket policy
+# EXPLANATION: Creates a restrictive root bucket policy
 
-// Restrictive Bucket Policy
+# Restrictive Bucket Policy
 resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
   bucket = var.root_s3_bucket
   policy = jsonencode({
