@@ -70,7 +70,7 @@ variable "databricks_account_id" {
 
 variable "deployment_name" {
   description = "Deployment name for the workspace. Must first be enabled by a Databricks representative."
-  type        = string
+  default     = null
   nullable    = true
 }
 

@@ -1,4 +1,4 @@
-// Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/system_schema
+# Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/system_schema
 
 resource "databricks_system_schema" "access" {
   schema = "access"
