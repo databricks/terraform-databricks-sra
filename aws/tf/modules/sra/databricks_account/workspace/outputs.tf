@@ -3,12 +3,16 @@ output "workspace_url" {
 <<<<<<< HEAD
   description = "Workspace URL."
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1f2d783 (fix deployment name, update log delivery, and linting)
   value       = databricks_mws_workspaces.workspace.workspace_url
 }
 
 output "workspace_id" {
   description = "Workspace ID."
   value       = databricks_mws_workspaces.workspace.workspace_id
+<<<<<<< HEAD
 =======
 =======
   description = "Workspace URL."
@@ -27,4 +31,6 @@ output "workspace_id" {
 =======
   value       = length(databricks_mws_workspaces.this_with_deployment_name) > 0 ? databricks_mws_workspaces.this_with_deployment_name[0].workspace_id : databricks_mws_workspaces.this_without_deployment_name[0].workspace_id
 >>>>>>> ecbeb76 (adding required provider versions)
+=======
+>>>>>>> 1f2d783 (fix deployment name, update log delivery, and linting)
 }

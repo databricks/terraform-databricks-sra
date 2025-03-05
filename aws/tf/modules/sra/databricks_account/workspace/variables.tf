@@ -26,10 +26,14 @@ variable "databricks_account_id" {
 variable "deployment_name" {
   description = "Deployment name for the workspace. Must first be enabled by a Databricks representative."
 <<<<<<< HEAD
+<<<<<<< HEAD
   default     = null
 =======
   type        = string
 >>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
+=======
+  default     = null
+>>>>>>> 1f2d783 (fix deployment name, update log delivery, and linting)
   nullable    = true
 }
 

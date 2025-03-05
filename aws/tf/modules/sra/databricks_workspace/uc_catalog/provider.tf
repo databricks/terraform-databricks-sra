@@ -35,6 +35,10 @@ terraform {
       version = "0.12.1"
 >>>>>>> ecbeb76 (adding required provider versions)
     }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.76.0"
+    }
   }
 >>>>>>> b3e4c6f (aws simplicity update)
 }
