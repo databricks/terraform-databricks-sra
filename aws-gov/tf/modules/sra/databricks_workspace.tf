@@ -78,6 +78,7 @@ module "restrictive_root_bucket" {
   region_name           = var.region_name
   root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
   databricks_account_id = var.databricks_account_id
+<<<<<<< HEAD
 
   depends_on = [module.databricks_mws_workspace]
 }
@@ -101,6 +102,8 @@ module "restrictive_root_bucket" {
   workspace_id          = module.databricks_mws_workspace.workspace_id
   region_name           = var.region_name
   root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
+=======
+>>>>>>> ebc5795 ([aws-gov] updated restrictive root bucket policy)
 
   depends_on = [module.databricks_mws_workspace]
 }
