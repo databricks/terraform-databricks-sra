@@ -1,4 +1,4 @@
-// Security group for privatelink - skipped in custom operation mode
+# Security group for privatelink - skipped in custom operation mode
 resource "aws_security_group" "privatelink" {
   count = var.network_configuration != "custom" ? 1 : 0
 
@@ -42,9 +42,9 @@ resource "aws_security_group" "privatelink" {
   }
 }
 
-// EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
+# EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 
-// Restrictive S3 endpoint policy:
+# Restrictive S3 endpoint policy:
 data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
 
@@ -219,7 +219,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   }
 }
 
-// Restrictive STS endpoint policy:
+# Restrictive STS endpoint policy:
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
   statement {
@@ -235,7 +235,7 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${var.aws_account_id}"]
+      identifiers = [var.aws_account_id]
     }
   }
 
@@ -258,7 +258,7 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
   }
 }
 
-// Restrictive Kinesis endpoint policy:
+# Restrictive Kinesis endpoint policy:
 data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
   statement {
@@ -277,7 +277,7 @@ data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
   }
 }
 
-// VPC endpoint creation - Skipped in custom operation mode
+# VPC endpoint creation - Skipped in custom operation mode
 module "vpc_endpoints" {
   count = var.network_configuration != "custom" ? 1 : 0
 
@@ -321,7 +321,7 @@ module "vpc_endpoints" {
   }
 }
 
-// Databricks REST endpoint - skipped in custom operation mode
+# Databricks REST endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "backend_rest" {
   count = var.network_configuration != "custom" ? 1 : 0
 
@@ -337,7 +337,7 @@ resource "aws_vpc_endpoint" "backend_rest" {
   }
 }
 
-// Databricks SCC endpoint - skipped in custom operation mode
+# Databricks SCC endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "backend_relay" {
   count = var.network_configuration != "custom" ? 1 : 0
 

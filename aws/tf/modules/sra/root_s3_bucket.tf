@@ -1,4 +1,4 @@
-// EXPLANATION: Create the workspace root bucket
+# EXPLANATION: Create the workspace root bucket
 
 resource "aws_s3_bucket" "root_storage_bucket" {
   bucket        = "${var.resource_prefix}-workspace-root-storage"

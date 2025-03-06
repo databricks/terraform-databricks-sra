@@ -1,7 +1,9 @@
-variable "created_workspace_id" {
-  type = string
+variable "workspace_id" {
+  description = "workspace ID of deployed workspace."
+  type        = string
 }
 
 variable "workspace_access" {
-  type = string
+  type        = string
+  description = "data source for the workspace access."
 }

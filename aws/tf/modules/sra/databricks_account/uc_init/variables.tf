@@ -1,23 +1,14 @@
-variable "aws_account_id" {
-  type = string
-}
-
-variable "databricks_account_id" {
-  type = string
-}
-
 variable "metastore_exists" {
-  type = string
-}
-
-variable "metastore_name" {
-  type = string
+  description = "If a metastore exists."
+  type        = string
 }
 
 variable "region" {
-  type = string
+  description = "AWS region code."
+  type        = string
 }
 
 variable "resource_prefix" {
-  type = string
+  description = "Prefix for the resource names."
+  type        = string
 }

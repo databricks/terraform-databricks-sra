@@ -1,6 +1,6 @@
 resource "null_resource" "previous" {}
 
-// Wait to prevent race condition between IAM role and external location validation
+# Wait to prevent race condition between IAM role and external location validation
 resource "time_sleep" "wait_60_seconds" {
   depends_on      = [null_resource.previous]
   create_duration = "60s"
@@ -11,7 +11,7 @@ locals {
   uc_catalog_name_us = replace(var.uc_catalog_name, "-", "_")
 }
 
-// Unity Catalog KMS
+# Unity Catalog KMS
 resource "aws_kms_key" "catalog_storage" {
   description = "KMS key for Databricks catalog storage ${var.workspace_id}"
   policy = jsonencode({
@@ -53,7 +53,7 @@ resource "aws_kms_alias" "catalog_storage_key_alias" {
   target_key_id = aws_kms_key.catalog_storage.id
 }
 
-// Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
+# Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
 resource "databricks_storage_credential" "workspace_catalog_storage_credential" {
   name = "${var.uc_catalog_name}-storage-credential"
   aws_iam_role {
@@ -62,14 +62,14 @@ resource "databricks_storage_credential" "workspace_catalog_storage_credential" 
   isolation_mode = "ISOLATION_MODE_ISOLATED"
 }
 
-// Unity Catalog Trust Policy - Data Source
+# Unity Catalog Trust Policy - Data Source
 data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
   aws_account_id = var.aws_account_id
   role_name      = local.uc_iam_role
   external_id    = databricks_storage_credential.workspace_catalog_storage_credential.aws_iam_role[0].external_id
 }
 
-// Unity Catalog Policy - Data Source
+# Unity Catalog Policy - Data Source
 data "databricks_aws_unity_catalog_policy" "unity_catalog" {
   aws_account_id = var.aws_account_id
   bucket_name    = var.uc_catalog_name
@@ -77,13 +77,13 @@ data "databricks_aws_unity_catalog_policy" "unity_catalog" {
   kms_name       = aws_kms_alias.catalog_storage_key_alias.arn
 }
 
-// Unity Catalog Policy
+# Unity Catalog Policy
 resource "aws_iam_policy" "unity_catalog" {
   name   = "${var.resource_prefix}-catalog-policy-${var.workspace_id}"
   policy = data.databricks_aws_unity_catalog_policy.unity_catalog.json
 }
 
-// Unity Catalog Role
+# Unity Catalog Role
 resource "aws_iam_role" "unity_catalog" {
   name               = local.uc_iam_role
   assume_role_policy = data.databricks_aws_unity_catalog_assume_role_policy.unity_catalog.json
@@ -93,14 +93,14 @@ resource "aws_iam_role" "unity_catalog" {
   }
 }
 
-// Unity Catalog Policy Attachment
+# Unity Catalog Policy Attachment
 resource "aws_iam_policy_attachment" "unity_catalog_attach" {
   name       = "unity_catalog_policy_attach"
   roles      = [aws_iam_role.unity_catalog.name]
   policy_arn = aws_iam_policy.unity_catalog.arn
 }
 
-// Unity Catalog S3
+# Unity Catalog S3
 resource "aws_s3_bucket" "unity_catalog_bucket" {
   bucket        = var.uc_catalog_name
   force_destroy = true
@@ -138,7 +138,7 @@ resource "aws_s3_bucket_public_access_block" "unity_catalog" {
   depends_on              = [aws_s3_bucket.unity_catalog_bucket]
 }
 
-// External Location
+# External Location
 resource "databricks_external_location" "workspace_catalog_external_location" {
   name            = "${var.uc_catalog_name}-external-location"
   url             = "s3://${var.uc_catalog_name}/"
@@ -148,7 +148,7 @@ resource "databricks_external_location" "workspace_catalog_external_location" {
   depends_on      = [aws_iam_policy_attachment.unity_catalog_attach, time_sleep.wait_60_seconds]
 }
 
-// Workspace Catalog
+# Workspace Catalog
 resource "databricks_catalog" "workspace_catalog" {
   name           = local.uc_catalog_name_us
   comment        = "This catalog is for workspace - ${var.workspace_id}"
@@ -160,14 +160,14 @@ resource "databricks_catalog" "workspace_catalog" {
   depends_on = [databricks_external_location.workspace_catalog_external_location]
 }
 
-// Set Workspace Catalog as Default
+# Set Workspace Catalog as Default
 resource "databricks_default_namespace_setting" "this" {
   namespace {
     value = local.uc_catalog_name_us
   }
 }
 
-// Grant Admin Catalog Perms
+# Grant Admin Catalog Perms
 resource "databricks_grant" "workspace_catalog" {
   catalog = databricks_catalog.workspace_catalog.name
 

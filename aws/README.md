@@ -74,6 +74,8 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Cluster Example**: An example cluster and cluster policy have been included with Derby Metastore configurations. **NOTE:** This will create a cluster within your Databricks workspace, including the underlying EC2 instance.
 
+- **Audit Log Delivery**: Low-latency delivery of Databricks logs to a S3 bucket in your AWS account. [Audit logs](https://docs.databricks.com/aws/en/admin/account-settings/audit-log-delivery) contain two levels of events: workspace-level audit logs with workspace-level events, and account-level audit logs with account-level events. Additionally, you can generate more detailed events by enabling verbose audit logs. 
+
 ---
 
 ## Critical Next Steps
@@ -83,6 +85,8 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
     - [Front-End PrivateLink](https://docs.databricks.com/en/security/network/classic/privatelink.html#step-5-configure-internal-dns-to-redirect-user-requests-to-the-web-application-front-end).
 
 - **Implement Single Sign-On, Multi-factor Authentication, SCIM Provisioning**: Most enterprise deployments enable [Single Sign-On (SSO)](https://docs.databricks.com/administration-guide/users-groups/single-sign-on/index.html) and multi-factor authentication (MFA). For user management, we recommend integrating [SCIM (System for Cross-domain Identity Management)](https://docs.databricks.com/dev-tools/api/latest/scim/index.html) with your account console.
+
+- **Implement Restrictive Serverless Network Policy**: Serverless network policies can be found under Cloud resources, Network, in the account console. A network policy implements an egress firewall for your serverless compute. If you're using the Security Analysis Tool, be sure to allow list the Databricks account console and relevant Databricks workspace endpoints.
 
 ---
 

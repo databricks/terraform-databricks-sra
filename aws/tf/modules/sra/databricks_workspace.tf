@@ -1,13 +1,12 @@
-// EXPLANATION: All modules that reside at the workspace level
+# EXPLANATION: All modules that reside at the workspace level
 
-// Creates a Workspace Isolated Catalog
+# Creates a Workspace Isolated Catalog
 module "uc_catalog" {
   source = "./databricks_workspace/uc_catalog"
   providers = {
     databricks = databricks.created_workspace
   }
 
-  databricks_account_id        = var.databricks_account_id
   aws_account_id               = var.aws_account_id
   resource_prefix              = var.resource_prefix
   uc_catalog_name              = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
@@ -18,7 +17,7 @@ module "uc_catalog" {
   depends_on = [module.databricks_mws_workspace, module.uc_assignment]
 }
 
-// System Table Schemas Enablement
+# System Table Schemas Enablement
 module "system_table" {
   source = "./databricks_workspace/system_schema"
   providers = {
@@ -27,7 +26,7 @@ module "system_table" {
   depends_on = [module.uc_assignment]
 }
 
-// Create Create Cluster
+# Create Create Cluster
 module "cluster_configuration" {
   source = "./databricks_workspace/classic_cluster"
   providers = {
@@ -41,7 +40,7 @@ module "cluster_configuration" {
   ]
 }
 
-// Restrictive DBFS bucket policy
+# Restrictive DBFS bucket policy
 module "restrictive_root_bucket" {
   source = "./databricks_workspace/restrictive_root_bucket"
   providers = {

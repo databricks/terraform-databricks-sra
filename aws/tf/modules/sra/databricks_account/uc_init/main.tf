@@ -1,6 +1,6 @@
-// Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog
+# Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog
 
-// Optional data source - only run if the metastore exists
+# Optional data source - only run if the metastore exists
 data "databricks_metastore" "this" {
   count  = var.metastore_exists ? 1 : 0
   region = var.region

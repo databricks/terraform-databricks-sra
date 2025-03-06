@@ -21,6 +21,14 @@ mock_provider "aws" {
 # A mocked databricks provider is added here so that the alias requirement can be met
 mock_provider "databricks" {
   alias = "mws"
+
+  # This is used to return valid JSON for the data types of the assume role policy.
+  mock_data "databricks_aws_assume_role_policy" {
+    defaults = {
+      json = "{\"some_fake\":\"json\"}"
+    }    
+  }
+
 }
 # ---------------
 

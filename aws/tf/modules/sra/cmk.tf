@@ -1,4 +1,4 @@
-// EXPLANATION: The customer-managed keys for workspace and managed storage
+# EXPLANATION: The customer-managed keys for workspace and managed storage
 
 locals {
   cmk_admin_value = var.cmk_admin_arn == null ? "arn:aws:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
@@ -35,7 +35,7 @@ resource "aws_kms_key" "workspace_storage" {
         "Resource" : "*",
         "Condition" : {
           "StringEquals" : {
-            "aws:PrincipalTag/DatabricksAccountId" : "${var.databricks_account_id}"
+            "aws:PrincipalTag/DatabricksAccountId" : [var.databricks_account_id]
           }
         }
       },
@@ -43,7 +43,7 @@ resource "aws_kms_key" "workspace_storage" {
         "Sid" : "Allow Databricks to use KMS key for EBS",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "${aws_iam_role.cross_account_role.arn}"
+          "AWS" : aws_iam_role.cross_account_role.arn
         },
         "Action" : [
           "kms:Decrypt",
@@ -74,7 +74,7 @@ resource "aws_kms_alias" "workspace_storage_key_alias" {
   target_key_id = aws_kms_key.workspace_storage.id
 }
 
-## CMK for Managed Storage
+# CMK for Managed Storage
 
 resource "aws_kms_key" "managed_storage" {
   description = "KMS key for managed storage"
@@ -103,7 +103,7 @@ resource "aws_kms_key" "managed_storage" {
         "Resource" : "*",
         "Condition" : {
           "StringEquals" : {
-            "aws:PrincipalTag/DatabricksAccountId" : ["${var.databricks_account_id}"]
+            "aws:PrincipalTag/DatabricksAccountId" : [var.databricks_account_id]
           }
         }
       }
