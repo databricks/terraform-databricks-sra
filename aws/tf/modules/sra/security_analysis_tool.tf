@@ -7,9 +7,7 @@ module "security_analysis_tool" {
   providers = {
     databricks = databricks.created_workspace
   }
-
-  databricks_url       = module.databricks_mws_workspace.workspace_url
-  workspace_id         = module.databricks_mws_workspace.workspace_id
+  
   account_console_id   = var.databricks_account_id
   client_id            = var.client_id
   client_secret        = var.client_secret

@@ -1,15 +1,5 @@
 # Databricks variables
 
-variable "databricks_url" {
-  description = "Should look like https://<workspace>.cloud.databricks.com"
-  type        = string
-}
-
-variable "workspace_id" {
-  description = "Should be the string of numbers in the workspace URL arg (e.g. https://<workspace>.cloud.databricks.com/?o=1234567890123456)"
-  type        = string
-}
-
 variable "account_console_id" {
   description = "Databricks Account Console ID"
   type        = string
