@@ -22,6 +22,9 @@ mock_provider "aws" {
 mock_provider "databricks" {
   alias = "mws"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 
   # This is used to return valid JSON for the data types of the assume role policy.
   mock_data "databricks_aws_assume_role_policy" {
@@ -30,8 +33,11 @@ mock_provider "databricks" {
     }    
   }
 
+<<<<<<< HEAD
 =======
 >>>>>>> fec1eb1 (tests(aws): Add default test for aws)
+=======
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 }
 # ---------------
 

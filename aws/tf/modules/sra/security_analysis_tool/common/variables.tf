@@ -4,6 +4,7 @@ variable "account_console_id" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 variable "workspace_id" {
   type        = string
@@ -11,6 +12,8 @@ variable "workspace_id" {
 }
 
 >>>>>>> ecbeb76 (adding required provider versions)
+=======
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 variable "sqlw_id" {
   type        = string
   description = "16 character SQL Warehouse ID: Type new to have one created or enter an existing SQL Warehouse ID"

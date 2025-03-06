@@ -5,6 +5,17 @@ terraform {
 <<<<<<< HEAD
       source  = "databricks/databricks"
       version = ">=1.54.0"
+<<<<<<< HEAD
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">=0.12.1"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">=5.76.0"
+=======
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
     }
     time = {
       source  = "hashicorp/time"
@@ -14,16 +25,9 @@ terraform {
       source  = "hashicorp/aws"
       version = ">=5.76.0"
     }
-    time = {
-      source  = "hashicorp/time"
-      version = "0.12.1"
-    }
-    aws = {
-      source  = "hashicorp/aws"
-      version = "5.76.0"
-    }
   }
   required_version = ">=1.0"
+<<<<<<< HEAD
 =======
       source = "databricks/databricks"
 =======
@@ -33,4 +37,6 @@ terraform {
     }
   }
 >>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
+=======
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 }

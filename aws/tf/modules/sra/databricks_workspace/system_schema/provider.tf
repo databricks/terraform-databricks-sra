@@ -8,6 +8,7 @@ terraform {
     }
   }
   required_version = ">=1.0"
+<<<<<<< HEAD
 =======
       source = "databricks/databricks"
 =======
@@ -17,4 +18,6 @@ terraform {
     }
   }
 >>>>>>> b3e4c6f (aws simplicity update)
+=======
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 }

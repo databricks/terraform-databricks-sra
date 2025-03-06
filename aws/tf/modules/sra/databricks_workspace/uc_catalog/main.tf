@@ -4,6 +4,10 @@ resource "null_resource" "previous" {}
 resource "time_sleep" "wait_60_seconds" {
   depends_on      = [null_resource.previous]
   create_duration = "60s"
+<<<<<<< HEAD
+=======
+  create_duration = "60s"
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 }
 
 locals {
@@ -138,6 +142,7 @@ resource "aws_s3_bucket_public_access_block" "unity_catalog" {
   depends_on              = [aws_s3_bucket.unity_catalog_bucket]
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:aws/tf/modules/sra/databricks_workspace/uc_catalog/main.tf
 # External Location
 ========
@@ -164,14 +169,39 @@ resource "databricks_external_location" "workspace_catalog_external_location" {
 ========
   depends_on     = [aws_iam_role_policy.unity_catalog, time_sleep.wait_30_seconds]  
 >>>>>>>> b3e4c6f (aws simplicity update):aws/tf/modules/sra/databricks_workspace/uc_catalog/uc_catalog.tf
+=======
+<<<<<<< HEAD
+// External Location
+>>>>>>>> b3e4c6f (aws simplicity update):aws/tf/modules/sra/databricks_workspace/uc_catalog/uc_catalog.tf
+=======
+# External Location
+>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
+resource "databricks_external_location" "workspace_catalog_external_location" {
+  name            = "${var.uc_catalog_name}-external-location"
+  url             = "s3://${var.uc_catalog_name}/"
+  name            = "${var.uc_catalog_name}-external-location"
+  url             = "s3://${var.uc_catalog_name}/"
+  credential_name = databricks_storage_credential.workspace_catalog_storage_credential.id
+  comment         = "External location for catalog ${var.uc_catalog_name}"
+  isolation_mode  = "ISOLATION_MODE_ISOLATED"
+  depends_on      = [aws_iam_policy_attachment.unity_catalog_attach, time_sleep.wait_60_seconds]
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 }
 
 # Workspace Catalog
 resource "databricks_catalog" "workspace_catalog" {
   name           = local.uc_catalog_name_us
+<<<<<<< HEAD
   comment        = "This catalog is for workspace - ${var.workspace_id}"
   isolation_mode = "ISOLATED"
   storage_root   = "s3://${var.uc_catalog_name}/"
+=======
+  name           = local.uc_catalog_name_us
+  comment        = "This catalog is for workspace - ${var.workspace_id}"
+  isolation_mode = "ISOLATED"
+  storage_root   = "s3://${var.uc_catalog_name}/"
+  storage_root   = "s3://${var.uc_catalog_name}/"
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
   properties = {
     purpose = "Catalog for workspace - ${var.workspace_id}"
   }

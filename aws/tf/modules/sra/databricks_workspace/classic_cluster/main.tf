@@ -10,7 +10,11 @@ resource "databricks_cluster" "example" {
   cluster_name            = "Shared Classic Compute Plane Cluster"
   data_security_mode      = "USER_ISOLATION"
   spark_version           = data.databricks_spark_version.latest_lts.id
+<<<<<<< HEAD
   node_type_id            = "m5n.large"
+=======
+  node_type_id            = "i3.xlarge"
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
   autotermination_minutes = 10
 
   autoscale {
@@ -18,6 +22,7 @@ resource "databricks_cluster" "example" {
     max_workers = 2
   }
 
+<<<<<<< HEAD
   aws_attributes {
     availability           = "ON_DEMAND"
     ebs_volume_count       = 1
@@ -25,6 +30,8 @@ resource "databricks_cluster" "example" {
     ebs_volume_type        = "GENERAL_PURPOSE_SSD"
   }
 
+=======
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
   # Derby Metastore configs
   spark_conf = {
     "spark.hadoop.datanucleus.autoCreateTables" : "true",
@@ -41,4 +48,8 @@ resource "databricks_cluster" "example" {
   custom_tags = {
     "Project" = var.resource_prefix
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)

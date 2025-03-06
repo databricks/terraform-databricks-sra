@@ -4,6 +4,7 @@
 <<<<<<<< HEAD:aws/customizations/workspace/solution_accelerators/security_analysis_tool/aws/variables.tf
 ========
 
+<<<<<<< HEAD
 variable "databricks_url" {
   description = "Should look like https://<workspace>.cloud.databricks.com"
   type        = string
@@ -16,6 +17,8 @@ variable "workspace_id" {
 >>>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update):aws/tf/modules/sra/security_analysis_tool/aws/variables.tf
 >>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
 
+=======
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 variable "account_console_id" {
   description = "Databricks Account Console ID"
   type        = string

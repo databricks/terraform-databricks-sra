@@ -8,12 +8,16 @@ module "security_analysis_tool" {
     databricks = databricks.created_workspace
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
   
 =======
 
   databricks_url       = module.databricks_mws_workspace.workspace_url
   workspace_id         = module.databricks_mws_workspace.workspace_id
 >>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
+=======
+  
+>>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
   account_console_id   = var.databricks_account_id
   client_id            = var.client_id
   client_secret        = var.client_secret
