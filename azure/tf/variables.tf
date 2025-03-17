@@ -12,12 +12,6 @@ variable "hub_vnet_cidr" {
   description = "(Required) The CIDR block for the hub Virtual Network"
 }
 
-variable "hub_storage_account_name" {
-  type        = string
-  description = "(Optional) Name of the storage account created in hub (the metastore root storage account), will be generated if not provided"
-  default     = null
-}
-
 variable "hub_resource_suffix" {
   type        = string
   description = "(Required) Resource suffix for naming resources in hub"
@@ -32,9 +26,11 @@ variable "public_repos" {
 variable "spoke_config" {
   type = map(object(
     {
-      resource_suffix = string
-      cidr            = string
-      tags            = map(string)
+      resource_suffix          = string
+      cidr                     = string
+      tags                     = map(string)
+      is_unity_catalog_enabled = optional(bool, true)
+      storage_account_name     = optional(string, null)
     }
   ))
   description = "(Required) List of spoke configurations"
