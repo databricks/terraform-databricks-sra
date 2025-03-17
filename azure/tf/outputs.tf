@@ -16,6 +16,7 @@ output "hub_resource_group_name" {
 <<<<<<< HEAD
 output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
+<<<<<<< HEAD
   value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
 }
 =======
@@ -28,5 +29,8 @@ output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
   # value       = values(module.spoke)[*].workspace_url
   value = { for k, v in module.spoke : k => [v.resource_group_name, v.workspace_url] }
+=======
+  value       = [module.spoke.resource_group_name, module.spoke.workspace_url, module.spoke.uc_abfss_url]
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
 }
 >>>>>>> ad6dd10 (outputs, naming variables)

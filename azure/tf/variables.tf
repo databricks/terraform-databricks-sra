@@ -30,6 +30,7 @@ variable "hub_vnet_cidr" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 variable "hub_resource_suffix" {
   type        = string
 <<<<<<< HEAD
@@ -47,6 +48,8 @@ variable "hub_storage_account_name" {
   default     = null
 }
 
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
 variable "hub_resource_suffix" {
   type        = string
   description = "(Required) Resource suffix for naming resources in hub"
@@ -62,16 +65,22 @@ variable "spoke_config" {
   type = map(object(
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
       resource_suffix          = string
       cidr                     = string
       tags                     = map(string)
       is_unity_catalog_enabled = optional(bool, true)
       storage_account_name     = optional(string, null)
+<<<<<<< HEAD
 =======
       resource_suffix = string
       cidr            = string
       tags            = map(string)
 >>>>>>> 900395d (naming)
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
     }
   ))
   description = "(Required) List of spoke configurations"

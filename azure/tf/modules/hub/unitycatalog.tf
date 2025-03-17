@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 locals {
@@ -63,6 +64,8 @@ resource "azurerm_role_assignment" "this" {
 }
 
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
 # Define a Databricks Metastore resource
 resource "databricks_metastore" "this" {
   count = var.is_unity_catalog_enabled ? 1 : 0
@@ -71,6 +74,7 @@ resource "databricks_metastore" "this" {
 <<<<<<< HEAD
 <<<<<<< HEAD
   name = "uc-metastore-${var.resource_suffix}"
+<<<<<<< HEAD
 =======
   name = "${local.prefix}-metastore"
 =======
@@ -83,11 +87,14 @@ resource "databricks_metastore" "this" {
     azurerm_storage_container.unity_catalog[0].name,
   azurerm_storage_account.unity_catalog[0].name)
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
   # owner         = "uc admins"
   region        = azurerm_resource_group.this.location
   force_destroy = true
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 resource "databricks_group" "this" {
   count = var.is_unity_catalog_enabled ? 1 : 0
@@ -114,6 +121,8 @@ resource "databricks_metastore_data_access" "this" {
   }
 }
 
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
 resource "databricks_group" "this" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 

@@ -94,6 +94,7 @@ output "private_link_info" {
   }
   description = "Information related to the Private Link, including DNS Zone ID and Subnet ID for Private Link connectivity."
 }
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -156,3 +157,5 @@ output "my_ip_addr" {
 }
 =======
 >>>>>>> 6df143a (deployed without UC)
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)

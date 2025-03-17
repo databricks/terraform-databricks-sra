@@ -39,6 +39,9 @@ module "subnet_addrs" {
 module "hub" {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
   source             = "./modules/hub"
   location           = var.location
   hub_vnet_cidr      = var.hub_vnet_cidr
@@ -48,6 +51,7 @@ module "hub" {
   public_repos       = var.public_repos
   tags               = var.tags
   resource_suffix    = var.hub_resource_suffix
+<<<<<<< HEAD
 =======
   source = "./modules/hub"
 <<<<<<< HEAD
@@ -88,6 +92,8 @@ module "hub" {
   storage_account_name = var.hub_storage_account_name
   resource_suffix      = var.hub_resource_suffix
 >>>>>>> 5a2b623 (formatting)
+=======
+>>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
 
   #options
 <<<<<<< HEAD

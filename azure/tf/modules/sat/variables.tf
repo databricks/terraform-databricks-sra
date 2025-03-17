@@ -104,3 +104,13 @@ variable "workspace_id" {
   description = "Databricks Workspace ID"
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
 }
+
+variable "external_location_url" {
+  type        = string
+  description = "URL for external location"
+}
+
+variable "uc_credential_name" {
+  type        = string
+  description = "Name of the storage credential created for UC"
+}
