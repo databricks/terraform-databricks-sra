@@ -69,6 +69,7 @@ output "is_unity_catalog_enabled" {
   description = "If UC creation is enabled"
 }
 
+<<<<<<< HEAD
 =======
   value = var.is_unity_catalog_enabled
 =======
@@ -79,6 +80,8 @@ output "is_unity_catalog_enabled" {
 
 
 >>>>>>> 60cc2bc (remove redundant module naming)
+=======
+>>>>>>> 76eb303 (style(azure): various whitespace/styling updates)
 output "resource_group_name" {
   value       = azurerm_resource_group.this.name
   description = "The name of the Azure Resource Group."
