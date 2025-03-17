@@ -48,7 +48,6 @@ output "is_unity_catalog_enabled" {
   description = "If UC creation is enabled"
 }
 
-
 output "resource_group_name" {
   value       = azurerm_resource_group.this.name
   description = "The name of the Azure Resource Group."
