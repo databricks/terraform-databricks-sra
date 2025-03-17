@@ -27,7 +27,7 @@ resource "azurerm_private_endpoint" "backend" {
   tags = var.tags
 }
 
-#Define a private DNS zone resource for the backend
+# Define a private DNS zone resource for the backend
 resource "azurerm_private_dns_zone" "backend" {
   name                = "privatelink.azuredatabricks.net"
   resource_group_name = azurerm_resource_group.this.name
