@@ -60,8 +60,3 @@ output "private_link_info" {
   }
   description = "Information related to the Private Link, including DNS Zone ID and Subnet ID for Private Link connectivity."
 }
-
-output "ncc_id" {
-  value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
-  description = "The ID of the hub regional Network Connectivity Config."
-}

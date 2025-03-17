@@ -49,3 +49,13 @@ variable "workspace_id" {
   type        = string
   description = "Databricks Workspace ID"
 }
+
+variable "external_location_url" {
+  type        = string
+  description = "URL for external location"
+}
+
+variable "uc_credential_name" {
+  type        = string
+  description = "Name of the storage credential created for UC"
+}
