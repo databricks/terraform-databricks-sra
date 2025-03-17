@@ -102,7 +102,14 @@ variable "tags" {
   default     = {}
 }
 
-variable "ncc_id" {
+variable "is_unity_catalog_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable creation of new UC"
+  default     = true
+}
+
+variable "storage_account_name" {
   type        = string
-  description = "(Required) The ID of the regional hub Network Connectivity Config object to bind to ADB Workspace."
+  description = "(Optional) Name of the storage account created, if not provided - a random name will be generated"
+  default     = null
 }
