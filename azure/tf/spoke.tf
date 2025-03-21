@@ -25,3 +25,22 @@ module "spoke" {
 
   depends_on = [module.hub]
 }
+
+module "spoke_catalog" {
+  source = "./modules/catalog"
+
+  location = var.location
+
+  catalog_name        = module.spoke.resource_suffix
+  dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
+  metastore_id        = module.hub.metastore_id
+  ncc_id              = module.spoke.ncc_id
+  resource_group_name = module.spoke.resource_group_name
+  resource_suffix     = module.spoke.resource_suffix
+  subnet_id           = module.spoke.subnet_ids.privatelink
+  tags                = module.spoke.tags
+
+  providers = {
+    databricks.workspace = databricks.spoke
+  }
+}
