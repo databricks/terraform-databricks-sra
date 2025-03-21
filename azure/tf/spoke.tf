@@ -2,10 +2,17 @@
 module "spoke" {
   source = "./modules/spoke"
 
+<<<<<<< HEAD
   # Update these per spoke
   resource_suffix = var.spoke_config["spoke"].resource_suffix
   vnet_cidr       = var.spoke_config["spoke"].cidr
   tags            = var.spoke_config["spoke"].tags
+=======
+  # Pass the required variables to the module
+  resource_suffix          = var.spoke_config["spoke"].resource_suffix
+  vnet_cidr                = var.spoke_config["spoke"].cidr
+  tags                     = var.spoke_config["spoke"].tags
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 
   location                = var.location
   route_table_id          = module.hub.route_table_id
@@ -25,6 +32,7 @@ module "spoke" {
 
   depends_on = [module.hub]
 }
+<<<<<<< HEAD
 
 module "spoke_catalog" {
   source = "./modules/catalog"
@@ -45,3 +53,5 @@ module "spoke_catalog" {
     databricks.workspace = databricks.spoke
   }
 }
+=======
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)

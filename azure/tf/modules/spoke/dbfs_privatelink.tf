@@ -101,6 +101,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_blob" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 # NCC access to DBFS
 
@@ -122,3 +123,5 @@ resource "databricks_mws_ncc_private_endpoint_rule" "dbfs_dfs" {
   group_id                       = "dfs"
 }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)

@@ -160,17 +160,12 @@ variable "subscription_id" {
 variable "sat_configuration" {
   type = object({
     enabled           = optional(bool, true)
-    spoke             = optional(string, "")
     schema_name       = optional(string, "sat")
     catalog_name      = optional(string, "sat")
     proxies           = optional(map(any), {})
     run_on_serverless = optional(bool, true)
   })
-  default = {}
-  validation {
-    condition     = var.sat_configuration.spoke == "" || contains(keys(var.spoke_config), var.sat_configuration.spoke)
-    error_message = "SAT spoke must be a spoke in the spoke_config variable"
-  }
+  default     = {}
   description = "(Optional) Configuration for the SAT customization"
 }
 

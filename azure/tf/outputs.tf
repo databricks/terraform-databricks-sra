@@ -17,6 +17,9 @@ output "hub_resource_group_name" {
 output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
   value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
 }
 =======

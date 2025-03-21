@@ -4,6 +4,7 @@ resource "databricks_mws_network_connectivity_config" "this" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 resource "databricks_mws_ncc_private_endpoint_rule" "storage" {
   network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
@@ -12,6 +13,8 @@ resource "databricks_mws_ncc_private_endpoint_rule" "storage" {
 }
 
 >>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
+=======
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 # NCC access to DBFS
 data "azurerm_storage_account" "dbfs" {
   depends_on          = [azurerm_databricks_workspace.this]

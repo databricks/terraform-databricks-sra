@@ -131,6 +131,7 @@ module "hub" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 module "hub_catalog" {
   source = "./modules/catalog"
 
@@ -191,3 +192,5 @@ module "spoke" {
   depends_on = [module.hub]
 >>>>>>> d243d1c (make key vault optional on Azure)
 }
+=======
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)

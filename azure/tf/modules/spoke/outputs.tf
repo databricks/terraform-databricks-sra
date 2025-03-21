@@ -1,8 +1,3 @@
-locals {
-  uc_abfss_url       = var.is_unity_catalog_enabled ? "abfss://${azurerm_storage_container.unity_catalog[0].name}@${azurerm_storage_account.unity_catalog[0].primary_dfs_host}/unitycatalog" : ""
-  uc_credential_name = var.is_unity_catalog_enabled ? databricks_storage_credential.unity_catalog[0].name : ""
-}
-
 # The value of the "workspace_url" property represents the URL of the Databricks workspace
 output "workspace_url" {
 <<<<<<< HEAD
@@ -82,6 +77,9 @@ output "dbfs_storage_account_id" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 output "dns_zone_ids" {
   description = "Private DNS Zone IDs"
   value = {
@@ -89,6 +87,7 @@ output "dns_zone_ids" {
     blob    = var.boolean_create_private_dbfs ? azurerm_private_dns_zone.dbfs_blob[0].id : "",
     backend = azurerm_private_dns_zone.backend.id
   }
+<<<<<<< HEAD
 }
 
 output "subnet_ids" {
@@ -129,4 +128,30 @@ output "uc_crendential_name" {
   description = "Name of the storage credential created for UC"
   value       = local.uc_credential_name
 >>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
+=======
+}
+
+output "subnet_ids" {
+  description = "Subnet IDs"
+  value = {
+    host        = azurerm_subnet.host.id
+    container   = azurerm_subnet.container.id
+    privatelink = azurerm_subnet.privatelink.id
+  }
+}
+
+output "ncc_id" {
+  description = "NCC ID of this workspace"
+  value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+}
+
+output "resource_suffix" {
+  description = "Resource suffix of this spoke"
+  value       = var.resource_suffix
+}
+
+output "tags" {
+  description = "Tags of this spoke"
+  value       = var.tags
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 }

@@ -37,6 +37,7 @@ resource "databricks_group_member" "admin" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 resource "databricks_grant" "sat_sp_catalog" {
   principal  = databricks_service_principal.sp.application_id
   privileges = ["ALL_PRIVILEGES"]
@@ -53,18 +54,24 @@ resource "databricks_catalog" "catalog" {
   name = var.catalog_name
 }
 
+=======
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 resource "databricks_grant" "sat_sp_catalog" {
   principal  = databricks_service_principal.sp.application_id
   privileges = ["ALL_PRIVILEGES"]
-  catalog    = databricks_catalog.catalog.id
+  catalog    = var.catalog_name
 }
 
 module "sat" {
-  source = "git::https://github.com/databricks-industry-solutions/security-analysis-tool.git//terraform/common?ref=v0.3.3"
+  source = "git::https://github.com/databricks-industry-solutions/security-analysis-tool.git//terraform/common?ref=723cd448ac6d9ff488615930b7f747787a882193"
 
   account_console_id   = var.databricks_account_id
+<<<<<<< HEAD
   analysis_schema_name = "${databricks_catalog.catalog.name}.${var.schema_name}"
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
+=======
+  analysis_schema_name = "${var.catalog_name}.${var.schema_name}"
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
   proxies              = var.proxies
   run_on_serverless    = var.run_on_serverless
   workspace_id         = var.workspace_id

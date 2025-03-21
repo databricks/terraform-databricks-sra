@@ -1,8 +1,3 @@
-locals {
-  # This can be changed to any spoke, but by default is the first spoke in the spoke_config
-  sat_spoke = var.sat_configuration.spoke == "" ? keys(var.spoke_config)[0] : var.sat_configuration.spoke
-}
-
 provider "azurerm" {
   features {}
   subscription_id = var.subscription_id
@@ -54,6 +49,15 @@ provider "databricks" {
 >>>>>>> dfb2809 (fix: Remove defaulted auth info on Databricks providers)
 =======
   alias = "SAT"
+<<<<<<< HEAD
   host  = module.spoke[local.sat_spoke].workspace_url
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
+=======
+  host  = module.spoke.workspace_url
+}
+
+provider "databricks" {
+  alias = "spoke"
+  host  = module.spoke.workspace_url
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 }

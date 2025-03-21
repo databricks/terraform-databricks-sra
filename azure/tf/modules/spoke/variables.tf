@@ -122,6 +122,7 @@ variable "tags" {
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
 }
+<<<<<<< HEAD
 <<<<<<< HEAD:azure/tf/modules/spoke/variables.tf
 =======
 
@@ -148,3 +149,5 @@ variable "databricks_app_reg" {
 >>>>>>> 721eaf9 (fix linting):azure/tf/modules/azure_spoke/variables.tf
 =======
 >>>>>>> 795c8e1 (chore: Remove unused variables)
+=======
+>>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
