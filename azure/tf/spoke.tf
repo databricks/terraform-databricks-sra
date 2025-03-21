@@ -9,10 +9,16 @@ module "spoke" {
   tags            = var.spoke_config["spoke"].tags
 =======
   # Pass the required variables to the module
+<<<<<<< HEAD
   resource_suffix          = var.spoke_config["spoke"].resource_suffix
   vnet_cidr                = var.spoke_config["spoke"].cidr
   tags                     = var.spoke_config["spoke"].tags
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
+=======
+  resource_suffix = var.spoke_config["spoke"].resource_suffix
+  vnet_cidr       = var.spoke_config["spoke"].cidr
+  tags            = var.spoke_config["spoke"].tags
+>>>>>>> b2a5a02 (chore(azure): Terraform fmt)
 
   location                = var.location
   route_table_id          = module.hub.route_table_id
