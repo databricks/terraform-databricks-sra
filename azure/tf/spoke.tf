@@ -3,9 +3,9 @@ module "spoke" {
   source = "./modules/spoke"
 
   # Pass the required variables to the module
-  resource_suffix          = var.spoke_config["spoke"].resource_suffix
-  vnet_cidr                = var.spoke_config["spoke"].cidr
-  tags                     = var.spoke_config["spoke"].tags
+  resource_suffix = var.spoke_config["spoke"].resource_suffix
+  vnet_cidr       = var.spoke_config["spoke"].cidr
+  tags            = var.spoke_config["spoke"].tags
 
   location                = var.location
   route_table_id          = module.hub.route_table_id
