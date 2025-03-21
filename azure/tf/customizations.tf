@@ -2,6 +2,7 @@ locals {
   create_sat_sp     = var.sat_configuration.enabled && var.sat_service_principal.client_id == ""
   sat_client_id     = local.create_sat_sp ? azuread_service_principal.sat[0].client_id : var.sat_service_principal.client_id
   sat_client_secret = local.create_sat_sp ? azuread_service_principal_password.sat[0].value : var.sat_service_principal.client_secret
+  sat_spoke         = module.spoke
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -41,27 +42,46 @@ resource "azurerm_role_assignment" "sat_can_read_subscription" {
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
+module "sat_catalog" {
+  source = "./modules/catalog"
+
+  catalog_name        = var.sat_configuration.catalog_name
+  location            = var.location
+  metastore_id        = module.hub.metastore_id
+  dns_zone_ids        = [local.sat_spoke.dns_zone_ids.dfs]
+  ncc_id              = local.sat_spoke.ncc_id
+  resource_group_name = local.sat_spoke.resource_group_name
+  resource_suffix     = "sat"
+  subnet_id           = local.sat_spoke.subnet_ids.privatelink
+  tags                = local.sat_spoke.tags
+
+  providers = {
+    databricks.workspace = databricks.spoke
+  }
+}
 
 # This is modularized to allow for easy count and provider arguments
 module "sat" {
   source = "./modules/sat"
   count  = var.sat_configuration.enabled ? 1 : 0
 
+  tenant_id       = data.azurerm_client_config.current.tenant_id
+  subscription_id = var.subscription_id
+
   databricks_account_id           = var.databricks_account_id
   schema_name                     = var.sat_configuration.schema_name
-  catalog_name                    = var.sat_configuration.catalog_name
-  service_principal_client_id     = local.sat_client_id
-  service_principal_client_secret = local.sat_client_secret
-  subscription_id                 = var.subscription_id
-  tenant_id                       = data.azurerm_client_config.current.tenant_id
-  workspace_id                    = module.spoke[local.sat_spoke].workspace_id
   proxies                         = var.sat_configuration.proxies
   run_on_serverless               = var.sat_configuration.run_on_serverless
+  catalog_name                    = module.sat_catalog.catalog_name
+  service_principal_client_id     = local.sat_client_id
+  service_principal_client_secret = local.sat_client_secret
+
+  workspace_id = local.sat_spoke.workspace_id
 
   depends_on = [module.spoke]
 
   providers = {
-    databricks = databricks.SAT
+    databricks = databricks.spoke
   }
 }
 

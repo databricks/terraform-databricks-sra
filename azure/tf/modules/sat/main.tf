@@ -36,21 +36,17 @@ resource "databricks_group_member" "admin" {
   member_id = databricks_service_principal.sp.id
 }
 
-resource "databricks_catalog" "catalog" {
-  name = var.catalog_name
-}
-
 resource "databricks_grant" "sat_sp_catalog" {
   principal  = databricks_service_principal.sp.application_id
   privileges = ["ALL_PRIVILEGES"]
-  catalog    = databricks_catalog.catalog.id
+  catalog    = var.catalog_name
 }
 
 module "sat" {
-  source = "git::https://github.com/databricks-industry-solutions/security-analysis-tool.git//terraform/common?ref=v0.3.3"
+  source = "git::https://github.com/databricks-industry-solutions/security-analysis-tool.git//terraform/common?ref=723cd448ac6d9ff488615930b7f747787a882193"
 
   account_console_id   = var.databricks_account_id
-  analysis_schema_name = "${databricks_catalog.catalog.name}.${var.schema_name}"
+  analysis_schema_name = "${var.catalog_name}.${var.schema_name}"
   proxies              = var.proxies
   run_on_serverless    = var.run_on_serverless
   workspace_id         = var.workspace_id
