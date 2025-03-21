@@ -33,25 +33,42 @@ module "spoke" {
   depends_on = [module.hub]
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5554f06 (feat(azure): Add default catalog for spoke)
 
 module "spoke_catalog" {
   source = "./modules/catalog"
 
+<<<<<<< HEAD
   # Update these per catalog for the catalog's spoke
   catalog_name        = module.spoke.resource_suffix
   dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
+=======
+  location = var.location
+
+  catalog_name        = module.spoke.resource_suffix
+  dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
+  metastore_id        = module.hub.metastore_id
+>>>>>>> 5554f06 (feat(azure): Add default catalog for spoke)
   ncc_id              = module.spoke.ncc_id
   resource_group_name = module.spoke.resource_group_name
   resource_suffix     = module.spoke.resource_suffix
   subnet_id           = module.spoke.subnet_ids.privatelink
   tags                = module.spoke.tags
 
+<<<<<<< HEAD
   location     = var.location
   metastore_id = module.hub.metastore_id
 
+=======
+>>>>>>> 5554f06 (feat(azure): Add default catalog for spoke)
   providers = {
     databricks.workspace = databricks.spoke
   }
 }
+<<<<<<< HEAD
 =======
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
+=======
+>>>>>>> 5554f06 (feat(azure): Add default catalog for spoke)
