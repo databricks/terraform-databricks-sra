@@ -4,7 +4,11 @@ resource "azurerm_private_endpoint" "dfs" {
   resource_group_name = var.resource_group_name
   subnet_id           = var.subnet_id
 
+<<<<<<< HEAD
   # Define the private service connection for the dfs resource
+=======
+  # Define the private service connection for the dbfs_dfs resource
+>>>>>>> 575b72c (feat(azure): Add catalog module)
   private_service_connection {
     name                           = "${module.naming.private_service_connection.name}-dfs"
     private_connection_resource_id = azurerm_storage_account.unity_catalog.id
@@ -26,6 +30,7 @@ resource "databricks_mws_ncc_private_endpoint_rule" "dfs" {
   resource_id                    = azurerm_storage_account.unity_catalog.id
   group_id                       = "dfs"
 }
+<<<<<<< HEAD
 
 resource "azurerm_private_endpoint" "blob" {
   name                = "${module.naming.private_endpoint.name}-blob"
@@ -55,3 +60,5 @@ resource "databricks_mws_ncc_private_endpoint_rule" "blob" {
   resource_id                    = azurerm_storage_account.unity_catalog.id
   group_id                       = "blob"
 }
+=======
+>>>>>>> 575b72c (feat(azure): Add catalog module)
