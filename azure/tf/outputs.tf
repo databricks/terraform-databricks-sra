@@ -10,5 +10,5 @@ output "hub_resource_group_name" {
 
 output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
-  value       = [module.spoke.resource_group_name, module.spoke.workspace_url, module.spoke.uc_abfss_url]
+  value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
 }

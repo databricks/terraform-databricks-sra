@@ -1,8 +1,3 @@
-locals {
-  uc_abfss_url       = var.is_unity_catalog_enabled ? "abfss://${azurerm_storage_container.unity_catalog[0].name}@${azurerm_storage_account.unity_catalog[0].primary_dfs_host}/unitycatalog" : ""
-  uc_credential_name = var.is_unity_catalog_enabled ? databricks_storage_credential.unity_catalog[0].name : ""
-}
-
 # The value of the "workspace_url" property represents the URL of the Databricks workspace
 output "workspace_url" {
   description = "The URL of the Databricks workspace, used to access the Databricks environment."
@@ -42,12 +37,35 @@ output "dbfs_storage_account_id" {
   value       = data.azurerm_storage_account.dbfs.id
 }
 
-output "uc_abfss_url" {
-  description = "URL for Unity Catalog storage account for creating an external location"
-  value       = local.uc_abfss_url
+output "dns_zone_ids" {
+  description = "Private DNS Zone IDs"
+  value = {
+    dfs     = var.boolean_create_private_dbfs ? azurerm_private_dns_zone.dbfs_dfs[0].id : "",
+    blob    = var.boolean_create_private_dbfs ? azurerm_private_dns_zone.dbfs_blob[0].id : "",
+    backend = azurerm_private_dns_zone.backend.id
+  }
 }
 
-output "uc_crendential_name" {
-  description = "Name of the storage credential created for UC"
-  value       = local.uc_credential_name
+output "subnet_ids" {
+  description = "Subnet IDs"
+  value = {
+    host        = azurerm_subnet.host.id
+    container   = azurerm_subnet.container.id
+    privatelink = azurerm_subnet.privatelink.id
+  }
+}
+
+output "ncc_id" {
+  description = "NCC ID of this workspace"
+  value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+}
+
+output "resource_suffix" {
+  description = "Resource suffix of this spoke"
+  value       = var.resource_suffix
+}
+
+output "tags" {
+  description = "Tags of this spoke"
+  value       = var.tags
 }
