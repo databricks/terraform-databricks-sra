@@ -3,16 +3,9 @@ location              = "eastus2"
 hub_vnet_cidr         = "10.0.0.0/23"
 hub_resource_suffix   = "test"
 spoke_config = {
-  spoke_a = {
-    resource_suffix = "spokea"
+  spoke = {
+    resource_suffix = "spoke"
     cidr            = "10.0.2.0/24"
-    tags = {
-      example = "value"
-    }
-  }
-  spoke_b = {
-    resource_suffix = "spokeb"
-    cidr            = "10.0.3.0/24"
     tags = {
       example = "value"
     }

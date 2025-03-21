@@ -3,12 +3,6 @@ resource "databricks_mws_network_connectivity_config" "this" {
   region = azurerm_resource_group.this.location
 }
 
-resource "databricks_mws_ncc_private_endpoint_rule" "storage" {
-  network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
-  resource_id                    = azurerm_storage_account.unity_catalog[0].id
-  group_id                       = "dfs"
-}
-
 # NCC access to DBFS
 data "azurerm_storage_account" "dbfs" {
   depends_on          = [azurerm_databricks_workspace.this]

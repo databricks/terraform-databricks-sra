@@ -101,15 +101,3 @@ variable "tags" {
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
 }
-
-variable "is_unity_catalog_enabled" {
-  type        = bool
-  description = "(Optional - default to true) Enable creation of new UC"
-  default     = true
-}
-
-variable "storage_account_name" {
-  type        = string
-  description = "(Optional) Name of the storage account created, if not provided - a random name will be generated"
-  default     = null
-}
