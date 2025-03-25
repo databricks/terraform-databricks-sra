@@ -7,7 +7,9 @@ locals {
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Service Principal for SAT
-# Note: This is separated from the SAT module to allow for a BYO-SP pattern. If the user supplies values for the sat_service principal variable, creation will be skipped.
+# Note: This is separated from the SAT module to allow for a BYO-SP pattern. If the user supplies values for the
+# sat_service principal variable, creation will be skipped.
+
 resource "azuread_application_registration" "sat" {
   count = local.create_sat_sp ? 1 : 0
 
@@ -56,7 +58,7 @@ module "sat_catalog" {
   tags                = local.sat_spoke.tags
 
   providers = {
-    databricks.workspace = databricks.spoke
+    databricks.workspace = databricks.SAT
   }
 }
 
@@ -81,7 +83,7 @@ module "sat" {
   depends_on = [module.spoke]
 
   providers = {
-    databricks = databricks.spoke
+    databricks = databricks.SAT
   }
 }
 
