@@ -16,12 +16,18 @@ locals {
 # ----------------------------------------------------------------------------------------------------------------------
 # Service Principal for SAT
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Note: This is separated from the SAT module to allow for a BYO-SP pattern. If the user supplies values for the
 # sat_service principal variable, creation will be skipped.
 
 =======
 # Note: This is separated from the SAT module to allow for a BYO-SP pattern. If the user supplies values for the sat_service principal variable, creation will be skipped.
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
+=======
+# Note: This is separated from the SAT module to allow for a BYO-SP pattern. If the user supplies values for the
+# sat_service principal variable, creation will be skipped.
+
+>>>>>>> 9d6a2f7 (fix(azure): Make all SAT resources use the same azure provider)
 resource "azuread_application_registration" "sat" {
   count = local.create_sat_sp ? 1 : 0
 
@@ -74,7 +80,7 @@ module "sat_catalog" {
   tags                = local.sat_spoke.tags
 
   providers = {
-    databricks.workspace = databricks.spoke
+    databricks.workspace = databricks.SAT
   }
 }
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
@@ -125,11 +131,15 @@ module "sat" {
 
   providers = {
 <<<<<<< HEAD
+<<<<<<< HEAD
     databricks = databricks.SAT
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
 =======
     databricks = databricks.spoke
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
+=======
+    databricks = databricks.SAT
+>>>>>>> 9d6a2f7 (fix(azure): Make all SAT resources use the same azure provider)
   }
 }
 
