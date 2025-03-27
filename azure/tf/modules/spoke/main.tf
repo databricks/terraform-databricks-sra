@@ -21,10 +21,14 @@ locals {
 module "naming" {
   source  = "Azure/naming/azurerm"
 <<<<<<< HEAD
+<<<<<<< HEAD
   version = "~>0.4"
 =======
   version = "0.4.1"
 >>>>>>> 900395d (naming)
+=======
+  version = "~>0.4"
+>>>>>>> c67c73c (feat(azure): Switch to pessimistic pin for naming module)
   suffix  = [var.resource_suffix]
 }
 

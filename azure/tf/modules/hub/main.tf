@@ -37,7 +37,7 @@ resource "random_string" "naming" {
 >>>>>>> 2531551 (chore: Remove commented code)
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.1"
+  version = "~>0.4"
   suffix  = [var.resource_suffix]
 >>>>>>> 900395d (naming)
 }
