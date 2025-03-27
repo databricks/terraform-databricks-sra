@@ -4,6 +4,7 @@ locals {
   sat_client_secret = local.create_sat_sp ? azuread_service_principal_password.sat[0].value : var.sat_service_principal.client_secret
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   sat_workspace     = module.hub
   sat_catalog       = var.sat_configuration.enabled ? module.hub_catalog[0] : {}
 =======
@@ -11,6 +12,9 @@ locals {
 =======
   sat_spoke         = module.spoke
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
+=======
+  sat_workspace     = module.spoke
+>>>>>>> bc16a6a (style(azure): Rename local.sat_spoke to local.sat_workspace)
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,12 +76,12 @@ module "sat_catalog" {
   catalog_name        = var.sat_configuration.catalog_name
   location            = var.location
   metastore_id        = module.hub.metastore_id
-  dns_zone_ids        = [local.sat_spoke.dns_zone_ids.dfs]
-  ncc_id              = local.sat_spoke.ncc_id
-  resource_group_name = local.sat_spoke.resource_group_name
+  dns_zone_ids        = [local.sat_workspace.dns_zone_ids.dfs]
+  ncc_id              = local.sat_workspace.ncc_id
+  resource_group_name = local.sat_workspace.resource_group_name
   resource_suffix     = "sat"
-  subnet_id           = local.sat_spoke.subnet_ids.privatelink
-  tags                = local.sat_spoke.tags
+  subnet_id           = local.sat_workspace.subnet_ids.privatelink
+  tags                = local.sat_workspace.tags
 
   providers = {
     databricks.workspace = databricks.SAT
@@ -125,7 +129,7 @@ module "sat" {
   service_principal_client_id     = local.sat_client_id
   service_principal_client_secret = local.sat_client_secret
 
-  workspace_id = local.sat_spoke.workspace_id
+  workspace_id = local.sat_workspace.workspace_id
 
   depends_on = [module.spoke]
 
