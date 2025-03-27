@@ -28,7 +28,7 @@ export ARM_TENANT_ID="00000000-0000-0000-0000-000000000000"
 
 Alternatively, you can set the tenant ID in the databricks provider configurations (see the provider [doc](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure) for more info.)
 
-You may also encounter errors like the below when Terraform begins provisioning SAT resources:
+You may also encounter errors like the below when Terraform begins provisioning workspace resources:
 
 ```shell
 ╷
@@ -86,21 +86,54 @@ DBU usage reports for cost analysis.
 
 ## Security Analysis Tool
 Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
-SAT will be installed in the first `spoke` workspace in the `spoke_config` variable by default, but If you would like to 
-customize which of the spoke workspaces SAT is installed in, you can do so by changing the `sat_configuration.spoke` 
-variable like so:
+By default, SAT is installed in the default spoke workspace defined in `spoke.tf`.
+
+### Changing the SAT workspace
+To change which workspace SAT is installed in, there are two modifications required:
+
+1. Change the Databricks provider aliased as `SAT` to use a different workspace
+```hcl
+# providers.tf - default
+# Default
+provider "databricks" {
+  alias = "SAT"
+  host  = module.spoke.workspace_url #<- This should be updated to the spoke you would like to use for SAT
+}
+```
+
+```hcl
+# providers.tf - modified
+provider "databricks" {
+  alias = "SAT"
+  host  = module.spoke_b.workspace_url
+}
+```
+
+2. Change the "sat_workspace" local to use the correct module
+```hcl
+# customizations.tf - default
+locals {
+  sat_workspace     = module.spoke #<- This should be updated to the spoke you would like to use for SAT
+}
+```
+```hcl
+# customizations.tf - modified
+locals {
+  sat_workspace     = module.spoke_b #<- This should be updated to the spoke you would like to use for SAT
+}
+```
 
 ```hcl
 # example.tfvars
 spoke_config = {
-  spokeA = {
+  spoke = {
     resource_suffix = "spoke-a",
     cidr            = "10.0.1.0/24",
     tags = {
       "Owner" = "some.user@databricks.com"
     }
   }
-  spokeB = {
+  spoke_b = {
     resource_suffix = "spoke-b",
     cidr            = "10.0.0.0/24",
     tags = {
@@ -113,8 +146,8 @@ sat_configuration = {
   spoke = "spokeB"
 }
 ```
-Note that SAT is designed to be deployed _once per Azure subscription_. SAT is deployed to a spoke to more easily permit
-users of this Terraform to deploy SAT to multiple subscriptions if needed.
+Note that SAT is designed to be deployed _once per Azure subscription_. If needed, SAT can be deployed multiple times in
+different regions using this terraform configuration.
 
 ### SAT Service Principal
 Some users of SRA may not have permissions to create Entra ID service principals. If this is the case, you can choose to
