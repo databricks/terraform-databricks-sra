@@ -154,6 +154,44 @@ resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
 >>>>>>> 3603a0f (fix: Remove ignore_changes on all tags and pass var.tags as tags argument)
 }
 
+# Define an Azure Key Vault access policy for Databricks
+resource "azurerm_key_vault_access_policy" "dbstorage" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  key_vault_id = azurerm_key_vault.this[0].id
+  tenant_id    = azurerm_databricks_workspace.webauth.storage_account_identity[0].tenant_id
+  object_id    = azurerm_databricks_workspace.webauth.storage_account_identity[0].principal_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "dbmanageddisk" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  key_vault_id = azurerm_key_vault.this[0].id
+  tenant_id    = azurerm_databricks_workspace.webauth.managed_disk_identity[0].tenant_id
+  object_id    = azurerm_databricks_workspace.webauth.managed_disk_identity[0].principal_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
+resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  workspace_id     = azurerm_databricks_workspace.webauth.id
+  key_vault_key_id = azurerm_key_vault_key.managed_disk[0].id
+
+  depends_on = [azurerm_key_vault_access_policy.dbstorage]
+}
+
 # This resource block defines a private DNS zone Databricks
 resource "azurerm_private_dns_zone" "auth_front" {
   name                = "privatelink.azuredatabricks.net"
@@ -210,6 +248,7 @@ resource "azurerm_private_endpoint" "webauth" {
   }
 }
 
+<<<<<<< HEAD
 resource "azurerm_private_dns_zone_virtual_network_link" "webauth" {
   name                  = "databricks-vnetlink-backend"
   private_dns_zone_name = azurerm_private_dns_zone.auth_front.name
@@ -219,6 +258,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "webauth" {
   tags = var.tags
 }
 
+=======
+>>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
 resource "databricks_metastore_assignment" "webauth" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 

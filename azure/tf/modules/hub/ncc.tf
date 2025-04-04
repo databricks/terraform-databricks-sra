@@ -4,6 +4,9 @@ resource "databricks_mws_network_connectivity_config" "this" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
 # NCC access to DBFS
 data "azurerm_storage_account" "dbfs" {
   name                = local.dbfs_name
@@ -19,10 +22,13 @@ resource "databricks_mws_ncc_private_endpoint_rule" "dbfs_blob" {
 resource "databricks_mws_ncc_private_endpoint_rule" "dbfs_dfs" {
   network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
   resource_id                    = data.azurerm_storage_account.dbfs.id
+<<<<<<< HEAD
 =======
 resource "databricks_mws_ncc_private_endpoint_rule" "storage" {
   network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
   resource_id                    = azurerm_storage_account.unity_catalog[0].id
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+>>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
   group_id                       = "dfs"
 }

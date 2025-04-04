@@ -1,5 +1,8 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
 # Generate a random string for dbfsnaming
 resource "random_string" "dbfsnaming" {
   special = false

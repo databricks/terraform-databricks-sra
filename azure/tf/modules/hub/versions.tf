@@ -9,6 +9,9 @@ terraform {
       version = ">=1.24.1"
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
     random = {
       source  = "hashicorp/random"
       version = ">=3.0"

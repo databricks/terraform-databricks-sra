@@ -140,6 +140,7 @@ variable "is_frontend_private_link_enabled" {
   description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
   default     = false
 }
+<<<<<<< HEAD
 =======
 variable "client_secret" {
   type        = string
@@ -172,3 +173,5 @@ variable "resource_suffix" {
   description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
 }
 >>>>>>> 8d44021 (serverless and classic compute working)
+=======
+>>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)

@@ -95,9 +95,13 @@ output "private_link_info" {
   description = "Information related to the Private Link, including DNS Zone ID and Subnet ID for Private Link connectivity."
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+
+>>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
 output "dns_zone_ids" {
   description = "Private DNS Zone IDs"
   value = {
@@ -135,6 +139,7 @@ output "workspace_id" {
   value       = azurerm_databricks_workspace.webauth.workspace_id
   description = "Workspace ID of the created workspace, according to the Databricks account console"
 }
+<<<<<<< HEAD
 
 output "resource_suffix" {
   description = "Resource suffix to use for naming down stream resources"
@@ -159,3 +164,5 @@ output "my_ip_addr" {
 >>>>>>> 6df143a (deployed without UC)
 =======
 >>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
+=======
+>>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
