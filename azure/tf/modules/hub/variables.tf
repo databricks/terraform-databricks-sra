@@ -74,3 +74,15 @@ variable "databricks_app_reg" {
   type        = any
   description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
 }
+
+variable "boolean_create_private_dbfs" {
+  description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
+  type        = bool
+  default     = true
+}
+
+variable "is_frontend_private_link_enabled" {
+  type        = bool
+  description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
+  default     = false
+}
