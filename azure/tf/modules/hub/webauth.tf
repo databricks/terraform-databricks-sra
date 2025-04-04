@@ -67,15 +67,23 @@ resource "azurerm_subnet_network_security_group_association" "host" {
 
 # This resource block defines a databricks workspace for webauth
 resource "azurerm_databricks_workspace" "webauth" {
-  name                                  = join("_", ["WEB_AUTH_DO_NOT_DELETE", upper(azurerm_resource_group.this.location)])
-  resource_group_name                   = azurerm_resource_group.this.name
-  location                              = azurerm_resource_group.this.location
-  sku                                   = "premium"
-  public_network_access_enabled         = false
-  network_security_group_rules_required = "NoAzureDatabricksRules"
+  name                        = join("_", ["WEB_AUTH_DO_NOT_DELETE", upper(azurerm_resource_group.this.location)])
+  resource_group_name         = azurerm_resource_group.this.name
+  managed_resource_group_name = local.managed_rg_name
+  location                    = azurerm_resource_group.this.location
+  sku                         = "premium"
+
+  # managed_disk_cmk_rotation_to_latest_version_enabled = var.is_kms_enabled ? true : false
+  managed_disk_cmk_key_vault_key_id     = var.is_kms_enabled ? azurerm_key_vault_key.managed_disk[0].id : null
+  managed_services_cmk_key_vault_key_id = var.is_kms_enabled ? azurerm_key_vault_key.managed_services[0].id : null
+  customer_managed_key_enabled          = var.is_kms_enabled
+  infrastructure_encryption_enabled     = var.is_kms_enabled
+  public_network_access_enabled         = !var.is_frontend_private_link_enabled
+  network_security_group_rules_required = var.is_frontend_private_link_enabled ? "NoAzureDatabricksRules" : "AllRules"
 
   # This custom_parameters block specifies additional parameters for the databricks workspace
   custom_parameters {
+    storage_account_name                                 = local.dbfs_name
     no_public_ip                                         = true
     virtual_network_id                                   = azurerm_virtual_network.this.id
     private_subnet_name                                  = azurerm_subnet.container.name
@@ -85,6 +93,44 @@ resource "azurerm_databricks_workspace" "webauth" {
   }
 
   tags = var.tags
+}
+
+# Define an Azure Key Vault access policy for Databricks
+resource "azurerm_key_vault_access_policy" "dbstorage" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  key_vault_id = azurerm_key_vault.this[0].id
+  tenant_id    = azurerm_databricks_workspace.webauth.storage_account_identity[0].tenant_id
+  object_id    = azurerm_databricks_workspace.webauth.storage_account_identity[0].principal_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
+resource "azurerm_key_vault_access_policy" "dbmanageddisk" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  key_vault_id = azurerm_key_vault.this[0].id
+  tenant_id    = azurerm_databricks_workspace.webauth.managed_disk_identity[0].tenant_id
+  object_id    = azurerm_databricks_workspace.webauth.managed_disk_identity[0].principal_id
+
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey",
+  ]
+}
+
+resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  workspace_id     = azurerm_databricks_workspace.webauth.id
+  key_vault_key_id = azurerm_key_vault_key.managed_disk[0].id
+
+  depends_on = [azurerm_key_vault_access_policy.dbstorage]
 }
 
 # This resource block defines a private DNS zone Databricks
@@ -121,7 +167,14 @@ resource "azurerm_private_endpoint" "webauth" {
   }
 }
 
-# resource "databricks_metastore_assignment" "webauth" {
-#   workspace_id = azurerm_databricks_workspace.webauth.workspace_id
-#   metastore_id = databricks_metastore.this.id
-# }
+resource "databricks_metastore_assignment" "webauth" {
+  count = var.is_unity_catalog_enabled ? 1 : 0
+
+  workspace_id = azurerm_databricks_workspace.webauth.workspace_id
+  metastore_id = databricks_metastore.this[0].id
+}
+
+resource "databricks_mws_ncc_binding" "this" {
+  network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  workspace_id                   = azurerm_databricks_workspace.webauth.workspace_id
+}
