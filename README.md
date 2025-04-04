@@ -1,7 +1,8 @@
 # Security Reference Architectures (SRA) - Terraform Templates
 
-![SRA Diagram]("https://i.ibb.co/NrfH2qc/Screenshot-2024-09-17-at-1-02-06-PM.png")
-
+<p align="center">
+  <img src="https://i.postimg.cc/hP90xPqh/SRA-Screenshot.png" />
+</p>
 
 ## Project Overview
 
