@@ -3,10 +3,6 @@ variable "account_console_id" {
   description = "Databricks Account ID"
 }
 
-variable "workspace_id" {
-  description = "Should be the string of numbers in the workspace URL arg (e.g. https://<workspace>.azuredatabricks.net/?o=1234567890123456)"
-}
-
 variable "sqlw_id" {
   type        = string
   description = "16 character SQL Warehouse ID: Type new to have one created or enter an existing SQL Warehouse ID"
@@ -41,6 +37,11 @@ variable "analysis_schema_name" {
 }
 
 variable "proxies" {
-  type        = map
+  type        = map(any)
   description = "Proxies to be used for Databricks API calls"
+}
+
+variable "run_on_serverless" {
+  type        = bool
+  description = "Flag to run SAT initializer/Driver on Serverless"
 }

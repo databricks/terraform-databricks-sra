@@ -1,6 +1,6 @@
-// EXPLANATION: The cross-account role for the Databricks workspace
+# EXPLANATION: The cross-account role for the Databricks workspace
 
-// Cross Account Role
+# Cross Account Role
 data "databricks_aws_assume_role_policy" "this" {
   external_id = var.databricks_account_id
 }
