@@ -2,7 +2,7 @@ locals {
   create_sat_sp     = var.sat_configuration.enabled && var.sat_service_principal.client_id == ""
   sat_client_id     = local.create_sat_sp ? azuread_service_principal.sat[0].client_id : var.sat_service_principal.client_id
   sat_client_secret = local.create_sat_sp ? azuread_service_principal_password.sat[0].value : var.sat_service_principal.client_secret
-  sat_workspace     = module.spoke
+  sat_workspace     = module.hub
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -46,6 +46,7 @@ resource "azurerm_role_assignment" "sat_can_read_subscription" {
 # ----------------------------------------------------------------------------------------------------------------------
 module "sat_catalog" {
   source = "./modules/catalog"
+  count  = var.sat_configuration.enabled ? 1 : 0
 
   catalog_name        = var.sat_configuration.catalog_name
   location            = var.location
@@ -74,7 +75,7 @@ module "sat" {
   schema_name                     = var.sat_configuration.schema_name
   proxies                         = var.sat_configuration.proxies
   run_on_serverless               = var.sat_configuration.run_on_serverless
-  catalog_name                    = module.sat_catalog.catalog_name
+  catalog_name                    = module.sat_catalog[0].catalog_name
   service_principal_client_id     = local.sat_client_id
   service_principal_client_secret = local.sat_client_secret
 
