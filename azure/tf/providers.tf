@@ -10,7 +10,7 @@ provider "databricks" {
 
 provider "databricks" {
   alias = "SAT"
-  host  = module.spoke.workspace_url
+  host  = module.hub.workspace_url
 }
 
 provider "databricks" {
