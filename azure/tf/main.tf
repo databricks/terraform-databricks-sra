@@ -132,6 +132,7 @@ module "hub" {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 module "hub_catalog" {
   source = "./modules/catalog"
 
@@ -194,3 +195,22 @@ module "spoke" {
 }
 =======
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
+=======
+module "hub_catalog" {
+  source = "./modules/catalog"
+
+  catalog_name        = var.sat_configuration.catalog_name
+  location            = var.location
+  metastore_id        = module.hub.metastore_id
+  dns_zone_ids        = [local.sat_workspace.dns_zone_ids.dfs]
+  ncc_id              = local.sat_workspace.ncc_id
+  resource_group_name = local.sat_workspace.resource_group_name
+  resource_suffix     = "sat"
+  subnet_id           = local.sat_workspace.subnet_ids.privatelink
+  tags                = local.sat_workspace.tags
+
+  providers = {
+    databricks.workspace = databricks.SAT
+  }
+}
+>>>>>>> de4190a (feat(azure): Default SAT to the hub webauth workspace)

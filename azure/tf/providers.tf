@@ -50,10 +50,14 @@ provider "databricks" {
 =======
   alias = "SAT"
 <<<<<<< HEAD
+<<<<<<< HEAD
   host  = module.spoke[local.sat_spoke].workspace_url
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
 =======
   host  = module.spoke.workspace_url
+=======
+  host  = module.hub.workspace_url
+>>>>>>> de4190a (feat(azure): Default SAT to the hub webauth workspace)
 }
 
 provider "databricks" {
