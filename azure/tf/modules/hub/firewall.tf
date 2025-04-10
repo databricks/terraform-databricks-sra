@@ -151,7 +151,7 @@ resource "azurerm_firewall" "this" {
   tags = var.tags
 
   depends_on = [
-    resource.azurerm_firewall_policy_rule_collection_group.this
+    azurerm_firewall_policy_rule_collection_group.this
   ]
 }
 

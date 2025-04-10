@@ -101,8 +101,3 @@ variable "tags" {
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
 }
-
-variable "ncc_id" {
-  type        = string
-  description = "(Required) The ID of the regional hub Network Connectivity Config object to bind to ADB Workspace."
-}

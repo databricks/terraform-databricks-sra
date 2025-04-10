@@ -5,8 +5,9 @@ resource "databricks_mws_network_connectivity_config" "this" {
 
 # NCC access to DBFS
 data "azurerm_storage_account" "dbfs" {
+  depends_on          = [azurerm_databricks_workspace.this]
   name                = local.dbfs_name
-  resource_group_name = azurerm_databricks_workspace.webauth.managed_resource_group_name
+  resource_group_name = local.managed_rg_name
 }
 
 resource "databricks_mws_ncc_private_endpoint_rule" "dbfs_blob" {
