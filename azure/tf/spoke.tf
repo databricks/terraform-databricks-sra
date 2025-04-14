@@ -2,7 +2,7 @@
 module "spoke" {
   source = "./modules/spoke"
 
-  # Pass the required variables to the module
+  # Update these per spoke
   resource_suffix = var.spoke_config["spoke"].resource_suffix
   vnet_cidr       = var.spoke_config["spoke"].cidr
   tags            = var.spoke_config["spoke"].tags
@@ -29,16 +29,17 @@ module "spoke" {
 module "spoke_catalog" {
   source = "./modules/catalog"
 
-  location = var.location
-
+  # Update these per catalog for the catalog's spoke
   catalog_name        = module.spoke.resource_suffix
   dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
-  metastore_id        = module.hub.metastore_id
   ncc_id              = module.spoke.ncc_id
   resource_group_name = module.spoke.resource_group_name
   resource_suffix     = module.spoke.resource_suffix
   subnet_id           = module.spoke.subnet_ids.privatelink
   tags                = module.spoke.tags
+
+  location     = var.location
+  metastore_id = module.hub.metastore_id
 
   providers = {
     databricks.workspace = databricks.spoke

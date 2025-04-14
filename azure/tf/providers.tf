@@ -13,7 +13,13 @@ provider "databricks" {
   host  = module.hub.workspace_url
 }
 
+# Add additional spoke providers as necessary (required for creating a catalog in a spoke)
 provider "databricks" {
   alias = "spoke"
   host  = module.spoke.workspace_url
+}
+
+provider "databricks" {
+  alias = "spoke_b"
+  host  = module.spoke_b.workspace_url
 }
