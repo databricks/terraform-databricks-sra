@@ -175,26 +175,28 @@ above modifications to deploy to multiple spokes.
 =======
 ## Security Analysis Tool
 Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
-By default, SAT is installed in the default spoke workspace defined in `spoke.tf`.
+By default, SAT is installed in the hub workspace, also called the "WEB_AUTH" workspace.
 
 ### Changing the SAT workspace
-To change which workspace SAT is installed in, there are two modifications required:
+To change which workspace SAT is installed in, there are three modifications required to the `customizations.tf`:
 
-1. Change the Databricks provider aliased as `SAT` to use a different workspace
+1. Change the Databricks provider used in the `SAT` module to use a different workspace
 ```hcl
-# providers.tf - default
+# customizations.tf - default
 # Default
-provider "databricks" {
-  alias = "SAT"
-  host  = module.spoke.workspace_url #<- This should be updated to the spoke you would like to use for SAT
+
+# Change the provider if needed
+providers = {
+  databricks = databricks.hub #<---- This can be modified
 }
 ```
 
 ```hcl
-# providers.tf - modified
-provider "databricks" {
-  alias = "SAT"
-  host  = module.spoke_b.workspace_url
+# customizations.tf - modified
+
+# Change the provider if needed
+providers = {
+  databricks = databricks.spoke
 }
 ```
 
@@ -202,37 +204,31 @@ provider "databricks" {
 ```hcl
 # customizations.tf - default
 locals {
-  sat_workspace     = module.spoke #<- This should be updated to the spoke you would like to use for SAT
+  sat_workspace     = module.hub #<- This should be updated to the spoke you would like to use for SAT
 }
 ```
 ```hcl
 # customizations.tf - modified
 locals {
-  sat_workspace     = module.spoke_b #<- This should be updated to the spoke you would like to use for SAT
+  sat_workspace     = module.spoke #<- This should be updated to the spoke you would like to use for SAT
 }
 ```
 
+3. Change the `databricks_permission_assignment.sat_workspace_admin` resource to use the correct provider
 ```hcl
-# example.tfvars
-spoke_config = {
-  spoke = {
-    resource_suffix = "spoke-a",
-    cidr            = "10.0.1.0/24",
-    tags = {
-      "Owner" = "some.user@databricks.com"
-    }
-  }
-  spoke_b = {
-    resource_suffix = "spoke-b",
-    cidr            = "10.0.0.0/24",
-    tags = {
-      "Owner" = "some.user@databricks.com"
-    }
-  }
+# customizations.tf - default
+resource "databricks_permission_assignment" "sat_workspace_admin" {
+  count = length(module.sat)
+  ...
+  provider = databricks.hub #<- This should be updated to the spoke you would like to use for SAT
 }
-
-sat_configuration = {
-  spoke = "spokeB"
+```
+```hcl
+# customizations.tf - modified
+resource "databricks_permission_assignment" "sat_workspace_admin" {
+  count = length(module.sat)
+  ...
+  provider = databricks.spoke
 }
 ```
 <<<<<<< HEAD
@@ -241,8 +237,13 @@ users of this Terraform to deploy SAT to multiple subscriptions if needed.
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
 =======
 Note that SAT is designed to be deployed _once per Azure subscription_. If needed, SAT can be deployed multiple times in
+<<<<<<< HEAD
 different regions using this terraform configuration.
 >>>>>>> f60e53b (docs(azure): Update README with SAT details)
+=======
+different regions using this terraform configuration. This requires provisioning SAT in multiple spokes. Reference the 
+above modifications to deploy to multiple spokes.
+>>>>>>> cac46f6 (docs(azure): Improve comments and README)
 
 ### SAT Service Principal
 Some users of SRA may not have permissions to create Entra ID service principals. If this is the case, you can choose to
@@ -271,6 +272,9 @@ SAT is installed using serverless compute by default. Before running the [requir
 in Databricks, the private endpoints on your hub storage account must be approved.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cac46f6 (docs(azure): Improve comments and README)
 ## Adding additional spokes
 
 To add additional spokes to this configuration, follow the below steps.
@@ -385,10 +389,13 @@ module "spoke_b_catalog" {
 
 5. Run `terraform apply` to create the new spoke
 
+<<<<<<< HEAD
 =======
 >>>>>>> b9834b2 (remove make items, doc update.)
 =======
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
+=======
+>>>>>>> cac46f6 (docs(azure): Improve comments and README)
 # Additional Security Recommendations and Opportunities
 
 In this section, we break down additional security recommendations and opportunities to maintain a strong security posture that either cannot be configured into this

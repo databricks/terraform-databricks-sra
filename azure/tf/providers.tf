@@ -21,6 +21,7 @@ provider "databricks" {
 }
 
 # Add additional spoke providers as necessary (required for creating a catalog in a spoke)
+<<<<<<< HEAD
 provider "databricks" {
   alias = "spoke"
   host  = module.spoke.workspace_url
@@ -63,8 +64,15 @@ provider "databricks" {
 >>>>>>> de4190a (feat(azure): Default SAT to the hub webauth workspace)
 }
 
+=======
+>>>>>>> cac46f6 (docs(azure): Improve comments and README)
 provider "databricks" {
   alias = "spoke"
   host  = module.spoke.workspace_url
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
+}
+
+provider "databricks" {
+  alias = "spoke_b"
+  host  = module.spoke_b.workspace_url
 }

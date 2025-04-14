@@ -3,6 +3,9 @@ module "spoke" {
   source = "./modules/spoke"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cac46f6 (docs(azure): Improve comments and README)
   # Update these per spoke
   resource_suffix = var.spoke_config["spoke"].resource_suffix
   vnet_cidr       = var.spoke_config["spoke"].cidr
@@ -47,6 +50,7 @@ module "spoke_catalog" {
   source = "./modules/catalog"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   # Update these per catalog for the catalog's spoke
   catalog_name        = module.spoke.resource_suffix
   dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
@@ -57,6 +61,11 @@ module "spoke_catalog" {
   dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
   metastore_id        = module.hub.metastore_id
 >>>>>>> 5554f06 (feat(azure): Add default catalog for spoke)
+=======
+  # Update these per catalog for the catalog's spoke
+  catalog_name        = module.spoke.resource_suffix
+  dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
+>>>>>>> cac46f6 (docs(azure): Improve comments and README)
   ncc_id              = module.spoke.ncc_id
   resource_group_name = module.spoke.resource_group_name
   resource_suffix     = module.spoke.resource_suffix
@@ -64,11 +73,17 @@ module "spoke_catalog" {
   tags                = module.spoke.tags
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   location     = var.location
   metastore_id = module.hub.metastore_id
 
 =======
 >>>>>>> 5554f06 (feat(azure): Add default catalog for spoke)
+=======
+  location     = var.location
+  metastore_id = module.hub.metastore_id
+
+>>>>>>> cac46f6 (docs(azure): Improve comments and README)
   providers = {
     databricks.workspace = databricks.spoke
   }
