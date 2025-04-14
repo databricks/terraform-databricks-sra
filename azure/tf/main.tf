@@ -199,18 +199,21 @@ module "spoke" {
 module "hub_catalog" {
   source = "./modules/catalog"
 
+  # This catalog is only created if SAT is enabled. If SAT is provisioned in a spoke, this can be manually removed.
+  count = var.sat_configuration.enabled ? 1 : 0
+
   catalog_name        = var.sat_configuration.catalog_name
   location            = var.location
   metastore_id        = module.hub.metastore_id
-  dns_zone_ids        = [local.sat_workspace.dns_zone_ids.dfs]
-  ncc_id              = local.sat_workspace.ncc_id
-  resource_group_name = local.sat_workspace.resource_group_name
+  dns_zone_ids        = [module.hub.dns_zone_ids.dfs]
+  ncc_id              = module.hub.ncc_id
+  resource_group_name = module.hub.resource_group_name
   resource_suffix     = "sat"
-  subnet_id           = local.sat_workspace.subnet_ids.privatelink
-  tags                = local.sat_workspace.tags
+  subnet_id           = module.hub.subnet_ids.privatelink
+  tags                = module.hub.tags
 
   providers = {
-    databricks.workspace = databricks.SAT
+    databricks.workspace = databricks.hub
   }
 }
 >>>>>>> de4190a (feat(azure): Default SAT to the hub webauth workspace)

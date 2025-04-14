@@ -72,6 +72,7 @@ resource "azurerm_role_assignment" "sat_can_read_subscription" {
 # ----------------------------------------------------------------------------------------------------------------------
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 module "sat_catalog" {
@@ -95,11 +96,14 @@ module "sat_catalog" {
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
+=======
+>>>>>>> 09ee8ac (feat(azure): Remove dedicated SAT catalog and provider)
 # This is modularized to allow for easy count and provider arguments
 module "sat" {
   source = "./modules/sat"
   count  = var.sat_configuration.enabled ? 1 : 0
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   # Update this as needed
@@ -126,19 +130,26 @@ module "sat" {
   subscription_id = var.subscription_id
 
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
+=======
+  # Update this as needed
+  catalog_name = module.hub_catalog[0].catalog_name
+
+  tenant_id                       = data.azurerm_client_config.current.tenant_id
+  subscription_id                 = var.subscription_id
+>>>>>>> 09ee8ac (feat(azure): Remove dedicated SAT catalog and provider)
   databricks_account_id           = var.databricks_account_id
   schema_name                     = var.sat_configuration.schema_name
   proxies                         = var.sat_configuration.proxies
   run_on_serverless               = var.sat_configuration.run_on_serverless
-  catalog_name                    = module.sat_catalog[0].catalog_name
   service_principal_client_id     = local.sat_client_id
   service_principal_client_secret = local.sat_client_secret
+  workspace_id                    = local.sat_workspace.workspace_id
 
-  workspace_id = local.sat_workspace.workspace_id
+  depends_on = [module.hub_catalog]
 
-  depends_on = [module.spoke]
-
+  # Change the provider if needed
   providers = {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     databricks = databricks.SAT
@@ -149,6 +160,9 @@ module "sat" {
 =======
     databricks = databricks.SAT
 >>>>>>> 9d6a2f7 (fix(azure): Make all SAT resources use the same azure provider)
+=======
+    databricks = databricks.hub
+>>>>>>> 09ee8ac (feat(azure): Remove dedicated SAT catalog and provider)
   }
 }
 
@@ -167,8 +181,12 @@ resource "databricks_permission_assignment" "sat_workspace_admin" {
   principal_id = module.sat[0].service_principal_id
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   provider = databricks.hub
 =======
   provider = databricks.SAT
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
+=======
+  provider = databricks.hub
+>>>>>>> 09ee8ac (feat(azure): Remove dedicated SAT catalog and provider)
 }

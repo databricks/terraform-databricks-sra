@@ -13,6 +13,9 @@ provider "databricks" {
 
 provider "databricks" {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 09ee8ac (feat(azure): Remove dedicated SAT catalog and provider)
   alias = "hub"
   host  = module.hub.workspace_url
 }
