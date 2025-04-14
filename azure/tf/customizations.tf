@@ -44,47 +44,29 @@ resource "azurerm_role_assignment" "sat_can_read_subscription" {
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
-module "sat_catalog" {
-  source = "./modules/catalog"
-  count  = var.sat_configuration.enabled ? 1 : 0
-
-  catalog_name        = var.sat_configuration.catalog_name
-  location            = var.location
-  metastore_id        = module.hub.metastore_id
-  dns_zone_ids        = [local.sat_workspace.dns_zone_ids.dfs]
-  ncc_id              = local.sat_workspace.ncc_id
-  resource_group_name = local.sat_workspace.resource_group_name
-  resource_suffix     = "sat"
-  subnet_id           = local.sat_workspace.subnet_ids.privatelink
-  tags                = local.sat_workspace.tags
-
-  providers = {
-    databricks.workspace = databricks.SAT
-  }
-}
-
 # This is modularized to allow for easy count and provider arguments
 module "sat" {
   source = "./modules/sat"
   count  = var.sat_configuration.enabled ? 1 : 0
 
-  tenant_id       = data.azurerm_client_config.current.tenant_id
-  subscription_id = var.subscription_id
+  # Update this as needed
+  catalog_name = module.hub_catalog[0].catalog_name
 
+  tenant_id                       = data.azurerm_client_config.current.tenant_id
+  subscription_id                 = var.subscription_id
   databricks_account_id           = var.databricks_account_id
   schema_name                     = var.sat_configuration.schema_name
   proxies                         = var.sat_configuration.proxies
   run_on_serverless               = var.sat_configuration.run_on_serverless
-  catalog_name                    = module.sat_catalog[0].catalog_name
   service_principal_client_id     = local.sat_client_id
   service_principal_client_secret = local.sat_client_secret
+  workspace_id                    = local.sat_workspace.workspace_id
 
-  workspace_id = local.sat_workspace.workspace_id
+  depends_on = [module.hub_catalog]
 
-  depends_on = [module.spoke]
-
+  # Change the provider if needed
   providers = {
-    databricks = databricks.SAT
+    databricks = databricks.hub
   }
 }
 
@@ -102,5 +84,5 @@ resource "databricks_permission_assignment" "sat_workspace_admin" {
   permissions  = ["ADMIN"]
   principal_id = module.sat[0].service_principal_id
 
-  provider = databricks.SAT
+  provider = databricks.hub
 }
