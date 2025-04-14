@@ -9,7 +9,7 @@ provider "databricks" {
 }
 
 provider "databricks" {
-  alias = "SAT"
+  alias = "hub"
   host  = module.hub.workspace_url
 }
 
