@@ -58,11 +58,15 @@ run "plan_test_sat_with_byosp" {
   }
 }
 
-run "plan_test_sat_nondefault_spoke" {
+run "plan_test_sat_nondefaults" {
   command = plan
   variables {
     sat_configuration = {
-      spoke = "spoke_b"
+      resource_suffix   = "spoke_b"
+      proxies           = { "http_proxy" : "http://localhost:80" }
+      run_on_serverless = false
+      schema_name       = "notsat"
+      catalog_name      = "notsat"
     }
   }
 }
