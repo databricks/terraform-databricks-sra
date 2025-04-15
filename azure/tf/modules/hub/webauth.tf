@@ -130,7 +130,7 @@ resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
   workspace_id     = azurerm_databricks_workspace.webauth.id
   key_vault_key_id = azurerm_key_vault_key.managed_disk[0].id
 
-  depends_on = [azurerm_key_vault_access_policy.dbstorage]
+  depends_on = [azurerm_key_vault_access_policy.databricks]
 }
 
 # This resource block defines a private DNS zone Databricks

@@ -18,8 +18,3 @@ provider "databricks" {
   alias = "spoke"
   host  = module.spoke.workspace_url
 }
-
-provider "databricks" {
-  alias = "spoke_b"
-  host  = module.spoke_b.workspace_url
-}
