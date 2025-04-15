@@ -85,6 +85,7 @@ run "plan_test_sat_with_byosp" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 run "plan_test_sat_nondefaults" {
   command = plan
   variables {
@@ -116,10 +117,17 @@ variables {
 >>>>>>> 9ec052c (tests(azure): Update test to include new requirements)
 =======
 run "plan_test_sat_nondefault_spoke" {
+=======
+run "plan_test_sat_nondefaults" {
+>>>>>>> 47afa16 (tests(azure): Replace sat spoke test with nondefault test)
   command = plan
   variables {
     sat_configuration = {
-      spoke = "spoke_b"
+      resource_suffix   = "spoke_b"
+      proxies           = { "http_proxy" : "http://localhost:80" }
+      run_on_serverless = false
+      schema_name       = "notsat"
+      catalog_name      = "notsat"
     }
   }
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
