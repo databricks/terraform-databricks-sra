@@ -71,8 +71,3 @@ provider "databricks" {
   host  = module.spoke.workspace_url
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 }
-
-provider "databricks" {
-  alias = "spoke_b"
-  host  = module.spoke_b.workspace_url
-}
