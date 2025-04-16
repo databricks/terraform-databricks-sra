@@ -63,7 +63,7 @@ resource "databricks_grant" "sat_sp_catalog" {
 }
 
 module "sat" {
-  source = "git::https://github.com/databricks-industry-solutions/security-analysis-tool.git//terraform/common?ref=723cd448ac6d9ff488615930b7f747787a882193"
+  source = "git::https://github.com/databricks-industry-solutions/security-analysis-tool.git//terraform/common?ref=d57d08288afff59ee14b248d8218d443eae1001e"
 
   account_console_id   = var.databricks_account_id
 <<<<<<< HEAD
