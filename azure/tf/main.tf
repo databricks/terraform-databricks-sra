@@ -208,7 +208,7 @@ module "hub_catalog" {
   dns_zone_ids        = [module.hub.dns_zone_ids.dfs]
   ncc_id              = module.hub.ncc_id
   resource_group_name = module.hub.resource_group_name
-  resource_suffix     = "sat"
+  resource_suffix     = "${local.sat_workspace.resource_suffix}sat"
   subnet_id           = module.hub.subnet_ids.privatelink
   tags                = module.hub.tags
 

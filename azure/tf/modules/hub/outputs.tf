@@ -140,10 +140,14 @@ output "workspace_id" {
   description = "Workspace ID of the created workspace, according to the Databricks account console"
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9818e98 (feat(azure): Add better support for resource_suffix on SAT catalog)
 
 output "resource_suffix" {
   description = "Resource suffix to use for naming down stream resources"
   value       = var.resource_suffix
+<<<<<<< HEAD
 =======
 output "tenant_id" {
   value       = local.tenant_id
@@ -166,3 +170,6 @@ output "my_ip_addr" {
 >>>>>>> 1942ef7 (feat(azure): Remove default storage from metastore)
 =======
 >>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
+=======
+}
+>>>>>>> 9818e98 (feat(azure): Add better support for resource_suffix on SAT catalog)
