@@ -3,6 +3,7 @@ locals {
   sat_client_id     = local.create_sat_sp ? azuread_service_principal.sat[0].client_id : var.sat_service_principal.client_id
   sat_client_secret = local.create_sat_sp ? azuread_service_principal_password.sat[0].value : var.sat_service_principal.client_secret
   sat_workspace     = module.hub
+  sat_catalog       = var.sat_configuration.enabled ? module.hub_catalog[0] : {}
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -50,7 +51,7 @@ module "sat" {
   count  = var.sat_configuration.enabled ? 1 : 0
 
   # Update this as needed
-  catalog_name = module.hub_catalog[0].catalog_name
+  catalog_name = local.sat_catalog.catalog_name
 
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   subscription_id                 = var.subscription_id
@@ -62,7 +63,7 @@ module "sat" {
   service_principal_client_secret = local.sat_client_secret
   workspace_id                    = local.sat_workspace.workspace_id
 
-  depends_on = [module.hub_catalog]
+  depends_on = [local.sat_catalog]
 
   # Change the provider if needed
   providers = {
