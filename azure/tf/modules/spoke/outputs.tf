@@ -61,7 +61,7 @@ output "ncc_id" {
 }
 
 output "resource_suffix" {
-  description = "Resource suffix of this spoke"
+  description = "Resource suffix to use for naming down stream resources"
   value       = var.resource_suffix
 }
 
