@@ -8,6 +8,7 @@ locals {
 <<<<<<< HEAD
   sat_workspace     = module.hub
   sat_catalog       = var.sat_configuration.enabled ? module.hub_catalog[0] : {}
+<<<<<<< HEAD
 =======
 >>>>>>> d83f047 (feat(azure): Add support for SAT)
 =======
@@ -19,6 +20,8 @@ locals {
 =======
   sat_workspace     = module.hub
 >>>>>>> de4190a (feat(azure): Default SAT to the hub webauth workspace)
+=======
+>>>>>>> 8f5d8d9 (feat(azure): Allow dynamic dependency for SAT catalog on SAT module)
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -132,7 +135,7 @@ module "sat" {
 >>>>>>> 791c76c (feat(azure): Remove for_each spoke creation)
 =======
   # Update this as needed
-  catalog_name = module.hub_catalog[0].catalog_name
+  catalog_name = local.sat_catalog.catalog_name
 
   tenant_id                       = data.azurerm_client_config.current.tenant_id
   subscription_id                 = var.subscription_id
@@ -145,7 +148,7 @@ module "sat" {
   service_principal_client_secret = local.sat_client_secret
   workspace_id                    = local.sat_workspace.workspace_id
 
-  depends_on = [module.hub_catalog]
+  depends_on = [local.sat_catalog]
 
   # Change the provider if needed
   providers = {
