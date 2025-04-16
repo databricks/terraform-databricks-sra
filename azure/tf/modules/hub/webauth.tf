@@ -95,6 +95,13 @@ resource "azurerm_databricks_workspace" "webauth" {
   tags = var.tags
 }
 
+resource "azurerm_management_lock" "webauth" {
+  lock_level = "CanNotDelete"
+  name       = azurerm_databricks_workspace.webauth.name
+  scope      = azurerm_databricks_workspace.webauth.id
+  notes      = "Deleting this workspace will cause SSO failures to ALL workspaces. Please use caution."
+}
+
 # Define an Azure Key Vault access policy for Databricks
 resource "azurerm_key_vault_access_policy" "dbstorage" {
   count = var.is_kms_enabled ? 1 : 0
@@ -130,7 +137,7 @@ resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
   workspace_id     = azurerm_databricks_workspace.webauth.id
   key_vault_key_id = azurerm_key_vault_key.managed_disk[0].id
 
-  depends_on = [azurerm_key_vault_access_policy.databricks]
+  depends_on = [azurerm_key_vault_access_policy.databricks, azurerm_key_vault_access_policy.dbstorage]
 }
 
 # This resource block defines a private DNS zone Databricks
@@ -150,7 +157,7 @@ resource "azurerm_private_endpoint" "webauth" {
 
   tags = var.tags
 
-  depends_on = [azurerm_subnet.privatelink] # for proper destruction order
+  depends_on = [azurerm_subnet.privatelink, azurerm_private_endpoint.backend] # for proper destruction order and creation of only one PE at a time
 
   # This private_service_connection block specifies the connection details for the private endpoint
   private_service_connection {
