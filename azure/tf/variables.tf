@@ -58,6 +58,7 @@ variable "sat_configuration" {
     enabled           = optional(bool, true)
     schema_name       = optional(string, "sat")
     catalog_name      = optional(string, "sat")
+    resource_suffix   = optional(string, "null")
     proxies           = optional(map(any), {})
     run_on_serverless = optional(bool, true)
   })

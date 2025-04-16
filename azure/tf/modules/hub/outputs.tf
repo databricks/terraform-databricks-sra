@@ -98,3 +98,8 @@ output "workspace_id" {
   value       = azurerm_databricks_workspace.webauth.workspace_id
   description = "Workspace ID of the created workspace, according to the Databricks account console"
 }
+
+output "resource_suffix" {
+  description = "Resource suffix to use for naming down stream resources"
+  value       = var.resource_suffix
+}
