@@ -18,12 +18,12 @@ variable "databricks_gov_shard" {
 
 variable "databricks_prod_aws_account_id" {
   description = "Databricks Govcloud Prod AWS Account ID."
-  type = string
+  type = map(string)
 }
 
 variable "log_delivery_role_name" {
   description = "Govcloud Log Delivery Role Name."
-  type = string
+  type = map(string)
 }
 
 variable "resource_prefix" {

@@ -100,7 +100,12 @@ module "log_delivery" {
   databricks_account_id          = var.databricks_account_id
   resource_prefix                = var.resource_prefix
   databricks_gov_shard           = var.databricks_gov_shard
+<<<<<<< HEAD
   databricks_prod_aws_account_id = var.databricks_prod_aws_account_id[var.databricks_gov_shard]
   log_delivery_role_name         = var.log_delivery_role_name[var.databricks_gov_shard]
 >>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
+=======
+  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
+  log_delivery_role_name         = var.log_delivery_role_name
+>>>>>>> 559a635 ([aws-gov] updated to log_delivery variables)
 }
