@@ -259,6 +259,9 @@ resource "azurerm_private_endpoint" "webauth" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 18253c8 (fix(azure): Make webauth workspace use hub firewall)
 resource "azurerm_private_dns_zone_virtual_network_link" "webauth" {
   name                  = "databricks-vnetlink-backend"
   private_dns_zone_name = azurerm_private_dns_zone.auth_front.name
@@ -268,8 +271,11 @@ resource "azurerm_private_dns_zone_virtual_network_link" "webauth" {
   tags = var.tags
 }
 
+<<<<<<< HEAD
 =======
 >>>>>>> 076f3d9 (feat(azure): Provision webauth workspace as a normal workspace, now supporting SAT)
+=======
+>>>>>>> 18253c8 (fix(azure): Make webauth workspace use hub firewall)
 resource "databricks_metastore_assignment" "webauth" {
   count = var.is_unity_catalog_enabled ? 1 : 0
 
