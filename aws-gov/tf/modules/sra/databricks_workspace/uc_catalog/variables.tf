@@ -1,39 +1,49 @@
 variable "aws_account_id" {
-  type = string
+  type        = string
+  description = "ID of the AWS account."
 }
 
 variable "cmk_admin_arn" {
-  type = string
+  description = "Amazon Resource Name (ARN) of the CMK admin."
+  type        = string
 }
 
 variable "databricks_account_id" {
-  type = string
+  description = "ID of the Databricks account."
+  type        = string
 }
 
 variable "databricks_gov_shard" {
-  type = string
+  description = "Databricks Govcloud Shard (civilian or dod)."
+  type        = string
 }
 
 variable "databricks_prod_aws_account_id" {
-  type = map(string)
+  description = "Databricks Govcloud Prod AWS Account ID."
+  type        = map(string)
 }
 
 variable "resource_prefix" {
-  type = string
+  description = "Prefix for the resource names."
+  type        = string
 }
 
 variable "uc_catalog_name" {
-  type = string
+  description = "UC catalog name isolated to the workspace."
+  type        = string
 }
 
 variable "uc_master_role_id" {
-  type = map(string)
+  description = "Govcloud UC Master Role ID"
+  type        = map(string)
 }
 
 variable "user_workspace_catalog_admin" {
-  type = string
+  description = "Workspace catalog admin - same user as the account admin."
+  type        = string
 }
 
 variable "workspace_id" {
-  type = string
+  description = "workspace ID of deployed workspace."
+  type        = string
 }

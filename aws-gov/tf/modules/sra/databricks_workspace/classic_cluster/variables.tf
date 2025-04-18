@@ -1,3 +1,4 @@
 variable "resource_prefix" {
-  type = string
+  description = "Prefix for the resource names."
+  type        = string
 }
