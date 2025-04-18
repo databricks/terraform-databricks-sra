@@ -3,10 +3,14 @@ terraform {
     databricks = {
       source  = "databricks/databricks"
 <<<<<<< HEAD
+<<<<<<< HEAD
       version = "1.54.0"
 =======
       version = " 1.54.0"
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+      version = "1.54.0"
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
     }
     aws = {
       source  = "hashicorp/aws"

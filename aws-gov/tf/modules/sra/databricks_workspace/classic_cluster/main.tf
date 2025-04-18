@@ -10,7 +10,11 @@ resource "databricks_cluster" "example" {
   cluster_name            = "Shared Classic Compute Plane Cluster"
   data_security_mode      = "USER_ISOLATION"
   spark_version           = data.databricks_spark_version.latest_lts.id
+<<<<<<< HEAD
   node_type_id            = "i3en.large"
+=======
+  node_type_id            = "i3en.xlarge"
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   autotermination_minutes = 10
 
   autoscale {

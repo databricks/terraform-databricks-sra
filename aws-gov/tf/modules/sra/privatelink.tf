@@ -45,10 +45,14 @@ resource "aws_security_group" "privatelink" {
 # EXPLANATION: VPC Gateway Endpoint for S3, Interface Endpoint for Kinesis, and Interface Endpoint for STS
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Restrictive S3 endpoint policy:
 =======
 // Restrictive S3 endpoint policy:
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+# Restrictive S3 endpoint policy:
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
 
@@ -78,10 +82,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
 <<<<<<< HEAD
+<<<<<<< HEAD
       values   = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
 =======
       values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+      values   = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
     }
   }
 
@@ -178,10 +186,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
 <<<<<<< HEAD
+<<<<<<< HEAD
       values   = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
 =======
       values   = ["${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"]
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+      values   = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
     }
   }
 
@@ -279,21 +291,29 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
     principals {
       type = "AWS"
 <<<<<<< HEAD
+<<<<<<< HEAD
       identifiers = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
 =======
       identifiers = [
       "${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}" // "arn:aws-us-gov:iam::${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}:user/databricks-datasets-readonly-user-prod", "${var.databricks_prod_aws_account_id[var.databricks_gov_shard]}"
       ]
 >>>>>>> 267f853 (Update privatelink.tf)
+=======
+      identifiers = [var.databricks_prod_aws_account_id[var.databricks_gov_shard]]
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
     }
   }
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Restrictive Kinesis endpoint policy:
 =======
 // Restrictive Kinesis endpoint policy:
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+# Restrictive Kinesis endpoint policy:
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
   statement {

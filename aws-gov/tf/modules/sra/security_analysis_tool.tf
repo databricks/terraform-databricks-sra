@@ -14,7 +14,11 @@ module "security_analysis_tool" {
   use_sp_auth          = true
   proxies              = {}
   analysis_schema_name = replace("${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}.SAT", "-", "_")
+<<<<<<< HEAD
   run_on_serverless    = false
+=======
+  run_on_serverless    = true
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 
   depends_on = [
     module.databricks_mws_workspace,

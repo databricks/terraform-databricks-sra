@@ -29,10 +29,14 @@ module "vpc" {
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Security group - skipped in custom mode
 =======
 // Security group - skipped in custom mode
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+# Security group - skipped in custom mode
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 resource "aws_security_group" "sg" {
   count = var.network_configuration != "custom" ? 1 : 0
 

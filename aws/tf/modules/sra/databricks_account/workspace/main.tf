@@ -2,7 +2,11 @@
 
 
 # Wait on Credential Due to Race Condition
+<<<<<<<< HEAD:aws/tf/modules/sra/databricks_account/workspace/main.tf
 # https://kb.databricks.com/en_US/terraform/failed-credential-validation-checks-error-with-terraform 
+========
+# https://kb.databricks.com/en_US/terraform/failed-credential-validation-checks-error-with-terraform
+>>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider):aws-gov/tf/modules/sra/databricks_account/workspace/main.tf
 resource "null_resource" "previous" {}
 
 resource "time_sleep" "wait_30_seconds" {
@@ -83,7 +87,11 @@ resource "databricks_mws_private_access_settings" "pas" {
 }
 
 # Workspace Configuration with Deployment Name
+<<<<<<<< HEAD:aws/tf/modules/sra/databricks_account/workspace/main.tf
 resource "databricks_mws_workspaces" "workspace" {
+========
+resource "databricks_mws_workspaces" "this" {
+>>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider):aws-gov/tf/modules/sra/databricks_account/workspace/main.tf
   account_id                               = var.databricks_account_id
   aws_region                               = var.region
   workspace_name                           = var.resource_prefix
@@ -96,5 +104,9 @@ resource "databricks_mws_workspaces" "workspace" {
   storage_customer_managed_key_id          = databricks_mws_customer_managed_keys.workspace_storage.customer_managed_key_id
   pricing_tier                             = "ENTERPRISE"
 
+<<<<<<<< HEAD:aws/tf/modules/sra/databricks_account/workspace/main.tf
   depends_on = [databricks_mws_networks.this]
+========
+  depends_on                               = [databricks_mws_networks.this]
+>>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider):aws-gov/tf/modules/sra/databricks_account/workspace/main.tf
 }

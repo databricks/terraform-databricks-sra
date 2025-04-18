@@ -1,6 +1,6 @@
 # Configuration Variables for AWS and Databricks
-# Remove comments from file before using
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 # Databricks Variables
 # Admin user email.
@@ -36,3 +36,27 @@ resource_prefix = ""       // Prefix used for naming and tagging resources (e.g.
 // AWS Variables
 aws_account_id = ""        // AWS account ID where resources will be deployed.
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+# Databricks Variables
+# Admin user email.
+admin_user            = ""
+
+# Service principal ID for Databricks with admin permissions.
+client_id             = ""
+
+# Secret for the corresponding service principal.
+client_secret         = ""
+
+# Databricks account ID.
+databricks_account_id = ""
+
+# Databricks Govcloud Shard (civilian or dod).
+databricks_gov_shard  = ""
+
+# Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles).
+resource_prefix       = ""
+
+# AWS Variables
+# AWS account ID where resources will be deployed.
+aws_account_id = ""
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)

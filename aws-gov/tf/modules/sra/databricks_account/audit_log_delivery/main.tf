@@ -135,6 +135,7 @@ resource "databricks_mws_storage_configurations" "log_bucket" {
   bucket_name                = aws_s3_bucket.logdelivery.bucket
 }
 
+<<<<<<< HEAD
 // Databricks Billable Usage Logs Configurations
 
 // Uncomment this section when system tables are available on govcloud
@@ -152,6 +153,9 @@ resource "databricks_mws_storage_configurations" "log_bucket" {
 // }
 
 // Databricks Audit Logs Configurations
+=======
+# Log Delivery
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 resource "databricks_mws_log_delivery" "audit_logs" {
   account_id               = var.databricks_account_id
   credentials_id           = databricks_mws_credentials.log_writer.credentials_id
@@ -160,4 +164,12 @@ resource "databricks_mws_log_delivery" "audit_logs" {
   config_name              = "Audit Logs"
   log_type                 = "AUDIT_LOGS"
   output_format            = "JSON"
+<<<<<<< HEAD
 }
+=======
+<<<<<<<< HEAD:aws-gov/customizations/account/logging_configuration/logging_configuration.tf
+}
+========
+}
+>>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider):aws-gov/tf/modules/sra/databricks_account/audit_log_delivery/main.tf
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)

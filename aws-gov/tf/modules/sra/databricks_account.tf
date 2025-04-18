@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # EXPLANATION: All modules that reside at the account level
 =======
 // EXPLANATION: All modules that reside at the account level
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+# EXPLANATION: All modules that reside at the account level
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 
 
 # Create Unity Catalog Metastore - No Root Storage
@@ -61,21 +65,29 @@ module "user_assignment" {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   workspace_id         = module.databricks_mws_workspace.workspace_id
 =======
   created_workspace_id = module.databricks_mws_workspace.workspace_id
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+  workspace_id         = module.databricks_mws_workspace.workspace_id
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   workspace_access     = var.admin_user
   depends_on           = [module.uc_assignment, module.databricks_mws_workspace]
 }
 
 # Audit log delivery
 module "log_delivery" {
+<<<<<<< HEAD
   count = var.audit_log_delivery_exists ? 0 : 1
+=======
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   source = "./databricks_account/audit_log_delivery"
   providers = {
     databricks = databricks.mws
   }
+<<<<<<< HEAD
   
   audit_log_delivery_exists      = var.audit_log_delivery_exists
   databricks_account_id          = var.databricks_account_id
@@ -83,4 +95,12 @@ module "log_delivery" {
   databricks_gov_shard           = var.databricks_gov_shard
   databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
   log_delivery_role_name         = var.log_delivery_role_name
+=======
+
+  databricks_account_id          = var.databricks_account_id
+  resource_prefix                = var.resource_prefix
+  databricks_gov_shard           = var.databricks_gov_shard
+  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id[var.databricks_gov_shard]
+  log_delivery_role_name         = var.log_delivery_role_name[var.databricks_gov_shard]
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 }

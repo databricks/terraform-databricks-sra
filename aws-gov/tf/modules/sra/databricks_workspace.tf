@@ -14,9 +14,13 @@ module "uc_catalog" {
   workspace_id                   = module.databricks_mws_workspace.workspace_id
   user_workspace_catalog_admin   = var.admin_user
 <<<<<<< HEAD
+<<<<<<< HEAD
   databricks_account_id          = var.databricks_account_id
 =======
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+  databricks_account_id          = var.databricks_account_id
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   databricks_gov_shard           = var.databricks_gov_shard
   databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
   uc_master_role_id              = var.uc_master_role_id
@@ -25,10 +29,14 @@ module "uc_catalog" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # System Table Schemas Enablement - Coming Soon to AWS-Gov
 =======
 // System Table Schemas Enablement - Coming Soon to AWS-Gov
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+# System Table Schemas Enablement - Coming Soon to AWS-Gov
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 /*
 module "system_table" {
   source = "./databricks_workspace/system_schema"
@@ -40,10 +48,14 @@ module "system_table" {
 */
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Create Create Cluster
 =======
 // Create Create Cluster
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+# Create Create Cluster
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 module "cluster_configuration" {
   source = "./databricks_workspace/classic_cluster"
   providers = {
@@ -58,10 +70,14 @@ module "cluster_configuration" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Restrictive DBFS bucket policy
 =======
 // Restrictive DBFS bucket policy
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+# Restrictive DBFS bucket policy
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 module "restrictive_root_bucket" {
   source = "./databricks_workspace/restrictive_root_bucket"
   providers = {

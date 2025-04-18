@@ -24,11 +24,21 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
         ],
         Condition = {
           StringEquals = {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 <<<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_workspace/restrictive_root_bucket/main.tf
             "aws:PrincipalTag/DatabricksAccountId" = var.databricks_account_id
 ========
             "aws:PrincipalTag/DatabricksAccountId" = var.databricks_prod_aws_account_id[var.databricks_gov_shard]
 >>>>>>>> c1185b0 (aws gov simplicity update):aws-gov/tf/modules/sra/databricks_workspace/restrictive_root_bucket/restrictive_root_bucket.tf
+<<<<<<< HEAD
+=======
+=======
+            "aws:PrincipalTag/DatabricksAccountId" = var.databricks_account_id
+>>>>>>> 424b1c9 ([aws-gov] updated restrictive root bucket policy)
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
           }
         }
       },
@@ -61,11 +71,21 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
         ],
         Condition = {
           StringEquals = {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 <<<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_workspace/restrictive_root_bucket/main.tf
             "aws:PrincipalTag/DatabricksAccountId" = var.databricks_account_id
 ========
             "aws:PrincipalTag/DatabricksAccountId" = var.databricks_prod_aws_account_id[var.databricks_gov_shard]
 >>>>>>>> c1185b0 (aws gov simplicity update):aws-gov/tf/modules/sra/databricks_workspace/restrictive_root_bucket/restrictive_root_bucket.tf
+<<<<<<< HEAD
+=======
+=======
+            "aws:PrincipalTag/DatabricksAccountId" = var.databricks_account_id
+>>>>>>> 424b1c9 ([aws-gov] updated restrictive root bucket policy)
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
           }
         }
       },

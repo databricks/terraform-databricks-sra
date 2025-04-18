@@ -44,45 +44,65 @@ variable "cmk_admin_arn" {
 variable "custom_private_subnet_ids" {
   description = "List of custom private subnet IDs"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = list(string)
 =======
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+  type        = list(string)
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   default     = null
 }
 
 variable "custom_relay_vpce_id" {
   description = "Custom Relay VPC Endpoint ID"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = string
 =======
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+  type        = string
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   default     = null
 }
 
 variable "custom_sg_id" {
   description = "Custom security group ID"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = string
 =======
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+  type        = string
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   default     = null
 }
 
 variable "custom_vpc_id" {
   description = "Custom VPC ID"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = string
 =======
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+  type        = string
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   default     = null
 }
 
 variable "custom_workspace_vpce_id" {
   description = "Custom Workspace VPC Endpoint ID"
 <<<<<<< HEAD
+<<<<<<< HEAD
   type        = string
 =======
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+  type        = string
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   default     = null
 }
 
@@ -93,6 +113,9 @@ variable "databricks_account_id" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 variable "deployment_name" {
   description = "Deployment name for the workspace. Must first be enabled by a Databricks representative."
   type        = string
@@ -100,9 +123,12 @@ variable "deployment_name" {
 }
 
 variable "enable_security_analysis_tool" {
+<<<<<<< HEAD
 =======
 variable "enable_sat_boolean" {
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   description = "Flag to enable the security analysis tool."
   type        = bool
   sensitive   = true
@@ -116,12 +142,17 @@ variable "metastore_exists" {
 
 variable "network_configuration" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   description = "The type of network set-up for the workspace network configuration."
   type        = string
 =======
   type        = string
   description = "The type of network set-up for the workspace network configuration."
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+  description = "The type of network set-up for the workspace network configuration."
+  type        = string
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
   nullable    = false
 
   validation {

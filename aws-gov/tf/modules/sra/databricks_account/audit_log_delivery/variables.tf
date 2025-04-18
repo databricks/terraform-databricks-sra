@@ -1,8 +1,11 @@
+<<<<<<< HEAD
 variable "audit_log_delivery_exists" {
   description = "If audit log delivery is already configured"
   type        = bool
 }
 
+=======
+>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 variable "databricks_account_id" {
   description = "ID of the Databricks account."
   type = string
