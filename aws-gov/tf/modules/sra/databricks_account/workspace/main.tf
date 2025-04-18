@@ -96,6 +96,7 @@ resource "databricks_mws_private_access_settings" "pas" {
 
 # Workspace Configuration with Deployment Name
 <<<<<<< HEAD
+<<<<<<< HEAD
 <<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_account/workspace/main.tf
 resource "databricks_mws_workspaces" "workspace" {
 =======
@@ -105,6 +106,9 @@ resource "databricks_mws_workspaces" "workspace" {
 resource "databricks_mws_workspaces" "this" {
 >>>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider):aws-gov/tf/modules/sra/databricks_account/workspace/main.tf
 >>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
+=======
+resource "databricks_mws_workspaces" "workspace" {
+>>>>>>> 30215e6 (Update main.tf)
   account_id                               = var.databricks_account_id
   aws_region                               = var.region
   workspace_name                           = var.resource_prefix
