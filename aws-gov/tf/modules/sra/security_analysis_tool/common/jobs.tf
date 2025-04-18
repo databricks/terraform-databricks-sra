@@ -12,24 +12,24 @@ resource "databricks_job" "initializer" {
         runtime_engine     = "PHOTON"
       }
     }
+  }
 
-    task {
-      task_key        = "Initializer"
-      job_cluster_key = var.run_on_serverless ? null : "job_cluster"
-      dynamic "library" {
-        for_each = var.run_on_serverless ? [] : [1]
-        content {
-          pypi {
-            package = "dbl-sat-sdk"
-          }
+  task {
+    task_key        = "Initializer"
+    job_cluster_key = var.run_on_serverless ? null : "job_cluster"
+    dynamic "library" {
+      for_each = var.run_on_serverless ? [] : [1]
+      content {
+        pypi {
+          package = "dbl-sat-sdk"
         }
       }
-      notebook_task {
-        notebook_path = "${databricks_repo.security_analysis_tool.workspace_path}/notebooks/security_analysis_initializer"
-      }
     }
-
+    notebook_task {
+      notebook_path = "${databricks_repo.security_analysis_tool.workspace_path}/notebooks/security_analysis_initializer"
+    }
   }
+
 }
 
 resource "databricks_job" "driver" {
