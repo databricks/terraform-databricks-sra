@@ -1,11 +1,11 @@
-// Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/cluster
+# Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/cluster
 
-// Cluster Version
+# Cluster Version
 data "databricks_spark_version" "latest_lts" {
   long_term_support = true
 }
 
-// Cluster Creation
+# Cluster Creation
 resource "databricks_cluster" "example" {
   cluster_name            = "Shared Classic Compute Plane Cluster"
   data_security_mode      = "USER_ISOLATION"
@@ -18,7 +18,7 @@ resource "databricks_cluster" "example" {
     max_workers = 2
   }
 
-  // Derby Metastore configs
+  # Derby Metastore configs
   spark_conf = {
     "spark.hadoop.datanucleus.autoCreateTables" : "true",
     "spark.hadoop.datanucleus.autoCreateSchema" : "true",
@@ -30,7 +30,7 @@ resource "databricks_cluster" "example" {
     "spark.hadoop.datanucleus.fixedDatastore" : "false"
   }
 
-  // Custom Tags
+  # Custom Tags
   custom_tags = {
     "Project" = var.resource_prefix
   }
