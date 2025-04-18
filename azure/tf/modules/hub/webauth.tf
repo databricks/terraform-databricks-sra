@@ -44,6 +44,17 @@ resource "azurerm_subnet" "container" {
   }
 }
 
+# Assign the host subnet CIDR to the IP group
+resource "azurerm_ip_group_cidr" "host" {
+  ip_group_id = azurerm_ip_group.this.id
+  cidr        = var.subnet_map["webauth-host"]
+}
+
+resource "azurerm_subnet_route_table_association" "host" {
+  route_table_id = azurerm_route_table.this.id
+  subnet_id      = azurerm_subnet.host.id
+}
+
 # This resource block defines a network security group for webauth
 resource "azurerm_network_security_group" "webauth" {
   name                = "webauth-nsg"
@@ -172,6 +183,15 @@ resource "azurerm_private_endpoint" "webauth" {
     name                 = "private-dns-zone-webauth"
     private_dns_zone_ids = [azurerm_private_dns_zone.auth_front.id]
   }
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "webauth" {
+  name                  = "databricks-vnetlink-backend"
+  private_dns_zone_name = azurerm_private_dns_zone.auth_front.name
+  resource_group_name   = azurerm_private_dns_zone.auth_front.resource_group_name
+  virtual_network_id    = azurerm_virtual_network.this.id
+
+  tags = var.tags
 }
 
 resource "databricks_metastore_assignment" "webauth" {
