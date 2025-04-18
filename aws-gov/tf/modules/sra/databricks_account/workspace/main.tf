@@ -83,7 +83,7 @@ resource "databricks_mws_private_access_settings" "pas" {
 }
 
 # Workspace Configuration with Deployment Name
-resource "databricks_mws_workspaces" "this" {
+resource "databricks_mws_workspaces" "workspace" {
   account_id                               = var.databricks_account_id
   aws_region                               = var.region
   workspace_name                           = var.resource_prefix
