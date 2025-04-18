@@ -17,6 +17,7 @@ resource "databricks_job" "initializer" {
       }
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
   }
 
   task {
@@ -52,28 +53,34 @@ resource "databricks_job" "initializer" {
    }
 =======
 >>>>>>> 04cb5f1 (Update jobs.tf)
+=======
+  }
+>>>>>>> 84f68c7 (Update jobs.tf)
 
-    task {
-      task_key        = "Initializer"
-      job_cluster_key = var.run_on_serverless ? null : "job_cluster"
-      dynamic "library" {
-        for_each = var.run_on_serverless ? [] : [1]
-        content {
-          pypi {
-            package = "dbl-sat-sdk"
-          }
+  task {
+    task_key        = "Initializer"
+    job_cluster_key = var.run_on_serverless ? null : "job_cluster"
+    dynamic "library" {
+      for_each = var.run_on_serverless ? [] : [1]
+      content {
+        pypi {
+          package = "dbl-sat-sdk"
         }
       }
-      notebook_task {
-        notebook_path = "${databricks_repo.security_analysis_tool.workspace_path}/notebooks/security_analysis_initializer"
-      }
     }
+<<<<<<< HEAD
 
 <<<<<<< HEAD
  }
 >>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
 =======
+=======
+    notebook_task {
+      notebook_path = "${databricks_repo.security_analysis_tool.workspace_path}/notebooks/security_analysis_initializer"
+    }
+>>>>>>> 84f68c7 (Update jobs.tf)
   }
+
 }
 >>>>>>> 04cb5f1 (Update jobs.tf)
 
