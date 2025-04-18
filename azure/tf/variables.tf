@@ -12,12 +12,6 @@ variable "hub_vnet_cidr" {
   description = "(Required) The CIDR block for the hub Virtual Network"
 }
 
-variable "hub_storage_account_name" {
-  type        = string
-  description = "(Optional) Name of the storage account created in hub (the metastore root storage account), will be generated if not provided"
-  default     = null
-}
-
 variable "hub_resource_suffix" {
   type        = string
   description = "(Required) Resource suffix for naming resources in hub"
@@ -32,9 +26,11 @@ variable "public_repos" {
 variable "spoke_config" {
   type = map(object(
     {
-      resource_suffix = string
-      cidr            = string
-      tags            = map(string)
+      resource_suffix          = string
+      cidr                     = string
+      tags                     = map(string)
+      is_unity_catalog_enabled = optional(bool, true)
+      storage_account_name     = optional(string, null)
     }
   ))
   description = "(Required) List of spoke configurations"
@@ -55,4 +51,32 @@ variable "databricks_metastore_id" {
 variable "subscription_id" {
   type        = string
   description = "(Required) Azure Subscription ID to deploy into"
+}
+
+variable "sat_configuration" {
+  type = object({
+    enabled           = optional(bool, true)
+    schema_name       = optional(string, "sat")
+    catalog_name      = optional(string, "sat")
+    resource_suffix   = optional(string, "null")
+    proxies           = optional(map(any), {})
+    run_on_serverless = optional(bool, true)
+  })
+  default     = {}
+  description = "(Optional) Configuration for the SAT customization"
+}
+
+variable "sat_service_principal" {
+  type = object({
+    client_id     = optional(string, "")
+    client_secret = optional(string, "")
+    name          = optional(string, "spSAT")
+  })
+  default = {}
+  validation {
+    condition     = var.sat_service_principal.client_id == "" && var.sat_service_principal.client_secret == "" || var.sat_service_principal.client_id != "" && var.sat_service_principal.client_secret != ""
+    error_message = "Both a client_id and client_secret must be provided for SAT if either are provided"
+  }
+  description = "(Optional) Service principal configuration for running SAT. If this is not provided, a service principal will be created. The created service principal name can be configured with the name field in this variable."
+  sensitive   = true
 }

@@ -37,16 +37,15 @@ module "subnet_addrs" {
 # Define module "hub" with the source "./modules/azure_hub"
 # Pass the required variables to the module
 module "hub" {
-  source               = "./modules/hub"
-  location             = var.location
-  hub_vnet_cidr        = var.hub_vnet_cidr
-  subnet_map           = module.subnet_addrs.network_cidr_blocks
-  client_config        = data.azurerm_client_config.current
-  databricks_app_reg   = data.azuread_service_principal.this
-  public_repos         = var.public_repos
-  tags                 = var.tags
-  storage_account_name = var.hub_storage_account_name
-  resource_suffix      = var.hub_resource_suffix
+  source             = "./modules/hub"
+  location           = var.location
+  hub_vnet_cidr      = var.hub_vnet_cidr
+  subnet_map         = module.subnet_addrs.network_cidr_blocks
+  client_config      = data.azurerm_client_config.current
+  databricks_app_reg = data.azuread_service_principal.this
+  public_repos       = var.public_repos
+  tags               = var.tags
+  resource_suffix    = var.hub_resource_suffix
 
   #options
   is_kms_enabled           = true
@@ -54,34 +53,23 @@ module "hub" {
   is_unity_catalog_enabled = true
 }
 
-# Define module "spoke" with a for_each loop to iterate over each spoke configuration
-module "spoke" {
+module "hub_catalog" {
+  source = "./modules/catalog"
 
-  for_each = var.spoke_config
+  # This catalog is only created if SAT is enabled. If SAT is provisioned in a spoke, this can be manually removed.
+  count = var.sat_configuration.enabled ? 1 : 0
 
-  source = "./modules/spoke"
+  catalog_name        = var.sat_configuration.catalog_name
+  location            = var.location
+  metastore_id        = module.hub.metastore_id
+  dns_zone_ids        = [module.hub.dns_zone_ids.dfs]
+  ncc_id              = module.hub.ncc_id
+  resource_group_name = module.hub.resource_group_name
+  resource_suffix     = "${local.sat_workspace.resource_suffix}sat"
+  subnet_id           = module.hub.subnet_ids.privatelink
+  tags                = module.hub.tags
 
-  # Pass the required variables to the module
-  resource_suffix = each.value.resource_suffix
-  vnet_cidr       = each.value.cidr
-  tags            = each.value.tags
-
-  location                = var.location
-  route_table_id          = module.hub.route_table_id
-  metastore_id            = module.hub.is_unity_catalog_enabled ? module.hub.metastore_id : var.databricks_metastore_id
-  hub_vnet_name           = module.hub.vnet_name
-  hub_resource_group_name = module.hub.resource_group_name
-  hub_vnet_id             = module.hub.vnet_id
-  key_vault_id            = module.hub.key_vault_id
-  ipgroup_id              = module.hub.ipgroup_id
-  managed_disk_key_id     = module.hub.managed_disk_key_id
-  managed_services_key_id = module.hub.managed_services_key_id
-  ncc_id                  = module.hub.ncc_id
-
-  #options
-  is_kms_enabled                   = true
-  is_frontend_private_link_enabled = false
-  boolean_create_private_dbfs      = true
-
-  depends_on = [module.hub]
+  providers = {
+    databricks.workspace = databricks.hub
+  }
 }
