@@ -24,7 +24,7 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
         ],
         Condition = {
           StringEquals = {
-            "aws:PrincipalTag/DatabricksAccountId" = var.databricks_prod_aws_account_id[var.databricks_gov_shard]
+            "aws:PrincipalTag/DatabricksAccountId" = var.databricks_account_id
           }
         }
       },
@@ -57,7 +57,7 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
         ],
         Condition = {
           StringEquals = {
-            "aws:PrincipalTag/DatabricksAccountId" = var.databricks_prod_aws_account_id[var.databricks_gov_shard]
+            "aws:PrincipalTag/DatabricksAccountId" = var.databricks_account_id
           }
         }
       },

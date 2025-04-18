@@ -1,21 +1,49 @@
 # Security Reference Architecture Template
 
-# Introduction:
+# Getting Started
+
+1. Clone this Repo
+2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
+3. CD into `tf`
+4. Using `template.tfvars.example` as starting point, supply your variables and place in `tf` directory
+5. Run `terraform init`
+6. Run `terraform validate`
+7. From `tf` directory, run `terraform plan -var-file <YOUR_VAR_FILE>`, if edited directly, the command would be `terraform plan -var-file template.tfvars.example`
+8. Run `terraform apply -var-file <YOUR_VAR_FILE`
+
+## Note on provider initialization
+If you are using [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli),
+you may encounter an error like the below:
+
+```shell
+Error: cannot create mws network connectivity config: io.jsonwebtoken.IncorrectClaimException: Expected iss claim to be: https://sts.windows.net/00000000-0000-0000-0000-000000000000/, but was: https://sts.windows.net/ffffffff-ffff-ffff-ffff-ffffffffffff/
+```
+This typically happens if you are running this Terraform in a tenant where you are a guest, or if you have multiple
+Azure accounts configured. To resolve this error, set the Azure Tenant ID by exporting the `ARM_TENANT_ID` environment
+variable:
+
+```shell
+export ARM_TENANT_ID="00000000-0000-0000-0000-000000000000"
+```
+
+Alternatively, you can set the tenant ID in the databricks provider configurations (see the provider [doc](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure) for more info.)
+
+# Introduction
 
 Databricks has worked with thousands of customers to securely deploy the Databricks platform with appropriate security features to meet their architecture requirements.
 
 This Security Reference Architecture (SRA) repository implements common security features as a unified terraform templates that are typically deployed by our security conscious customers.
 
-# Component Breakdown and Description:
+# Component Breakdown and Description
 
 In this section, we break down each of the components that we've included in this Security Reference Architecture.
 
 In various .tf scripts, we have included direct links to the Databricks Terraform documentation. The [official documentation](https://registry.terraform.io/providers/databricks/databricks/latest/docs) can be found here.
 
-## Infrastructure Deployment:
+## Infrastructure Deployment
 
 - **Vnet Injection**: [Vnet injection](https://learn.microsoft.com/en-us/azure/databricks/security/network/classic/vnet-inject)
-allows Databricks customers to exercise more control over your network configures to comply with specific cloud security and governance standards that a 
+allows Databricks customers to exercise more control over your network configures to comply with specific cloud security and governance standards that a
 customer's organization may require.
 
 - **Private Endpoints**: Using Private Link technology, a [private endpoint](https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview) is a service that connects a customer's Vnet
@@ -30,20 +58,21 @@ to the [Simplified Private Link](https://learn.microsoft.com/en-us/azure/databri
 files, tables, and machine learning models. Unity Catalog provides a modern approach to granular access controls with centralized policy, auditing, and lineage tracking,
 all integrated into your Databricks workflow.
 
-## Post Workspace Deployment:
+## Post Workspace Deployment
 
 - **Admin Console Configurations**: There are a number of configurations within the [admin console](https://docs.databricks.com/administration-guide/admin-console.html) that
-can be controlled to reduce your threat vector. In this example, we use the workspace configurations Terraform template to disable and enable numerous options.
+can be controlled to reduce your threat vector. The AWS directory contains examples of configuring these, should your organization desire them.
 
 - **Cluster Tags and Pool Tags**: [Cluster and pool tags](https://learn.microsoft.com/en-us/azure/databricks/administration-guide/account-settings/usage-detail-tags) allow customers to
 monitor cost and accurately attribute Databricks usage to your organization's business unit and teams (for chargebacks, for examples). These tags propagate to detailed
 DBU usage reports for cost analysis.
 
-# Additional Security Recommendations and Opportunities:
+# Additional Security Recommendations and Opportunities
+
 In this section, we break down additional security recommendations and opportunities to maintain a strong security posture that either cannot be configured into this
 Terraform script or is very specific to individual customers (e.g. SCIM, SSO, etc.)
 
-- **Segement Workspaces for Various Levels of Data Seperation**: While Databricks has numerous capabilities for isolating different workloads, such as table ACLs and
+- **Segment Workspaces for Various Levels of Data Separation**: While Databricks has numerous capabilities for isolating different workloads, such as table ACLs and
 IAM passthrough for very sensitive workloads, the primary isolation method is to move sensitive workloads to a different workspace. This sometimes happens when
 a customer has very different teams (for example, a security team and a marketing team) who must both analyze different data in Databricks.
 
@@ -67,24 +96,6 @@ This reduces the risk of an auto-restart disrupting a scheduled job.
 
 - **Evaluate Whether your Workflow requires using Git Repos or CI/CD**: Mature organizations often build production workloads by using CI/CD to integrate code scanning,
 better control permissions, perform linting, and more. When there is highly sensitive data analyzed, a CI/CD process can also allow scanning for known scenarios such as hard coded secrets.
-
-# Getting Started:
-
-1. Clone this Repo 
-
-2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
-
-3. Fill out `example.tfvars` and place in `tf` directory
-
-5. CD into `tf`
-
-5. Run `terraform init`
-
-6. Run `terraform validate`
-
-7. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
-
-8. Run `terraform apply -var-file ../example.tfvars`
 
 # Network Diagram
 
