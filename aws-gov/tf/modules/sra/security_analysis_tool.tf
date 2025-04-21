@@ -14,7 +14,7 @@ module "security_analysis_tool" {
   use_sp_auth          = true
   proxies              = {}
   analysis_schema_name = replace("${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}.SAT", "-", "_")
-  run_on_serverless    = true
+  run_on_serverless    = false
 
   depends_on = [
     module.databricks_mws_workspace,
