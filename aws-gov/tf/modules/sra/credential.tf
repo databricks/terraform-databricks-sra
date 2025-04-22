@@ -1,6 +1,6 @@
-// EXPLANATION: The cross-account role for the Databricks workspace
+# EXPLANATION: The cross-account role for the Databricks workspace
 
-// Cross Account Trust Policy
+# Cross Account Trust Policy
 data "aws_iam_policy_document" "passrole_for_cross_account_credential" {
   statement {
     effect  = "Allow"
@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "passrole_for_cross_account_credential" {
   }
 }
 
-// Cross Account Role
+# Cross Account Role
 resource "aws_iam_role" "cross_account_role" {
   name               = "${var.resource_prefix}-cross-account"
   assume_role_policy = data.aws_iam_policy_document.passrole_for_cross_account_credential.json

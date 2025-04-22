@@ -1,16 +1,8 @@
-variable "databricks_url" {
-  description = "Should look like https://<workspace>.cloud.databricks.com"
-  type        = string
-}
-
-variable "workspace_id" {
-  description = "Should be the string of numbers in the workspace URL arg (e.g. https://<workspace>.cloud.databricks.com/?o=1234567890123456)"
-  type        = string
-}
+# Databricks variables
 
 variable "account_console_id" {
-  description = "Databricks Account Console ID"
   type        = string
+  description = "Databricks Account ID"
 }
 
 variable "sqlw_id" {
@@ -22,8 +14,6 @@ variable "sqlw_id" {
   }
   default = "new"
 }
-
-### AWS Specific Variables
 
 variable "account_user" {
   description = "Account Console Username"
@@ -63,4 +53,9 @@ variable "analysis_schema_name" {
 variable "proxies" {
   type        = map(any)
   description = "Proxies to be used for Databricks API calls"
+}
+
+variable "run_on_serverless" {
+  type        = bool
+  description = "Flag to run SAT initializer/Driver on Serverless"
 }

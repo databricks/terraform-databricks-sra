@@ -1,6 +1,6 @@
-// EXPLANATION: Create the customer managed-vpc and security group rules
+# EXPLANATION: Create the customer managed-vpc and security group rules
 
-// VPC and other assets - skipped entirely in custom mode, some assets skipped for firewall and isolated
+# VPC and other assets - skipped entirely in custom mode, some assets skipped for firewall and isolated
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.1.1"
@@ -28,7 +28,7 @@ module "vpc" {
 }
 
 
-// Security group - skipped in custom mode
+# Security group - skipped in custom mode
 resource "aws_security_group" "sg" {
   count = var.network_configuration != "custom" ? 1 : 0
 
