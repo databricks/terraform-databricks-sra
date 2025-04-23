@@ -133,10 +133,14 @@ This section provides additional security recommendations to help maintain a str
 1. Clone this Repo.
 2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads).
 <<<<<<< HEAD
+<<<<<<< HEAD
 3. Fill out `main.tf`.
 =======
 3. Fill out `sra.tf`.
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+3. Fill out `main.tf`.
+>>>>>>> a043e86 (Updated README)
 4. Fill out `template.tfvars.example` and rename the file to `template.tfvars` by removing `.example`.
 5. Configure the [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration) and [Databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authentication) provider authentication.
 6. Change directory into `tf`.

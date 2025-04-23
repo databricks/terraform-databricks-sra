@@ -124,6 +124,7 @@ This section provides additional security recommendations to help maintain a str
 
 ## Getting Started
 
+<<<<<<< HEAD
 1. Clone this Repo
 2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
 3. Decide which [operation](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) mode you'd like to use.
@@ -135,6 +136,19 @@ This section provides additional security recommendations to help maintain a str
 9. Run `terraform validate`
 10. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
 11. Run `terraform apply -var-file ../example.tfvars`
+=======
+1. Clone this Repo.
+2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads).
+3. Decide which [operation mode](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) you'd like to use.
+4. Fill out `main.tf`.
+5. Fill out `template.tfvars.example` and rename the file to `template.tfvars` by removing `.example`.
+6. Configure the [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration) and [Databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authentication) provider authentication.
+7. Change directory into `tf`.
+8. Run `terraform init`.
+9. Run `terraform validate`.
+10. From the `tf` directory, run `terraform plan -var-file ../example.tfvars`.
+11. Run `terraform apply -var-file ../example.tfvars`.
+>>>>>>> a043e86 (Updated README)
 
 
 ## Network Diagram - Sandbox
