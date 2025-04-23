@@ -11,10 +11,14 @@ resource "databricks_cluster" "example" {
   data_security_mode      = "USER_ISOLATION"
   spark_version           = data.databricks_spark_version.latest_lts.id
 <<<<<<< HEAD
+<<<<<<< HEAD
   node_type_id            = "m5n.large"
 =======
   node_type_id            = "i3.xlarge"
 >>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
+=======
+  node_type_id            = "i3.large"
+>>>>>>> 68bb11e (Downsized AWS & AWS Gov classic cluster instance type)
   autotermination_minutes = 10
 
   autoscale {
