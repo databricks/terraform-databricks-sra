@@ -38,7 +38,11 @@ module "sra" {
   # custom_workspace_vpce_id  = "vpce-0abcdef1234567890" // Example PrivateLink endpoint ID for Databricks workspace
 
   # OPTIONAL - ENABLE SECURITY ANALYSIS TOOL:
-  enable_security_analysis_tool = true
+  # The SAT jobs will not work out of the box in isolated mode (i.e., when your Databricks cluster does not have Internet access). To ensure the necessary Python packages are installed, you must either:
+  # - Provide Internet access so pip can install packages from PyPI, or
+  # - Copy all wheel files from the /docs/wheels folder in the SAT repository to a Unity Catalog (UC) volume.
+  # - Then, edit the /notebooks/Includes/install_sat_sdk.py file in the repo to change the pip install commands so they reference the UC volume path where you copied the wheels (instead of the default PyPI source).
+  enable_security_analysis_tool = false
 
   # OPTIONAL - DEPLOYMENT NAME:
   deployment_name = null // Deployment name for the workspace. Must first be enabled by a Databricks representative.
