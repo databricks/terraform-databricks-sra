@@ -68,7 +68,7 @@ resource "aws_iam_role" "logdelivery" {
 resource "time_sleep" "wait" {
   count = var.audit_log_delivery_exists ? 0 : 1
   depends_on = [
-    aws_iam_role.logdelivery[count.index]
+    aws_iam_role.logdelivery
   ]
   create_duration = "10s"
 }
