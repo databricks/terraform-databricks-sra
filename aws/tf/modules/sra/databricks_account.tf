@@ -67,6 +67,7 @@ module "log_delivery" {
     databricks = databricks.mws
   }
 
-  databricks_account_id = var.databricks_account_id
-  resource_prefix       = var.resource_prefix
+  audit_log_delivery_exists = var.audit_log_delivery_exists
+  databricks_account_id     = var.databricks_account_id
+  resource_prefix           = var.resource_prefix
 }

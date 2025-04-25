@@ -5,19 +5,20 @@ module "sra" {
     aws            = aws
   }
 
-  databricks_account_id = var.databricks_account_id
-  client_id             = var.client_id
-  client_secret         = var.client_secret
-  aws_account_id        = var.aws_account_id
-  region                = var.region
-  region_name           = var.region_name[var.region]
-  region_bucket_name    = var.region_bucket_name[var.region]
-  admin_user            = var.admin_user
-  resource_prefix       = var.resource_prefix
+  databricks_account_id     = var.databricks_account_id
+  client_id                 = var.client_id
+  client_secret             = var.client_secret
+  aws_account_id            = var.aws_account_id
+  region                    = var.region
+  region_name               = var.region_name[var.region]
+  region_bucket_name        = var.region_bucket_name[var.region]
+  admin_user                = var.admin_user
+  resource_prefix           = var.resource_prefix
 
   # REQUIRED:
-  network_configuration = "isolated" # Network (custom or isolated), see README.md for more information.
-  metastore_exists      = false      # If a regional metastore exists set to true.
+  network_configuration     = "isolated" # Network (custom or isolated), see README.md for more information.
+  metastore_exists          = false      # If a regional metastore exists set to true.
+  audit_log_delivery_exists = false      # If audit log delivery is already configured.
 
   # REQUIRED - IF USING ISOLATED NETWORK:
   vpc_cidr_range           = "10.0.0.0/18" # Please re-define the subsequent subnet ranges if the VPC CIDR range is updated.
