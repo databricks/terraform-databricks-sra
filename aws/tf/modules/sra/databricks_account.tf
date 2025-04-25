@@ -76,9 +76,13 @@ module "user_assignment" {
 # Audit log delivery
 module "log_delivery" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   count = var.audit_log_delivery_exists ? 0 : 1
 =======
 >>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
+=======
+  count = var.audit_log_delivery_exists ? 0 : 1
+>>>>>>> a9049df ([AWS & AWS GOV] Audit Log Delivery now a boolean)
   source = "./databricks_account/audit_log_delivery"
   providers = {
     databricks = databricks.mws
