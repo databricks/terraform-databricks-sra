@@ -20,9 +20,13 @@ module "sra" {
   network_configuration          = "isolated" // Network (custom or isolated), see README.md for more information.
   metastore_exists               = false      // If a regional metastore exists set to true.
 <<<<<<< HEAD
+<<<<<<< HEAD
   audit_log_delivery_exists      = false      // If audit log delivery is already configured.
 =======
 >>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
+=======
+  audit_log_delivery_exists      = false      // If audit log delivery is already configured.
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
 
   # REQUIRED IF USING ISOLATED NETWORK:
   vpc_cidr_range                           = "10.0.0.0/18" // Please re-define the subsequent subnet ranges if the VPC CIDR range is updated.

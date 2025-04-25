@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
 variable "audit_log_delivery_exists" {
   description = "If audit log delivery is already configured"
   type        = bool

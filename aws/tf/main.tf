@@ -6,6 +6,9 @@ module "sra" {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
   databricks_account_id     = var.databricks_account_id
   client_id                 = var.client_id
   client_secret             = var.client_secret
@@ -15,6 +18,7 @@ module "sra" {
   region_bucket_name        = var.region_bucket_name[var.region]
   admin_user                = var.admin_user
   resource_prefix           = var.resource_prefix
+<<<<<<< HEAD
 
   # REQUIRED:
   network_configuration     = "isolated" # Network (custom or isolated), see README.md for more information.
@@ -35,6 +39,13 @@ module "sra" {
   network_configuration = "isolated" # Network (custom or isolated), see README.md for more information.
   metastore_exists      = false      # If a regional metastore exists set to true.
 >>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
+=======
+
+  # REQUIRED:
+  network_configuration     = "isolated" # Network (custom or isolated), see README.md for more information.
+  metastore_exists          = false      # If a regional metastore exists set to true.
+  audit_log_delivery_exists = false      # If audit log delivery is already configured.
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
 
   # REQUIRED - IF USING ISOLATED NETWORK:
   vpc_cidr_range           = "10.0.0.0/18" # Please re-define the subsequent subnet ranges if the VPC CIDR range is updated.

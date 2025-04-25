@@ -12,6 +12,7 @@ resource "databricks_cluster" "example" {
   spark_version           = data.databricks_spark_version.latest_lts.id
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   node_type_id            = "m5n.large"
 =======
   node_type_id            = "i3.xlarge"
@@ -19,6 +20,9 @@ resource "databricks_cluster" "example" {
 =======
   node_type_id            = "i3.large"
 >>>>>>> 68bb11e (Downsized AWS & AWS Gov classic cluster instance type)
+=======
+  node_type_id            = "m5n.large"
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
   autotermination_minutes = 10
 
   autoscale {
@@ -27,6 +31,9 @@ resource "databricks_cluster" "example" {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
   aws_attributes {
     availability           = "ON_DEMAND"
     ebs_volume_count       = 1
@@ -34,8 +41,11 @@ resource "databricks_cluster" "example" {
     ebs_volume_type        = "GENERAL_PURPOSE_SSD"
   }
 
+<<<<<<< HEAD
 =======
 >>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
   # Derby Metastore configs
   spark_conf = {
     "spark.hadoop.datanucleus.autoCreateTables" : "true",

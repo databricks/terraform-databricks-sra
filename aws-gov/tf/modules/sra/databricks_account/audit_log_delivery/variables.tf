@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
 variable "audit_log_delivery_exists" {
   description = "If audit log delivery is already configured"
   type        = bool
 }
 
+<<<<<<< HEAD
 =======
 >>>>>>> fc4eee5 ([aws-gov] fix(aws-gov) update naming convention of modules, update test, add required terraform provider)
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
 variable "databricks_account_id" {
   description = "ID of the Databricks account."
   type = string

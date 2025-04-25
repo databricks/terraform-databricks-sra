@@ -88,6 +88,9 @@ module "log_delivery" {
     databricks = databricks.mws
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
   
   audit_log_delivery_exists      = var.audit_log_delivery_exists
   databricks_account_id          = var.databricks_account_id

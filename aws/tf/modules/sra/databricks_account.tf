@@ -85,6 +85,7 @@ module "log_delivery" {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   audit_log_delivery_exists = var.audit_log_delivery_exists
   databricks_account_id     = var.databricks_account_id
   resource_prefix           = var.resource_prefix
@@ -97,4 +98,9 @@ module "log_delivery" {
   databricks_account_id = var.databricks_account_id
   resource_prefix       = var.resource_prefix
 >>>>>>> d598b99 (tf linting, sat integration, audit logs reintegration, additional resource for deployment name, and readme update)
+=======
+  audit_log_delivery_exists = var.audit_log_delivery_exists
+  databricks_account_id     = var.databricks_account_id
+  resource_prefix           = var.resource_prefix
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
 }

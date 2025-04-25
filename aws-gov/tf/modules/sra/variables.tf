@@ -4,14 +4,20 @@ variable "admin_user" {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
 variable "audit_log_delivery_exists" {
   description = "If audit log delivery is already configured"
   type        = bool
   default     = false
 }
 
+<<<<<<< HEAD
 =======
 >>>>>>> c1185b0 (aws gov simplicity update)
+=======
+>>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
 variable "availability_zones" {
   description = "List of AWS availability zones."
   type        = list(string)
