@@ -13,6 +13,7 @@ resource "databricks_cluster" "example" {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   node_type_id            = "m5n.large"
 =======
   node_type_id            = "i3.xlarge"
@@ -23,6 +24,9 @@ resource "databricks_cluster" "example" {
 =======
   node_type_id            = "m5n.large"
 >>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
+=======
+  node_type_id            = "m5n.large"
+>>>>>>> 08a49fd ([AWS] Downsizing Classic Cluster)
   autotermination_minutes = 10
 
   autoscale {
@@ -32,8 +36,11 @@ resource "databricks_cluster" "example" {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
+=======
+>>>>>>> 08a49fd ([AWS] Downsizing Classic Cluster)
   aws_attributes {
     availability           = "ON_DEMAND"
     ebs_volume_count       = 1
@@ -42,10 +49,13 @@ resource "databricks_cluster" "example" {
   }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
 =======
 >>>>>>> 0ef66cd ([AWS, AWS-GOV] Added Boolean for Audit Log Delivery)
+=======
+>>>>>>> 08a49fd ([AWS] Downsizing Classic Cluster)
   # Derby Metastore configs
   spark_conf = {
     "spark.hadoop.datanucleus.autoCreateTables" : "true",
@@ -63,7 +73,11 @@ resource "databricks_cluster" "example" {
     "Project" = var.resource_prefix
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
 }
 >>>>>>> 8eced5b (fix(aws) update naming convention of modules, update test, add required terraform provider)
+=======
+}
+>>>>>>> 08a49fd ([AWS] Downsizing Classic Cluster)
