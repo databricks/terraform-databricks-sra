@@ -3,6 +3,12 @@ variable "admin_user" {
   type        = string
 }
 
+variable "audit_log_delivery_exists" {
+  description = "If audit log delivery is already configured"
+  type        = bool
+  default     = false
+}
+
 variable "availability_zones" {
   description = "List of AWS availability zones."
   type        = list(string)
