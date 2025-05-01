@@ -19,22 +19,15 @@ resource "databricks_cluster" "example" {
   }
 
   aws_attributes {
-    availability           = "ON_DEMAND"
-    ebs_volume_count       = 1
-    ebs_volume_size        = 32  # Size in GB, adjust as needed
-    ebs_volume_type        = "GENERAL_PURPOSE_SSD"
+    availability     = "ON_DEMAND"
+    ebs_volume_count = 1
+    ebs_volume_size  = 32 # Size in GB, adjust as needed
+    ebs_volume_type  = "GENERAL_PURPOSE_SSD"
   }
 
-  # Derby Metastore configs
+  # Unity Catalog only configuration
   spark_conf = {
-    "spark.hadoop.datanucleus.autoCreateTables" : "true",
-    "spark.hadoop.datanucleus.autoCreateSchema" : "true",
-    "spark.hadoop.javax.jdo.option.ConnectionDriverName" : "org.apache.derby.jdbc.EmbeddedDriver",
-    "spark.hadoop.javax.jdo.option.ConnectionPassword" : "hivepass",
-    "spark.hadoop.javax.jdo.option.ConnectionURL" : "jdbc:derby:memory:myInMemDB;create=true",
-    "spark.sql.catalogImplementation" : "hive",
-    "spark.hadoop.javax.jdo.option.ConnectionUserName" : "hiveuser",
-    "spark.hadoop.datanucleus.fixedDatastore" : "false"
+    "spark.databricks.unityCatalogOnlyMode" : "true"
   }
 
   # Custom Tags

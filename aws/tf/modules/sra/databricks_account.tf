@@ -41,9 +41,9 @@ module "databricks_mws_workspace" {
   region                      = var.region
   backend_rest                = var.custom_workspace_vpce_id != null ? var.custom_workspace_vpce_id : aws_vpc_endpoint.backend_rest[0].id
   backend_relay               = var.custom_relay_vpce_id != null ? var.custom_relay_vpce_id : aws_vpc_endpoint.backend_relay[0].id
-  managed_storage_key         = aws_kms_key.managed_storage.arn
+  managed_services_key        = aws_kms_key.managed_services.arn
   workspace_storage_key       = aws_kms_key.workspace_storage.arn
-  managed_storage_key_alias   = aws_kms_alias.managed_storage_key_alias.name
+  managed_services_key_alias  = aws_kms_alias.managed_services_key_alias.name
   workspace_storage_key_alias = aws_kms_alias.workspace_storage_key_alias.name
   deployment_name             = var.deployment_name
 }
@@ -62,13 +62,12 @@ module "user_assignment" {
 
 # Audit log delivery
 module "log_delivery" {
-  count = var.audit_log_delivery_exists ? 0 : 1
+  count  = var.audit_log_delivery_exists ? 0 : 1
   source = "./databricks_account/audit_log_delivery"
   providers = {
     databricks = databricks.mws
   }
 
-  audit_log_delivery_exists = var.audit_log_delivery_exists
-  databricks_account_id     = var.databricks_account_id
-  resource_prefix           = var.resource_prefix
+  databricks_account_id = var.databricks_account_id
+  resource_prefix       = var.resource_prefix
 }

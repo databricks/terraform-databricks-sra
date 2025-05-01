@@ -29,13 +29,13 @@ variable "deployment_name" {
   nullable    = true
 }
 
-variable "managed_storage_key" {
-  description = "CMK for managed storage."
+variable "managed_services_key" {
+  description = "CMK for managed services."
   type        = string
 }
 
-variable "managed_storage_key_alias" {
-  description = "CMK for managed storage alias."
+variable "managed_services_key_alias" {
+  description = "CMK for managed services alias."
   type        = string
 }
 
