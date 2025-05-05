@@ -5,10 +5,14 @@ resource "azurerm_private_endpoint" "dfs" {
   subnet_id           = var.subnet_id
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   # Define the private service connection for the dfs resource
 =======
   # Define the private service connection for the dbfs_dfs resource
 >>>>>>> 575b72c (feat(azure): Add catalog module)
+=======
+  # Define the private service connection for the dfs resource
+>>>>>>> 4f00bf9 (fix(azure): Add missing blob private endpoint for UC model downloads)
   private_service_connection {
     name                           = "${module.naming.private_service_connection.name}-dfs"
     private_connection_resource_id = azurerm_storage_account.unity_catalog.id
@@ -31,6 +35,9 @@ resource "databricks_mws_ncc_private_endpoint_rule" "dfs" {
   group_id                       = "dfs"
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4f00bf9 (fix(azure): Add missing blob private endpoint for UC model downloads)
 
 resource "azurerm_private_endpoint" "blob" {
   name                = "${module.naming.private_endpoint.name}-blob"
@@ -60,5 +67,8 @@ resource "databricks_mws_ncc_private_endpoint_rule" "blob" {
   resource_id                    = azurerm_storage_account.unity_catalog.id
   group_id                       = "blob"
 }
+<<<<<<< HEAD
 =======
 >>>>>>> 575b72c (feat(azure): Add catalog module)
+=======
+>>>>>>> 4f00bf9 (fix(azure): Add missing blob private endpoint for UC model downloads)
