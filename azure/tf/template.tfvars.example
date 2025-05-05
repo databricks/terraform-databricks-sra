@@ -1,23 +1,26 @@
-databricks_account_id   = "00000000-0000-0000-0000-000000000000"
-hub_resource_suffix     = "srahub"
-hub_vnet_cidr           = "10.0.0.0/22"
-location                = "westus2"
+databricks_account_id = "00000000-0000-0000-0000-000000000000"
+hub_resource_suffix   = "srahub"
+hub_vnet_cidr         = "10.0.0.0/22"
+location              = "westus2"
 tags = {
   Owner = "john.smith@company.com"
 }
 spoke_config = {
-  spoke1 = {
-    resource_suffix = "spoke1"
+  spoke = {
+    resource_suffix = "spoke"
     cidr            = "10.1.0.0/20"
     tags = {
-      environment       = "test"
+      environment = "test"
     },
-  spoke2 = {
-    resource_suffix = "spoke2"
-    cidr            = "10.2.0.0/20"
-    tags = {
-      environment       = "dev"
-    }
+    # Uncomment the below if a second spoke is needed
+
+    # spoke2 = {
+    #   resource_suffix = "spoke2"
+    #   cidr            = "10.2.0.0/20"
+    #   tags = {
+    #     environment = "dev"
+    #   }
+    # }
   }
 }
 
