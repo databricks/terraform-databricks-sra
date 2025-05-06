@@ -11,7 +11,7 @@
 7. From `tf` directory, run `terraform plan -var-file <YOUR_VAR_FILE>`, if edited directly, the command would be `terraform plan -var-file template.tfvars.example`
 8. Run `terraform apply -var-file <YOUR_VAR_FILE`
 
-## Note on provider initialization
+## Note on provider initialization with Azure CLI
 If you are using [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli),
 you may encounter an error like the below:
 
@@ -27,6 +27,23 @@ export ARM_TENANT_ID="00000000-0000-0000-0000-000000000000"
 ```
 
 Alternatively, you can set the tenant ID in the databricks provider configurations (see the provider [doc](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure) for more info.)
+
+You may also encounter errors like the below when Terraform begins provisioning workspace resources:
+
+```shell
+╷
+│ Error: cannot read current user: Unauthorized access to Org: 0000000000000000
+│ 
+│   with module.sat[0].module.sat.data.databricks_current_user.me,
+│   on .terraform/modules/sat.sat/terraform/common/data.tf line 1, in data "databricks_current_user" "me":
+│    1: data "databricks_current_user" "me" {}
+│ 
+╵
+```
+
+To fix this error, log in to the newly created spoke workspace by clicking on the "Launch Workspace" button in the Azure
+portal. This must be done as the user who is running this Terraform, or the user running this Terraform must be granted
+workspace admin after the first user launches the workspace.
 
 # Introduction
 
@@ -66,6 +83,208 @@ can be controlled to reduce your threat vector. The AWS directory contains examp
 - **Cluster Tags and Pool Tags**: [Cluster and pool tags](https://learn.microsoft.com/en-us/azure/databricks/administration-guide/account-settings/usage-detail-tags) allow customers to
 monitor cost and accurately attribute Databricks usage to your organization's business unit and teams (for chargebacks, for examples). These tags propagate to detailed
 DBU usage reports for cost analysis.
+
+## Security Analysis Tool
+Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
+By default, SAT is installed in the hub workspace, also called the "WEB_AUTH" workspace.
+
+### Changing the SAT workspace
+To change which workspace SAT is installed in, there are three modifications required to the `customizations.tf`:
+
+1. Change the Databricks provider used in the `SAT` module to use a different workspace
+```hcl
+# customizations.tf - default
+# Default
+
+# Change the provider if needed
+providers = {
+  databricks = databricks.hub #<---- This can be modified
+}
+```
+
+```hcl
+# customizations.tf - modified
+
+# Change the provider if needed
+providers = {
+  databricks = databricks.spoke
+}
+```
+
+2. Change the "sat_workspace" local to use the correct module
+```hcl
+# customizations.tf - default
+locals {
+  sat_workspace     = module.hub #<- This should be updated to the spoke you would like to use for SAT
+}
+```
+```hcl
+# customizations.tf - modified
+locals {
+  sat_workspace     = module.spoke #<- This should be updated to the spoke you would like to use for SAT
+}
+```
+
+3. Change the `databricks_permission_assignment.sat_workspace_admin` resource to use the correct provider
+```hcl
+# customizations.tf - default
+resource "databricks_permission_assignment" "sat_workspace_admin" {
+  count = length(module.sat)
+  ...
+  provider = databricks.hub #<- This should be updated to the spoke you would like to use for SAT
+}
+```
+```hcl
+# customizations.tf - modified
+resource "databricks_permission_assignment" "sat_workspace_admin" {
+  count = length(module.sat)
+  ...
+  provider = databricks.spoke
+}
+```
+Note that SAT is designed to be deployed _once per Azure subscription_. If needed, SAT can be deployed multiple times in
+different regions using this terraform configuration. This requires provisioning SAT in multiple spokes. Reference the 
+above modifications to deploy to multiple spokes.
+
+### SAT Service Principal
+Some users of SRA may not have permissions to create Entra ID service principals. If this is the case, you can choose to
+bring-your-own service principal. To configure a pre-existing Entra ID service principal to be used for SAT, configure 
+the `sat_service_principal` variable like the example below:
+
+```hcl
+# example.tfvars
+sat_service_principal = {
+  client_id     = "00000000-0000-0000-0000-000000000000"
+  client_secret = "some-secret"
+}
+```
+
+If you do not bring-your-own service principal, an Entra ID service principal will be created for you with a default
+name of `spSAT`. This name can be customized by modifying the `sat_service_principal` variable like so:
+```hcl
+# example.tfvars
+sat_service_principal = {
+  name = "spSATDev"
+}
+```
+
+### SAT Serverless Compute
+SAT is installed using serverless compute by default. Before running the [required jobs](https://github.com/databricks-industry-solutions/security-analysis-tool/blob/v0.3.3/terraform/azure/TERRAFORM_Azure.md#step-7-run-databricks-jobs)
+in Databricks, the private endpoints on your hub storage account must be approved.
+
+## Adding additional spokes
+
+To add additional spokes to this configuration, follow the below steps.
+
+1. Add a new key to the spoke_config variable
+
+```hcl
+# Terraform variables (for example, terraform.tfvars)
+spoke_config = {
+  spoke = {
+    resource_suffix = "spoke"
+    cidr            = "10.1.0.0/20"
+    tags = {
+      environment       = "dev"
+    },
+  spoke_b = { #<----- Add a new spoke config
+    resource_suffix = "spoke_b"
+    cidr            = "10.2.0.0/20"
+    tags = {
+      environment       = "test"
+    }
+  }
+}
+```
+
+2. Add a new provider to the providers.tf for the new spoke
+
+```hcl
+# providers.tf
+
+# New spoke provider
+provider "databricks" {
+  alias = "spoke_b"
+  host  = module.spoke_b.workspace_url
+}
+```
+
+3. Copy the `spoke.tf` file to a new file (for example, `spoke_b.tf`).
+
+4. Make the following adjustments to the new file
+
+```hcl
+# spoke_b.tf
+module "spoke" { #<----- Modify the name of the module to something unique
+  source = "./modules/spoke"
+
+  # Update these per spoke
+  resource_suffix = var.spoke_config["spoke"].resource_suffix #<----- Use a new key in the spoke_config variable
+  vnet_cidr       = var.spoke_config["spoke"].cidr
+  tags            = var.spoke_config["spoke"].tags
+
+  ...
+
+  depends_on = [module.hub]
+}
+
+module "spoke_catalog" { #<----- Rename this spoke's catalog to something unique
+  source = "./modules/catalog"
+
+  # Update these per catalog for the catalog's spoke
+  catalog_name        = module.spoke.resource_suffix #<----- Replace all references to original spoke with new spoke
+  dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
+  ncc_id              = module.spoke.ncc_id
+  resource_group_name = module.spoke.resource_group_name
+  resource_suffix     = module.spoke.resource_suffix
+  subnet_id           = module.spoke.subnet_ids.privatelink
+  tags                = module.spoke.tags
+
+  ...
+
+  providers = {
+    databricks.workspace = databricks.spoke #<----- Replace provider reference to new spoke
+  }
+}
+```
+
+```hcl
+# spoke_b.tf - modified
+module "spoke_b" {
+  source = "./modules/spoke"
+
+  # Update these per spoke
+  resource_suffix = var.spoke_config["spoke_b"].resource_suffix
+  vnet_cidr       = var.spoke_config["spoke_b"].cidr
+  tags            = var.spoke_config["spoke_b"].tags
+  
+  ...
+  
+  depends_on = [module.hub]
+}
+
+module "spoke_b_catalog" {
+  source = "./modules/catalog"
+
+  # Update these per catalog for the catalog's spoke
+  catalog_name        = module.spoke_b.resource_suffix
+  dns_zone_ids        = [module.spoke_b.dns_zone_ids["dfs"]]
+  ncc_id              = module.spoke_b.ncc_id
+  resource_group_name = module.spoke_b.resource_group_name
+  resource_suffix     = module.spoke_b.resource_suffix
+  subnet_id           = module.spoke_b.subnet_ids.privatelink
+  tags                = module.spoke_b.tags
+  
+  ...
+  
+  providers = {
+    databricks.workspace = databricks.spoke_b
+  }
+}
+
+```
+
+5. Run `terraform apply` to create the new spoke
 
 # Additional Security Recommendations and Opportunities
 

@@ -69,6 +69,6 @@ resource "databricks_metastore_assignment" "this" {
 }
 
 resource "databricks_mws_ncc_binding" "this" {
-  network_connectivity_config_id = var.ncc_id
+  network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
   workspace_id                   = azurerm_databricks_workspace.this.workspace_id
 }

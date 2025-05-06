@@ -62,11 +62,13 @@ module "user_assignment" {
 
 # Audit log delivery
 module "log_delivery" {
+  count = var.audit_log_delivery_exists ? 0 : 1
   source = "./databricks_account/audit_log_delivery"
   providers = {
     databricks = databricks.mws
   }
 
-  databricks_account_id = var.databricks_account_id
-  resource_prefix       = var.resource_prefix
+  audit_log_delivery_exists = var.audit_log_delivery_exists
+  databricks_account_id     = var.databricks_account_id
+  resource_prefix           = var.resource_prefix
 }

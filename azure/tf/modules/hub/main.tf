@@ -1,6 +1,20 @@
+# Generate a random string for dbfsnaming
+resource "random_string" "dbfsnaming" {
+  special = false
+  upper   = false
+  length  = 13
+}
+
+# Define subnets using cidrsubnet function
+locals {
+  # Generate a random string for dbfs_name
+  dbfs_name       = join("", ["dbstorage", random_string.dbfsnaming.result])
+  managed_rg_name = join("", [module.naming.resource_group.name_unique, "adbmanaged"])
+}
+
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.1"
+  version = "~>0.4"
   suffix  = [var.resource_suffix]
 }
 
@@ -8,7 +22,8 @@ module "naming" {
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name
   location = var.location
-  tags     = var.tags
+
+  tags = var.tags
 }
 
 # Create the hub virtual network
