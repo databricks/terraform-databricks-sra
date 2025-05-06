@@ -51,3 +51,12 @@ terraform.rc
 .envrc*
 
 *.hcl
+
+# Include tflint configurations for CI workflows
+!**/.tflint.hcl
+!**/*.tftest.hcl
+gcp/modules/workspace_deployment/*.json
+
+aws/
+aws-gov/
+azure/

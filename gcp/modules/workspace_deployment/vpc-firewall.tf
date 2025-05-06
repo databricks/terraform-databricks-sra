@@ -1,6 +1,6 @@
 resource "google_compute_firewall" "deny_egress" {
   count = var.harden_network ? 1 : 0
-  name                    = "deny-egress-${var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].name}"
+  name                    = "deny-egress-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1100
   destination_ranges      = ["0.0.0.0/0"]
@@ -9,7 +9,7 @@ resource "google_compute_firewall" "deny_egress" {
   deny  {
     protocol              = "all"
   }
-  network                 = var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].self_link
+  network                 = google_compute_network.dbx_private_vpc.self_link
 }
 
 
@@ -17,7 +17,7 @@ resource "google_compute_firewall" "deny_egress" {
 # It can be avoided if the workspace is UC-enabled and that the spark config is configured to avoid fetching the metastore IP
 resource "google_compute_firewall" "to_databricks_managed_hive" {
   count = var.harden_network ? 1 : 0
-  name                    = "to-databricks-managed-hive-${var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].name}"
+  name                    = "to-databricks-managed-hive-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1010
   destination_ranges      = []
@@ -26,54 +26,13 @@ resource "google_compute_firewall" "to_databricks_managed_hive" {
     protocol              = "tcp"
     ports                 = ["3306"]
   }
-  network                 = var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].self_link
+  network                 = google_compute_network.dbx_private_vpc.self_link
 }
 
-resource "google_compute_firewall" "to_gke_health_checks" {
-  count = var.harden_network ? 1 : 0
-  name                    = "to-gke-health-checks-${var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].name}"
-  direction               = "EGRESS"
-  priority                = 1010
-  destination_ranges      = ["35.191.0.0/16", "130.211.0.0/22"]
-  source_ranges           = []
-  allow {
-    protocol              = "tcp"
-    ports                 = ["443", "80"]
-  }
-  network                 = var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].self_link
-}
-
-resource "google_compute_firewall" "from_gke_health_checks" {
-  count = var.harden_network ? 1 : 0
-  name                    = "from-gke-health-checks-${var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].name}"
-  direction               = "INGRESS"
-  priority                = 1010
-  destination_ranges      = []
-  source_ranges           = ["35.191.0.0/16", "130.211.0.0/22"]
-  allow {
-    protocol              = "tcp"
-    ports                 = ["443", "80"]
-  }
-  network                 = var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].name
-}
-
-resource "google_compute_firewall" "to_gke_cp" {
-  count = var.harden_network ? 1 : 0
-  name                    = "to-gke-cp-${var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].name}"
-  direction               = "EGRESS"
-  priority                = 1010
-  destination_ranges      = ["10.32.0.0/28"]
-  source_ranges           = []
-  allow {
-    protocol              = "tcp"
-    ports                 = ["443", "10250"]
-  }
-  network                 = var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].self_link
-}
 
 resource "google_compute_firewall" "to_google_apis" {
   count = var.harden_network ? 1 : 0
-  name                    = "to-google-apis-${var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].name}"
+  name                    = "to-google-apis-${google_compute_network.dbx_private_vpc.name}"
   direction               = "EGRESS"
   priority                = 1010
   destination_ranges      = ["199.36.153.4/30"]
@@ -81,18 +40,5 @@ resource "google_compute_firewall" "to_google_apis" {
   allow {
     protocol              = "all"
   }
-  network                 = var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].self_link
-}
-
-resource "google_compute_firewall" "to_gke_nodes_subnet" {
-  count = var.harden_network ? 1 : 0
-  name                    = "to-gke-nodes-subnet-${var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].name}"
-  direction               = "EGRESS"
-  priority                = 1010
-  destination_ranges      = [var.nodes_ip_cidr_range, var.pod_ip_cidr_range, var.service_ip_cidr_range]
-  source_ranges           = []
-  allow {
-    protocol              = "all"
-  }
-  network                 = var.use_existing_vpc?var.existing_vpc_name:google_compute_network.dbx_private_vpc[0].self_link
+  network                 = google_compute_network.dbx_private_vpc.self_link
 }

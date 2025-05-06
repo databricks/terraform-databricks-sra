@@ -5,6 +5,7 @@ module "customer_managed_vpc" {
   google_region = var.google_region
   databricks_account_id = var.databricks_account_id
   databricks_google_service_account = var.databricks_google_service_account
+  use_existing_pas = var.use_existing_pas
 
   workspace_pe = var.workspace_pe
  relay_pe =  var.relay_pe
