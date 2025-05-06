@@ -24,10 +24,10 @@ resource "databricks_mws_networks" "network_config" {
     subnet_region         = var.google_region
    
   }
-  vpc_endpoints {
+  # vpc_endpoints {
     
-   dataplane_relay = [databricks_mws_vpc_endpoint.relay_vpce.vpc_endpoint_id]
-   rest_api        = [databricks_mws_vpc_endpoint.backend_rest_vpce.vpc_endpoint_id]
-  }
+  #  dataplane_relay = [databricks_mws_vpc_endpoint.relay_vpce.vpc_endpoint_id]
+  #  rest_api        = [databricks_mws_vpc_endpoint.backend_rest_vpce.vpc_endpoint_id]
+  # }
 
 }

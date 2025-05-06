@@ -1,0 +1,18 @@
+# This workflow is used for testing the aws terraform module.
+
+name: AWS Tests
+on:
+  push:
+    paths:
+      - 'aws/tf/**'
+      - '.github/workflows/aws-test.yml'
+  pull_request:
+    paths:
+      - 'aws/tf/**'
+      - '.github/workflows/aws-test.yml'
+jobs:
+  test-aws:
+    uses: ./.github/workflows/terraform-ruw.yml
+    with:
+      working_directory: aws/tf
+      tflint_args: "--config=$(pwd)/.tflint.hcl"

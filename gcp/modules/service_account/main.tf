@@ -1,3 +1,23 @@
+variable "prefix" {}
+
+variable "project" {
+  type    = string
+}
+
+variable "workspace_creator_creates_cmek"{
+  type = bool
+  default = false
+}
+
+variable "workspace_creator_creates_psc" {
+  type = bool
+  default = false
+}
+
+variable "workspace_create_modifies_compute_SA" {
+  type = bool
+  default = false
+}
 
 provider "google" {
   project = var.project
@@ -22,7 +42,6 @@ output "service_account" {
   description = "Add this email as a user in the Databricks account console"
 }
 
-
 data "google_iam_policy" "this" {
   binding {
     role = "roles/iam.serviceAccountTokenCreator"
@@ -38,48 +57,24 @@ resource "google_service_account_iam_policy" "impersonate_workspace_creator" {
 resource "google_project_iam_custom_role" "workspace_creator" {
   role_id = "${var.prefix}_workspace_creator"
   title   = "Databricks Workspace Creator"
-  "iam.roles.create",
-  "iam.roles.delete",
-  "iam.roles.get",
-  "iam.roles.update",
-  "iam.serviceAccounts.actAs",
-  "iam.serviceAccounts.create",
-  "iam.serviceAccounts.delete",
-  "iam.serviceAccounts.get",
-  "iam.serviceAccounts.getIamPolicy",
-  "iam.serviceAccounts.list",
-  "iam.serviceAccounts.setIamPolicy",
-  "iam.serviceAccounts.update",
-  "resourcemanager.projects.get",
-  "resourcemanager.projects.getIamPolicy",
-  "resourcemanager.projects.setIamPolicy",
-  "serviceusage.services.enable",
-  "serviceusage.services.get",
-  "serviceusage.services.list",
-  "compute.networks.get",
-  "compute.networks.updatePolicy",
-  "compute.subnetworks.get",
-  "compute.subnetworks.getIamPolicy",
-  "compute.subnetworks.setIamPolicy",
-  "compute.projects.get",
-  "compute.forwardingRules.get",
-  "compute.forwardingRules.list",
-  "compute.firewalls.get",
-  "compute.firewalls.create",
-  "storage.buckets.create",
-  "storage.buckets.delete",
-  "storage.buckets.get",
-  "storage.buckets.list",
-  "storage.buckets.update",
-  "cloudkms.keyRings.create",
-  "cloudkms.keyRings.get",
-  "cloudkms.keyRings.list",
-  "cloudkms.cryptoKeys.create",
-  "cloudkms.cryptoKeys.get",
-  "cloudkms.cryptoKeys.list",
-  "cloudkms.cryptoKeys.setIamPolicy",
-  "cloudkms.cryptoKeys.update",
-  "cloudkms.cryptoKeys.getIamPolicy"
+  permissions = [
+    "iam.serviceAccounts.getIamPolicy",
+    "iam.serviceAccounts.setIamPolicy",
+    "iam.roles.create",
+    "iam.roles.delete",
+    "iam.roles.get",
+    "iam.roles.update",
+    "resourcemanager.projects.get",
+    "resourcemanager.projects.getIamPolicy",
+    "resourcemanager.projects.setIamPolicy",
+    "serviceusage.services.get",
+    "serviceusage.services.list",
+    "serviceusage.services.enable",
+    "compute.networks.get",
+    "compute.projects.get",
+    "compute.subnetworks.get",
+    "iam.serviceAccounts.getOpenIdToken",
+
   ]
 }
 
