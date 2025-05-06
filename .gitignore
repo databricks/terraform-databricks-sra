@@ -57,6 +57,3 @@ terraform.rc
 !**/*.tftest.hcl
 gcp/modules/workspace_deployment/*.json
 
-aws/
-aws-gov/
-azure/
