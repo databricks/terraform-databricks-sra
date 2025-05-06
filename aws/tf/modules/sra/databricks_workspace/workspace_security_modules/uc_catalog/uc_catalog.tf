@@ -50,6 +50,10 @@ resource "aws_iam_role" "unity_catalog_role" {
   tags = {
     Name = "${var.resource_prefix}-unity-catalog"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 // Unity Catalog IAM Policy
@@ -85,6 +89,10 @@ resource "aws_iam_role_policy" "unity_catalog" {
   name   = "${var.resource_prefix}-unity-catalog-policy-${var.workspace_id}"
   role   = aws_iam_role.unity_catalog_role.id
   policy = data.aws_iam_policy_document.unity_catalog_iam_policy.json
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 

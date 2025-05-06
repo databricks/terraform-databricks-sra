@@ -314,6 +314,10 @@ resource "aws_vpc_endpoint" "backend_rest" {
   tags = {
     Name = "${var.resource_prefix}-databricks-backend-rest"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 // Databricks SCC endpoint - skipped in custom operation mode
@@ -329,5 +333,9 @@ resource "aws_vpc_endpoint" "backend_relay" {
   depends_on          = [module.vpc.vpc_id]
   tags = {
     Name = "${var.resource_prefix}-databricks-backend-relay"
+  }
+  
+  lifecycle {
+    ignore_changes = all
   }
 }

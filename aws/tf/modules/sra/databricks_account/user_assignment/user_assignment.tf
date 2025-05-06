@@ -8,4 +8,8 @@ resource "databricks_mws_permission_assignment" "workspace_access" {
   workspace_id = var.created_workspace_id
   principal_id = data.databricks_user.workspace_access.id
   permissions  = ["ADMIN"]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
