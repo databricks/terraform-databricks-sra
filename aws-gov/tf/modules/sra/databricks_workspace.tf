@@ -53,6 +53,7 @@ module "restrictive_root_bucket" {
     aws = aws
   }
 
+<<<<<<< HEAD
   databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
   databricks_gov_shard           = var.databricks_gov_shard
   workspace_id          = module.databricks_mws_workspace.workspace_id
@@ -62,3 +63,11 @@ module "restrictive_root_bucket" {
 
   depends_on = [module.databricks_mws_workspace]
 }
+=======
+  alert_emails = [var.user_workspace_admin]
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
+}
+>>>>>>> 101e277 (Adding workspace dependency for databricks_workspace.tf)

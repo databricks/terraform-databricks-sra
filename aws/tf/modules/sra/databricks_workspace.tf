@@ -47,10 +47,18 @@ module "restrictive_root_bucket" {
     aws = aws
   }
 
+<<<<<<< HEAD
   databricks_account_id = var.databricks_account_id
   workspace_id          = module.databricks_mws_workspace.workspace_id
   region_name           = var.region_name
   root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
 
   depends_on = [module.databricks_mws_workspace]
+=======
+  alert_emails = [var.user_workspace_admin]
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
+>>>>>>> 101e277 (Adding workspace dependency for databricks_workspace.tf)
 }

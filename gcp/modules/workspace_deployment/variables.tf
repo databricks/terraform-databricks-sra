@@ -2,7 +2,6 @@ variable "databricks_account_id" {}
 variable "databricks_google_service_account" {}
 variable "google_project" {}
 variable "google_region" {}
-# variable "google_zone" {}
 
 variable "workspace_pe" {}
 variable "relay_pe" {}
@@ -21,7 +20,9 @@ variable "workspace_pe_ip_name" {}
 # Here - https://docs.gcp.databricks.com/en/resources/ip-domain-region.html
 variable "hive_metastore_ip" {}
 
-variable "use_existing_cmek" {}
+variable "use_existing_cmek" {
+    default = false
+}
 variable "key_name" {}
 variable "keyring_name" {}
 
@@ -29,9 +30,6 @@ variable "keyring_name" {}
 variable "google_pe_subnet_ip_cidr_range" {
   default = "10.3.0.0/24"
 }
-# variable "google_pe_subnet_secondary_ip_range" {
-#   default = "192.168.10.0/24"
-# }
 
 variable "nodes_ip_cidr_range"{
   default = "10.0.0.0/16"
@@ -67,7 +65,9 @@ variable "ip_addresses" {
 variable "cmek_resource_id" {
   default = ""
 }
-variable "use_existing_pas" {}
+variable "use_existing_pas" {
+    default = false
+}
 variable "existing_pas_id" {
   default = ""
 }
