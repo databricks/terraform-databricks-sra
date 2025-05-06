@@ -25,12 +25,6 @@ variable "notification_email" {
   default     = ""
 }
 
-variable "gcp_impersonate_service_account" {
-  type        = string
-  description = "GCP Service Account to impersonate (e.g. xyz-sa-2@project.iam.gserviceaccount.com)"
-  default     = ""
-}
-
 variable "analysis_schema_name" {
   type        = string
   description = "Name of the schema to be used for analysis"

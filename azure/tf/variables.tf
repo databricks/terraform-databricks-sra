@@ -1,14 +1,10 @@
-variable "application_id" {
-	type = string
-	description = "(Required) Application ID in Hub unitycatalog.tf"
-}
 variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
 }
 variable "location" {
   type        = string
-  description = "(Required) The location for the hub and spoke deployment"
+  description = "(Required) The Azure region for the hub and spoke deployment"
 }
 
 variable "hub_vnet_cidr" {
@@ -16,18 +12,9 @@ variable "hub_vnet_cidr" {
   description = "(Required) The CIDR block for the hub Virtual Network"
 }
 
-<<<<<<< Updated upstream
-variable "hub_resource_group_name" {
-  type        = string
-  description = "(Required) The name for the hub Resource Group"
-}
-
-variable "hub_vnet_name" {
-=======
 variable "hub_resource_suffix" {
->>>>>>> Stashed changes
   type        = string
-  description = "(Required) The name for the hub Virtual Network"
+  description = "(Required) Resource suffix for naming resources in hub"
 }
 
 variable "public_repos" {
@@ -37,27 +24,16 @@ variable "public_repos" {
 }
 
 variable "spoke_config" {
-  type = list(object(
+  type = map(object(
     {
-<<<<<<< Updated upstream
-      prefix = string
-      cidr   = string
-      tags   = map(string)
-=======
       resource_suffix          = string
       cidr                     = string
       tags                     = map(string)
       is_unity_catalog_enabled = optional(bool, true)
       storage_account_name     = optional(string, null)
->>>>>>> Stashed changes
     }
   ))
   description = "(Required) List of spoke configurations"
-}
-
-variable "test_vm_password" {
-  type        = string
-  description = "(Required) Password for the VM to be deployed in the hub for testing (in the absence of ExpressRoute etc.)"
 }
 
 variable "tags" {
@@ -66,14 +42,15 @@ variable "tags" {
   default     = {}
 }
 
-variable "client_secret" {
+variable "databricks_metastore_id" {
   type        = string
-  description = "(Required) The client secret for the service principal"
+  default     = ""
+  description = "Required if is_unity_catalog_enabled = false"
 }
 
-variable "databricks_app_object_id" {
+variable "subscription_id" {
   type        = string
-  description = "(Required) The object ID of the AzureDatabricks App Registration"
+  description = "(Required) Azure Subscription ID to deploy into"
 }
 
 variable "sat_configuration" {

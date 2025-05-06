@@ -2,11 +2,7 @@ terraform {
   required_providers {
     databricks = {
       source  = "databricks/databricks"
-<<<<<<< Updated upstream
-      version = " 1.50.0"
-=======
       version = "1.54.0"
->>>>>>> Stashed changes
     }
     aws = {
       source  = "hashicorp/aws"

@@ -1,6 +1,6 @@
-// EXPLANATION: The cross-account role for the Databricks workspace
+# EXPLANATION: The cross-account role for the Databricks workspace
 
-// Cross Account Role
+# Cross Account Role
 data "databricks_aws_assume_role_policy" "this" {
   external_id = var.databricks_account_id
 }
@@ -45,6 +45,31 @@ resource "aws_iam_role_policy" "cross_account" {
           "ec2:CreateTags",
           "ec2:DeleteTags",
           "ec2:RequestSpotInstances"
+        ],
+        "Resource" : [
+          "*"
+        ]
+      },
+      {
+        "Sid" : "FleetPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeFleetHistory",
+          "ec2:ModifyFleet",
+          "ec2:DeleteFleets",
+          "ec2:DescribeFleetInstances",
+          "ec2:DescribeFleets",
+          "ec2:CreateFleet",
+          "ec2:DeleteLaunchTemplate",
+          "ec2:GetLaunchTemplateData",
+          "ec2:CreateLaunchTemplate",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:DescribeLaunchTemplateVersions",
+          "ec2:ModifyLaunchTemplate",
+          "ec2:DeleteLaunchTemplateVersions",
+          "ec2:CreateLaunchTemplateVersion",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:GetSpotPlacementScores"
         ],
         "Resource" : [
           "*"

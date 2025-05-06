@@ -135,25 +135,7 @@ resource "databricks_mws_storage_configurations" "log_bucket" {
   bucket_name                = aws_s3_bucket.logdelivery.bucket
 }
 
-<<<<<<<< Updated upstream:aws-gov/tf/modules/sra/databricks_account/logging_configuration/logging_configuration.tf
-// Databricks Billable Usage Logs Configurations
-resource "databricks_mws_log_delivery" "billable_usage_logs" {
-  account_id               = var.databricks_account_id
-  credentials_id           = databricks_mws_credentials.log_writer.credentials_id
-  storage_configuration_id = databricks_mws_storage_configurations.log_bucket.storage_configuration_id
-  delivery_path_prefix     = "billable-usage-logs"
-  config_name              = "Billable Usage Logs"
-  log_type                 = "BILLABLE_USAGE"
-  output_format            = "CSV"
-  depends_on = [
-    aws_s3_bucket_policy.log_delivery
-  ]
-}
-
-// Databricks Audit Logs Configurations
-========
 # Log Delivery
->>>>>>>> Stashed changes:aws-gov/tf/modules/sra/databricks_account/audit_log_delivery/main.tf
 resource "databricks_mws_log_delivery" "audit_logs" {
   account_id               = var.databricks_account_id
   credentials_id           = databricks_mws_credentials.log_writer.credentials_id
@@ -162,10 +144,4 @@ resource "databricks_mws_log_delivery" "audit_logs" {
   config_name              = "Audit Logs"
   log_type                 = "AUDIT_LOGS"
   output_format            = "JSON"
-<<<<<<<< Updated upstream:aws-gov/tf/modules/sra/databricks_account/logging_configuration/logging_configuration.tf
-  depends_on = [
-    aws_s3_bucket_policy.log_delivery
-  ]
-========
->>>>>>>> Stashed changes:aws-gov/tf/modules/sra/databricks_account/audit_log_delivery/main.tf
 }

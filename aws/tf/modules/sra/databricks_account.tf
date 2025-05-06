@@ -1,34 +1,18 @@
-// EXPLANATION: All modules that reside at the account level
+# EXPLANATION: All modules that reside at the account level
 
-// Billable Usage and Audit Logs
-module "log_delivery" {
-  source = "./databricks_account/logging_configuration"
-  count  = var.enable_logging_boolean ? 1 : 0
-  providers = {
-    databricks = databricks.mws
-  }
-
-  databricks_account_id = var.databricks_account_id
-  resource_prefix       = var.resource_prefix
-}
-
-
-// Create Unity Catalog Metastore - No Root Storage
+# Create Unity Catalog Metastore - No Root Storage
 module "uc_init" {
   source = "./databricks_account/uc_init"
   providers = {
     databricks = databricks.mws
   }
 
-  aws_account_id        = var.aws_account_id
-  databricks_account_id = var.databricks_account_id
-  resource_prefix       = var.resource_prefix
-  region                = var.region
-  metastore_name        = join("", [var.resource_prefix, "-", var.region, "-", "uc"])
-  metastore_exists      = var.metastore_exists
+  resource_prefix  = var.resource_prefix
+  region           = var.region
+  metastore_exists = var.metastore_exists
 }
 
-// Unity Catalog Assignment
+# Unity Catalog Assignment
 module "uc_assignment" {
   source = "./databricks_account/uc_assignment"
   providers = {
@@ -36,12 +20,11 @@ module "uc_assignment" {
   }
 
   metastore_id = module.uc_init.metastore_id
-  region       = var.region
   workspace_id = module.databricks_mws_workspace.workspace_id
   depends_on   = [module.databricks_mws_workspace, module.uc_init]
 }
 
-// Create Databricks Workspace
+# Create Databricks Workspace
 module "databricks_mws_workspace" {
   source = "./databricks_account/workspace"
   providers = {
@@ -62,20 +45,16 @@ module "databricks_mws_workspace" {
   workspace_storage_key       = aws_kms_key.workspace_storage.arn
   managed_storage_key_alias   = aws_kms_alias.managed_storage_key_alias.name
   workspace_storage_key_alias = aws_kms_alias.workspace_storage_key_alias.name
+  deployment_name             = var.deployment_name
 }
 
-// User Workspace Assignment (Admin)
+# User Workspace Assignment (Admin)
 module "user_assignment" {
   source = "./databricks_account/user_assignment"
   providers = {
     databricks = databricks.mws
   }
 
-<<<<<<< Updated upstream
-  created_workspace_id = module.databricks_mws_workspace.workspace_id
-  workspace_access     = var.user_workspace_admin
-  depends_on           = [module.uc_assignment, module.databricks_mws_workspace]
-=======
   workspace_id     = module.databricks_mws_workspace.workspace_id
   workspace_access = var.admin_user
   depends_on       = [module.uc_assignment, module.databricks_mws_workspace]
@@ -92,5 +71,4 @@ module "log_delivery" {
   audit_log_delivery_exists = var.audit_log_delivery_exists
   databricks_account_id     = var.databricks_account_id
   resource_prefix           = var.resource_prefix
->>>>>>> Stashed changes
 }

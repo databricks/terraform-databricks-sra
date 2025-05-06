@@ -1,4 +1,4 @@
-// EXPLANATION: Create the workspace root bucket
+# EXPLANATION: Create the workspace root bucket
 
 resource "aws_s3_bucket" "root_storage_bucket" {
   bucket        = "${var.resource_prefix}-workspace-root-storage"
@@ -42,19 +42,7 @@ data "databricks_aws_bucket_policy" "this" {
   bucket                   = aws_s3_bucket.root_storage_bucket.bucket
 }
 
-# Bucket policy to use if the restrictive root bucket is set to false
 resource "aws_s3_bucket_policy" "root_bucket_policy" {
-  count = var.enable_restrictive_root_bucket_boolean ? 0 : 1
-
-  bucket     = aws_s3_bucket.root_storage_bucket.id
-  policy     = data.databricks_aws_bucket_policy.this.json
-  depends_on = [aws_s3_bucket_public_access_block.root_storage_bucket]
-}
-
-# Bucket policy to use if the restrictive root bucket is set to true
-resource "aws_s3_bucket_policy" "root_bucket_policy_ignore" {
-  count = var.enable_restrictive_root_bucket_boolean ? 1 : 0
-
   bucket     = aws_s3_bucket.root_storage_bucket.id
   policy     = data.databricks_aws_bucket_policy.this.json
   depends_on = [aws_s3_bucket_public_access_block.root_storage_bucket]

@@ -1,20 +1,5 @@
 # EXPLANATION: All modules that reside at the account level
 
-// Billable Usage and Audit Logs
-module "log_delivery" {
-  source = "./databricks_account/logging_configuration"
-  count  = var.enable_logging_boolean ? 1 : 0
-  providers = {
-    databricks = databricks.mws
-  }
-
-  databricks_account_id          = var.databricks_account_id
-  resource_prefix                = var.resource_prefix
-  databricks_gov_shard           = var.databricks_gov_shard
-  databricks_prod_aws_account_id = var.databricks_prod_aws_account_id
-  log_delivery_role_name         = var.log_delivery_role_name
-}
-
 
 # Create Unity Catalog Metastore - No Root Storage
 module "uc_init" {
@@ -71,13 +56,8 @@ module "user_assignment" {
     databricks = databricks.mws
   }
 
-<<<<<<< Updated upstream
-  created_workspace_id = module.databricks_mws_workspace.workspace_id
-  workspace_access     = var.user_workspace_admin
-=======
   workspace_id         = module.databricks_mws_workspace.workspace_id
   workspace_access     = var.admin_user
->>>>>>> Stashed changes
   depends_on           = [module.uc_assignment, module.databricks_mws_workspace]
 }
 
