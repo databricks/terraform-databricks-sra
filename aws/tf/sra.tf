@@ -1,0 +1,38 @@
+module "SRA" {
+  source = "./modules/sra"
+  providers = {
+    databricks.mws = databricks.mws
+    aws            = aws
+  }
+
+  databricks_account_id = var.databricks_account_id
+  client_id             = var.client_id
+  client_secret         = var.client_secret
+  aws_account_id        = var.aws_account_id
+  region                = var.region
+  region_name           = var.region_name[var.region]
+  region_bucket_name    = var.region_bucket_name[var.region]
+  admin_user            = var.admin_user
+  resource_prefix       = var.resource_prefix
+
+  // REQUIRED:
+  network_configuration = "isolated" // Network (custom or isolated), see README.md for more information.
+  metastore_exists      = false      // If a regional metastore exists set to true.
+
+  // REQUIRED IF USING ISOLATED NETWORK:
+  vpc_cidr_range           = "10.0.0.0/18" // Please re-define the subsequent subnet ranges if the VPC CIDR range is updated.
+  private_subnets_cidr     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
+  privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
+  availability_zones       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1], data.aws_availability_zones.available.names[2]]
+  sg_egress_ports          = [443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
+
+  // REQUIRED IF USING NON-ROOT ACCOUNT CMK ADMIN:
+  # cmk_admin_arn    = null       // CMK admin ARN, defaults to the AWS account root.
+
+  // REQUIRED IF USING CUSTOM NETWORK:
+  # custom_vpc_id             = null
+  # custom_private_subnet_ids = null // List of custom private subnet IDs required.
+  # custom_sg_id              = null
+  # custom_relay_vpce_id      = null
+  # custom_workspace_vpce_id  = null
+}
