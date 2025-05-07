@@ -104,8 +104,6 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}/*",
       "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
     ]
-
-<<<<<<< HEAD
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
@@ -118,9 +116,6 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
   }
 
-  statement {
-    sid    = "Grant access to Artifact Buckets"
-=======
   statement {
     sid    = "Grant Databricks Read Access to Artifact, Data, and System Table Buckets"
 >>>>>>> b3e4c6f (aws simplicity update)
@@ -146,63 +141,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}",
       "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket/*",
       "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket"
->>>>>>> b3e4c6f (aws simplicity update)
     ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:ResourceAccount"
-      values   = ["414351767826"]
-    }
-  }
-
-  statement {
-    sid    = "Grant access to Databricks System Tables Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:GetObjectVersion",
-      "s3:GetObject",
-      "s3:GetBucketLocation"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    resources = [
-      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket/*",
-      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket"
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:PrincipalAccount"
-      values   = ["414351767826"]
-    }
-  }
-
-  statement {
-    sid    = "Grant access to Databricks Sample Data Bucket"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:GetObjectVersion",
-      "s3:GetObject",
-      "s3:GetBucketLocation"
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    resources = [
-      "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}/*",
-      "arn:aws:s3:::databricks-datasets-${var.region_bucket_name}"
-    ]
-
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"

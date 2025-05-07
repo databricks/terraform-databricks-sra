@@ -159,11 +159,15 @@ resource "databricks_external_location" "workspace_catalog_external_location" {
   credential_name = databricks_storage_credential.workspace_catalog_storage_credential.id
   comment         = "External location for catalog ${var.uc_catalog_name}"
   isolation_mode  = "ISOLATION_MODE_ISOLATED"
+<<<<<<< HEAD
 <<<<<<<< HEAD:aws/tf/modules/sra/databricks_workspace/uc_catalog/main.tf
   depends_on      = [aws_iam_policy_attachment.unity_catalog_attach, time_sleep.wait_60_seconds]
 ========
   depends_on     = [aws_iam_role_policy.unity_catalog, time_sleep.wait_30_seconds]  
 >>>>>>>> b3e4c6f (aws simplicity update):aws/tf/modules/sra/databricks_workspace/uc_catalog/uc_catalog.tf
+=======
+  depends_on      = [aws_iam_role_policy.unity_catalog, time_sleep.wait_30_seconds]
+>>>>>>> 13b91c7 (update s3, fmt, and update md for configurations)
 }
 
 # Workspace Catalog

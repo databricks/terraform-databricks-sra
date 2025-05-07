@@ -8,7 +8,6 @@ Databricks delivers logs to your S3 buckets. [Audit logs](https://docs.databrick
 ```
 module "log_delivery" {
   source = "./databricks_account/logging_configuration"
-  count  = var.enable_logging_boolean ? 1 : 0
   providers = {
     databricks = databricks.mws
   }
