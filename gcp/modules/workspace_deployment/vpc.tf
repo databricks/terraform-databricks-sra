@@ -14,6 +14,7 @@ resource "google_compute_subnetwork" "network-with-private-secondary-ip-ranges" 
 }
 
 resource "databricks_mws_networks" "network_config" {
+  depends_on = [databricks_mws_vpc_endpoint.relay_vpce, databricks_mws_vpc_endpoint.backend_rest_vpce]
   provider     = databricks.accounts
   account_id   = var.databricks_account_id
   network_name = "config-eu1-${random_string.suffix.result}"

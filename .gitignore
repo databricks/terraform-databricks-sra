@@ -55,3 +55,5 @@ terraform.rc
 # Include tflint configurations for CI workflows
 !**/.tflint.hcl
 !**/*.tftest.hcl
+gcp/modules/workspace_deployment/*.json
+gcp/examples/end-to-end provisionning/.terraform

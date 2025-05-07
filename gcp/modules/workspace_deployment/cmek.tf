@@ -26,7 +26,7 @@ resource "databricks_mws_customer_managed_keys" "this" {
         provider = databricks.accounts
         account_id   = var.databricks_account_id
         gcp_key_info {
-            kms_key_id   = var.use_existing_cmek? "projects/${var.google_project}/locations/${var.google_region}/keyRings/${var.keyring_name}/cryptoKeys/${var.key_name}": google_kms_crypto_key.databricks_key[0].id
+            kms_key_id   = var.use_existing_cmek? var.cmek_resource_id: google_kms_crypto_key.databricks_key[0].id
         }
         use_cases = ["STORAGE","MANAGED","MANAGED_SERVICES"]
         lifecycle {
