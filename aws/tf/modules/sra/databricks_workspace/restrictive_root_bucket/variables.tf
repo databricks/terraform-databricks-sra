@@ -1,4 +1,5 @@
 variable "databricks_account_id" {
+<<<<<<< HEAD
   type        = string
   description = "ID of the Databricks account."
 }
@@ -16,4 +17,19 @@ variable "root_s3_bucket" {
 variable "workspace_id" {
   type        = string
   description = "workspace ID of deployed workspace."
+=======
+  type = string
+}
+
+variable "region_name" {
+  type = string
+}
+
+variable "root_s3_bucket" {
+  type = string
+}
+
+variable "workspace_id" {
+  type = string
+>>>>>>> b3e4c6f (aws simplicity update)
 }

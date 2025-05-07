@@ -14,10 +14,17 @@ module "system_tables_audit_log" {
     databricks = databricks.created_workspace
   }
 
+<<<<<<< HEAD
   alert_emails = [var.admin_user]
 
   depends_on = [
     module.databricks_mws_workspace, module.uc_assignment
+=======
+  alert_emails = [var.user_workspace_admin]
+
+  depends_on = [
+    module.databricks_mws_workspace
+>>>>>>> b3e4c6f (aws simplicity update)
   ]
 }
 ```

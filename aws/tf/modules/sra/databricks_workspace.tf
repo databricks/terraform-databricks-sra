@@ -17,7 +17,11 @@ module "uc_catalog" {
   depends_on = [module.databricks_mws_workspace, module.uc_assignment]
 }
 
+<<<<<<< HEAD
 # System Table Schemas Enablement
+=======
+// System Table Schemas Enablement
+>>>>>>> b3e4c6f (aws simplicity update)
 module "system_table" {
   source = "./databricks_workspace/system_schema"
   providers = {
@@ -26,7 +30,11 @@ module "system_table" {
   depends_on = [module.uc_assignment]
 }
 
+<<<<<<< HEAD
 # Create Create Cluster
+=======
+// Create Create Cluster
+>>>>>>> b3e4c6f (aws simplicity update)
 module "cluster_configuration" {
   source = "./databricks_workspace/classic_cluster"
   providers = {
@@ -34,6 +42,7 @@ module "cluster_configuration" {
   }
 
   resource_prefix = var.resource_prefix
+<<<<<<< HEAD
 
   depends_on = [
     module.databricks_mws_workspace, module.vpc_endpoints
@@ -56,9 +65,31 @@ module "restrictive_root_bucket" {
   depends_on = [module.databricks_mws_workspace]
 =======
   alert_emails = [var.user_workspace_admin]
+=======
+>>>>>>> b3e4c6f (aws simplicity update)
 
   depends_on = [
-    module.databricks_mws_workspace
+    module.databricks_mws_workspace, module.vpc_endpoints
   ]
+<<<<<<< HEAD
 >>>>>>> 101e277 (Adding workspace dependency for databricks_workspace.tf)
 }
+=======
+}
+
+// Restrictive DBFS bucket policy
+module "restrictive_root_bucket" {
+  source = "./databricks_workspace/restrictive_root_bucket"
+  providers = {
+    aws = aws
+  }
+
+  databricks_account_id = var.databricks_account_id
+  workspace_id          = module.databricks_mws_workspace.workspace_id
+  region_name           = var.region_name
+  root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
+
+  depends_on = [module.databricks_mws_workspace]
+}
+
+>>>>>>> b3e4c6f (aws simplicity update)

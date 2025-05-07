@@ -1,9 +1,12 @@
 # Security Reference Architectures (SRA) - Terraform Templates
 
 ## Read Before Deploying
+## Read Before Deploying
 
 SRA is a purpose-built, simplified deployment pattern designed for highly secure and regulated customers.
+SRA is a purpose-built, simplified deployment pattern designed for highly secure and regulated customers.
 
+This architecture includes specific functionalities that may affect certain use cases, as outlined below.
 This architecture includes specific functionalities that may affect certain use cases, as outlined below.
 
 - **No outbound internet traffic**: There is no outbound internet from the classic compute plane, meaning there is no access to public package repositories, public APIs, and [Apache Derby](https://kb.databricks.com/metastore/set-up-embedded-metastore) configurations must be used on every classic compute cluster.
@@ -67,28 +70,33 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
     - [Unity Catalog - Workspace Catalog](https://docs.databricks.com/en/connect/unity-catalog/cloud-storage/manage-external-locations.html#configure-an-encryption-algorithm-on-an-external-location)
 
 ### Core Databricks Components
+### Core Databricks Components
 
 - **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/data-governance/unity-catalog/index.html) is a unified governance solution for data and AI assets, including files, tables, and machine learning models. It provides granular access controls with centralized policy, auditing, and lineage tracking—all integrated into the Databricks workflow.
 
 - **System Tables Schemas**: [System Tables](https://docs.databricks.com/en/admin/system-tables/index.html) provide visibility into access, billing, compute, Lakeflow, query, serving, and storage logs. These tables can be found within the system catalog in Unity Catalog.
 
-- **Cluster Example**: An example cluster and cluster policy have been included with Derby Metastore configurations. **NOTE:** This will create a cluster within your Databricks workspace, including the underlying EC2 instance.
+- **Cluster Example**: An example of a cluster and a cluster policy has been included. **NOTE:** Please be aware this will create a cluster within your Databricks workspace including the underlying EC2 instance.
 
-- **Audit Log Delivery**: Low-latency delivery of Databricks logs to a S3 bucket in your AWS account. [Audit logs](https://docs.databricks.com/aws/en/admin/account-settings/audit-log-delivery) contain two levels of events: workspace-level audit logs with workspace-level events, and account-level audit logs with account-level events. Additionally, you can generate more detailed events by enabling verbose audit logs. 
+- **IP Access Lists**: IP Access can be enabled to only allow a subset of IPs to access the Databricks workspace console. **NOTE:** Please verify all of the IPs are correct prior to enabling this feature to prevent a lockout scenario.
 
----
+- **Read Only External Location**: This creates a read-only external location in Unity Catalog for a given bucket as well as the corresponding AWS IAM role.
 
-## Critical Next Steps
+- **Restrictive Root Bucket**: A restrictive root bucket policy can be applied to the root bucket of the workspace. **NOTE:** Please be aware this bucket is updated frequently, however, may not contain prefixes for the latest product releases.
 
-- **Implement a Front-End Mitigation Strategy**:
-    - [IP Access Lists](https://docs.databricks.com/en/security/network/front-end/ip-access-list.html): The Terraform code for enabling IP access lists can be found in the customization folder.
-    - [Front-End PrivateLink](https://docs.databricks.com/en/security/network/classic/privatelink.html#step-5-configure-internal-dns-to-redirect-user-requests-to-the-web-application-front-end).
+- **Restrictive Kinesis, STS, and S3 Endpoint Policies**: Restrictive policies for Kinesis, STS, and S3 endpoints can be added for Databricks specific assets. **NOTE:** Please be aware thse policies could be updated and may result in potentially breaking changes. If this is the case, we recommend removing the policy.
 
-- **Implement Single Sign-On, Multi-factor Authentication, SCIM Provisioning**: Most enterprise deployments enable [Single Sign-On (SSO)](https://docs.databricks.com/administration-guide/users-groups/single-sign-on/index.html) and multi-factor authentication (MFA). For user management, we recommend integrating [SCIM (System for Cross-domain Identity Management)](https://docs.databricks.com/dev-tools/api/latest/scim/index.html) with your account console.
+- **System Tables**: System tables are a Databricks-hosted analytical store of your account’s operational data found in the system catalog. System tables can be used for historical observability across your account. This is currently in public preview, so is optional to enable or not.
 
-- **Implement Restrictive Serverless Network Policy**: Serverless network policies can be found under Cloud resources, Network, in the account console. A network policy implements an egress firewall for your serverless compute. If you're using the Security Analysis Tool, be sure to allow list the Databricks account console and relevant Databricks workspace endpoints.
+- **Workspace Admin. Configurations**: Workspace administration configurations that can be enabled that align with security best practices. The Terraform resource is experimental, which is why it is optional. Documentation on each configuration is provided in the Terraform file.
 
----
+
+## Solution Accelerators
+
+- **Security Analysis Tool (SAT)**: The Security Analysis Tool analyzes customer's Databricks account and workspace security configurations and provides recommendations that can help them follow Databricks' security best practices. This can be enabled into the workspace that is being created. **NOTE:** Please be aware this creates a cluster, a job, and a dashboard within your environment. 
+
+- **Audit Log Alerting**: Audit Log Alerting, based on this [blog post](https://www.databricks.com/blog/improve-lakehouse-security-monitoring-using-system-tables-databricks-unity-catalog), creates 40+ SQL alerts to monitor for incidents based on a Zero Trust Architecture (ZTA) model. **NOTE:** Please be aware this creates a cluster, a job, and queries within your environment. 
+
 
 ## Additional Security Recommendations
 
@@ -104,20 +112,26 @@ This section provides additional security recommendations to help maintain a str
 
 ## Getting Started
 
-1. Clone this Repo.
-2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads).
-3. Decide which [operation mode](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) you'd like to use.
-4. Fill out `main.tf`.
-5. Fill out `template.tfvars.example` and rename the file to `template.tfvars` by removing `.example`.
-6. Configure the [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration) and [Databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authentication) provider authentication.
-7. Change directory into `tf`.
-8. Run `terraform init`.
-9. Run `terraform validate`.
-10. From the `tf` directory, run `terraform plan -var-file ../example.tfvars`.
-11. Run `terraform apply -var-file ../example.tfvars`.
+1. Clone this Repo
+2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
+3. Decide which [operation](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) mode you'd like to use.
+4. Fill out `sra.tf` in place
+5. Fill out `template.tfvars.example` remove the .example part of the file name
+6. Configure the [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration) and [Databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authentication) provider authentication
+7. CD into `tf`
+8. Run `terraform init`
+9. Run `terraform validate`
+10. From `tf` directory, run `terraform plan -var-file ../example.tfvars`
+11. Run `terraform apply -var-file ../example.tfvars`
 
----
 
-## Network Diagram
+## Network Diagram - Sandbox
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Sandbox%20-%20Network%20Topology.png)
 
+
+## Network Diagram - Firewall
+![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Firewall%20-%20Network%20Topology.png)
+
+
+## Network Diagram - Isolated
 ![Architecture Diagram](https://github.com/databricks/terraform-databricks-sra/blob/main/aws/img/Isolated%20-%20Network%20Topology.png)
