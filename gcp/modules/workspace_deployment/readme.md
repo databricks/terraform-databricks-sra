@@ -4,7 +4,25 @@ page_title: "Provisioning Secure Databricks Workspaces on GCP with Terraform"
 
 # How to Deploy a Lakehouse Blueprint using Best Practices and Industry Helper Libraries
 
+<<<<<<< Updated upstream
 This guide uses the following variables in configurations:
+=======
+This module is provided as-is and you can use this guide as the basis for your custom Terraform module. This module is meant to be used either to provision a workspace with all the required GCP objects associated or to leverage existing objects, thus enabling use cases where CMEK, PSCs, and other artefacts that require higher privileges need to be provisionned through an external process and can't be provisionned through terraform.
+The example folder aims at illustrating this through different use cases.
+
+## Requirements
+Running this module has the following requirements :
+- Recent version of Terraform.
+- Access to recent versions the Databricks Provider (```databricks/databricks```) and the google Provider (```hashicorp/google```).
+- A Google Service Account with the GCP privileges defined in the module service_account and added to the Databricks Account Console as a **User** with the account admin privileges.
+- Authentication : the simplest way is to authentify as the GSA through GOOGLE_APPLICATION_CREDENTIALS value as path to the json key, but your approved authentication method should work here.
+- You require to have a Quota of Endpoints on a region-base for a given project. Please reach out to your Databricks Account team to provision PSC EP services (you will need to provide them with a project name and a region).
+- Depending on how much you are allowed to provision through this module, the values for the following variables.
+
+## Variables
+
+This module uses the following variables in configurations:
+>>>>>>> Stashed changes
 
 - `databricks_account_id`: The ID per Databricks GCP account used for accessing account management APIs. After the GCP account is created, this is available after logging into [https://accounts.cloud.databricks.com](https://accounts.cloud.databricks.com).
 - `databricks_google_service_account`: Service account used for programattically interacting with cloud infrastructure. More documentation [here](https://cloud.google.com/iam/docs/service-accounts)
