@@ -18,16 +18,9 @@ resource "databricks_cluster" "example" {
     max_workers = 2
   }
 
-  # Derby Metastore configs
+  # Unity Catalog only configuration
   spark_conf = {
-    "spark.hadoop.datanucleus.autoCreateTables" : "true",
-    "spark.hadoop.datanucleus.autoCreateSchema" : "true",
-    "spark.hadoop.javax.jdo.option.ConnectionDriverName" : "org.apache.derby.jdbc.EmbeddedDriver",
-    "spark.hadoop.javax.jdo.option.ConnectionPassword" : "hivepass",
-    "spark.hadoop.javax.jdo.option.ConnectionURL" : "jdbc:derby:memory:myInMemDB;create=true",
-    "spark.sql.catalogImplementation" : "hive",
-    "spark.hadoop.javax.jdo.option.ConnectionUserName" : "hiveuser",
-    "spark.hadoop.datanucleus.fixedDatastore" : "false"
+    "spark.databricks.unityCatalogOnlyMode" : "true"
   }
 
   # Custom Tags

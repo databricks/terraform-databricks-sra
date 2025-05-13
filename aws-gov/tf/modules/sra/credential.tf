@@ -34,15 +34,145 @@ resource "aws_iam_role_policy" "cross_account" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Sid" : "NonResourceBasedPermissions",
+        "Sid" : "CreateEC2ResourcesWithRequestTag",
         "Effect" : "Allow",
         "Action" : [
+          "ec2:CreateFleet",
+          "ec2:CreateLaunchTemplate",
+          "ec2:CreateLaunchTemplateVersion",
+          "ec2:CreateVolume",
+          "ec2:RequestSpotInstances",
+          "ec2:RunInstances"
+        ],
+        "Resource" : [
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:fleet/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:launch-template/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:network-interface/*"
+        ],
+        "Condition" : {
+          "StringEquals" : {
+            "aws:RequestTag/Vendor" : "Databricks"
+          }
+        }
+      },
+      {
+        "Sid" : "AllowDatabricksTagOnCreate",
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:CreateTags"
+        ],
+        "Resource" : [
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:launch-template/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:fleet/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:network-interface/*"
+        ],
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:CreateAction" : [
+              "CreateFleet",
+              "CreateLaunchTemplate",
+              "CreateVolume",
+              "RequestSpotInstances",
+              "RunInstances"
+            ],
+            "aws:RequestTag/Vendor" : "Databricks"
+          }
+        }
+      },
+      {
+        "Sid" : "ModifyEC2ResourcesByResourceTags",
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:AssociateIamInstanceProfile",
+          "ec2:AttachVolume",
           "ec2:CancelSpotInstanceRequests",
+          "ec2:CreateLaunchTemplateVersion",
+          "ec2:DetachVolume",
+          "ec2:DisassociateIamInstanceProfile",
+          "ec2:ModifyFleet",
+          "ec2:ModifyLaunchTemplate",
+          "ec2:RequestSpotInstances",
+          "ec2:CreateFleet",
+          "ec2:CreateLaunchTemplate",
+          "ec2:CreateVolume",
+          "ec2:RunInstances"
+        ],
+        "Resource" : [
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:network-interface/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:launch-template/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:fleet/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:spot-instance-request/*"
+        ],
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:ResourceTag/Vendor" : "Databricks"
+          }
+        }
+      },
+      {
+        "Sid" : "GetEC2LaunchTemplateDataByTag",
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:GetLaunchTemplateData"
+        ],
+        "Resource" : [
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:fleet/*"
+        ],
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:ResourceTag/Vendor" : "Databricks"
+          }
+        }
+      },
+      {
+        "Sid" : "DeleteEC2ResourcesByTag",
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DeleteFleets",
+          "ec2:DeleteLaunchTemplate",
+          "ec2:DeleteLaunchTemplateVersions",
+          "ec2:DeleteTags",
+          "ec2:DeleteVolume",
+          "ec2:TerminateInstances"
+        ],
+        "Resource" : [
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:network-interface/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:launch-template/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:fleet/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:spot-instance-request/*"
+        ],
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:ResourceTag/Vendor" : "Databricks"
+          }
+        }
+      },
+      {
+        "Sid" : "DescribeEC2Resources",
+        "Effect" : "Allow",
+        "Action" : [
           "ec2:DescribeAvailabilityZones",
+          "ec2:DescribeFleetHistory",
+          "ec2:DescribeFleetInstances",
+          "ec2:DescribeVpcAttribute",
+          "ec2:DescribeFleets",
           "ec2:DescribeIamInstanceProfileAssociations",
           "ec2:DescribeInstanceStatus",
           "ec2:DescribeInstances",
           "ec2:DescribeInternetGateways",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:DescribeLaunchTemplateVersions",
           "ec2:DescribeNatGateways",
           "ec2:DescribeNetworkAcls",
           "ec2:DescribePrefixLists",
@@ -53,50 +183,26 @@ resource "aws_iam_role_policy" "cross_account" {
           "ec2:DescribeSpotPriceHistory",
           "ec2:DescribeSubnets",
           "ec2:DescribeVolumes",
-          "ec2:DescribeVpcAttribute",
           "ec2:DescribeVpcs",
-          "ec2:CreateTags",
-          "ec2:DeleteTags",
-          "ec2:RequestSpotInstances"
-        ],
-        "Resource" : [
-          "*"
-        ]
-      },
-      {
-        "Sid" : "FleetPermissions",
-        "Effect" : "Allow",
-        "Action" : [
-          "ec2:DescribeFleetHistory",
-          "ec2:ModifyFleet",
-          "ec2:DeleteFleets",
-          "ec2:DescribeFleetInstances",
-          "ec2:DescribeFleets",
-          "ec2:CreateFleet",
-          "ec2:DeleteLaunchTemplate",
-          "ec2:GetLaunchTemplateData",
-          "ec2:CreateLaunchTemplate",
-          "ec2:DescribeLaunchTemplates",
-          "ec2:DescribeLaunchTemplateVersions",
-          "ec2:ModifyLaunchTemplate",
-          "ec2:DeleteLaunchTemplateVersions",
-          "ec2:CreateLaunchTemplateVersion",
-          "ec2:AssignPrivateIpAddresses",
           "ec2:GetSpotPlacementScores"
         ],
-        "Resource" : [
-          "*"
-        ]
+        "Resource" : "*"
       },
       {
-        "Sid" : "InstancePoolsSupport",
+        "Sid" : "AllowEC2TaggingOnDatabricksResources",
         "Effect" : "Allow",
         "Action" : [
-          "ec2:AssociateIamInstanceProfile",
-          "ec2:DisassociateIamInstanceProfile",
-          "ec2:ReplaceIamInstanceProfileAssociation"
+          "ec2:CreateTags",
+          "ec2:DeleteTags"
         ],
-        "Resource" : "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*",
+        "Resource" : [
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:network-interface/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:launch-template/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:fleet/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:spot-instance-request/*"
+        ],
         "Condition" : {
           "StringEquals" : {
             "ec2:ResourceTag/Vendor" : "Databricks"
@@ -104,52 +210,14 @@ resource "aws_iam_role_policy" "cross_account" {
         }
       },
       {
-        "Sid" : "AllowEc2RunInstancePerTag",
-        "Effect" : "Allow",
-        "Action" : "ec2:RunInstances",
-        "Resource" : [
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*",
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*"
-        ],
-        "Condition" : {
-          "StringEquals" : {
-            "aws:RequestTag/Vendor" : "Databricks"
-        } }
-      },
-      {
-        "Sid" : "AllowEc2RunInstancePerVPCid",
-        "Effect" : "Allow",
-        "Action" : "ec2:RunInstances",
-        "Resource" : [
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:network-interface/*",
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:subnet/*",
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:security-group/*"
-        ],
-        "Condition" : {
-          "StringEquals" : {
-            "ec2:vpc" : "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:vpc/${var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id}"
-          }
-        }
-      },
-      {
-        "Sid" : "AllowEc2RunInstanceOtherResources",
-        "Effect" : "Allow",
-        "Action" : "ec2:RunInstances",
-        "NotResource" : [
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:network-interface/*",
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:subnet/*",
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:security-group/*",
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*",
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*"
-        ]
-      },
-      {
-        "Sid" : "DatabricksSuppliedImages",
+        "Sid" : "RestrictAMIUsageToDatabricksDeny",
         "Effect" : "Deny",
-        "Action" : "ec2:RunInstances",
-        "Resource" : [
-          "arn:aws-us-gov:ec2:*:*:image/*"
+        "Action" : [
+          "ec2:RunInstances",
+          "ec2:CreateFleet",
+          "ec2:RequestSpotInstances"
         ],
+        "Resource" : "arn:aws-us-gov:ec2:*:*:image/*",
         "Condition" : {
           "StringNotEquals" : {
             "ec2:Owner" : "044732911619"
@@ -157,72 +225,39 @@ resource "aws_iam_role_policy" "cross_account" {
         }
       },
       {
-        "Sid" : "EC2TerminateInstancesTag",
+        "Sid" : "RestrictAMIUsageToDatabricksAllow",
         "Effect" : "Allow",
         "Action" : [
-          "ec2:TerminateInstances"
+          "ec2:RunInstances",
+          "ec2:CreateFleet",
+          "ec2:RequestSpotInstances"
         ],
-        "Resource" : [
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*"
-        ],
+        "Resource" : "arn:aws-us-gov:ec2:*:*:image/*",
         "Condition" : {
           "StringEquals" : {
-            "ec2:ResourceTag/Vendor" : "Databricks"
+            "ec2:Owner" : "044732911619"
           }
         }
       },
       {
-        "Sid" : "EC2AttachDetachVolumeTag",
+        "Sid" : "AllowRunInstancesWithScopedResources",
         "Effect" : "Allow",
-        "Action" : [
-          "ec2:AttachVolume",
-          "ec2:DetachVolume"
-        ],
+        "Action" : "ec2:RunInstances",
         "Resource" : [
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:instance/*",
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*"
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:subnet/*",
+          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:security-group/*"
         ],
         "Condition" : {
-          "StringEquals" : {
-            "ec2:ResourceTag/Vendor" : "Databricks"
+          "StringEqualsIfExists" : {
+            "ec2:vpc" : "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:vpc/${var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id}"
           }
         }
       },
       {
-        "Sid" : "EC2CreateVolumeByTag",
+        "Sid" : "IAMRoleForEC2Spot",
         "Effect" : "Allow",
         "Action" : [
-          "ec2:CreateVolume"
-        ],
-        "Resource" : [
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*"
-        ],
-        "Condition" : {
-          "StringEquals" : {
-            "aws:RequestTag/Vendor" : "Databricks"
-          }
-        }
-      },
-      {
-        "Sid" : "EC2DeleteVolumeByTag",
-        "Effect" : "Allow",
-        "Action" : [
-          "ec2:DeleteVolume"
-        ],
-        "Resource" : [
-          "arn:aws-us-gov:ec2:${var.region}:${var.aws_account_id}:volume/*"
-        ],
-        "Condition" : {
-          "StringEquals" : {
-            "ec2:ResourceTag/Vendor" : "Databricks"
-          }
-        }
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "iam:CreateServiceLinkedRole",
-          "iam:PutRolePolicy"
+          "iam:CreateServiceLinkedRole"
         ],
         "Resource" : "arn:aws-us-gov:iam::*:role/aws-service-role/spot.amazonaws.com/AWSServiceRoleForEC2Spot",
         "Condition" : {

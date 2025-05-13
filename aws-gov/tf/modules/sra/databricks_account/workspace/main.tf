@@ -54,12 +54,12 @@ resource "databricks_mws_networks" "this" {
   }
 }
 
-# Managed Key Configuration
-resource "databricks_mws_customer_managed_keys" "managed_storage" {
+# Managed ServicesKey Configuration
+resource "databricks_mws_customer_managed_keys" "managed_services" {
   account_id = var.databricks_account_id
   aws_key_info {
-    key_arn   = var.managed_storage_key
-    key_alias = var.managed_storage_key_alias
+    key_arn   = var.managed_services_key
+    key_alias = var.managed_services_key_alias
   }
   use_cases = ["MANAGED_SERVICES"]
 }
@@ -92,7 +92,7 @@ resource "databricks_mws_workspaces" "workspace" {
   storage_configuration_id                 = databricks_mws_storage_configurations.this.storage_configuration_id
   network_id                               = databricks_mws_networks.this.network_id
   private_access_settings_id               = databricks_mws_private_access_settings.pas.private_access_settings_id
-  managed_services_customer_managed_key_id = databricks_mws_customer_managed_keys.managed_storage.customer_managed_key_id
+  managed_services_customer_managed_key_id = databricks_mws_customer_managed_keys.managed_services.customer_managed_key_id
   storage_customer_managed_key_id          = databricks_mws_customer_managed_keys.workspace_storage.customer_managed_key_id
   pricing_tier                             = "ENTERPRISE"
 
