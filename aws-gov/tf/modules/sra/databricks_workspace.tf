@@ -21,8 +21,8 @@ module "uc_catalog" {
   depends_on = [module.databricks_mws_workspace, module.uc_assignment]
 }
 
-# System Table Schemas Enablement - Coming Soon to AWS-Gov
-/*
+# System Table Schemas Enablement
+
 module "system_table" {
   source = "./databricks_workspace/system_schema"
   providers = {
@@ -30,7 +30,6 @@ module "system_table" {
   }
   depends_on = [ module.uc_assignment ]
 }
-*/
 
 # Create Create Cluster
 module "cluster_configuration" {
