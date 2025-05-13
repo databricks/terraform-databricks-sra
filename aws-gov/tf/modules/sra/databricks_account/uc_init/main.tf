@@ -9,7 +9,7 @@ data "databricks_metastore" "this" {
 
 resource "databricks_metastore" "this" {
   count         = var.metastore_exists ? 0 : 1
-  name          = "${var.resource_prefix}-${var.region}-unity-catalog"
+  name          = "${var.region}-unity-catalog"
   region        = var.region
   force_destroy = true
   storage_root  = ""

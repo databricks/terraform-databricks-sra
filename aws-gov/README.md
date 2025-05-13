@@ -6,7 +6,7 @@ SRA is a purpose-built, simplified deployment pattern designed for highly secure
 
 This architecture includes specific functionalities that may affect certain use cases, as outlined below.
 
-- **No outbound internet traffic**: There is no outbound internet from the classic compute plane, meaning there is no access to public package repositories, public APIs, and [Apache Derby](https://kb.databricks.com/metastore/set-up-embedded-metastore) configurations must be used on every classic compute cluster.
+- **No outbound internet traffic**: There is no outbound internet from the classic compute plane, meaning there is no access to public package repositories, public APIs, and Unity Catalog only mode configurations must be set on each cluster or configured at the workspace admin level, official documentation [here](https://docs.databricks.com/aws/en/data-governance/unity-catalog/disable-hms).
     - To add packages to classic compute plane clusters, set up a private repository for scanned packages.
     - Consider using a modern firewall solution to connect to public API endpoints.
     - An example cluster is provided with the correct Apache Derby configurations.
@@ -39,7 +39,7 @@ Various `.tf` scripts contain direct links to the Databricks Terraform documenta
 Choose from two network configurations for your workspaces: **isolated** or **custom**.
 
 - **Isolated (Default)**: Opting for 'isolated' prevents any traffic to the public internet, limiting traffic to AWS private endpoints for AWS services or the Databricks control plane.
-   - **NOTE**: Apache Derby Metastore will be required for clusters and non-serverless SQL Warehouses. For more information, view this [knowledge article](https://kb.databricks.com/metastore/set-up-embedded-metastore).
+   - **NOTE**: A Unity Catalog only configuration is required for any clusters running without access to the public internet. Please see official documentation [here](https://docs.databricks.com/aws/en/data-governance/unity-catalog/disable-hms).
 
 - **Custom**: Selecting 'custom' allows you to specify your own VPC ID, subnet IDs, security group IDs, and PrivateLink endpoint IDs. This mode is recommended when networking assets are created in different pipelines or pre-assigned by a centralized infrastructure team.
 
@@ -57,9 +57,9 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **AWS VPC Endpoints for S3, STS, and Kinesis**: Using AWS PrivateLink, a VPC endpoint connects a customer's VPC endpoint to AWS services without traversing public IP addresses. [S3, STS, and Kinesis endpoints](https://docs.databricks.com/administration-guide/cloud-configurations/aws/privatelink.html#step-5-add-vpc-endpoints-for-other-aws-services-recommended-but-optional) are best practices for enterprise Databricks deployments. Additional endpoints can be configured based on your use case (e.g., Amazon DynamoDB and AWS Glue).
 
-- **Back-end AWS PrivateLink Connectivity**: AWS PrivateLink provides a private network route from one AWS environment to another. [Back-end PrivateLink](https://docs.databricks.com/administration-guide/cloud-configurations/aws/privatelink.html#overview) is configured so communication between the customer's data plane and the Databricks control plane does not traverse public IP addresses. This is accomplished through Databricks-specific interface VPC endpoints. Front-end PrivateLink is also available for customers to keep user traffic over the AWS backbone, though front-end PrivateLink is not included in this Terraform template.
+- **Back-end AWS PrivateLink Connectivity**: AWS PrivateLink provides a private network route from one AWS environment to another. [Back-end PrivateLink](https://docs.databricks.com/administration-guide/cloud-configurations/aws/privatelink.html#overview) is configured so communication between the customer's classic compute plane and the Databricks control plane does not traverse public IP addresses. This is accomplished through Databricks-specific interface VPC endpoints. Front-end PrivateLink is also available for customers to keep user traffic over the AWS backbone, though front-end PrivateLink is not included in this Terraform template.
 
-- **Scoped-down IAM Policy for the Databricks cross-account role**: A [cross-account role](https://docs.databricks.com/administration-guide/account-api/iam-role.html) is needed for users, jobs, and other third-party tools to spin up Databricks clusters within the customer's data plane environment. This role can be scoped down to function only within the data plane's VPC, subnets, and security group.
+- **Scoped-down IAM Policy for the Databricks cross-account role**: A [cross-account role](https://docs.databricks.com/administration-guide/account-api/iam-role.html) is needed for users, jobs, and other third-party tools to spin up Databricks clusters within the customer's classic compute plane. This role can be scoped down to function only within the classic compute plane's VPC, subnets, and security group.
 
 - **AWS KMS Keys**: Three AWS KMS keys are created to support the following functionalities:
     - [Workspace Storage](https://docs.databricks.com/en/security/keys/customer-managed-keys.html#customer-managed-keys-for-workspace-storage)
@@ -72,9 +72,10 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **System Tables Schemas (COMING SOON TO AWS-GOV)**: [System Tables](https://docs.databricks.com/en/admin/system-tables/index.html) provide visibility into access, billing, compute, Lakeflow, query, serving, and storage logs. These tables can be found within the system catalog in Unity Catalog.
 
-- **Cluster Example**: An example cluster and cluster policy have been included with Derby Metastore configurations. **NOTE:** This will create a cluster within your Databricks workspace, including the underlying EC2 instance.
+- **Cluster Example**: An example cluster and cluster policy have been included with Unity Catalog only mode configurations. **NOTE:** This will create a cluster within your Databricks workspace, including the underlying EC2 instance.
 
-- **Audit Log Delivery**: Low-latency delivery of Databricks logs to a S3 bucket in your AWS account. [Audit logs](https://docs.databricks.com/aws/en/admin/account-settings/audit-log-delivery) contain two levels of events: workspace-level audit logs with workspace-level events, and account-level audit logs with account-level events. Additionally, you can generate more detailed events by enabling verbose audit logs. 
+- **Audit Log Delivery**: Low-latency delivery of Databricks logs to an S3 bucket in your AWS account. [Audit logs](https://docs.databricks.com/aws/en/admin/account-settings/audit-log-delivery) contain two levels of events: workspace-level audit logs with workspace-level events, and account-level audit logs with account-level events. Additionally, you can generate more detailed events by enabling verbose audit logs. 
+   - **NOTE**: Audit log delivery can only be configured twice for a single account. It's recommended that once it is configured, set *audit_log_delivery_exists* = *false* for subsequent runs.
 
 ---
 
@@ -86,7 +87,7 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Implement Single Sign-On, Multi-factor Authentication, SCIM Provisioning**: Most enterprise deployments enable [Single Sign-On (SSO)](https://docs.databricks.com/administration-guide/users-groups/single-sign-on/index.html) and multi-factor authentication (MFA). For user management, we recommend integrating [SCIM (System for Cross-domain Identity Management)](https://docs.databricks.com/dev-tools/api/latest/scim/index.html) with your account console.
 
-- **Implement Restrictive Serverless Network Policy (COMING SOON TO AWS-GOV)**: Serverless network policies can be found under Cloud resources, Network, in the account console. A network policy implements an egress firewall for your serverless compute. If you're using the Security Analysis Tool, be sure to allow list the Databricks account console and relevant Databricks workspace endpoints.
+- **Implement Restrictive Serverless Network Policy (COMING SOON TO AWS-GOV)**: Serverless network policies can be found under Cloud resources, Network, in the account console. A network policy implements an egress firewall for your serverless compute. If you're using the Security Analysis Tool, be sure to allowlist the Databricks account console and relevant Databricks workspace endpoints.
 
 ---
 

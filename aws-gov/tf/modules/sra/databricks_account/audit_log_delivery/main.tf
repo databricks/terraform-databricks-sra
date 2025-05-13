@@ -120,7 +120,6 @@ resource "time_sleep" "wait" {
 
 # Log Credential
 resource "databricks_mws_credentials" "log_writer" {
-  account_id       = var.databricks_account_id
   credentials_name = "Usage Delivery"
   role_arn         = aws_iam_role.logdelivery.arn
   depends_on = [

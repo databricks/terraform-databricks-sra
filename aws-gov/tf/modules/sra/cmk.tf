@@ -1,4 +1,4 @@
-# EXPLANATION: The customer-managed keys for workspace and managed storage
+# EXPLANATION: The customer-managed keys for workspace and managed services
 
 locals {
   cmk_admin_value = var.cmk_admin_arn == null ? "arn:aws-us-gov:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
@@ -74,12 +74,12 @@ resource "aws_kms_alias" "workspace_storage_key_alias" {
   target_key_id = aws_kms_key.workspace_storage.id
 }
 
-## CMK for Managed Storage
+## CMK for Managed Services
 
-resource "aws_kms_key" "managed_storage" {
-  description = "KMS key for managed storage"
+resource "aws_kms_key" "managed_services" {
+  description = "KMS key for managed services"
   policy = jsonencode({ Version : "2012-10-17",
-    "Id" : "key-policy-managed-storage",
+    "Id" : "key-policy-managed-services",
     Statement : [
       {
         "Sid" : "Enable IAM User Permissions",
@@ -113,11 +113,11 @@ resource "aws_kms_key" "managed_storage" {
 
   tags = {
     Project = var.resource_prefix
-    Name    = "${var.resource_prefix}-managed-storage-key"
+    Name    = "${var.resource_prefix}-managed-services-key"
   }
 }
 
-resource "aws_kms_alias" "managed_storage_key_alias" {
-  name          = "alias/${var.resource_prefix}-managed-storage-key"
-  target_key_id = aws_kms_key.managed_storage.key_id
+resource "aws_kms_alias" "managed_services_key_alias" {
+  name          = "alias/${var.resource_prefix}-managed-services-key"
+  target_key_id = aws_kms_key.managed_services.key_id
 }
