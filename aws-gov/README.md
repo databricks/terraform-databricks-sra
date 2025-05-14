@@ -70,7 +70,7 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/data-governance/unity-catalog/index.html) is a unified governance solution for data and AI assets, including files, tables, and machine learning models. It provides granular access controls with centralized policy, auditing, and lineage tracking—all integrated into the Databricks workflow.
 
-- **System Tables Schemas**: [System Tables](https://docs.databricks.com/en/admin/system-tables/index.html) provide visibility into access, compute, Lakeflow, query, serving, and storage logs. These tables can be found within the system catalog in Unity Catalog.
+- **System Tables Schemas (Coming soon to AWS-GOV)**: [System Tables](https://docs.databricks.com/en/admin/system-tables/index.html) provide visibility into access, compute, Lakeflow, query, serving, and storage logs. These tables can be found within the system catalog in Unity Catalog.
 
 - **Cluster Example**: An example cluster and cluster policy have been included with Unity Catalog only mode configurations. **NOTE:** This will create a cluster within your Databricks workspace, including the underlying EC2 instance.
 
