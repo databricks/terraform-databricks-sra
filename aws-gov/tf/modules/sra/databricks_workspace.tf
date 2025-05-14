@@ -61,3 +61,11 @@ module "restrictive_root_bucket" {
 
   depends_on = [module.databricks_mws_workspace]
 }
+
+# Admin Configuration
+module "admin_configuration" {
+  source = "./databricks_workspace/admin_configuration"
+  providers = {
+    databricks = databricks.created_workspace
+  }
+}
