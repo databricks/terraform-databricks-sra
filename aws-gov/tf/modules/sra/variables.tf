@@ -187,6 +187,15 @@ variable "log_delivery_role_name" {
   }
 }
 
+variable "system_table_bucket_prefix" {
+  description = "System Table Bucket Prefix"
+  type = map(string)
+  default = {
+    "civilian" = "gov"
+    "dod"      = "dod"
+  }
+}
+
 variable "uc_master_role_id" {
   description = "UC Master Role ID"
   type = map(string)
