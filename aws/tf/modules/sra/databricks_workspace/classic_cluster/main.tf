@@ -7,7 +7,7 @@ data "databricks_spark_version" "latest_lts" {
 
 # Cluster Creation
 resource "databricks_cluster" "example" {
-  cluster_name            = "Shared Classic Compute Plane Cluster"
+  cluster_name            = "Standard Classic Compute Plane Cluster"
   data_security_mode      = "USER_ISOLATION"
   spark_version           = data.databricks_spark_version.latest_lts.id
   node_type_id            = "m5n.large"
