@@ -26,6 +26,22 @@ module "system_table" {
   depends_on = [module.uc_assignment]
 }
 
+# Workspace Network Policy
+module "network_policy" {
+  source = "./databricks_workspace/network_policy"
+  providers = {
+    databricks = databricks.mws
+  }
+
+  databricks_account_id = var.databricks_account_id
+  region                = var.region
+  resource_prefix       = var.resource_prefix
+  storage_buckets       = [module.uc_catalog.catalog_bucket_name, aws_s3_bucket.root_storage_bucket.bucket]
+  workspace_id          = module.databricks_mws_workspace.workspace_id
+
+  depends_on = [module.databricks_mws_workspace, module.uc_catalog, aws_s3_bucket.root_storage_bucket]
+}
+
 # Create Create Cluster
 module "cluster_configuration" {
   source = "./databricks_workspace/classic_cluster"
@@ -40,7 +56,7 @@ module "cluster_configuration" {
   ]
 }
 
-# Restrictive DBFS bucket policy
+# Restrictive root bucket policy
 module "restrictive_root_bucket" {
   source = "./databricks_workspace/restrictive_root_bucket"
   providers = {
@@ -53,4 +69,16 @@ module "restrictive_root_bucket" {
   root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
 
   depends_on = [module.databricks_mws_workspace]
+}
+
+# Disable legacy access settings like Hive Metastore, Disables Databricks Runtime prior to 13.3 LTS, etc.
+module "disable_legacy_access_setting" {
+  source = "./databricks_workspace/disable_legacy_access_settings"
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
 }
