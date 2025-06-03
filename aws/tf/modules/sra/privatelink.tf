@@ -36,6 +36,14 @@ resource "aws_security_group" "privatelink" {
     security_groups = [aws_security_group.sg[0].id]
   }
 
+  ingress {
+    description     = "Databricks - PrivateLink Endpoint SG - Future Extendability"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg[0].id]
+  }
+
   tags = {
     Name    = "${var.resource_prefix}-private-link-sg",
     Project = var.resource_prefix
