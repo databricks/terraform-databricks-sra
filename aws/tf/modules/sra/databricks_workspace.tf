@@ -26,22 +26,6 @@ module "system_table" {
   depends_on = [module.uc_assignment]
 }
 
-# Workspace Network Policy
-module "network_policy" {
-  source = "./databricks_workspace/network_policy"
-  providers = {
-    databricks = databricks.mws
-  }
-
-  databricks_account_id = var.databricks_account_id
-  region                = var.region
-  resource_prefix       = var.resource_prefix
-  storage_buckets       = [module.uc_catalog.catalog_bucket_name, aws_s3_bucket.root_storage_bucket.bucket]
-  workspace_id          = module.databricks_mws_workspace.workspace_id
-
-  depends_on = [module.databricks_mws_workspace, module.uc_catalog, aws_s3_bucket.root_storage_bucket]
-}
-
 # Create Create Cluster
 module "cluster_configuration" {
   source = "./databricks_workspace/classic_cluster"

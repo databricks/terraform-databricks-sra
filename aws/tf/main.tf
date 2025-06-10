@@ -25,7 +25,7 @@ module "sra" {
   private_subnets_cidr     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
   privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
   availability_zones       = [data.aws_availability_zones.available.names[0], data.aws_availability_zones.available.names[1], data.aws_availability_zones.available.names[2]]
-  sg_egress_ports          = [443, 2443, 3306, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
+  sg_egress_ports          = [443, 2443, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
   # REQUIRED - IF USING NON-ROOT ACCOUNT CMK ADMIN:
   # cmk_admin_arn             = "arn:aws:iam::123456789012:user/CMKAdmin" # Example CMK ARN
