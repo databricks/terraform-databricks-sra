@@ -1,7 +1,7 @@
 # Security group for privatelink - skipped in custom operation mode
 resource "aws_security_group" "privatelink" {
-  count = var.network_configuration != "custom" ? 1 : 0
-
+  count  = var.network_configuration != "custom" ? 1 : 0
+  name   = "${var.resource_prefix}-privatelink-sg"
   vpc_id = module.vpc[0].vpc_id
 
   ingress {
@@ -29,15 +29,31 @@ resource "aws_security_group" "privatelink" {
   }
 
   ingress {
-    description     = "Databricks - PrivateLink Endpoint SG - Future Extendability"
+    description     = "Databricks - Internal calls from the Databricks compute plane to the Databricks control plane API"
     from_port       = 8443
+    to_port         = 8443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg[0].id]
+  }
+
+  ingress {
+    description     = "Databricks - Unity Catalog logging and lineage data streaming into Databricks"
+    from_port       = 8444
+    to_port         = 8444
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg[0].id]
+  }
+
+  ingress {
+    description     = "Databricks - PrivateLink Endpoint SG - Future Extendability"
+    from_port       = 8445
     to_port         = 8451
     protocol        = "tcp"
     security_groups = [aws_security_group.sg[0].id]
   }
 
   tags = {
-    Name    = "${var.resource_prefix}-private-link-sg",
+    Name    = "${var.resource_prefix}-privatelink-sg",
     Project = var.resource_prefix
   }
 }

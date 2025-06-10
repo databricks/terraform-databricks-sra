@@ -25,11 +25,6 @@ resource "databricks_cluster" "example" {
     ebs_volume_type  = "GENERAL_PURPOSE_SSD"
   }
 
-  # Unity Catalog only configuration
-  spark_conf = {
-    "spark.databricks.unityCatalogOnlyMode" : "true"
-  }
-
   # Custom Tags
   custom_tags = {
     "Project" = var.resource_prefix
