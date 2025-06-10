@@ -61,6 +61,46 @@ module "user_assignment" {
   depends_on           = [module.uc_assignment, module.databricks_mws_workspace]
 }
 
+# Workspace Network Policy
+module "network_policy" {
+  source = "./databricks_account/network_policy"
+  providers = {
+    databricks = databricks.mws
+  }
+
+  databricks_account_id = var.databricks_account_id
+  region                = var.region
+  resource_prefix       = var.resource_prefix
+  storage_buckets       = [module.uc_catalog.catalog_bucket_name, aws_s3_bucket.root_storage_bucket.bucket]
+  workspace_id          = module.databricks_mws_workspace.workspace_id
+
+  depends_on = [module.databricks_mws_workspace, module.uc_catalog, aws_s3_bucket.root_storage_bucket]
+}
+
+# Create Network Connectivity Connection Object
+module "ncc_init" {
+  source = "./databricks_account/ncc_init"
+  providers = {
+    databricks = databricks.mws
+  }
+
+  region          = var.region
+  resource_prefix = var.resource_prefix
+}
+
+# Bind Network Connectivity Connection Object
+module "ncc_binding" {
+  source = "./databricks_account/ncc_binding"
+  providers = {
+    databricks = databricks.mws
+  }
+
+  ncc_id       = module.ncc_init.ncc_id
+  workspace_id = module.databricks_mws_workspace.workspace_id
+
+  depends_on = [module.databricks_mws_workspace]
+}
+
 # Audit log delivery
 module "log_delivery" {
   count  = var.audit_log_delivery_exists ? 0 : 1
