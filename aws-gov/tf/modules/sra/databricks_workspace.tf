@@ -46,7 +46,7 @@ module "cluster_configuration" {
   ]
 }
 
-# Restrictive DBFS bucket policy
+# Restrictive root bucket policy
 module "restrictive_root_bucket" {
   source = "./databricks_workspace/restrictive_root_bucket"
   providers = {
@@ -61,6 +61,19 @@ module "restrictive_root_bucket" {
   databricks_account_id = var.databricks_account_id
 
   depends_on = [module.databricks_mws_workspace]
+}
+
+
+# Disable legacy access settings like Hive Metastore, Disables Databricks Runtime prior to 13.3 LTS, etc.
+module "disable_legacy_access_setting" {
+  source = "./databricks_workspace/disable_legacy_access_settings"
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
 }
 
 # Admin Configuration

@@ -30,10 +30,9 @@ module "vpc" {
 
 # Security group - skipped in custom mode
 resource "aws_security_group" "sg" {
-  count = var.network_configuration != "custom" ? 1 : 0
-
-  vpc_id     = module.vpc[0].vpc_id
-  depends_on = [module.vpc]
+  count  = var.network_configuration != "custom" ? 1 : 0
+  name   = "${var.resource_prefix}-workspace-sg"
+  vpc_id = module.vpc[0].vpc_id
 
   dynamic "ingress" {
     for_each = ["tcp", "udp"]
@@ -60,7 +59,7 @@ resource "aws_security_group" "sg" {
   dynamic "egress" {
     for_each = var.sg_egress_ports
     content {
-      description = "Databricks - Workspace SG - REST (443), Secure Cluster Connectivity (2443/6666), Future Extendability (8443-8451)"
+      description = "Databricks - Workspace SG - REST (443), Secure Cluster Connectivity (2443/6666), Compute Plane to Control Plane Internal Calls (8443), Unity Catalog Logging and Lineage Data Streaming (8444), Future Extendability (8445-8451)"
       from_port   = egress.value
       to_port     = egress.value
       protocol    = "tcp"
@@ -72,4 +71,5 @@ resource "aws_security_group" "sg" {
     Name    = "${var.resource_prefix}-workspace-sg"
     Project = var.resource_prefix
   }
+  depends_on = [module.vpc]
 }
