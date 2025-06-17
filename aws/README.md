@@ -21,9 +21,7 @@ This architecture includes specific functionalities that may affect certain use 
 
 Terraform customizations are available to support the baseline deployment of the Security Reference Architecture (SRA). These customizations are organized by provider:
 
-- **Account**: Databricks account provider.
 - **Workspace**: Databricks workspace provider.
-- **Networking Configuration**: AWS provider.
 
 These extensions can be found in the top-level customization folder.
 

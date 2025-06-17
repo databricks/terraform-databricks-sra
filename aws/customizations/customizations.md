@@ -3,9 +3,7 @@
 Customizations are **Terraform code** available to support the baseline deployment of the **Security Reference Architecture (SRA) - Terraform Templates**.
 
 Customizations are sectioned by providers:
-- **Account**: Databricks account provider.
 - **Workspace**: Databricks workspace provider.
-- **Networking Configuration**: AWS provider.
 
 The current customizations available are:
 
@@ -17,5 +15,3 @@ The current customizations available are:
 | **Workspace** | **Security Analysis Tool (SAT)** | The Security Analysis Tool evaluates a customer’s Databricks account and workspace security configurations, providing recommendations that align with Databricks’ best practices. This can be enabled within the workspace. |
 | **Workspace** | **Audit Log Alerting** | Based on this [blog post](https://www.databricks.com/blog/improve-lakehouse-security-monitoring-using-system-tables-databricks-unity-catalog), Audit Log Alerting creates 40+ SQL alerts to monitor incidents following a Zero Trust Architecture (ZTA) model. **NOTE:** This configuration creates a cluster, a job, and queries within your environment. |
 | **Workspace** | **Read-Only External Location** | Creates a read-only external location in Unity Catalog for a specified bucket, as well as the corresponding AWS IAM role. |
-| **AWS** | **Firewall (Limited Egress)** | This firewall networking configuration restricts traffic to a specified list of public addresses, suitable for situations where open internet access is limited due to workload or data sensitivity. |
-| **AWS** | **Sandbox (Open Egress)** | Open egress allows free traffic flow to the public internet, ideal for sandbox or development scenarios where data exfiltration protection is minimal, and developers need public API access. |
