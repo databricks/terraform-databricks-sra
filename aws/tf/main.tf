@@ -116,7 +116,7 @@ module "log_delivery" {
 }
 
 # =============================================================================
-# Databricks Workspace Modules - PyPI must be enabled to work.
+# Databricks Workspace Modules
 # =============================================================================
 
 # Creates a Workspace Isolated Catalog
@@ -178,7 +178,7 @@ module "disable_legacy_access_setting" {
 }
 
 # =============================================================================
-# Security Analysis Tool
+# Security Analysis Tool  - PyPI must be enabled in network policy resource to function.
 # =============================================================================
 
 module "security_analysis_tool" {
