@@ -17,7 +17,7 @@ resource "databricks_cluster" "example" {
     min_workers = 1
     max_workers = 2
   }
-  
+
   # Custom Tags
   custom_tags = {
     "Project" = var.resource_prefix

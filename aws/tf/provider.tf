@@ -15,7 +15,7 @@ terraform {
 # Authenticate using environment variables: https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html
 # export AWS_ACCESS_KEY_ID=KEY_ID
 # export AWS_SECRET_ACCESS_KEY=SECRET_KEY
-# export AWSAWS_SESSION_TOKEN=SESSION_TOKEN
+# export AWS_SESSION_TOKEN=SESSION_TOKEN
 
 provider "aws" {
   region = var.region
