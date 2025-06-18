@@ -9,7 +9,6 @@ The current customizations available are:
 
 | Provider                    | Customization                 | Summary |
 |-----------------------------|-------------------------------|---------|
-| **Account** | **Audit and Billable Usage Logs** | Databricks delivers logs to your S3 buckets. [Audit logs](https://docs.databricks.com/administration-guide/account-settings/audit-logs.html) contain workspace and account-level events. Additionally, [Billable usage logs](https://docs.databricks.com/administration-guide/account-settings/billable-usage-delivery.html) are delivered daily to an AWS S3 bucket, containing historical data about cluster usage in DBUs for each workspace. |
 | **Workspace** | **Workspace Admin Configurations** | Workspace administration configurations can be enabled to align with security best practices. The Terraform resource is experimental and optional, with documentation on each configuration provided in the Terraform file. |
 | **Workspace** | **IP Access Lists** | IP Access can be enabled to restrict console access to a subset of IPs. **NOTE:** Ensure IPs are accurate to prevent lockout scenarios. |
 | **Workspace** | **Security Analysis Tool (SAT)** | The Security Analysis Tool evaluates a customer’s Databricks account and workspace security configurations, providing recommendations that align with Databricks’ best practices. This can be enabled within the workspace. |
