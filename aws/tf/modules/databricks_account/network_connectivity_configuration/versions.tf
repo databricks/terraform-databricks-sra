@@ -1,9 +1,9 @@
-variable "region" {
-  description = "AWS region code."
-  type        = string
-}
-
-variable "resource_prefix" {
-  description = "Prefix for the resource names."
-  type        = string
+terraform {
+  required_providers {
+    databricks = {
+      source  = "databricks/databricks"
+      version = ">=1.81.0"
+    }
+  }
+  required_version = ">=1.0"
 }

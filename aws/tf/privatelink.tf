@@ -65,7 +65,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
 
   statement {
-    sid    = "Grant access to Databricks Root Bucket"
+    sid    = "Grant access to Workspace Root Bucket"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -94,7 +94,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   }
 
   statement {
-    sid    = "Grant access to Databricks Unity Catalog Metastore Bucket"
+    sid    = "Grant access to Unity Catalog Workspace Catalog Bucket"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -128,7 +128,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
   }
 
   statement {
-    sid    = "Grant access to Artifact Buckets"
+    sid    = "Grant access to Databricks Artifact Buckets"
     effect = "Allow"
     actions = [
       "s3:ListBucket",
@@ -142,10 +142,12 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
       identifiers = ["*"]
     }
 
-    resources = [
-      "arn:aws:s3:::databricks-prod-artifacts-${var.region}/*",
-      "arn:aws:s3:::databricks-prod-artifacts-${var.region}",
-    ]
+    resources = flatten([
+      for bucket in var.artifact_storage_bucket[var.region] : [
+        "arn:aws:s3:::${bucket}/*",
+        "arn:aws:s3:::${bucket}"
+      ]
+    ])
 
     condition {
       test     = "StringEquals"
@@ -170,8 +172,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket/*",
-      "arn:aws:s3:::system-tables-prod-${var.region}-uc-metastore-bucket"
+      "arn:aws:s3:::${var.system_table_bucket[var.region]}/*",
+      "arn:aws:s3:::${var.system_table_bucket[var.region]}"
     ]
 
     condition {
@@ -197,8 +199,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::databricks-datasets-${var.region_name[var.region]}/*",
-      "arn:aws:s3:::databricks-datasets-${var.region_name[var.region]}"
+      "arn:aws:s3:::${var.shared_datasets_bucket[var.region]}/*",
+      "arn:aws:s3:::${var.shared_datasets_bucket[var.region]}"
     ]
 
     condition {
@@ -223,8 +225,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::databricks-prod-storage-${var.region_name[var.region]}/*",
-      "arn:aws:s3:::databricks-prod-storage-${var.region_name[var.region]}"
+      "arn:aws:s3:::${var.log_storage_bucket[var.region]}/*",
+      "arn:aws:s3:::${var.log_storage_bucket[var.region]}"
     ]
 
     condition {

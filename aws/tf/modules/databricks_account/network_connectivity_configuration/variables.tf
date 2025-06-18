@@ -1,5 +1,5 @@
-variable "databricks_account_id" {
-  description = "ID of the Databricks account."
+variable "region" {
+  description = "AWS region code."
   type        = string
 }
 

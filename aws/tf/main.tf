@@ -9,7 +9,6 @@ module "unity_catalog_metastore_creation" {
     databricks = databricks.mws
   }
 
-  resource_prefix  = var.resource_prefix
   region           = var.region
   metastore_exists = var.metastore_exists
 }
@@ -33,7 +32,6 @@ module "network_policy" {
   }
 
   databricks_account_id = var.databricks_account_id
-  region                = var.region
   resource_prefix       = var.resource_prefix
 }
 
@@ -190,16 +188,14 @@ module "security_analysis_tool" {
   }
 
   # Authentication Variables
-  account_console_id    = var.databricks_account_id
+  databricks_account_id = var.databricks_account_id
   client_id             = null # Provide Workspace Admin ID
   client_secret         = null # Provide Workspace Admin Secret
-  databricks_account_id = var.databricks_account_id
-  use_sp_auth           = true
+
+  use_sp_auth = true
 
   # Databricks Variables
   analysis_schema_name = replace("${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}.SAT", "-", "_")
-  catalog_name         = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
-  schema_name          = replace("${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}.SAT", "-", "_")
   workspace_id         = module.databricks_mws_workspace.workspace_id
 
   # Configuration Variables
