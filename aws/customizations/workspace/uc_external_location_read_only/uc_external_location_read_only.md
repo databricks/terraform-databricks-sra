@@ -4,11 +4,11 @@ This creates a read-only external location in Unity Catalog for a specified buck
 
 ### How to add this resource to SRA:
 
-1. Copy the `uc_external_location_read_only` folder into `modules/sra/databricks_workspace/` 
-2. Add the following code block into `modules/sra/databricks_workspace.tf`
+1. Copy the `uc_external_location_read_only` folder into `modules/databricks_workspace/` 
+2. Add the following code block into `modules/databricks_workspace.tf`
 ```
 module "uc_external_location_read_only" {
-  source = "./databricks_workspace/uc_external_location_read_only"
+  source = "./modules/databricks_workspace/uc_external_location_read_only"
   providers = {
     databricks = databricks.created_workspace
   }

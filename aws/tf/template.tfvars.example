@@ -1,24 +1,76 @@
+# =============================================================================
 # Configuration Variables for AWS and Databricks
+# =============================================================================
 
-# Databricks Variables
-# Admin user email.
-admin_user            = "" 
-
-# Service principal ID for Databricks with admin permissions.
-client_id             = "" 
-
-# Secret for the corresponding service principal.
-client_secret         = "" 
-
-# Databricks account ID.
-databricks_account_id = "" 
-
-# Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles).
-resource_prefix       = "" 
-
+# -----------------------------------------------------------------------------
 # AWS Variables
-# AWS account ID where resources will be deployed.
-aws_account_id = "" 
+# -----------------------------------------------------------------------------
 
-# AWS and Databricks region (e.g., us-west-2).
-region         = "" 
+# AWS account ID where resources will be deployed
+aws_account_id = ""
+
+# AWS region for deployment
+region = ""
+
+# -----------------------------------------------------------------------------
+# Databricks Variables
+# -----------------------------------------------------------------------------
+
+# Admin user email for workspace and catalog management
+admin_user = ""
+
+# Databricks account ID
+databricks_account_id = ""
+
+# -----------------------------------------------------------------------------
+# Resource Configuration
+# -----------------------------------------------------------------------------
+
+# Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles)
+resource_prefix = ""
+
+# -----------------------------------------------------------------------------
+# Network Configuration
+# -----------------------------------------------------------------------------
+
+# Network type: "custom" or "isolated" (see README.md for more information)
+network_configuration = "isolated"
+
+# ISOLATED NETWORK CONFIGURATION
+# Required when using network_configuration = "isolated"
+vpc_cidr_range           = "10.0.0.0/18"
+private_subnets_cidr     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
+privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
+sg_egress_ports          = [443, 2443, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
+
+# CUSTOM NETWORK CONFIGURATION
+# Required when using network_configuration = "custom"
+# Uncomment and configure the following variables for custom networking:
+# custom_vpc_id             = ""
+# custom_private_subnet_ids = ["", ""]
+# custom_sg_id              = ""
+# custom_relay_vpce_id      = ""
+# custom_workspace_vpce_id  = ""
+
+# -----------------------------------------------------------------------------
+# Feature Flags
+# -----------------------------------------------------------------------------
+
+# If audit log delivery is already configured
+audit_log_delivery_exists = false
+
+# If a regional metastore exists
+metastore_exists = false
+
+# Enable the security analysis tool
+enable_security_analysis_tool = false
+
+# -----------------------------------------------------------------------------
+# Optional Configuration
+# -----------------------------------------------------------------------------
+
+# CMK Admin ARN (required for non-root account CMK usage)
+# cmk_admin_arn = ""
+
+# Deployment name for the workspace (must be enabled by Databricks representative)
+deployment_name = null

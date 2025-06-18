@@ -5,11 +5,11 @@ IP Access can be enabled to restrict access to the Databricks workspace console 
 
 ### How to add this resource to SRA:
 
-1. Copy the `ip_access_list` folder into `modules/sra/databricks_workspace/` 
-2. Add the following code block into `modules/sra/databricks_workspace.tf`
+1. Copy the `ip_access_list` folder into `modules/databricks_workspace/` 
+2. Add the following code block into `modules/databricks_workspace.tf`
 ```
 module "ip_access_list" {
-    source = "./databricks_workspace/ip_access_list"
+    source = "./modules/databricks_workspace/ip_access_list"
     providers = {
     databricks = databricks.created_workspace
   }
