@@ -48,7 +48,6 @@ output "is_unity_catalog_enabled" {
   description = "If UC creation is enabled"
 }
 
-
 output "resource_group_name" {
   value       = azurerm_resource_group.this.name
   description = "The name of the Azure Resource Group."
@@ -62,7 +61,45 @@ output "private_link_info" {
   description = "Information related to the Private Link, including DNS Zone ID and Subnet ID for Private Link connectivity."
 }
 
+output "dns_zone_ids" {
+  description = "Private DNS Zone IDs"
+  value = {
+    dfs     = azurerm_private_dns_zone.dbfs_dfs[0].id,
+    blob    = azurerm_private_dns_zone.dbfs_blob[0].id,
+    backend = azurerm_private_dns_zone.auth_front.id
+  }
+}
+
 output "ncc_id" {
+  description = "NCC ID of this workspace"
   value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
-  description = "The ID of the hub regional Network Connectivity Config."
+}
+
+output "subnet_ids" {
+  description = "Subnet IDs"
+  value = {
+    host        = azurerm_subnet.host.id
+    container   = azurerm_subnet.container.id
+    privatelink = azurerm_subnet.privatelink.id
+  }
+}
+
+output "tags" {
+  description = "Tags used in hub"
+  value       = var.tags
+}
+
+output "workspace_url" {
+  description = "The URL of the Databricks workspace, used to access the Databricks environment."
+  value       = azurerm_databricks_workspace.webauth.workspace_url
+}
+
+output "workspace_id" {
+  value       = azurerm_databricks_workspace.webauth.workspace_id
+  description = "Workspace ID of the created workspace, according to the Databricks account console"
+}
+
+output "resource_suffix" {
+  description = "Resource suffix to use for naming down stream resources"
+  value       = var.resource_suffix
 }

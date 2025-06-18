@@ -4,10 +4,7 @@ resource "google_compute_subnetwork" "backend_pe_subnetwork" {
   ip_cidr_range = var.google_pe_subnet_ip_cidr_range
   region        = var.google_region
   network       = google_compute_network.dbx_private_vpc.id
-  secondary_ip_range {
-    range_name    = "tf-secondary-range-update1"
-    ip_cidr_range = var.google_pe_subnet_secondary_ip_range
-  }
+
   private_ip_google_access = true
 
   depends_on=[google_compute_network.dbx_private_vpc]
@@ -77,23 +74,23 @@ resource "databricks_mws_vpc_endpoint" "backend_rest_vpce" {
  }
 }
 
-resource "databricks_mws_vpc_endpoint" "relay_vpce" {
-  provider     = databricks.accounts
-  depends_on = [ google_compute_forwarding_rule.frontend_psc_ep ]
-  account_id          = var.databricks_account_id
-  vpc_endpoint_name   = "vpce-relay"
-  gcp_vpc_endpoint_info {
-    project_id        = var.google_project
-    psc_endpoint_name = var.relay_pe
-    endpoint_region   = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
- }
-}
+# resource "databricks_mws_vpc_endpoint" "relay_vpce" {
+#   provider     = databricks.accounts
+#   depends_on = [ google_compute_forwarding_rule.frontend_psc_ep ]
+#   account_id          = var.databricks_account_id
+#   vpc_endpoint_name   = "vpce-relay"
+#   gcp_vpc_endpoint_info {
+#     project_id        = var.google_project
+#     psc_endpoint_name = var.relay_pe
+#     endpoint_region   = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
+#  }
+# }
 
-output "front_end_psc_status"{
-  value = "Frontend psc status: ${var.use_existing_PSC_EP?"Pre-provisioned":google_compute_forwarding_rule.frontend_psc_ep[0].psc_connection_status}"
-}
+# output "front_end_psc_status"{
+#   value = "Frontend psc status: ${var.use_existing_PSC_EP?"Pre-provisioned":google_compute_forwarding_rule.frontend_psc_ep[0].psc_connection_status}"
+# }
 
-output "backend_end_psc_status"{
-  value = "Backend psc status: ${var.use_existing_PSC_EP?"Pre-provisioned":google_compute_forwarding_rule.backend_psc_ep[0].psc_connection_status}"
-}
+# output "backend_end_psc_status"{
+#   value = "Backend psc status: ${var.use_existing_PSC_EP?"Pre-provisioned":google_compute_forwarding_rule.backend_psc_ep[0].psc_connection_status}"
+# }
 

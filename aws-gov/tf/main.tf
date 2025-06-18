@@ -5,16 +5,16 @@ module "sra" {
     aws            = aws
   }
 
-  databricks_account_id          = var.databricks_account_id
-  client_id                      = var.client_id
-  client_secret                  = var.client_secret
-  aws_account_id                 = var.aws_account_id
-  region                         = var.region
-  region_name                    = var.region_name[var.databricks_gov_shard]
-  region_bucket_name             = var.region_bucket_name[var.databricks_gov_shard]
-  databricks_gov_shard           = var.databricks_gov_shard
-  admin_user                     = var.admin_user
-  resource_prefix                = var.resource_prefix
+  databricks_account_id = var.databricks_account_id
+  client_id             = var.client_id
+  client_secret         = var.client_secret
+  aws_account_id        = var.aws_account_id
+  region                = var.region
+  region_name           = var.region_name[var.databricks_gov_shard]
+  region_bucket_name    = var.region_bucket_name[var.databricks_gov_shard]
+  databricks_gov_shard  = var.databricks_gov_shard
+  admin_user            = var.admin_user
+  resource_prefix       = var.resource_prefix
 
   # REQUIRED:
   network_configuration          = "isolated" // Network (custom or isolated), see README.md for more information.

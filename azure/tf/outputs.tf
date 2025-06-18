@@ -10,6 +10,5 @@ output "hub_resource_group_name" {
 
 output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
-  # value       = values(module.spoke)[*].workspace_url
-  value = { for k, v in module.spoke : k => [v.resource_group_name, v.workspace_url] }
+  value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
 }

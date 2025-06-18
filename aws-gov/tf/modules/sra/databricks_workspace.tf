@@ -21,8 +21,8 @@ module "uc_catalog" {
   depends_on = [module.databricks_mws_workspace, module.uc_assignment]
 }
 
-# System Table Schemas Enablement - Coming Soon to AWS-Gov
 /*
+# System Table Schemas Enablement - Coming Soon to AWS-Gov
 module "system_table" {
   source = "./databricks_workspace/system_schema"
   providers = {
@@ -46,7 +46,7 @@ module "cluster_configuration" {
   ]
 }
 
-# Restrictive DBFS bucket policy
+# Restrictive root bucket policy
 module "restrictive_root_bucket" {
   source = "./databricks_workspace/restrictive_root_bucket"
   providers = {
@@ -61,4 +61,25 @@ module "restrictive_root_bucket" {
   databricks_account_id = var.databricks_account_id
 
   depends_on = [module.databricks_mws_workspace]
+}
+
+
+# Disable legacy access settings like Hive Metastore, Disables Databricks Runtime prior to 13.3 LTS, etc.
+module "disable_legacy_access_setting" {
+  source = "./databricks_workspace/disable_legacy_access_settings"
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  depends_on = [
+    module.databricks_mws_workspace
+  ]
+}
+
+# Admin Configuration
+module "admin_configuration" {
+  source = "./databricks_workspace/admin_configuration"
+  providers = {
+    databricks = databricks.created_workspace
+  }
 }

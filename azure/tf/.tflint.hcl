@@ -1,5 +1,5 @@
 config {
-  variables = ["tags={\"foo\"=\"bar\"}"]
+  varfile = ["tests/terraform.tfvars"]
 }
 
 plugin "terraform" {
@@ -13,6 +13,6 @@ plugin "azurerm" {
 }
 
 rule "azurerm_resource_missing_tags" {
-  enabled = false
-  tags = ["foo"]
+  enabled = true
+  tags    = ["example"]
 }
