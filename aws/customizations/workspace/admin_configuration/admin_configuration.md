@@ -3,11 +3,11 @@ Workspace administration configurations can be enabled to align with security be
 
 ### How to add this resource to SRA:
 
-1. Copy the `admin_configuration` folder into `modules/sra/databricks_workspace/` 
-2. Add the following code block into `modules/sra/databricks_workspace.tf`
+1. Copy the `admin_configuration` folder into `modules/databricks_workspace/` 
+2. Add the following code block into `modules/databricks_workspace.tf`
 ```
 module "admin_configuration" {
-  source = "./databricks_workspace/admin_configuration"
+  source = "./modules/databricks_workspace/admin_configuration"
   providers = {
     databricks = databricks.created_workspace
   }
