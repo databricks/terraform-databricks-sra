@@ -4,15 +4,15 @@ name: AWS Gov Tests
 on:
   push:
     paths:
-      - 'aws-gov/tf/**'
+      - 'aws/tf/**'
       - '.github/workflows/aws-gov-test.yml'
   pull_request:
     paths:
-      - 'aws-gov/tf/**'
+      - 'aws/tf/**'
       - '.github/workflows/aws-gov-test.yml'
 jobs:
   test-aws-gov:
     uses: ./.github/workflows/terraform-ruw.yml
     with:
-      working_directory: aws-gov/tf
+      working_directory: aws/tf
       tflint_args: "--config=$(pwd)/.tflint.hcl"
