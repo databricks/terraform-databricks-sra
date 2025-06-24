@@ -169,7 +169,7 @@ module "restrictive_root_bucket" {
   aws_partition         = local.computed_aws_partition
   databricks_gov_shard  = var.databricks_gov_shard
   workspace_id          = module.databricks_mws_workspace.workspace_id
-  region_name           = var.region_name_config[var.region].primary_name
+  region_name           = var.databricks_gov_shard == "dod" ? var.region_name_config[var.region].secondary_name : var.region_name_config[var.region].primary_name
   root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
 }
 
