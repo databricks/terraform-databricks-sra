@@ -3,6 +3,12 @@ variable "aws_account_id" {
   description = "ID of the AWS account."
 }
 
+variable "aws_partition" {
+  type        = string
+  description = "AWS partition to use for ARNs and policies"
+  default     = "aws"
+}
+
 variable "cmk_admin_arn" {
   description = "Amazon Resource Name (ARN) of the CMK admin."
   type        = string

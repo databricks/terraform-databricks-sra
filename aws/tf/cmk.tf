@@ -1,7 +1,7 @@
 # EXPLANATION: The customer-managed keys for workspace and managed services
 
 locals {
-  cmk_admin_value = var.cmk_admin_arn == null ? "arn:aws:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
+  cmk_admin_value = var.cmk_admin_arn == null ? "arn:${local.computed_aws_partition}:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
 }
 
 resource "aws_kms_key" "workspace_storage" {
@@ -23,7 +23,7 @@ resource "aws_kms_key" "workspace_storage" {
         "Sid" : "Allow Databricks to use KMS key for DBFS",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::414351767826:root"
+          "AWS" : "arn:${local.computed_aws_partition}:iam::${local.databricks_aws_account_id}:root"
         },
         "Action" : [
           "kms:Encrypt",
@@ -94,7 +94,7 @@ resource "aws_kms_key" "managed_services" {
         "Sid" : "Allow Databricks to use KMS key for managed services in the control plane",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::414351767826:root"
+          "AWS" : "arn:${local.computed_aws_partition}:iam::${local.databricks_aws_account_id}:root"
         },
         "Action" : [
           "kms:Encrypt",
