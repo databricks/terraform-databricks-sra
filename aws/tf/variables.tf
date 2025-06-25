@@ -606,6 +606,17 @@ locals {
   # GovCloud regions use a different account ID for AMIs
   databricks_ec2_image_account_id = var.region == "us-gov-west-1" ? "044732911619" : "601306020600"
 
+  # Compute the correct AWS partition for assume role policies
+  # Different partitions based on region and GovCloud shard type
+  assume_role_partition = var.region == "us-gov-west-1" ? (
+    var.databricks_gov_shard == "dod" ? "aws-us-gov-dod" : "aws-us-gov"
+  ) : "aws"
+
+  # Compute the correct Unity Catalog IAM ARN based on region and GovCloud shard type
+  unity_catalog_iam_arn = var.region == "us-gov-west-1" ? (
+    var.databricks_gov_shard == "dod" ? "arn:aws-us-gov:iam::170661010020:role/unity-catalog-prod-UCMasterRole-1DI6DL6ZP26AS" : "arn:aws-us-gov:iam::044793339203:role/unity-catalog-prod-UCMasterRole-1QRFA8SGY15OJ"
+  ) : "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
+
   # Backward compatibility variables - provide the same interface as the old simple map variables
   scc_relay = {
     for region, config in var.scc_relay_config : region => (

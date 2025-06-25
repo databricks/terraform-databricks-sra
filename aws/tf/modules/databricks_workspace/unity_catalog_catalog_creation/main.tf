@@ -31,7 +31,7 @@ resource "aws_kms_key" "catalog_storage" {
         "Sid" : "Allow IAM Role to use the key",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:${var.aws_partition}:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
+          "AWS" : "arn:${var.aws_iam_partition}:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
         },
         "Action" : [
           "kms:Decrypt",
@@ -57,7 +57,7 @@ resource "aws_kms_alias" "catalog_storage_key_alias" {
 resource "databricks_storage_credential" "workspace_catalog_storage_credential" {
   name = "${var.uc_catalog_name}-storage-credential"
   aws_iam_role {
-    role_arn = "arn:${var.aws_partition}:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
+    role_arn = "arn:${var.aws_iam_partition}:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
   }
   isolation_mode = "ISOLATION_MODE_ISOLATED"
 }
@@ -65,15 +65,16 @@ resource "databricks_storage_credential" "workspace_catalog_storage_credential" 
 # Unity Catalog Trust Policy - Data Source
 data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
   aws_account_id = var.aws_account_id
-  aws_partition  = var.aws_partition
+  aws_partition  = var.aws_assume_partition
   role_name      = local.uc_iam_role
+  unity_catalog_iam_arn = var.unity_catalog_iam_arn
   external_id    = databricks_storage_credential.workspace_catalog_storage_credential.aws_iam_role[0].external_id
 }
 
 # Unity Catalog Policy - Data Source
 data "databricks_aws_unity_catalog_policy" "unity_catalog" {
   aws_account_id = var.aws_account_id
-  aws_partition  = var.aws_partition
+  aws_partition  = var.aws_assume_partition
   bucket_name    = var.uc_catalog_name
   role_name      = local.uc_iam_role
   kms_name       = aws_kms_alias.catalog_storage_key_alias.arn

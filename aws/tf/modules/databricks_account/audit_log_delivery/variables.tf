@@ -8,8 +8,8 @@ variable "resource_prefix" {
   type        = string
 }
 
-variable "aws_partition" {
-  description = "AWS partition to use for ARNs and policies"
+variable "aws_assume_partition" {
+  description = "AWS partition to use for assume role policies"
   type        = string
   default     = "aws"
 }

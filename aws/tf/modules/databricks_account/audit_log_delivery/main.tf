@@ -31,7 +31,7 @@ resource "aws_s3_bucket_versioning" "log_delivery_versioning" {
 # Bucket Policy Data Source
 data "databricks_aws_bucket_policy" "log_delivery" {
   full_access_role = aws_iam_role.log_delivery.arn
-  aws_partition    = var.aws_partition
+  aws_partition    = var.aws_assume_partition
   bucket           = aws_s3_bucket.log_delivery.bucket
 }
 
@@ -45,7 +45,7 @@ resource "aws_s3_bucket_policy" "log_delivery" {
 data "databricks_aws_assume_role_policy" "log_delivery" {
   external_id      = var.databricks_account_id
   for_log_delivery = true
-  aws_partition    = var.aws_partition
+  aws_partition    = var.aws_assume_partition
 }
 
 # IAM Role

@@ -3,7 +3,7 @@
 # Cross Account Role
 data "databricks_aws_assume_role_policy" "this" {
   external_id   = var.databricks_account_id
-  aws_partition = local.computed_aws_partition
+  aws_partition = local.assume_role_partition
 }
 
 resource "aws_iam_role" "cross_account_role" {

@@ -111,7 +111,7 @@ module "log_delivery" {
 
   databricks_account_id = var.databricks_account_id
   resource_prefix       = var.resource_prefix
-  aws_partition         = local.computed_aws_partition
+  aws_assume_partition  = local.assume_role_partition
 }
 
 # =============================================================================
@@ -126,7 +126,9 @@ module "unity_catalog_catalog_creation" {
   }
 
   aws_account_id               = var.aws_account_id
-  aws_partition                = local.computed_aws_partition
+  aws_iam_partition            = local.computed_aws_partition
+  aws_assume_partition         = local.assume_role_partition
+  unity_catalog_iam_arn        = local.unity_catalog_iam_arn
   resource_prefix              = var.resource_prefix
   uc_catalog_name              = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
   cmk_admin_arn                = var.cmk_admin_arn == null ? "arn:${local.computed_aws_partition}:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
