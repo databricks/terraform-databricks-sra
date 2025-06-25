@@ -12,11 +12,7 @@ resource "databricks_cluster" "example" {
   spark_version           = data.databricks_spark_version.latest_lts.id
   node_type_id            = var.region == "us-gov-west-1" ? "i3en.xlarge" : "i3.xlarge"
   autotermination_minutes = 10
-
-  autoscale {
-    min_workers = 1
-    max_workers = 2
-  }
+  num_workers             = 0 #single node cluster
 
   # Custom Tags
   custom_tags = {
