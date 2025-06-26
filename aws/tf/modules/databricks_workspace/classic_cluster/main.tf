@@ -17,6 +17,6 @@ resource "databricks_cluster" "example" {
 
   # Custom Tags
   custom_tags = {
-    "Project" = var.resource_prefix
+    "SRA" = var.resource_prefix
   }
 }

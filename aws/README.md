@@ -88,6 +88,14 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 ---
 
+## Govcloud Deployments
+
+- **Region**: `region` must be set as `us-gov-west-1`.
+- **Govcloud Shard**: `databricks_gov_shard` must be either `civilian` or `dod`. For all non-govcloud deployments (commercial regions) `databricks_gov_shard` should remain null.
+    - **NOTE**: `dod` is only available to customers with a .mil email address.
+
+---
+
 ## Additional Security Recommendations
 
 This section provides additional security recommendations to help maintain a strong security posture. These cannot always be configured in this Terraform script or may be specific to individual customers (e.g., SCIM, SSO, Front-End PrivateLink, etc.).
