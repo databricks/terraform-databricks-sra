@@ -74,3 +74,6 @@ enable_security_analysis_tool = false
 
 # Deployment name for the workspace (must be enabled by Databricks representative)
 deployment_name = null
+
+# If deploying to govcloud, is deployment "civilian" or "dod" shard
+databricks_gov_shard = null

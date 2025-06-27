@@ -111,6 +111,7 @@ module "log_delivery" {
 
   databricks_account_id = var.databricks_account_id
   resource_prefix       = var.resource_prefix
+  aws_assume_partition  = local.assume_role_partition
 }
 
 # =============================================================================
@@ -125,9 +126,12 @@ module "unity_catalog_catalog_creation" {
   }
 
   aws_account_id               = var.aws_account_id
+  aws_iam_partition            = local.computed_aws_partition
+  aws_assume_partition         = local.assume_role_partition
+  unity_catalog_iam_arn        = local.unity_catalog_iam_arn
   resource_prefix              = var.resource_prefix
   uc_catalog_name              = "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
-  cmk_admin_arn                = var.cmk_admin_arn == null ? "arn:aws:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
+  cmk_admin_arn                = var.cmk_admin_arn == null ? "arn:${local.computed_aws_partition}:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
   workspace_id                 = module.databricks_mws_workspace.workspace_id
   user_workspace_catalog_admin = var.admin_user
 
@@ -136,6 +140,7 @@ module "unity_catalog_catalog_creation" {
 
 # System Table Schemas Enablement
 module "system_table" {
+  count  = var.region == "us-gov-west-1" ? 0 : 1
   source = "./modules/databricks_workspace/system_schema"
   providers = {
     databricks = databricks.created_workspace
@@ -151,6 +156,7 @@ module "cluster_configuration" {
   }
 
   resource_prefix = var.resource_prefix
+  region          = var.region
   depends_on      = [module.databricks_mws_workspace]
 }
 
@@ -162,8 +168,10 @@ module "restrictive_root_bucket" {
   }
 
   databricks_account_id = var.databricks_account_id
+  aws_partition         = local.computed_aws_partition
+  databricks_gov_shard  = var.databricks_gov_shard
   workspace_id          = module.databricks_mws_workspace.workspace_id
-  region_name           = var.region_name[var.region]
+  region_name           = var.databricks_gov_shard == "dod" ? var.region_name_config[var.region].secondary_name : var.region_name_config[var.region].primary_name
   root_s3_bucket        = "${var.resource_prefix}-workspace-root-storage"
 }
 
@@ -180,7 +188,7 @@ module "disable_legacy_access_setting" {
 # =============================================================================
 
 module "security_analysis_tool" {
-  count  = var.enable_security_analysis_tool ? 1 : 0
+  count  = var.enable_security_analysis_tool && var.region != "us-gov-west-1" ? 1 : 0
   source = "./modules/security_analysis_tool"
 
   providers = {

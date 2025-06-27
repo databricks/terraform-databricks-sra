@@ -60,6 +60,11 @@ variables {
   custom_sg_id                  = null
   custom_relay_vpce_id          = null
   custom_workspace_vpce_id      = null
+  
+  # New variables for GovCloud support
+  databricks_gov_shard          = null
+  aws_partition                 = null
+  databricks_provider_host      = null
 }
 
 # ---------------

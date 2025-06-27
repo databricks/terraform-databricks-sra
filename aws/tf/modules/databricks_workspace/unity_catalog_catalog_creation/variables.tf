@@ -3,6 +3,24 @@ variable "aws_account_id" {
   description = "ID of the AWS account."
 }
 
+variable "aws_iam_partition" {
+  type        = string
+  description = "AWS partition to use for IAM ARNs and policies"
+  default     = "aws"
+}
+
+variable "aws_assume_partition" {
+  type        = string
+  description = "AWS partition to use for assume role policies"
+  default     = "aws"
+}
+
+variable "unity_catalog_iam_arn" {
+  type        = string
+  description = "Unity Catalog IAM ARN for the master role"
+  default     = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
+}
+
 variable "cmk_admin_arn" {
   description = "Amazon Resource Name (ARN) of the CMK admin."
   type        = string

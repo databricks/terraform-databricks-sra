@@ -1,4 +1,5 @@
 # Security group for privatelink - skipped in custom operation mode
+
 resource "aws_security_group" "privatelink" {
   count  = var.network_configuration != "custom" ? 1 : 0
   name   = "${var.resource_prefix}-privatelink-sg"
@@ -12,12 +13,15 @@ resource "aws_security_group" "privatelink" {
     security_groups = [aws_security_group.sg[0].id]
   }
 
-  ingress {
-    description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity"
-    from_port       = 6666
-    to_port         = 6666
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg[0].id]
+  dynamic "ingress" {
+    for_each = var.databricks_gov_shard == "civilian" || var.databricks_gov_shard == "dod" ? [] : [1]
+    content {
+      description     = "Databricks - PrivateLink Endpoint SG - Secure Cluster Connectivity"
+      from_port       = 6666
+      to_port         = 6666
+      protocol        = "tcp"
+      security_groups = [aws_security_group.sg[0].id]
+    }
   }
 
   ingress {
@@ -82,14 +86,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.resource_prefix}-workspace-root-storage/*",
-      "arn:aws:s3:::${var.resource_prefix}-workspace-root-storage"
+      "arn:${local.computed_aws_partition}:s3:::${var.resource_prefix}-workspace-root-storage/*",
+      "arn:${local.computed_aws_partition}:s3:::${var.resource_prefix}-workspace-root-storage"
     ]
 
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
-      values   = ["414351767826"]
+      values   = [local.databricks_aws_account_id]
     }
   }
 
@@ -111,8 +115,8 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}/*",
-      "arn:aws:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
+      "arn:${local.computed_aws_partition}:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}/*",
+      "arn:${local.computed_aws_partition}:s3:::${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}"
     ]
 
     condition {
@@ -144,15 +148,15 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
 
     resources = flatten([
       for bucket in var.artifact_storage_bucket[var.region] : [
-        "arn:aws:s3:::${bucket}/*",
-        "arn:aws:s3:::${bucket}"
+        "arn:${local.computed_aws_partition}:s3:::${bucket}/*",
+        "arn:${local.computed_aws_partition}:s3:::${bucket}"
       ]
     ])
 
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceAccount"
-      values   = ["414351767826"]
+      values   = [local.databricks_artifact_and_sample_data_account_id]
     }
   }
 
@@ -172,14 +176,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.system_table_bucket[var.region]}/*",
-      "arn:aws:s3:::${var.system_table_bucket[var.region]}"
+      "arn:${local.computed_aws_partition}:s3:::${var.databricks_gov_shard == "dod" ? var.system_table_bucket_config[var.region].secondary_bucket : var.system_table_bucket_config[var.region].primary_bucket}/*",
+      "arn:${local.computed_aws_partition}:s3:::${var.databricks_gov_shard == "dod" ? var.system_table_bucket_config[var.region].secondary_bucket : var.system_table_bucket_config[var.region].primary_bucket}"
     ]
 
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
-      values   = ["414351767826"]
+      values   = [local.databricks_aws_account_id]
     }
   }
 
@@ -199,14 +203,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.shared_datasets_bucket[var.region]}/*",
-      "arn:aws:s3:::${var.shared_datasets_bucket[var.region]}"
+      "arn:${local.computed_aws_partition}:s3:::${var.shared_datasets_bucket[var.region]}/*",
+      "arn:${local.computed_aws_partition}:s3:::${var.shared_datasets_bucket[var.region]}"
     ]
 
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
-      values   = ["414351767826"]
+      values   = [local.databricks_artifact_and_sample_data_account_id]
     }
   }
 
@@ -225,14 +229,14 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
     }
 
     resources = [
-      "arn:aws:s3:::${var.log_storage_bucket[var.region]}/*",
-      "arn:aws:s3:::${var.log_storage_bucket[var.region]}"
+      "arn:${local.computed_aws_partition}:s3:::${var.databricks_gov_shard == "dod" ? var.log_storage_bucket_config[var.region].secondary_bucket : var.log_storage_bucket_config[var.region].primary_bucket}/*",
+      "arn:${local.computed_aws_partition}:s3:::${var.databricks_gov_shard == "dod" ? var.log_storage_bucket_config[var.region].secondary_bucket : var.log_storage_bucket_config[var.region].primary_bucket}"
     ]
 
     condition {
       test     = "StringEquals"
       variable = "aws:PrincipalAccount"
-      values   = ["414351767826"]
+      values   = [local.databricks_aws_account_id]
     }
   }
 }
@@ -240,6 +244,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
 # Restrictive STS endpoint policy:
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
+  
   statement {
     actions = [
       "sts:AssumeRole",
@@ -268,9 +273,9 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
 
     principals {
       type = "AWS"
-      identifiers = [
-        "arn:aws:iam::414351767826:user/databricks-datasets-readonly-user-prod",
-        "414351767826"
+      identifiers = var.region == "us-gov-west-1" ? [local.databricks_aws_account_id] : [
+        "arn:${local.computed_aws_partition}:iam::${local.databricks_aws_account_id}:user/databricks-datasets-readonly-user-prod",
+        local.databricks_aws_account_id
       ]
     }
   }
@@ -286,11 +291,11 @@ data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
       "kinesis:DescribeStream"
     ]
     effect    = "Allow"
-    resources = ["arn:aws:kinesis:${var.region}:414351767826:stream/*"]
+    resources = ["arn:${local.computed_aws_partition}:kinesis:${var.region}:${local.databricks_aws_account_id}:stream/*"]
 
     principals {
       type        = "AWS"
-      identifiers = ["414351767826"]
+      identifiers = [local.databricks_aws_account_id]
     }
   }
 }
@@ -344,7 +349,7 @@ resource "aws_vpc_endpoint" "backend_rest" {
   count = var.network_configuration != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
-  service_name        = var.workspace[var.region]
+  service_name        = var.databricks_gov_shard == "dod" ? var.workspace_config[var.region].secondary_endpoint : var.workspace_config[var.region].primary_endpoint
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
   subnet_ids          = module.vpc[0].intra_subnets
@@ -360,7 +365,7 @@ resource "aws_vpc_endpoint" "backend_relay" {
   count = var.network_configuration != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
-  service_name        = var.scc_relay[var.region]
+  service_name        = var.databricks_gov_shard == "dod" ? var.scc_relay_config[var.region].secondary_endpoint : var.scc_relay_config[var.region].primary_endpoint
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
   subnet_ids          = module.vpc[0].intra_subnets

@@ -10,16 +10,13 @@ resource "databricks_cluster" "example" {
   cluster_name            = "Standard Classic Compute Plane Cluster"
   data_security_mode      = "USER_ISOLATION"
   spark_version           = data.databricks_spark_version.latest_lts.id
-  node_type_id            = "i3.xlarge"
+  node_type_id            = var.region == "us-gov-west-1" ? "i3en.xlarge" : "i3.xlarge"
   autotermination_minutes = 10
-
-  autoscale {
-    min_workers = 1
-    max_workers = 2
-  }
+  is_single_node          = true
+  kind                    = "CLASSIC_PREVIEW"
 
   # Custom Tags
   custom_tags = {
-    "Project" = var.resource_prefix
+    "SRA" = var.resource_prefix
   }
 }
