@@ -24,42 +24,40 @@ resource "databricks_mws_workspaces" "this" {
   network_id = databricks_mws_networks.network_config.network_id
 
 
-  token {
-    comment = "Terraform generated PAT"
-    // 30 day token
-    lifetime_seconds = 259200
-  }
-  # storage_customer_managed_key_id = databricks_mws_customer_managed_keys.this.customer_managed_key_id
-  # managed_services_customer_managed_key_id = databricks_mws_customer_managed_keys.this.customer_managed_key_id
+  # token {
+  #   comment = "Terraform generated PAT"
+  #   // 30 day token
+  #   lifetime_seconds = 259200
+  # }
+  storage_customer_managed_key_id = databricks_mws_customer_managed_keys.this.customer_managed_key_id
+  managed_services_customer_managed_key_id = databricks_mws_customer_managed_keys.this.customer_managed_key_id
 
-  # this makes sure that the NAT is created for outbound traffic before creating the workspace
-  # not needed if the workspace uses backend PSC (recommended)
   depends_on = [ databricks_mws_customer_managed_keys.this]
 }
 
-resource "databricks_workspace_conf" "this" {
-  provider = databricks.workspace
-  custom_config = {
-    "maxTokenLifetimeDays" = "30",
-    "enableIpAccessLists" = true
-  }
-  depends_on = [ databricks_mws_workspaces.this ]
-}
+# resource "databricks_workspace_conf" "this" {
+#   provider = databricks.workspace
+#   custom_config = {
+#     "maxTokenLifetimeDays" = "30",
+#     "enableIpAccessLists" = true
+#   }
+#   depends_on = [ databricks_mws_workspaces.this ]
+# }
 
-resource "databricks_ip_access_list" "allowed-list" {
-  provider = databricks.workspace
-  label     = "allow_in"
-  list_type = "ALLOW"
-  ip_addresses = var.ip_addresses
+# resource "databricks_ip_access_list" "allowed-list" {
+#   provider = databricks.workspace
+#   label     = "allow_in"
+#   list_type = "ALLOW"
+#   ip_addresses = var.ip_addresses
   
-  depends_on = [databricks_workspace_conf.this]
-}
+#   depends_on = [databricks_workspace_conf.this]
+# }
 
 output "databricks_host" {
   value = databricks_mws_workspaces.this.workspace_url
 }
 
-output "databricks_token" {
-  value     = databricks_mws_workspaces.this.token[0].token_value
-  sensitive = true
-}
+# output "databricks_token" {
+#   value     = databricks_mws_workspaces.this.token[0].token_value
+#   sensitive = true
+# }
