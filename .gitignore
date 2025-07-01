@@ -50,6 +50,9 @@ terraform.rc
 .direnv*
 .envrc*
 
+# Env files
+.env*
+
 *.hcl
 
 # Include tflint configurations for CI workflows
