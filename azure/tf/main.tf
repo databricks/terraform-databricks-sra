@@ -35,26 +35,21 @@ module "subnet_addrs" {
   ]
 }
 
-# This NCC is shared across all workspaces created by SRA
-resource "databricks_mws_network_connectivity_config" "this" {
-  name   = "ncc-${var.location}-${var.hub_resource_suffix}"
-  region = var.location
-}
-
-# Define module "hub" with the source "./modules/azure_hub"
+# Define module "hub" with the source "./modules/hub"
 # Pass the required variables to the module
 module "hub" {
-  source             = "./modules/hub"
-  location           = var.location
-  hub_vnet_cidr      = var.hub_vnet_cidr
-  subnet_map         = module.subnet_addrs.network_cidr_blocks
-  client_config      = data.azurerm_client_config.current
-  databricks_app_reg = data.azuread_service_principal.this
-  public_repos       = var.public_repos
-  tags               = var.tags
-  resource_suffix    = var.hub_resource_suffix
-  ncc_id             = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
-  ncc_name           = databricks_mws_network_connectivity_config.this.name
+  source                   = "./modules/hub"
+  location                 = var.location
+  hub_vnet_cidr            = var.hub_vnet_cidr
+  subnet_map               = module.subnet_addrs.network_cidr_blocks
+  client_config            = data.azurerm_client_config.current
+  databricks_app_reg       = data.azuread_service_principal.this
+  public_repos             = var.public_repos
+  tags                     = var.tags
+  resource_suffix          = var.hub_resource_suffix
+  ncc_id                   = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  ncc_name                 = databricks_mws_network_connectivity_config.this.name
+  provisioner_principal_id = data.databricks_user.provisioner.id
 
   #options
   is_kms_enabled           = true

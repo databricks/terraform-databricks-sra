@@ -7,18 +7,19 @@ module "spoke" {
   vnet_cidr       = var.spoke_config["spoke"].cidr
   tags            = var.spoke_config["spoke"].tags
 
-  location                = var.location
-  route_table_id          = module.hub.route_table_id
-  metastore_id            = module.hub.is_unity_catalog_enabled ? module.hub.metastore_id : var.databricks_metastore_id
-  hub_vnet_name           = module.hub.vnet_name
-  hub_resource_group_name = module.hub.resource_group_name
-  hub_vnet_id             = module.hub.vnet_id
-  key_vault_id            = module.hub.key_vault_id
-  ipgroup_id              = module.hub.ipgroup_id
-  managed_disk_key_id     = module.hub.managed_disk_key_id
-  managed_services_key_id = module.hub.managed_services_key_id
-  ncc_id                  = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
-  ncc_name                = databricks_mws_network_connectivity_config.this.name
+  location                 = var.location
+  route_table_id           = module.hub.route_table_id
+  metastore_id             = module.hub.is_unity_catalog_enabled ? module.hub.metastore_id : var.databricks_metastore_id
+  hub_vnet_name            = module.hub.vnet_name
+  hub_resource_group_name  = module.hub.resource_group_name
+  hub_vnet_id              = module.hub.vnet_id
+  key_vault_id             = module.hub.key_vault_id
+  ipgroup_id               = module.hub.ipgroup_id
+  managed_disk_key_id      = module.hub.managed_disk_key_id
+  managed_services_key_id  = module.hub.managed_services_key_id
+  ncc_id                   = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  ncc_name                 = databricks_mws_network_connectivity_config.this.name
+  provisioner_principal_id = data.databricks_user.provisioner.id
 
   #options
   is_kms_enabled                   = true

@@ -106,6 +106,31 @@ resource "azurerm_databricks_workspace" "webauth" {
   tags = var.tags
 }
 
+# Wait for 10 seconds after workspace creation to allow for APIs to become available
+resource "time_sleep" "workspace_wait" {
+  triggers = {
+    workspace_id = azurerm_databricks_workspace.webauth.workspace_id
+  }
+  create_duration  = "10s"
+  destroy_duration = "10s"
+}
+
+# Grant admin access to the provisioner account to the workspace, used for downstream workspace provider
+resource "databricks_mws_permission_assignment" "admin" {
+  workspace_id = time_sleep.workspace_wait.triggers.workspace_id
+  principal_id = var.provisioner_principal_id
+  permissions  = ["ADMIN"]
+}
+
+# This resource is used to output the workspace URL of the workspace AFTER the provisioner account has been granted admin
+# This removes the need to use depends_on in downstream modules that use this workspace in their aliased provider.
+resource "null_resource" "admin_wait" {
+  triggers = {
+    workspace_url = azurerm_databricks_workspace.webauth.workspace_url
+    workspace_id  = databricks_mws_permission_assignment.admin.workspace_id
+  }
+}
+
 resource "azurerm_management_lock" "webauth" {
   lock_level = "CanNotDelete"
   name       = azurerm_databricks_workspace.webauth.name

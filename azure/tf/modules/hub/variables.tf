@@ -96,3 +96,8 @@ variable "ncc_name" {
   type        = string
   description = "Name of the NCC to use for this workspace"
 }
+
+variable "provisioner_principal_id" {
+  type        = string
+  description = "Principal ID of the user running this terraform"
+}
