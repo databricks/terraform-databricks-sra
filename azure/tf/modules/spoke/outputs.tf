@@ -1,7 +1,7 @@
 # The value of the "workspace_url" property represents the URL of the Databricks workspace
 output "workspace_url" {
   description = "The URL of the Databricks workspace, used to access the Databricks environment."
-  value       = azurerm_databricks_workspace.this.workspace_url
+  value       = null_resource.admin_wait.triggers.workspace_url
 }
 
 output "workspace_id" {
@@ -34,7 +34,7 @@ output "resource_group_name" {
 
 output "dbfs_storage_account_id" {
   description = "Resource ID of the DBFS storage account"
-  value       = data.azurerm_storage_account.dbfs.id
+  value       = local.dbfs_sa_resource_id
 }
 
 output "dns_zone_ids" {

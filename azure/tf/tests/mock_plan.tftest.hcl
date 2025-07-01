@@ -29,7 +29,13 @@ mock_provider "azuread" {
   }
 }
 
-mock_provider "databricks" {}
+mock_provider "databricks" {
+  mock_data "databricks_user" {
+    defaults = {
+      id = 0
+    }
+  }
+}
 
 mock_provider "databricks" {
   alias = "SAT"
