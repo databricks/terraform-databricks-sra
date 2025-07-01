@@ -1,3 +1,7 @@
+locals {
+  dbfs_sa_resource_id = join("", [azurerm_databricks_workspace.this.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/", local.dbfs_name])
+}
+
 # Define a private DNS zone for the dbfs_dfs resource
 resource "azurerm_private_dns_zone" "dbfs_dfs" {
   count = var.boolean_create_private_dbfs ? 1 : 0
@@ -21,7 +25,7 @@ resource "azurerm_private_endpoint" "dbfs_dfs" {
   # Define the private service connection for the dbfs_dfs resource
   private_service_connection {
     name                           = "ple-${var.resource_suffix}-dbfs-dfs"
-    private_connection_resource_id = join("", [azurerm_databricks_workspace.this.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/", local.dbfs_name])
+    private_connection_resource_id = local.dbfs_sa_resource_id
     is_manual_connection           = false
     subresource_names              = ["dfs"]
   }
@@ -61,7 +65,7 @@ resource "azurerm_private_endpoint" "dbfspe_blob" {
   # Define the private service connection for the dbfs_blob resource
   private_service_connection {
     name                           = "ple-${var.resource_suffix}-dbfs-blob"
-    private_connection_resource_id = join("", [azurerm_databricks_workspace.this.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/", local.dbfs_name])
+    private_connection_resource_id = local.dbfs_sa_resource_id
     is_manual_connection           = false
     subresource_names              = ["blob"]
   }
@@ -100,3 +104,20 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_blob" {
   depends_on = [azurerm_databricks_workspace.this]
 }
 
+module "ncc_dbfs_blob" {
+  source = "../self-approving-pe"
+
+  group_id                         = "blob"
+  network_connectivity_config_id   = var.ncc_id
+  resource_id                      = local.dbfs_sa_resource_id
+  network_connectivity_config_name = var.ncc_name
+}
+
+module "ncc_dbfs_dfs" {
+  source = "../self-approving-pe"
+
+  group_id                         = "dfs"
+  network_connectivity_config_id   = var.ncc_id
+  resource_id                      = local.dbfs_sa_resource_id
+  network_connectivity_config_name = var.ncc_name
+}
