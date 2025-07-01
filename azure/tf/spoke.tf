@@ -17,6 +17,8 @@ module "spoke" {
   ipgroup_id              = module.hub.ipgroup_id
   managed_disk_key_id     = module.hub.managed_disk_key_id
   managed_services_key_id = module.hub.managed_services_key_id
+  ncc_id                  = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  ncc_name                = databricks_mws_network_connectivity_config.this.name
 
   #options
   is_kms_enabled                   = true
@@ -33,6 +35,7 @@ module "spoke_catalog" {
   catalog_name        = module.spoke.resource_suffix
   dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
   ncc_id              = module.spoke.ncc_id
+  ncc_name            = module.spoke.ncc_name
   resource_group_name = module.spoke.resource_group_name
   resource_suffix     = module.spoke.resource_suffix
   subnet_id           = module.spoke.subnet_ids.privatelink

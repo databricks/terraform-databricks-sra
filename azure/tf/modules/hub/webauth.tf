@@ -202,6 +202,6 @@ resource "databricks_metastore_assignment" "webauth" {
 }
 
 resource "databricks_mws_ncc_binding" "this" {
-  network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  network_connectivity_config_id = var.ncc_id
   workspace_id                   = azurerm_databricks_workspace.webauth.workspace_id
 }

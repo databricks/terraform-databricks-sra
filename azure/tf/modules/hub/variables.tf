@@ -86,3 +86,13 @@ variable "is_frontend_private_link_enabled" {
   description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
   default     = false
 }
+
+variable "ncc_id" {
+  type        = string
+  description = "ID of the NCC to use for this workspace"
+}
+
+variable "ncc_name" {
+  type        = string
+  description = "Name of the NCC to use for this workspace"
+}

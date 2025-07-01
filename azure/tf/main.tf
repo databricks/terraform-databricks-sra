@@ -34,6 +34,13 @@ module "subnet_addrs" {
     }
   ]
 }
+
+# This NCC is shared across all workspaces created by SRA
+resource "databricks_mws_network_connectivity_config" "this" {
+  name   = "ncc-${var.location}-${var.hub_resource_suffix}"
+  region = var.location
+}
+
 # Define module "hub" with the source "./modules/azure_hub"
 # Pass the required variables to the module
 module "hub" {
@@ -46,6 +53,8 @@ module "hub" {
   public_repos       = var.public_repos
   tags               = var.tags
   resource_suffix    = var.hub_resource_suffix
+  ncc_id             = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  ncc_name           = databricks_mws_network_connectivity_config.this.name
 
   #options
   is_kms_enabled           = true
@@ -64,10 +73,12 @@ module "hub_catalog" {
   metastore_id        = module.hub.metastore_id
   dns_zone_ids        = [module.hub.dns_zone_ids.dfs]
   ncc_id              = module.hub.ncc_id
+  ncc_name            = module.hub.ncc_name
   resource_group_name = module.hub.resource_group_name
   resource_suffix     = "${local.sat_workspace.resource_suffix}sat"
   subnet_id           = module.hub.subnet_ids.privatelink
   tags                = module.hub.tags
+  force_destroy       = var.sat_force_destroy
 
   providers = {
     databricks.workspace = databricks.hub

@@ -72,7 +72,12 @@ output "dns_zone_ids" {
 
 output "ncc_id" {
   description = "NCC ID of this workspace"
-  value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  value       = var.ncc_id
+}
+
+output "ncc_name" {
+  description = "NCC name of this workspace"
+  value       = var.ncc_name
 }
 
 output "subnet_ids" {

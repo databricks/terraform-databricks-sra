@@ -80,3 +80,10 @@ variable "sat_service_principal" {
   description = "(Optional) Service principal configuration for running SAT. If this is not provided, a service principal will be created. The created service principal name can be configured with the name field in this variable."
   sensitive   = true
 }
+
+# This variable is only used for development purposes - is should not be used/set if deploying SRA in a customer environment
+variable "sat_force_destroy" {
+  type        = bool
+  default     = false
+  description = "Used to allow Terraform to force destroy the SAT catalog. This is only used for testing SRA."
+}
