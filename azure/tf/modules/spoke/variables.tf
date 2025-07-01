@@ -101,3 +101,13 @@ variable "tags" {
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
 }
+
+variable "ncc_id" {
+  type        = string
+  description = "ID of the NCC to use for this workspace"
+}
+
+variable "ncc_name" {
+  type        = string
+  description = "Name of the NCC to use for this workspace"
+}

@@ -82,3 +82,8 @@ variable "catalog_isolation_mode" {
   description = "(Optional) Isolation mode for catalog. Must be one of: ISOLATED, OPEN"
   default     = "ISOLATED"
 }
+
+variable "ncc_name" {
+  type        = string
+  description = "Name of the NCC to use for this workspace"
+}
