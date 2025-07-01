@@ -57,3 +57,4 @@ terraform.rc
 !**/*.tftest.hcl
 gcp/modules/workspace_deployment/*.json
 gcp/examples/end-to-end provisionning/.terraform
+gcp/modules/service_account/fslakehouse-de3263f971a1.json

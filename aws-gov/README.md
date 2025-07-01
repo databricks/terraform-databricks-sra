@@ -74,6 +74,7 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Cluster Example**: An example cluster and cluster policy have been included with Derby Metastore configurations. **NOTE:** This will create a cluster within your Databricks workspace, including the underlying EC2 instance.
 
+<<<<<<< HEAD
 - **Audit Log Delivery**: Low-latency delivery of Databricks logs to a S3 bucket in your AWS account. [Audit logs](https://docs.databricks.com/aws/en/admin/account-settings/audit-log-delivery) contain two levels of events: workspace-level audit logs with workspace-level events, and account-level audit logs with account-level events. Additionally, you can generate more detailed events by enabling verbose audit logs. 
 
 ---
@@ -94,6 +95,24 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 This section provides additional security recommendations to help maintain a strong security posture. These cannot always be configured into this Terraform script or may be specific to individual customers (e.g., SCIM, SSO, Front-End PrivateLink, etc.)
 
+=======
+---
+
+## Critical Next Steps
+
+- **Implement a Front-End Mitigation Strategy**:
+    - [IP Access Lists](https://docs.databricks.com/en/security/network/front-end/ip-access-list.html): The Terraform code for enabling IP access lists can be found in the customization folder.
+    - [Front-End PrivateLink](https://docs.databricks.com/en/security/network/classic/privatelink.html#step-5-configure-internal-dns-to-redirect-user-requests-to-the-web-application-front-end).
+
+- **Implement Single Sign-On, Multi-factor Authentication, SCIM Provisioning**: Most enterprise deployments enable [Single Sign-On (SSO)](https://docs.databricks.com/administration-guide/users-groups/single-sign-on/index.html) and multi-factor authentication (MFA). For user management, we recommend integrating [SCIM (System for Cross-domain Identity Management)](https://docs.databricks.com/dev-tools/api/latest/scim/index.html) with your account console.
+
+---
+
+## Additional Security Recommendations
+
+This section provides additional security recommendations to help maintain a strong security posture. These cannot always be configured into this Terraform script or may be specific to individual customers (e.g., SCIM, SSO, Front-End PrivateLink, etc.)
+
+>>>>>>> c1185b0 (aws gov simplicity update)
 - **Segment Workspaces for Data Separation**: This approach is particularly useful when teams such as security and marketing require distinct data access.
 - **Avoid Storing Production Datasets in Databricks File Store**: The DBFS root is accessible to all users in a workspace. Specify a location on external storage when creating databases in the Hive metastore.
 - **Backup Assets from the Databricks Control Plane**: Use tools such as the Databricks [migration tool](https://github.com/databrickslabs/migrate) or [Terraform exporter](https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/experimental-exporter).
@@ -106,7 +125,11 @@ This section provides additional security recommendations to help maintain a str
 
 1. Clone this Repo.
 2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads).
+<<<<<<< HEAD
 3. Fill out `main.tf`.
+=======
+3. Fill out `sra.tf`.
+>>>>>>> c1185b0 (aws gov simplicity update)
 4. Fill out `template.tfvars.example` and rename the file to `template.tfvars` by removing `.example`.
 5. Configure the [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration) and [Databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authentication) provider authentication.
 6. Change directory into `tf`.

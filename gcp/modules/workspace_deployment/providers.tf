@@ -15,23 +15,21 @@ terraform {
 provider "google" {
   project = var.google_project
   region  = var.google_region
-  impersonate_service_account = var.databricks_google_service_account
+  # impersonate_service_account = var.databricks_google_service_account
 }
 
 // initialize provider in "accounts" mode to provision new workspace
 provider "databricks" {
   alias                  = "accounts"
   host                   = var.account_console_url
-  # google_service_account = var.databricks_google_service_account
   account_id             = var.databricks_account_id
 }
 
-
-# provider "databricks" {
-#   alias                  = "workspace"
-#   # profile = var.databricks_connection_profile
-#   host                   = databricks_mws_workspaces.this.workspace_url
-#   google_service_account = var.databricks_google_service_account
-#   token                = databricks_mws_workspaces.this.token[0].token_value
-# }
+provider "databricks" {
+  alias                  = "workspace"
+  host                   = databricks_mws_workspaces.this.workspace_url
+  account_id             = var.databricks_account_id
+  impersonate_service_account = var.databricks_google_service_account
+  
+}
 

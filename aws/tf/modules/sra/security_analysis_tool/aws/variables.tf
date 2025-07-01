@@ -53,7 +53,7 @@ variable "analysis_schema_name" {
 }
 
 variable "proxies" {
-  type        = map(any)
+  type        = map
   description = "Proxies to be used for Databricks API calls"
 }
 
