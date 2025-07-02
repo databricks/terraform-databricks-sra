@@ -19,6 +19,7 @@ module "spoke" {
   managed_services_key_id  = module.hub.managed_services_key_id
   ncc_id                   = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
   ncc_name                 = databricks_mws_network_connectivity_config.this.name
+  network_policy_id        = databricks_account_network_policy.restrictive_network_policy.network_policy_id
   provisioner_principal_id = data.databricks_user.provisioner.id
 
   #options

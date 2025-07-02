@@ -49,6 +49,7 @@ module "hub" {
   resource_suffix          = var.hub_resource_suffix
   ncc_id                   = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
   ncc_name                 = databricks_mws_network_connectivity_config.this.name
+  network_policy_id        = var.sat_configuration.enabled ? databricks_account_network_policy.sat_network_policy[0].network_policy_id : databricks_account_network_policy.restrictive_network_policy.network_policy_id
   provisioner_principal_id = data.databricks_user.provisioner.id
 
   #options

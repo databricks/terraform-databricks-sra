@@ -22,3 +22,8 @@ provider "databricks" {
   alias = "spoke"
   host  = module.spoke.workspace_url
 }
+
+# These blocks are not required by terraform, but they are here to silence TFLint warnings
+provider "null" {}
+
+provider "time" {}
