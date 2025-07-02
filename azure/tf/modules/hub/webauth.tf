@@ -230,3 +230,8 @@ resource "databricks_mws_ncc_binding" "this" {
   network_connectivity_config_id = var.ncc_id
   workspace_id                   = azurerm_databricks_workspace.webauth.workspace_id
 }
+
+resource "databricks_workspace_network_option" "this" {
+  network_policy_id = var.network_policy_id
+  workspace_id      = azurerm_databricks_workspace.webauth.workspace_id
+}

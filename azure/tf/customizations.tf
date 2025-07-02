@@ -4,6 +4,13 @@ locals {
   sat_client_secret = local.create_sat_sp ? azuread_service_principal_password.sat[0].value : var.sat_service_principal.client_secret
   sat_workspace     = module.hub
   sat_catalog       = var.sat_configuration.enabled ? module.hub_catalog[0] : {}
+
+  # SAT gets it's own network policy to guarantee that it works, even if a customer removes all internet access from other workspaces
+  sat_internet_allowed_domains = ["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"]
+  sat_internet_allowed_destinations = [for dest in local.sat_internet_allowed_domains : {
+    destination               = dest,
+    internet_destination_type = "DNS_NAME"
+  }]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -86,4 +93,21 @@ resource "databricks_permission_assignment" "sat_workspace_admin" {
   principal_id = module.sat[0].service_principal_id
 
   provider = databricks.hub
+}
+
+# SAT requires a more permissive network policy so that it can use Azure APIs and install Python packages
+resource "databricks_account_network_policy" "sat_network_policy" {
+  count             = var.sat_configuration.enabled ? 1 : 0 # This uses a different count than the other SAT resources to avoid a cycle
+  account_id        = var.databricks_account_id
+  network_policy_id = "np-${var.hub_resource_suffix}-SAT"
+
+  egress = {
+    network_access = {
+      restriction_mode              = "RESTRICTED_ACCESS"
+      allowed_internet_destinations = local.sat_internet_allowed_destinations
+      policy_enforcement = {
+        enforcement_mode = "ENFORCED"
+      }
+    }
+  }
 }
