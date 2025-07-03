@@ -227,11 +227,11 @@ resource "databricks_metastore_assignment" "webauth" {
 }
 
 resource "databricks_mws_ncc_binding" "this" {
-  network_connectivity_config_id = var.ncc_id
+  network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
   workspace_id                   = azurerm_databricks_workspace.webauth.workspace_id
 }
 
 resource "databricks_workspace_network_option" "this" {
-  network_policy_id = var.network_policy_id
+  network_policy_id = var.network_policy_id == null ? databricks_account_network_policy.restrictive_network_policy.network_policy_id : var.network_policy_id
   workspace_id      = azurerm_databricks_workspace.webauth.workspace_id
 }

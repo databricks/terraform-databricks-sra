@@ -108,16 +108,16 @@ module "ncc_dbfs_blob" {
   source = "../self-approving-pe"
 
   group_id                         = "blob"
-  network_connectivity_config_id   = var.ncc_id
+  network_connectivity_config_id   = databricks_mws_network_connectivity_config.this.id
   resource_id                      = local.dbfs_sa_resource_id
-  network_connectivity_config_name = var.ncc_name
+  network_connectivity_config_name = databricks_mws_network_connectivity_config.this.name
 }
 
 module "ncc_dbfs_dfs" {
   source = "../self-approving-pe"
 
   group_id                         = "dfs"
-  network_connectivity_config_id   = var.ncc_id
+  network_connectivity_config_id   = databricks_mws_network_connectivity_config.this.id
   resource_id                      = local.dbfs_sa_resource_id
-  network_connectivity_config_name = var.ncc_name
+  network_connectivity_config_name = databricks_mws_network_connectivity_config.this.name
 }

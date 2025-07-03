@@ -17,9 +17,9 @@ module "spoke" {
   ipgroup_id               = module.hub.ipgroup_id
   managed_disk_key_id      = module.hub.managed_disk_key_id
   managed_services_key_id  = module.hub.managed_services_key_id
-  ncc_id                   = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
-  ncc_name                 = databricks_mws_network_connectivity_config.this.name
-  network_policy_id        = databricks_account_network_policy.restrictive_network_policy.network_policy_id
+  ncc_id                   = module.hub.ncc_id
+  ncc_name                 = module.hub.ncc_name
+  network_policy_id        = module.hub.network_policy_id
   provisioner_principal_id = data.databricks_user.provisioner.id
 
   #options
@@ -28,6 +28,16 @@ module "spoke" {
   boolean_create_private_dbfs      = true
 
   depends_on = [module.hub]
+}
+
+moved {
+  from = databricks_account_network_policy.restrictive_network_policy
+  to   = module.hub.databricks_account_network_policy.restrictive_network_policy
+}
+
+moved {
+  from = databricks_mws_network_connectivity_config.this
+  to   = module.hub.databricks_mws_network_connectivity_config.this
 }
 
 module "spoke_catalog" {
