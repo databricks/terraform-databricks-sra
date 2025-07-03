@@ -16,8 +16,3 @@ data "azuread_service_principal" "this" {
 data "databricks_user" "provisioner" {
   user_name = data.azuread_user.current.mail
 }
-
-# Used to validate that there are enough NCCs left in a region
-data "databricks_mws_network_connectivity_configs" "this" {
-  region = var.location
-}

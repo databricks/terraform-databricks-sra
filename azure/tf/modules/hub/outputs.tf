@@ -72,12 +72,12 @@ output "dns_zone_ids" {
 
 output "ncc_id" {
   description = "NCC ID of this workspace"
-  value       = var.ncc_id
+  value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
 }
 
 output "ncc_name" {
   description = "NCC name of this workspace"
-  value       = var.ncc_name
+  value       = databricks_mws_network_connectivity_config.this.name
 }
 
 output "subnet_ids" {
@@ -107,4 +107,9 @@ output "workspace_id" {
 output "resource_suffix" {
   description = "Resource suffix to use for naming down stream resources"
   value       = var.resource_suffix
+}
+
+output "network_policy_id" {
+  description = "Network Policy ID"
+  value       = databricks_account_network_policy.restrictive_network_policy.network_policy_id
 }

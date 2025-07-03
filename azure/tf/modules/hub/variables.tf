@@ -87,19 +87,10 @@ variable "is_frontend_private_link_enabled" {
   default     = false
 }
 
-variable "ncc_id" {
-  type        = string
-  description = "ID of the NCC to use for this workspace"
-}
-
-variable "ncc_name" {
-  type        = string
-  description = "Name of the NCC to use for this workspace"
-}
-
 variable "network_policy_id" {
   type        = string
-  description = "ID of the network policy to use for this workspace"
+  description = "ID of the network policy to use for this workspace. If not provided, the policy created by this module will be used."
+  default     = null
 }
 
 variable "provisioner_principal_id" {
