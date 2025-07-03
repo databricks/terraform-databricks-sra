@@ -86,3 +86,14 @@ variable "is_frontend_private_link_enabled" {
   description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
   default     = false
 }
+
+variable "network_policy_id" {
+  type        = string
+  description = "ID of the network policy to use for this workspace. If not provided, the policy created by this module will be used."
+  default     = null
+}
+
+variable "provisioner_principal_id" {
+  type        = string
+  description = "Principal ID of the user running this terraform"
+}

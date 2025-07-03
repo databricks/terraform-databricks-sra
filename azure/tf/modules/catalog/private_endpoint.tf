@@ -21,11 +21,15 @@ resource "azurerm_private_endpoint" "dfs" {
   tags = var.tags
 }
 
-resource "databricks_mws_ncc_private_endpoint_rule" "dfs" {
-  network_connectivity_config_id = var.ncc_id
-  resource_id                    = azurerm_storage_account.unity_catalog.id
-  group_id                       = "dfs"
+module "ncc_dfs" {
+  source = "../self-approving-pe"
+
+  group_id                         = "dfs"
+  network_connectivity_config_id   = var.ncc_id
+  resource_id                      = azurerm_storage_account.unity_catalog.id
+  network_connectivity_config_name = var.ncc_name
 }
+
 
 resource "azurerm_private_endpoint" "blob" {
   name                = "${module.naming.private_endpoint.name}-blob"
@@ -50,8 +54,11 @@ resource "azurerm_private_endpoint" "blob" {
   tags = var.tags
 }
 
-resource "databricks_mws_ncc_private_endpoint_rule" "blob" {
-  network_connectivity_config_id = var.ncc_id
-  resource_id                    = azurerm_storage_account.unity_catalog.id
-  group_id                       = "blob"
+module "ncc_blob" {
+  source = "../self-approving-pe"
+
+  group_id                         = "blob"
+  network_connectivity_config_id   = var.ncc_id
+  resource_id                      = azurerm_storage_account.unity_catalog.id
+  network_connectivity_config_name = var.ncc_name
 }

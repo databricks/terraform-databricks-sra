@@ -85,7 +85,7 @@ monitor cost and accurately attribute Databricks usage to your organization's bu
 DBU usage reports for cost analysis.
 
 ## Security Analysis Tool
-Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
+Security Analysis Tool ([SAT](https://databricks-industry-solutions.github.io/security-analysis-tool/)) is enabled by default. It can be customized using the `sat_configuration` variable. 
 By default, SAT is installed in the hub workspace, also called the "WEB_AUTH" workspace.
 
 ### Changing the SAT workspace

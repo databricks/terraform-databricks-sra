@@ -27,6 +27,31 @@ resource "azurerm_databricks_workspace" "this" {
   tags = var.tags
 }
 
+# Wait for 10 seconds after workspace creation to allow for APIs to become available
+resource "time_sleep" "workspace_wait" {
+  triggers = {
+    workspace_id = azurerm_databricks_workspace.this.workspace_id
+  }
+  create_duration  = "10s"
+  destroy_duration = "10s"
+}
+
+# Grant admin access to the provisioner account to the workspace, used for downstream workspace provider
+resource "databricks_mws_permission_assignment" "admin" {
+  workspace_id = time_sleep.workspace_wait.triggers.workspace_id
+  principal_id = var.provisioner_principal_id
+  permissions  = ["ADMIN"]
+}
+
+# This resource is used to output the workspace URL of the workspace AFTER the provisioner account has been granted admin
+# This removes the need to use depends_on in downstream modules that use this workspace in their aliased provider.
+resource "null_resource" "admin_wait" {
+  triggers = {
+    workspace_url = azurerm_databricks_workspace.this.workspace_url
+    workspace_id  = databricks_mws_permission_assignment.admin.workspace_id
+  }
+}
+
 resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
@@ -69,6 +94,11 @@ resource "databricks_metastore_assignment" "this" {
 }
 
 resource "databricks_mws_ncc_binding" "this" {
-  network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
+  network_connectivity_config_id = var.ncc_id
   workspace_id                   = azurerm_databricks_workspace.this.workspace_id
+}
+
+resource "databricks_workspace_network_option" "this" {
+  network_policy_id = var.network_policy_id
+  workspace_id      = azurerm_databricks_workspace.this.workspace_id
 }
