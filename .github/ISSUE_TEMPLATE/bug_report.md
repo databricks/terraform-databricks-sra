@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+**WARNING**: Do not disclose any secrets or credentials while filing bug reports.
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
