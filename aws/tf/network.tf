@@ -64,8 +64,20 @@ resource "aws_security_group" "sg" {
       from_port   = egress.value
       to_port     = egress.value
       protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks = [var.vpc_cidr_range]
     }
+  }
+
+  dynamic "egress"{
+    for_each = var.network_configuration != "custom" ? [1] : []
+    content{
+      from_port         = 443
+      to_port           = 443
+      protocol          = "tcp"
+      prefix_list_ids   = [data.aws_prefix_list.s3.id]
+      description       = "S3 access via Gateway Endpoint"
+    }
+  
   }
 
   tags = {
