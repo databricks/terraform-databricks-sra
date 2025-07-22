@@ -1,9 +1,72 @@
 resource "null_resource" "previous" {}
 
+<<<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_workspace/uc_catalog/main.tf
 # Wait to prevent race condition between IAM role and external location validation
 resource "time_sleep" "wait_60_seconds" {
   depends_on      = [null_resource.previous]
   create_duration = "60s"
+========
+// Wait to prevent race condition between IAM role and external location validation
+resource "time_sleep" "wait_60_seconds" {
+  depends_on      = [null_resource.previous]
+  create_duration = "60s"
+}
+
+locals {
+  uc_iam_role        = "${var.resource_prefix}-catalog-${var.workspace_id}"
+  uc_catalog_name_us = replace(var.uc_catalog_name, "-", "_")
+}
+
+// Unity Catalog KMS
+resource "aws_kms_key" "catalog_storage" {
+  description = "KMS key for Databricks catalog storage ${var.workspace_id}"
+  policy = jsonencode({
+    Version : "2012-10-17",
+    "Id" : "key-policy-catalog-storage-${var.workspace_id}",
+    Statement : [
+      {
+        "Sid" : "Enable IAM User Permissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : [var.cmk_admin_arn]
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      },
+      {
+        "Sid" : "Allow IAM Role to use the key",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws-us-gov:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
+        },
+        "Action" : [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey*"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+  tags = {
+    Name    = "${var.resource_prefix}-catalog-storage-${var.workspace_id}-key"
+    Project = var.resource_prefix
+  }
+}
+
+resource "aws_kms_alias" "catalog_storage_key_alias" {
+  name          = "alias/${var.resource_prefix}-catalog-storage-${var.workspace_id}-key"
+  target_key_id = aws_kms_key.catalog_storage.id
+}
+
+// Storage Credential (created before role): https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/unity-catalog#configure-external-locations-and-credentials
+resource "databricks_storage_credential" "workspace_catalog_storage_credential" {
+  name = "${var.uc_catalog_name}-storage-credential"
+  aws_iam_role {
+    role_arn = "arn:aws-us-gov:iam::${var.aws_account_id}:role/${local.uc_iam_role}"
+  }
+  isolation_mode = "ISOLATION_MODE_ISOLATED"
+>>>>>>>> c1185b0 (aws gov simplicity update):aws-gov/tf/modules/sra/databricks_workspace/uc_catalog/uc_catalog.tf
 }
 
 locals {
@@ -98,7 +161,11 @@ data "aws_iam_policy_document" "passrole_for_unity_catalog_catalog" {
   }
 }
 
+<<<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_workspace/uc_catalog/main.tf
 # Unity Catalog Role
+========
+// Unity Catalog Role
+>>>>>>>> c1185b0 (aws gov simplicity update):aws-gov/tf/modules/sra/databricks_workspace/uc_catalog/uc_catalog.tf
 resource "aws_iam_role" "unity_catalog" {
   name               = local.uc_iam_role
   assume_role_policy = data.aws_iam_policy_document.passrole_for_unity_catalog_catalog.json
@@ -143,7 +210,11 @@ resource "aws_iam_role_policy" "unity_catalog" {
   policy = data.aws_iam_policy_document.unity_catalog_iam_policy.json
 }
 
+<<<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_workspace/uc_catalog/main.tf
 # Unity Catalog S3
+========
+// Unity Catalog S3
+>>>>>>>> c1185b0 (aws gov simplicity update):aws-gov/tf/modules/sra/databricks_workspace/uc_catalog/uc_catalog.tf
 resource "aws_s3_bucket" "unity_catalog_bucket" {
   bucket        = var.uc_catalog_name
   force_destroy = true
@@ -181,7 +252,11 @@ resource "aws_s3_bucket_public_access_block" "unity_catalog" {
   depends_on              = [aws_s3_bucket.unity_catalog_bucket]
 }
 
+<<<<<<<< HEAD:aws-gov/tf/modules/sra/databricks_workspace/uc_catalog/main.tf
 # External Location
+========
+// External Location
+>>>>>>>> c1185b0 (aws gov simplicity update):aws-gov/tf/modules/sra/databricks_workspace/uc_catalog/uc_catalog.tf
 resource "databricks_external_location" "workspace_catalog_external_location" {
   name            = "${var.uc_catalog_name}-external-location"
   url             = "s3://${var.uc_catalog_name}/"

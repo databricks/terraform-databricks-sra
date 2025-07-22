@@ -1,6 +1,11 @@
 # EXPLANATION: All modules that reside at the account level
 
+<<<<<<< HEAD
 # Create Unity Catalog Metastore - No Root Storage
+=======
+
+// Create Unity Catalog Metastore - No Root Storage
+>>>>>>> b3e4c6f (aws simplicity update)
 module "uc_init" {
   source = "./databricks_account/uc_init"
   providers = {
@@ -55,6 +60,7 @@ module "user_assignment" {
     databricks = databricks.mws
   }
 
+<<<<<<< HEAD
   workspace_id     = module.databricks_mws_workspace.workspace_id
   workspace_access = var.admin_user
   depends_on       = [module.uc_assignment, module.databricks_mws_workspace]
@@ -71,4 +77,9 @@ module "log_delivery" {
   audit_log_delivery_exists = var.audit_log_delivery_exists
   databricks_account_id     = var.databricks_account_id
   resource_prefix           = var.resource_prefix
+=======
+  created_workspace_id = module.databricks_mws_workspace.workspace_id
+  workspace_access     = var.admin_user
+  depends_on           = [module.uc_assignment, module.databricks_mws_workspace]
+>>>>>>> b3e4c6f (aws simplicity update)
 }

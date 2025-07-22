@@ -1,0 +1,24 @@
+databricks_account_id = "<account_id>"
+databricks_google_service_account = "<sa-name>@<project-name>.iam.gserviceaccount.com"
+google_project = "<project-name>"
+google_region = "<region>"
+ip_addresses = ["0.0.0.0/0"]
+workspace_name = "sra-gcp-workspace"
+account_console_url = "https://accounts.gcp.databricks.com"
+hive_metastore_ip = "34.76.244.202"
+use_existing_cmek = false
+keyring_name = "sra-gcp-keyring"    
+key_name = "sra-gcp-key"
+cmek_resource_id = "<cmek-resource-id>"
+
+use_existing_PSC_EP = false
+google_pe_subnet = "databricks-pe-subnet"
+workspace_pe = "databricks-workspace-pe"
+relay_pe = "databricks-relay-pe"
+relay_pe_ip_name = "databricks-relay-pe-ip"
+workspace_pe_ip_name = "databricks-workspace-pe-ip"
+
+use_existing_pas = false
+
+relay_service_attachment = "projects/prod-gcp-europe-west1/regions/europe-west1/serviceAttachments/ngrok-psc-endpoint"
+workspace_service_attachment = "projects/general-prod-europewest1-01/regions/europe-west1/serviceAttachments/plproxy-psc-endpoint-all-ports"
