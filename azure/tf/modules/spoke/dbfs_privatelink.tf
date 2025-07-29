@@ -106,6 +106,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_blob" {
 
 module "ncc_dbfs_blob" {
   source = "../self-approving-pe"
+  count  = var.boolean_create_private_dbfs ? 1 : 0
 
   group_id                         = "blob"
   network_connectivity_config_id   = var.ncc_id
@@ -115,9 +116,24 @@ module "ncc_dbfs_blob" {
 
 module "ncc_dbfs_dfs" {
   source = "../self-approving-pe"
+  count  = var.boolean_create_private_dbfs ? 1 : 0
 
   group_id                         = "dfs"
   network_connectivity_config_id   = var.ncc_id
   resource_id                      = local.dbfs_sa_resource_id
   network_connectivity_config_name = var.ncc_name
+}
+
+# Access connector for the workspace to use for accessing workspace/dbfs storage
+resource "azurerm_databricks_access_connector" "ws" {
+  count = var.boolean_create_private_dbfs ? 1 : 0
+
+  # "ws" is used in the name to indicate that this access connector is for workspace storage
+  name                = "id-databricks-ws-${var.resource_suffix}"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  identity {
+    type = "SystemAssigned"
+  }
+  tags = var.tags
 }
