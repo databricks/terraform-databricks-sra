@@ -87,3 +87,8 @@ variable "ncc_name" {
   type        = string
   description = "Name of the NCC to use for this workspace"
 }
+
+variable "databricks_account_id" {
+  type        = string
+  description = "Databricks account ID"
+}

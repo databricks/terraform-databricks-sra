@@ -13,6 +13,7 @@ locals {
 }
 
 resource "databricks_mws_ncc_private_endpoint_rule" "this" {
+  account_id                     = var.databricks_account_id
   network_connectivity_config_id = var.network_connectivity_config_id
   resource_id                    = var.resource_id
   group_id                       = var.group_id

@@ -82,7 +82,7 @@ resource "databricks_mws_network_connectivity_config" "this" {
 
 resource "databricks_account_network_policy" "restrictive_network_policy" {
   network_policy_id = "np-${var.resource_suffix}-restrictive"
-
+  account_id        = var.databricks_account_id
   egress = {
     network_access = {
       restriction_mode              = "RESTRICTED_ACCESS"
