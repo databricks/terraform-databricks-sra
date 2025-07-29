@@ -97,3 +97,8 @@ variable "provisioner_principal_id" {
   type        = string
   description = "Principal ID of the user running this terraform"
 }
+
+variable "databricks_account_id" {
+  type        = string
+  description = "Databricks account ID"
+}

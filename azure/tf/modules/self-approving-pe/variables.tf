@@ -9,6 +9,11 @@ variable "network_connectivity_config_name" {
   default     = ""
 }
 
+variable "databricks_account_id" {
+  type        = string
+  description = "Databricks account ID"
+}
+
 variable "group_id" {
   type        = string
   description = "Group ID of the azure resource, e.g. blob or dfs"

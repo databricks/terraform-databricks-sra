@@ -108,6 +108,7 @@ module "ncc_dbfs_blob" {
   source = "../self-approving-pe"
   count  = var.boolean_create_private_dbfs ? 1 : 0
 
+  databricks_account_id            = var.databricks_account_id
   group_id                         = "blob"
   network_connectivity_config_id   = var.ncc_id
   resource_id                      = local.dbfs_sa_resource_id
@@ -118,6 +119,7 @@ module "ncc_dbfs_dfs" {
   source = "../self-approving-pe"
   count  = var.boolean_create_private_dbfs ? 1 : 0
 
+  databricks_account_id            = var.databricks_account_id
   group_id                         = "dfs"
   network_connectivity_config_id   = var.ncc_id
   resource_id                      = local.dbfs_sa_resource_id

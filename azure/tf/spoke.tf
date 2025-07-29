@@ -21,6 +21,7 @@ module "spoke" {
   ncc_name                 = module.hub.ncc_name
   network_policy_id        = module.hub.network_policy_id
   provisioner_principal_id = data.databricks_user.provisioner.id
+  databricks_account_id    = var.databricks_account_id
 
   #options
   is_kms_enabled                   = true
@@ -44,14 +45,15 @@ module "spoke_catalog" {
   source = "./modules/catalog"
 
   # Update these per catalog for the catalog's spoke
-  catalog_name        = module.spoke.resource_suffix
-  dns_zone_ids        = [module.spoke.dns_zone_ids["dfs"]]
-  ncc_id              = module.spoke.ncc_id
-  ncc_name            = module.spoke.ncc_name
-  resource_group_name = module.spoke.resource_group_name
-  resource_suffix     = module.spoke.resource_suffix
-  subnet_id           = module.spoke.subnet_ids.privatelink
-  tags                = module.spoke.tags
+  catalog_name          = module.spoke.resource_suffix
+  dns_zone_ids          = [module.spoke.dns_zone_ids["dfs"]]
+  ncc_id                = module.spoke.ncc_id
+  ncc_name              = module.spoke.ncc_name
+  resource_group_name   = module.spoke.resource_group_name
+  resource_suffix       = module.spoke.resource_suffix
+  subnet_id             = module.spoke.subnet_ids.privatelink
+  tags                  = module.spoke.tags
+  databricks_account_id = var.databricks_account_id
 
   location     = var.location
   metastore_id = module.hub.metastore_id

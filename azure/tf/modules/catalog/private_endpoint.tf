@@ -24,6 +24,7 @@ resource "azurerm_private_endpoint" "dfs" {
 module "ncc_dfs" {
   source = "../self-approving-pe"
 
+  databricks_account_id            = var.databricks_account_id
   group_id                         = "dfs"
   network_connectivity_config_id   = var.ncc_id
   resource_id                      = azurerm_storage_account.unity_catalog.id
@@ -57,6 +58,7 @@ resource "azurerm_private_endpoint" "blob" {
 module "ncc_blob" {
   source = "../self-approving-pe"
 
+  databricks_account_id            = var.databricks_account_id
   group_id                         = "blob"
   network_connectivity_config_id   = var.ncc_id
   resource_id                      = azurerm_storage_account.unity_catalog.id
