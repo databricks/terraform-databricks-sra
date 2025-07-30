@@ -1,4 +1,3 @@
-variable "prefix" {}
 
 variable "project" {
   type    = string
@@ -9,7 +8,11 @@ variable "delegate_from" {
   description = "Allow either user:user.name@example.com, group:deployers@example.com or serviceAccount:sa1@project.iam.gserviceaccount.com to impersonate created service account"
   type        = list(string)
 }
-
+variable "use_existing_pas" {
+  description = "Use existing private access service"
+  type        = bool
+  default     = false
+}
 variable "databricks_google_service_account" {}
 
 variable "google_region" {}
