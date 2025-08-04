@@ -9,7 +9,7 @@ terraform {
       version = "5.76.0"
     }
   }
-  required_version = "~>1.0"
+  required_version = "~>1.3"
 }
 
 # Authenticate using environment variables: https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html
