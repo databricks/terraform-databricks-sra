@@ -148,18 +148,6 @@ module "system_table" {
   depends_on = [module.unity_catalog_metastore_assignment]
 }
 
-# Create Create Cluster
-module "cluster_configuration" {
-  source = "./modules/databricks_workspace/classic_cluster"
-  providers = {
-    databricks = databricks.created_workspace
-  }
-
-  resource_prefix = var.resource_prefix
-  region          = var.region
-  depends_on      = [module.databricks_mws_workspace]
-}
-
 # Restrictive Root Buckt Policy
 module "restrictive_root_bucket" {
   source = "./modules/databricks_workspace/restrictive_root_bucket"
@@ -181,6 +169,32 @@ module "disable_legacy_access_setting" {
   providers = {
     databricks = databricks.created_workspace
   }
+}
+
+# Enable Compliance Security Profile (CSP) on the Databricks Workspace.
+module "compliance_security_profile" {
+  count  = var.enable_compliance_security_profile ? 1 : 0
+  source = "./modules/databricks_workspace/compliance_security_profile"
+
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  compliance_standards = var.compliance_standards
+}
+
+# Create Create Cluster
+module "cluster_configuration" {
+  source = "./modules/databricks_workspace/classic_cluster"
+  providers = {
+    databricks = databricks.created_workspace
+  }
+
+  enable_compliance_security_profile = var.enable_compliance_security_profile
+  resource_prefix                    = var.resource_prefix
+  region                             = var.region
+
+  depends_on = [module.databricks_mws_workspace]
 }
 
 # =============================================================================

@@ -72,6 +72,12 @@ enable_security_analysis_tool = false
 # CMK Admin ARN (required for non-root account CMK usage)
 # cmk_admin_arn = ""
 
+# Compliance Security Profile Setting
+# Standards: https://docs.databricks.com/aws/en/security/privacy/security-profile#compliance-security-profile-overview
+# NOTE: If you add HIPAA, it is your responsibility before you process PHI data to have a BAA agreement with Databricks.
+enable_compliance_security_profile = false
+compliance_standards = [ "PCI_DSS" ]
+
 # Deployment name for the workspace (must be enabled by Databricks representative)
 deployment_name = null
 
