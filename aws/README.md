@@ -44,12 +44,12 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Customer-managed VPC**: A [customer-managed VPC](https://docs.databricks.com/administration-guide/cloud-configurations/aws/customer-managed-vpc.html) allows Databricks customers to exercise more control over network configurations to comply with specific cloud security and governance standards required by their organization.
 
-- **S3 Buckets**: Two S3 buckets are created to support the following functionalities:
+- **S3 Buckets**: Three S3 buckets are created to support the following functionalities:
     - [Workspace Root Bucket](https://docs.databricks.com/en/admin/account-settings-e2/storage.html)
     - [Unity Catalog - Workspace Catalog](https://docs.databricks.com/en/catalogs/create-catalog.html)
     - [Audit Log Delivery Bucket](https://docs.databricks.com/aws/en/admin/account-settings-e2/audit-aws-storage)
 
-- **IAM Roles**: Two IAM roles are created to support the following functionalities:
+- **IAM Roles**: Three IAM roles are created to support the following functionalities:
     - [Classic Compute (EC2) Provisioning](https://docs.databricks.com/en/admin/account-settings-e2/credentials.html)
     - [Data Access for Unity Catalog - Workspace Catalog](https://docs.databricks.com/en/connect/unity-catalog/cloud-storage/storage-credentials.html#step-1-create-an-iam-role)
     - [Audit Log Delivery IAM Role](https://docs.databricks.com/aws/en/admin/account-settings-e2/audit-aws-credentials)
