@@ -16,3 +16,4 @@ jobs:
     with:
       working_directory: aws/tf
       tflint_args: "--config=$(pwd)/.tflint.hcl"
+      terraform_test_args: "-filter=tests/mock_plan.tftest.hcl -filter=tests/mock_plan_gov.tftest.hcl"
