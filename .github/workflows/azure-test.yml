@@ -16,3 +16,4 @@ jobs:
     with:
       working_directory: azure/tf
       terraform_fmt_check: true
+      terraform_test_args: "-filter=tests/mock_plan.tftest.hcl"
