@@ -8,6 +8,11 @@ output "hub_resource_group_name" {
   value       = module.hub.resource_group_name
 }
 
+output "hub_workspace_info" {
+  description = "URLs for the one (or more) deployed Databricks Workspaces"
+  value       = [module.hub.resource_group_name, module.hub.workspace_url]
+}
+
 output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
   value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
