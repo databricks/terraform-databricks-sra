@@ -92,3 +92,9 @@ variable "databricks_account_id" {
   type        = string
   description = "Databricks account ID"
 }
+
+variable "is_default_namespace" {
+  type        = bool
+  description = "If true, sets this catalog as the default namespace for the workspace"
+  default     = false
+}
