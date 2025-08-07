@@ -75,6 +75,7 @@ module "hub_catalog" {
   tags                  = module.hub.tags
   force_destroy         = var.sat_force_destroy
   databricks_account_id = var.databricks_account_id
+  is_default_namespace  = true
 
   providers = {
     databricks.workspace = databricks.hub
