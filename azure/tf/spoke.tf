@@ -54,6 +54,7 @@ module "spoke_catalog" {
   subnet_id             = module.spoke.subnet_ids.privatelink
   tags                  = module.spoke.tags
   databricks_account_id = var.databricks_account_id
+  is_default_namespace  = true
 
   location     = var.location
   metastore_id = module.hub.metastore_id
