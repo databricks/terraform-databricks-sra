@@ -3,23 +3,27 @@
 variable "databricks_account_id" {
     # Databricks account ID (found in the account console)
 } 
-variable "databricks_google_service_account" {
+variable "sa_name" {
     # Google service account for Databricks
-    # This service account must have the "Databricks Workspace Creator" role or equivalent
-    # and the "Databricks Account Admin" role in the Databricks account console
+    default = "databricks-workspace-creator"
 } 
 variable "google_project" {
     # Name of the Google Cloud project
 } 
+
 variable "google_region" {
-    # Google Cloud project ID
-    default = "europe-west1"
+    # Google Cloud region
 } 
 variable "workspace_name" { 
     # Name you want to give to the Databricks workspace you are creating
     default = "sra-deployed-ws"
 }
 
+variable "delegate_from" {
+    # List of users or service accounts to delegate permissions from
+    type    = list(string)
+    default = []
+}
 
 variable "relay_service_attachment" {
     # Relay service attachment. regional values - https://docs.gcp.databricks.com/resources/supported-regions.html#psc
@@ -31,4 +35,11 @@ variable "workspace_service_attachment" {
 }
 
 
+variable "regional_metastore_id" {
+    # ID of the regional Hive Metastore
+    default = "regional-metastore"
+}
 
+variable "provision_regional_metastore"{
+    default = false
+}

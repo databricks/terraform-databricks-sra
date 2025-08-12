@@ -1,23 +1,22 @@
-databricks_account_id = "<account_id>"
-databricks_google_service_account = "<sa-name>@<project-name>.iam.gserviceaccount.com"
-google_project = "<project-name>"
-google_region = "<region>"
+databricks_account_id = "<your-databricks-account-id>"
+databricks_google_service_account = "<service-account-name>@<project-name>.iam.gserviceaccount.com"
+google_project = "<your-gcp-project-id>"
+google_region = "<your-gcp-region>"
 ip_addresses = ["0.0.0.0/0"]
-workspace_name = "sra-gcp-workspace"
+workspace_name = "<your-workspace-name>"
+account_console_url = "https://accounts.gcp.databricks.com"
+google_pe_subnet = "<your-pe-subnet-name>"
 hive_metastore_ip = "34.76.244.202"
-use_existing_cmek = false
-keyring_name = "sra-gcp-keyring"    
-key_name = "sra-gcp-key"
-cmek_resource_id = "<cmek-resource-id>"
-
-use_existing_PSC_EP = false
-google_pe_subnet = "databricks-pe-subnet"
-workspace_pe = "databricks-workspace-pe"
-relay_pe = "databricks-relay-pe"
-relay_pe_ip_name = "databricks-relay-pe-ip"
-workspace_pe_ip_name = "databricks-workspace-pe-ip"
-
+key_name = "<your-kms-key-name>"
+use_existing_cmek = true
+workspace_pe = "<your-workspace-pe-name>"
+relay_pe = "<your-relay-pe-name>"
+relay_pe_ip_name = "<your-relay-pe-ip-name>"
 use_existing_pas = false
-
-relay_service_attachment = "projects/prod-gcp-europe-west1/regions/europe-west1/serviceAttachments/ngrok-psc-endpoint"
-workspace_service_attachment = "projects/general-prod-europewest1-01/regions/europe-west1/serviceAttachments/plproxy-psc-endpoint-all-ports"
+use_existing_PSC_EP = false
+workspace_pe_ip_name = "<your-workspace-pe-ip-name>"
+relay_service_attachment = "projects/prod-gcp-<region>/regions/<region>/serviceAttachments/ngrok-psc-endpoint"
+workspace_service_attachment = "projects/general-prod-<region>/regions/<region>/serviceAttachments/plproxy-psc-endpoint-all-ports"
+keyring_name = "<your-kms-keyring-name>"    
+cmek_resource_id = "projects/<project-name>/locations/<region>/keyRings/<keyring-name>/cryptoKeys/<key-name>"
+admin_user_email = "<admin-user-email@company.com>"

@@ -1,20 +1,20 @@
-variable "prefix" {}
+variable "sa_name" {
+  description = "The name of the service account"
+  type        = string
+  default     = "databricks-workspace-creator"
+  }
 
 variable "project" {
   type    = string
 }
 
-variable "workspace_creator_creates_cmek"{
-  type = bool
-  default = false
+variable "delegate_from" {
+  type    = list(string)
+  default = []
 }
 
-variable "workspace_creator_creates_psc" {
-  type = bool
-  default = false
-}
-
-variable "workspace_create_modifies_compute_SA" {
-  type = bool
-  default = false
+variable "create_service_account_key" {
+  description = "Whether to create a service account key for authentication"
+  type        = bool
+  default     = true
 }

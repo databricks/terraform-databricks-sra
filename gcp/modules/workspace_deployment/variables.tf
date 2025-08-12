@@ -8,6 +8,7 @@ variable "databricks_google_service_account" {
     # This service account must have the "Databricks Workspace Creatore" role or equivalent
     # and the "Databricks Account Admin" role in the Databricks account console
 } 
+
 variable "google_project" {
     # Name of the Google Cloud project
 } 
@@ -15,7 +16,7 @@ variable "google_region" {
     # Google Cloud project ID
 } 
 variable "account_console_url" {
-    default = "https://accounts.cloud.databricks.com" # Databricks account console URL
+    default = "https://accounts.gcp.databricks.com" # Databricks account console URL
 } 
 variable "workspace_name" { 
     # Name you want to give to the Databricks workspace you are creating
@@ -28,6 +29,11 @@ resource "random_string" "suffix" {
     length  = 6
 }
 
+variable "databricks_google_service_account_key" {
+    # Base64 encoded service account key for the Google service account
+    # This is optional and can be used if you want to authenticate using a key file
+    default = ""
+}
 
 ##### NETWORKING VARIABLES #####
 variable "use_existing_vpc" { 
@@ -53,6 +59,7 @@ variable "use_existing_PSC_EP" {
 }
 variable "google_pe_subnet" {
     #Name of the subnet to be used for the PSC endpoints
+    default = "databricks-pe-subnet"
 } 
 variable "google_pe_subnet_ip_cidr_range" { 
     # CIDR range for private endpoint subnet
@@ -60,15 +67,19 @@ variable "google_pe_subnet_ip_cidr_range" {
 }
 variable "workspace_pe" {
     # Name of the PSC endpoint (found in GCP console) used for the workspace communication
-} 
+    default = "worskspace-pe"
+}   
 variable "relay_pe" {
     # Name of the PSC endpoint (found in the GCP console) used for the relay communication
+    default = "relay-pe"
 } 
 variable "workspace_pe_ip_name" {
     # Workspace private endpoint IP name
+    default = ""
 } 
 variable "relay_pe_ip_name" {
-    # Name of the relay private endpoint IP 
+    # Name of the relay private endpoint IP
+    default = ""
 } 
 variable "harden_network" { 
     # Flag to enable network hardening with firewalls rules
@@ -84,15 +95,15 @@ variable "hive_metastore_ip" {
 variable "ip_addresses" { 
     # List of allowed IP addresses
     type = list(string)
-    default = []
+    default = ["0.0.0.0/0"] # This is a default value allowing all IPs. Change it to restrict access.
 }
 variable "relay_service_attachment" {
     # Relay service attachment. regional values - https://docs.gcp.databricks.com/resources/supported-regions.html#psc
-    default = "projects/prod-gcp-${var.google_project}/regions/${var.google_region}/serviceAttachments/ngrok-psc-endpoint"
+    default = ""
 } 
 variable "workspace_service_attachment" { 
     # Workspace service attachment. Regional values - https://docs.gcp.databricks.com/resources/supported-regions.html#psc
-    default = "projects/general-prod-europewest1-01/regions/${var.google_region}/serviceAttachments/plproxy-psc-endpoint-all-ports"
+    default = ""
 }
 variable "use_existing_pas" { 
     # Flag to use an existing private access settings (this will be rarely the case)
@@ -111,15 +122,50 @@ variable "use_existing_cmek" {
 }
 variable "key_name" {
     # Key name for CMEK. only needed if use_existing_cmek is false
-    default = ""
+    default = "sra-key"
 
 } 
 variable "keyring_name" {
     # Keyring name for CMEK. only needed if use_existing_cmek is false
-    default = ""
+    default = "sra-keyring"
 } 
 variable "cmek_resource_id" { 
     # Resource ID for CMEK. only needed if use_existing_cmek is true
     default = ""
 }
 
+variable "use_psc" {
+    # Flag to use Private Service Connect (PSC) for the workspace
+    default = false
+}
+
+variable "admin_user_email" {
+    # Email address of the admin user to be added to the workspace
+    type = string
+    default = ""
+    description = "Email of the user to be granted admin access to the workspace"
+}
+
+variable "can_create_workspaces" {
+    # Flag to allow the service account to create workspaces
+    type = bool
+    default = true
+    description = "Flag to timeout the creation of the workspace"
+}
+
+variable "create_admin_user" {
+    # Flag to create the admin user in the workspace
+    type = bool
+    default = false
+    description = "Flag to create the admin user in the workspace"
+}
+
+variable "regional_metastore_id" {
+    # Name of the regional Hive Metastore
+    default = ""
+}
+
+variable "provision_regional_metastore"{
+    # Flag to provision a regional Hive Metastore
+    default = false
+}
