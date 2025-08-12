@@ -1,3 +1,7 @@
+test {
+  parallel = true
+}
+
 # The below mocked providers have mock_data blocks anywhere a properly formatted GUID is used in the configuration
 # (i.e. access policies, role assignments, etc.)
 mock_provider "azurerm" {
@@ -57,20 +61,36 @@ run "plan_test_no_sat" {
   }
 }
 
-run "plan_test_broken_sat" {
-  state_key       = "broken_sat"
+run "plan_test_sat_broken_classic" {
+  state_key       = "sat_broken_classic"
   command         = plan
-  expect_failures = [var.hub_allowed_urls]
+  expect_failures = [var.public_repos]
   variables {
     sat_configuration = {
       enabled = true
     }
+    public_repos     = []
+    hub_allowed_urls = []
+  }
+}
+
+run "plan_test_sat_broken_serverless" {
+  state_key       = "sat_broken_serverless"
+  command         = plan
+  expect_failures = [var.hub_allowed_urls]
+  variables {
+    sat_configuration = {
+      enabled           = true
+      run_on_serverless = true
+    }
+    public_repos     = []
     hub_allowed_urls = []
   }
 }
 
 run "plan_test_sat_with_byosp" {
-  command = plan
+  state_key = "sat_byosp"
+  command   = plan
   variables {
     sat_service_principal = {
       client_id     = ""
