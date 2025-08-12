@@ -23,6 +23,17 @@ variable "public_repos" {
   default     = ["python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org", "cran.r-project.org", "*.cran.r-project.org", "r-project.org"]
 }
 
+variable "hub_allowed_urls" {
+  type        = set(string)
+  description = "(Optional) List of URLs to allow the hub workspace access to."
+  default     = ["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"]
+
+  validation {
+    condition     = var.sat_configuration.enabled ? length(setsubtract(["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"], var.hub_allowed_urls)) == 0 : true
+    error_message = "Since SAT is enabled, you must include SAT-required URLs in the hub_allowed_urls variable."
+  }
+}
+
 variable "spoke_config" {
   type = map(object(
     {

@@ -234,6 +234,6 @@ resource "databricks_mws_ncc_binding" "this" {
 }
 
 resource "databricks_workspace_network_option" "this" {
-  network_policy_id = var.network_policy_id == null ? databricks_account_network_policy.restrictive_network_policy.network_policy_id : var.network_policy_id
+  network_policy_id = databricks_account_network_policy.hub_policy.network_policy_id
   workspace_id      = azurerm_databricks_workspace.webauth.workspace_id
 }
