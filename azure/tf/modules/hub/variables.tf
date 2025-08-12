@@ -46,6 +46,11 @@ variable "public_repos" {
   description = "(Required) List of public repository IP addresses to allow access to."
 }
 
+variable "hub_allowed_urls" {
+  type        = list(string)
+  description = "(Required) List of URLs to allow the hub workspace access to."
+}
+
 # Define the variable "tags" with type map of strings and a description
 variable "tags" {
   type        = map(string)
@@ -85,12 +90,6 @@ variable "is_frontend_private_link_enabled" {
   type        = bool
   description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
   default     = false
-}
-
-variable "network_policy_id" {
-  type        = string
-  description = "ID of the network policy to use for this workspace. If not provided, the policy created by this module will be used."
-  default     = null
 }
 
 variable "provisioner_principal_id" {

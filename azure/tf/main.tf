@@ -45,9 +45,9 @@ module "hub" {
   client_config            = data.azurerm_client_config.current
   databricks_app_reg       = data.azuread_service_principal.this
   public_repos             = var.public_repos
+  hub_allowed_urls         = var.hub_allowed_urls
   tags                     = var.tags
   resource_suffix          = var.hub_resource_suffix
-  network_policy_id        = var.sat_configuration.enabled ? databricks_account_network_policy.sat_network_policy[0].network_policy_id : null
   provisioner_principal_id = data.databricks_user.provisioner.id
   databricks_account_id    = var.databricks_account_id
 

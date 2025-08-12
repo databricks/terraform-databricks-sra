@@ -42,15 +42,30 @@ mock_provider "databricks" {
 }
 
 run "plan_test_defaults" {
-  command = plan
+  state_key = "defaults"
+  command   = plan
 }
 
 run "plan_test_no_sat" {
-  command = plan
+  state_key = "no_sat"
+  command   = plan
   variables {
     sat_configuration = {
       enabled = false
     }
+    hub_allowed_urls = []
+  }
+}
+
+run "plan_test_broken_sat" {
+  state_key       = "broken_sat"
+  command         = plan
+  expect_failures = [var.hub_allowed_urls]
+  variables {
+    sat_configuration = {
+      enabled = true
+    }
+    hub_allowed_urls = []
   }
 }
 
@@ -65,7 +80,8 @@ run "plan_test_sat_with_byosp" {
 }
 
 run "plan_test_sat_nondefaults" {
-  command = plan
+  state_key = "sat_non_defaults"
+  command   = plan
   variables {
     sat_configuration = {
       resource_suffix   = "spoke_b"

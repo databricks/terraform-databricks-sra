@@ -11,10 +11,20 @@ locals {
   dbfs_name       = join("", ["dbstorage", random_string.dbfsnaming.result])
   managed_rg_name = join("", [module.naming.resource_group.name_unique, "adbmanaged"])
 
-  # Serverless network
-  serverless_internet_allowed_domains = [for dest in var.public_repos : dest if !startswith(dest, "*.")]
-  serverless_internet_allowed_destinations = [
-    for dest in local.serverless_internet_allowed_domains :
+  # The public_repos variable is used here to mirror firewall rules between classic and serverless for the spokes
+  spoke_internet_allowed_domains = [for dest in var.public_repos : dest if !startswith(dest, "*.")]
+  spoke_internet_allowed_destinations = [
+    for dest in local.spoke_internet_allowed_domains :
+    {
+      destination               = trimprefix(dest, "*."),
+      internet_destination_type = "DNS_NAME"
+    }
+  ]
+
+  # The hub_allowed_urls variable is used here to allow for hub to have a different allow list (primarily for SAT)
+  hub_internet_allowed_domains = [for dest in var.hub_allowed_urls : dest if !startswith(dest, "*.")]
+  hub_internet_allowed_destinations = [
+    for dest in local.hub_internet_allowed_domains :
     {
       destination               = trimprefix(dest, "*."),
       internet_destination_type = "DNS_NAME"
@@ -86,7 +96,21 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
   egress = {
     network_access = {
       restriction_mode              = "RESTRICTED_ACCESS"
-      allowed_internet_destinations = local.serverless_internet_allowed_destinations
+      allowed_internet_destinations = local.spoke_internet_allowed_destinations
+      policy_enforcement = {
+        enforcement_mode = "ENFORCED"
+      }
+    }
+  }
+}
+
+resource "databricks_account_network_policy" "hub_policy" {
+  network_policy_id = "np-${var.resource_suffix}-hub"
+  account_id        = var.databricks_account_id
+  egress = {
+    network_access = {
+      restriction_mode              = "RESTRICTED_ACCESS"
+      allowed_internet_destinations = local.hub_internet_allowed_destinations
       policy_enforcement = {
         enforcement_mode = "ENFORCED"
       }
