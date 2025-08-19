@@ -10,7 +10,7 @@ resource "databricks_cluster" "example" {
   cluster_name            = "Standard Classic Compute Plane Cluster"
   data_security_mode      = "USER_ISOLATION"
   spark_version           = data.databricks_spark_version.latest_lts.id
-  node_type_id            = var.enable_compliance_security_profile ? "m7gd.xlarge" : (var.region == "us-gov-west-1" ? "i3en.xlarge" : "i3.xlarge")
+  node_type_id            = var.enable_compliance_security_profile ? "M6idn.xlarge" : (var.region == "us-gov-west-1" ? "i3en.xlarge" : "i3.xlarge")
   autotermination_minutes = 10
   is_single_node          = true
   kind                    = "CLASSIC_PREVIEW"
