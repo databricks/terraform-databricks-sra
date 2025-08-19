@@ -85,7 +85,7 @@ monitor cost and accurately attribute Databricks usage to your organization's bu
 DBU usage reports for cost analysis.
 
 ## Security Analysis Tool
-Security Analysis Tool ([SAT](https://github.com/databricks-industry-solutions/security-analysis-tool/tree/main)) is enabled by default. It can be customized using the `sat_configuration` variable. 
+Security Analysis Tool ([SAT](https://databricks-industry-solutions.github.io/security-analysis-tool/)) is enabled by default. It can be customized using the `sat_configuration` variable. 
 By default, SAT is installed in the hub workspace, also called the "WEB_AUTH" workspace.
 
 ### Changing the SAT workspace
@@ -168,9 +168,15 @@ sat_service_principal = {
 }
 ```
 
-### SAT Serverless Compute
-SAT is installed using serverless compute by default. Before running the [required jobs](https://github.com/databricks-industry-solutions/security-analysis-tool/blob/v0.3.3/terraform/azure/TERRAFORM_Azure.md#step-7-run-databricks-jobs)
-in Databricks, the private endpoints on your hub storage account must be approved.
+### SAT Compute
+SAT is installed using classic compute by default. This is because SAT does not yet support inspecting workspaces outside of the current workspace when running on serverless. If you would like to run on serverless compute instead, you can modify the sat_configuration variable to specify using serverless (see below).
+```hcl
+sat_configuration = {
+  run_on_serverless = true
+}
+```
+> **Note:**  
+> When running SAT on serverless compute, SAT will only inspect the current workspace.
 
 ## Adding additional spokes
 
