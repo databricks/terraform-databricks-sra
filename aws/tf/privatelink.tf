@@ -244,7 +244,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
 # Restrictive STS endpoint policy:
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
-  
+
   statement {
     actions = [
       "sts:AssumeRole",

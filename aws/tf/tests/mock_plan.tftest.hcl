@@ -55,6 +55,7 @@ variables {
   sg_egress_ports               = ["443", "3306", "6666"]
   cmk_admin_arn                 = "arn:aws:iam::123456789012:role/DatabricksCMKAdmin"
   deployment_name               = "my-databricks-workspace"
+  compliance_standards          = ["PCI_DSS"]
   custom_vpc_id                 = null
   custom_private_subnet_ids     = null
   custom_sg_id                  = null

@@ -58,6 +58,7 @@ variables {
   admin_user                               = "workspace-admin-user@example.com"
   vpc_cidr_range                           = "10.0.0.0/16"
   databricks_gov_shard                     = "civilian"
+  compliance_standards                     = ["PCI_DSS"]
 }
 
 # -------
