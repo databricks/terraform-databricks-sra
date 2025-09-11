@@ -41,7 +41,7 @@ network_configuration = "isolated"
 vpc_cidr_range           = "10.0.0.0/18"
 private_subnets_cidr     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
 privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
-sg_egress_ports          = [443, 2443, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
+sg_egress_ports          = [443, 2443, 5432, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
 # CUSTOM NETWORK CONFIGURATION
 # Required when using network_configuration = "custom"
