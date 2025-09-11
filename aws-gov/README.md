@@ -1,1 +1,0 @@
-## aws-gov has been merged into the aws folder, please define the optional variable databricks_gov_shard with either "civilian" or "dod"

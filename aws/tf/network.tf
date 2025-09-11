@@ -65,7 +65,7 @@ resource "aws_security_group" "sg" {
   dynamic "egress" {
     for_each = var.databricks_gov_shard == "civilian" || var.databricks_gov_shard == "dod" ? [for port in var.sg_egress_ports : port if port != 6666] : var.sg_egress_ports
     content {
-      description = "Databricks - Workspace SG - REST (443), Secure Cluster Connectivity (2443/6666), Compute Plane to Control Plane Internal Calls (8443), Unity Catalog Logging and Lineage Data Streaming (8444), Future Extendability (8445-8451)"
+      description = "Databricks - Workspace SG - REST (443), Secure Cluster Connectivity (2443/6666), Lakebase PostgreSQL (5432), Compute Plane to Control Plane Internal Calls (8443), Unity Catalog Logging and Lineage Data Streaming (8444), Future Extendability (8445-8451)"
       from_port   = egress.value
       to_port     = egress.value
       protocol    = "tcp"
