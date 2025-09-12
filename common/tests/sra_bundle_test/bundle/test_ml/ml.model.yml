@@ -1,0 +1,10 @@
+resources:
+  registered_models:
+      classic_model:
+        name: ${bundle.name}
+        catalog_name: ${resources.schemas.schema_classic.catalog_name}
+        schema_name: ${resources.schemas.schema_classic.name}
+      serverless_model:
+        name: ${bundle.name}
+        catalog_name: ${resources.schemas.schema_serverless.catalog_name}
+        schema_name: ${resources.schemas.schema_serverless.name}
