@@ -5,7 +5,7 @@ data "databricks_spark_version" "latest" {
 
 # Get the smallest available node type for the cloud provider
 data "databricks_node_type" "smallest" {
-  min_cores = 3
+  min_cores  = 3
   local_disk = true
 }
 
