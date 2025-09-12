@@ -17,3 +17,8 @@ output "spoke_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
   value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
 }
+
+output "spoke_workspace_catalog" {
+  description = "Name of the catalog created for the spoke workspace"
+  value       = module.spoke_catalog.catalog_name
+}
