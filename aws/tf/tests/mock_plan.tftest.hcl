@@ -52,6 +52,8 @@ variables {
   vpc_cidr_range                = "10.0.0.0/16"
   private_subnets_cidr          = ["10.0.1.0/24", "10.0.2.0/24"]
   privatelink_subnets_cidr      = ["10.0.3.0/24", "10.0.4.0/24"]
+  public_subnets_cidr           = ["10.0.5.0/24", "10.0.6.0/24"]
+  firewall_subnets_cidr         = ["10.0.7.0/24", "10.0.8.0/24"]
   sg_egress_ports               = ["443", "3306", "6666"]
   cmk_admin_arn                 = "arn:aws:iam::123456789012:role/DatabricksCMKAdmin"
   deployment_name               = "my-databricks-workspace"
