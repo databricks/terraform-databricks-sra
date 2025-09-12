@@ -1,0 +1,37 @@
+resources:
+  jobs:
+    model_cleanup_classic:
+      name: model_cleanup_classic
+      tasks:
+        - task_key: notebook_task
+          job_cluster_key: job_cluster
+          notebook_task:
+            notebook_path: ./04_model_cleanup.ipynb
+            base_parameters:
+              model_catalog: ${resources.schemas.schema_classic.catalog_name}
+              model_schema: ${resources.schemas.schema_classic.name}
+              model_name: ${resources.registered_models.classic_model.name}
+              model_alias: "challenger"
+
+      # Note that this is not actually used since cluster_id is provided by the bundle for faster testing
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            spark_version: ${var.spark_version}
+            node_type_id: ${var.node_type_id}
+            data_security_mode: SINGLE_USER
+            autoscale:
+              min_workers: 1
+              max_workers: 2
+
+    model_cleanup_serverless:
+      name: model_cleanup_serverless
+      tasks:
+        - task_key: notebook_task
+          notebook_task:
+            notebook_path: ./04_model_cleanup.ipynb
+            base_parameters:
+              model_catalog: ${resources.schemas.schema_serverless.catalog_name}
+              model_schema: ${resources.schemas.schema_serverless.name}
+              model_name: ${resources.registered_models.serverless_model.name}
+              model_alias: "challenger"

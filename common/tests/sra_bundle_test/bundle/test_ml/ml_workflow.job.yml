@@ -1,0 +1,111 @@
+resources:
+  jobs:
+    ml_workflow_classic:
+      name: ml_workflow_classic
+      parameters:
+        - name: catalog
+          default: ${resources.schemas.schema_classic.catalog_name}
+        - name: schema
+          default: ${resources.schemas.schema_classic.name}
+        - name: model_name
+          default: ${resources.registered_models.classic_model.name}
+        - name: experiment_name
+          default: ${resources.experiments.experiment.name}
+        - name: model_alias
+          default: "challenger"
+
+      tasks:
+        - task_key: feature_engineering_training
+          job_cluster_key: job_cluster
+          notebook_task:
+            notebook_path: ./01_feature_engineering.ipynb
+            base_parameters:
+              features_table: ${resources.schemas.schema_classic.catalog_name}.${resources.schemas.schema_classic.name}.${bundle.name}_training_features
+        
+        - task_key: feature_engineering_inference
+          job_cluster_key: job_cluster
+          notebook_task:
+            notebook_path: ./01_feature_engineering.ipynb
+            base_parameters:
+              features_table: ${resources.schemas.schema_classic.catalog_name}.${resources.schemas.schema_classic.name}.${bundle.name}_inference_features
+              start_datetime: "2016-02-01 00:00:00"
+              end_datetime: "2016-02-28 23:59:59"
+
+        - task_key: model_training
+          job_cluster_key: job_cluster
+          depends_on:
+            - task_key: feature_engineering_training
+          notebook_task:
+            notebook_path: ./02_model_training.ipynb
+            base_parameters:
+              features_table: ${resources.schemas.schema_classic.catalog_name}.${resources.schemas.schema_classic.name}.${bundle.name}_training_features
+
+        - task_key: model_inference
+          job_cluster_key: job_cluster
+          depends_on:
+            - task_key: model_training
+            - task_key: feature_engineering_inference
+          notebook_task:
+            notebook_path: ./03_model_inference.ipynb
+            base_parameters:
+              features_table: ${resources.schemas.schema_classic.catalog_name}.${resources.schemas.schema_classic.name}.${bundle.name}_inference_features
+      
+      # Note that this is not actually used since cluster_id is provided by the bundle for faster testing
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            spark_version: ${var.spark_version}
+            node_type_id: ${var.node_type_id}
+            data_security_mode: SINGLE_USER
+            autoscale:
+              min_workers: 1
+              max_workers: 2
+
+
+    ml_workflow_serverless:
+      name: ml_workflow_serverless
+      parameters:
+        - name: catalog
+          default: ${resources.schemas.schema_serverless.catalog_name}
+        - name: schema
+          default: ${resources.schemas.schema_serverless.name}
+        - name: model_name
+          default: ${resources.registered_models.serverless_model.name}
+        - name: experiment_name
+          default: ${resources.experiments.experiment.name}
+        - name: model_alias
+          default: "challenger"
+
+      tasks:
+        - task_key: feature_engineering_training
+          notebook_task:
+            notebook_path: ./01_feature_engineering.ipynb
+            base_parameters:
+              features_table: ${resources.schemas.schema_serverless.catalog_name}.${resources.schemas.schema_serverless.name}.${bundle.name}_training_features
+
+        - task_key: feature_engineering_inference
+          notebook_task:
+            notebook_path: ./01_feature_engineering.ipynb
+            base_parameters:
+              features_table: ${resources.schemas.schema_serverless.catalog_name}.${resources.schemas.schema_serverless.name}.${bundle.name}_inference_features
+              start_datetime: "2016-02-01 00:00:00"
+              end_datetime: "2016-02-28 23:59:59"
+
+        - task_key: model_training
+          depends_on:
+            - task_key: feature_engineering_training 
+          notebook_task:
+            notebook_path: ./02_model_training.ipynb
+            base_parameters:
+              features_table: ${resources.schemas.schema_serverless.catalog_name}.${resources.schemas.schema_serverless.name}.${bundle.name}_training_features
+
+        - task_key: model_inference
+          depends_on:
+            - task_key: model_training
+            - task_key: feature_engineering_inference
+          notebook_task:
+            notebook_path: ./03_model_inference.ipynb
+            base_parameters:
+              features_table: ${resources.schemas.schema_serverless.catalog_name}.${resources.schemas.schema_serverless.name}.${bundle.name}_inference_features
+              start_datetime: "2016-02-01 00:00:00"
+              end_datetime: "2016-02-28 23:59:59"
