@@ -3,8 +3,17 @@ test {
 }
 
 variables {
-  tags = {
-    SRA = "Local SRA Test"
+  databricks_host = run.test_initializer.outputs.workspace_host
+  sra_tag         = "SRA Test Suite"
+  catalog_name    = run.test_initializer.outputs.catalog_name
+  open_test_job   = false
+  environment = {
+    DATABRICKS_HOST          = run.test_initializer.outputs.workspace_host
+    BUNDLE_VAR_node_type_id  = run.classic_cluster.node_type_id
+    BUNDLE_VAR_spark_version = run.classic_cluster.spark_version
+    BUNDLE_VAR_sra_tag       = var.sra_tag
+    BUNDLE_VAR_catalog_name  = run.test_initializer.outputs.catalog_name
+    BUNDLE_VAR_cluster_id    = run.classic_cluster.cluster_id
   }
 }
 
@@ -23,30 +32,80 @@ run "classic_cluster" {
     source = "../../common/tests/classic_cluster"
   }
   variables {
-    databricks_host = run.test_initializer.outputs.workspace_host
+    tags = {
+      SRA = var.sra_tag
+    }
   }
 }
 
-run "spark_classic" {
-  state_key = "spark_classic"
+run "bundle_deploy" {
+  state_key = "bundle_deploy"
   command   = apply
   module {
-    source = "../../common/tests/spark"
-  }
-  variables {
-    databricks_host = run.test_initializer.outputs.workspace_host
-    cluster_id      = run.classic_cluster.cluster_id
+    source = "../../common/tests/sra_bundle_test"
   }
 }
 
-run "spark_serverless" {
-  state_key = "spark_serverless"
+run "spark_basic" {
+  state_key = "bundle_spark_basic"
   command   = apply
   module {
-    source = "../../common/tests/spark"
+    source = "../../common/tests/bundle_run"
   }
   variables {
-    databricks_host = run.test_initializer.outputs.workspace_host
-    cluster_id      = null # This makes the job run on serverless
+    bundle_job_name = "spark_basic"
+    working_dir     = run.bundle_deploy.working_dir
+  }
+}
+
+run "ml_workflow_classic" {
+  state_key = "bundle_ml_workflow_classic"
+  command   = apply
+  module {
+    source = "../../common/tests/bundle_run"
+  }
+  variables {
+    bundle_job_name = "ml_workflow_classic"
+    working_dir     = run.bundle_deploy.working_dir
+  }
+}
+
+run "ml_cleanup_classic" {
+  state_key = "bundle_ml_cleanup_classic"
+  command   = apply
+  module {
+    source = "../../common/tests/bundle_run"
+  }
+  variables {
+    depends         = run.ml_workflow_classic.depends
+    bundle_job_name = "model_cleanup_classic"
+    working_dir     = run.bundle_deploy.working_dir
+    open_test_job   = false
+  }
+}
+
+run "ml_workflow_serverless" {
+  state_key = "bundle_ml_workflow_serverless"
+  command   = apply
+  module {
+    source = "../../common/tests/bundle_run"
+  }
+  variables {
+    bundle_job_name = "ml_workflow_serverless"
+    working_dir     = run.bundle_deploy.working_dir
+  }
+}
+
+run "ml_cleanup_serverless" {
+  state_key = "bundle_ml_cleanup_serverless"
+  command   = apply
+  module {
+    source = "../../common/tests/bundle_run"
+  }
+  variables {
+    depends         = run.ml_workflow_serverless.depends
+    bundle_job_name = "model_cleanup_serverless"
+    working_dir     = run.bundle_deploy.working_dir
+    open_test_job   = false
   }
 }
