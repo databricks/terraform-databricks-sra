@@ -1,0 +1,41 @@
+# This is a Databricks asset bundle definition for sra_test_suite.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: sra_test_suite
+  uuid: 8cabd153-9141-4393-be2e-b26127a637af
+
+include:
+  - base_resources/*.yml
+  - test_ml/*.yml
+  - test_spark_basic/*.yml
+
+variables:
+  node_type_id:
+    description: Node type to use with the job
+
+  spark_version:
+    description: Version of spark to use with the job
+
+  sra_tag:
+    description: Tag value for the SRA tag
+    default: "Local SRA Test"
+
+  catalog_name:
+    description: Catalog to use for testing
+
+  cluster_id:
+    description: Cluster to use for this bundle
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    cluster_id: ${var.cluster_id}
+
+presets:
+  tags:
+    SRA: ${var.sra_tag}
