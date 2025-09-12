@@ -15,7 +15,7 @@ resource "azurerm_private_endpoint" "dfs" {
   # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = module.naming.private_dns_zone_group.name
-    private_dns_zone_ids = var.dns_zone_ids
+    private_dns_zone_ids = [var.dns_zone_ids["dfs"]]
   }
 
   tags = var.tags
@@ -49,7 +49,7 @@ resource "azurerm_private_endpoint" "blob" {
   # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = module.naming.private_dns_zone_group.name
-    private_dns_zone_ids = var.dns_zone_ids
+    private_dns_zone_ids = [var.dns_zone_ids["blob"]]
   }
 
   tags = var.tags
