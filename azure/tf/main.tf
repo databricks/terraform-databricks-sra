@@ -66,7 +66,7 @@ module "hub_catalog" {
   catalog_name          = var.sat_configuration.catalog_name
   location              = var.location
   metastore_id          = module.hub.metastore_id
-  dns_zone_ids          = [module.hub.dns_zone_ids.dfs]
+  dns_zone_ids          = module.hub.dns_zone_ids
   ncc_id                = module.hub.ncc_id
   ncc_name              = module.hub.ncc_name
   resource_group_name   = module.hub.resource_group_name

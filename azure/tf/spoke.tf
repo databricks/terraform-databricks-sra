@@ -46,7 +46,7 @@ module "spoke_catalog" {
 
   # Update these per catalog for the catalog's spoke
   catalog_name          = module.spoke.resource_suffix
-  dns_zone_ids          = [module.spoke.dns_zone_ids["dfs"]]
+  dns_zone_ids          = module.spoke.dns_zone_ids
   ncc_id                = module.spoke.ncc_id
   ncc_name              = module.spoke.ncc_name
   resource_group_name   = module.spoke.resource_group_name

@@ -49,7 +49,7 @@ variable "subnet_id" {
 }
 
 variable "dns_zone_ids" {
-  type        = list(string)
+  type        = map(string)
   description = "(Required) IDs of the private DNS zones to place private endpoint records in"
 }
 
