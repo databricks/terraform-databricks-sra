@@ -38,12 +38,11 @@ provider "databricks" {
   host                   = var.account_console_url
   google_service_account = var.databricks_google_service_account
   account_id             = var.databricks_account_id
-  google_credentials = var.databricks_google_service_account_key != "" ? var.databricks_google_service_account_key : null
 }
 
-# provider "databricks" {
-#  alias                  = "workspace"
-#  host                   = databricks_mws_workspaces.this.workspace_url
-#  google_service_account = var.databricks_google_service_account
-# }
+provider "databricks" {
+  alias                  = "workspace"
+  host                   = databricks_mws_workspaces.this.workspace_url
+  google_service_account = var.databricks_google_service_account
+}
 

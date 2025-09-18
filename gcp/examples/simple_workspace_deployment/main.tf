@@ -6,9 +6,10 @@ module "customer_managed_vpc" {
   databricks_account_id = var.databricks_account_id
   databricks_google_service_account = var.databricks_google_service_account
   use_existing_pas = var.use_existing_pas
+  workspace_name = var.workspace_name
 
   workspace_pe = var.workspace_pe
- relay_pe =  var.relay_pe
+  relay_pe =  var.relay_pe
   google_pe_subnet = var.google_pe_subnet 
   relay_pe_ip_name = var.relay_pe_ip_name
   workspace_pe_ip_name = var.workspace_pe_ip_name
@@ -20,5 +21,4 @@ module "customer_managed_vpc" {
   keyring_name = var.keyring_name
   use_existing_cmek = var.use_existing_cmek
   cmek_resource_id = var.cmek_resource_id
-  hive_metastore_ip = var.hive_metastore_ip
 }

@@ -55,3 +55,8 @@ terraform.rc
 # Include tflint configurations for CI workflows
 !**/.tflint.hcl
 !**/*.tftest.hcl
+
+# Google Cloud Service Account Keys
+gcp/modules/workspace_deployment/fslakehouse-9b0f57986dbf.json
+gcp/modules/service_account/*.json
+**/service_account/*.json

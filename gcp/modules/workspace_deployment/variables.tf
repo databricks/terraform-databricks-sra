@@ -15,6 +15,8 @@ variable "google_project" {
 variable "google_region" {
     # Google Cloud project ID
 } 
+
+## TODO : default value not a variable
 variable "account_console_url" {
     default = "https://accounts.gcp.databricks.com" # Databricks account console URL
 } 
@@ -34,6 +36,7 @@ variable "databricks_google_service_account_key" {
     # This is optional and can be used if you want to authenticate using a key file
     default = ""
 }
+
 
 ##### NETWORKING VARIABLES #####
 variable "use_existing_vpc" { 

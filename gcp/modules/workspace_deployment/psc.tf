@@ -1,6 +1,6 @@
 resource "google_compute_subnetwork" "backend_pe_subnetwork" {
   count = (var.use_existing_PSC_EP || !var.use_psc) ? 0 : 1
-  name          = "var.google_pe_subnet-${random_string.suffix.result}"
+  name          = "pe-subnet-${random_string.suffix.result}"
   ip_cidr_range = var.google_pe_subnet_ip_cidr_range
   region        = var.google_region
   network       = google_compute_network.dbx_private_vpc.id

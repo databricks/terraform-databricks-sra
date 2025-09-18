@@ -10,6 +10,10 @@ variable "sa_name" {
 variable "google_project" {
     # Name of the Google Cloud project
 } 
+variable "cmek_resource_id" {
+    # Customer-managed encryption key resource ID
+    default = ""
+}
 
 variable "google_region" {
     # Google Cloud region

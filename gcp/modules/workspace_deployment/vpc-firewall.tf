@@ -48,6 +48,22 @@ resource "google_compute_firewall" "to_gcp_healthcheck" {
   }
   network                 = google_compute_network.dbx_private_vpc.self_link
 }
+resource "google_compute_firewall" "to_gcp_psc" {
+  depends_on = [
+    google_compute_network.dbx_private_vpc
+  ]
+  count = (var.harden_network && var.use_psc) ? 1 : 0
+  name                    = "to-psc-ep-${google_compute_network.dbx_private_vpc.name}"
+  direction               = "EGRESS"
+  priority                = 1000
+  destination_ranges      = ["${google_compute_address.backend_pe_ip_address[0].address}/32", "${google_compute_address.frontend_pe_ip_address[0].address}/32"]
+  source_ranges           = []
+  allow {
+    protocol              = "tcp"
+    ports                 = ["443","8443-8463"]
+  }
+  network                 = google_compute_network.dbx_private_vpc.self_link
+}
 
 
 resource "google_compute_firewall" "egress_intra_subnet" {
@@ -67,6 +83,8 @@ resource "google_compute_firewall" "egress_intra_subnet" {
   }
   network                 = google_compute_network.dbx_private_vpc.self_link
 }
+
+
 
 resource "google_compute_firewall" "to_databricks_control_plane" {
   depends_on = [

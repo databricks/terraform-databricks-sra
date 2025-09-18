@@ -9,7 +9,6 @@ module "service_account" {
 }
 
 
-
 module "make_sa_dbx_admin" {
   source = "../../modules/make_sa_dbx_admin/"
   
@@ -30,14 +29,14 @@ module "customer_managed_vpc" {
   databricks_google_service_account_key = module.service_account.workspace_creator_key  # Use output from service_account module
   regional_metastore_id = var.regional_metastore_id
   can_create_workspaces = module.service_account.workspace_creator_role_applied 
-
   admin_user_email            = module.make_sa_dbx_admin.original_admin_account
+  cmek_resource_id           = var.cmek_resource_id
 
   # Flags
   use_existing_vpc             = false
   use_existing_pas             = false
   use_existing_PSC_EP          = false
-  use_existing_cmek            = false
+  use_existing_cmek            = true
   use_psc                      = false
   harden_network               = true
   provision_regional_metastore  = false 
