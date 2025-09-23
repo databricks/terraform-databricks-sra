@@ -109,3 +109,16 @@ run "ml_cleanup_serverless" {
     open_test_job   = false
   }
 }
+
+
+run "lakebase_connectivity" {
+  state_key = "bundle_lakebase_connectivity"
+  command   = apply
+  module {
+    source = "../../common/tests/bundle_run"
+  }
+  variables {
+    bundle_job_name = "lakebase"
+    working_dir     = run.bundle_deploy.working_dir
+  }
+}

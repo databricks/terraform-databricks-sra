@@ -8,6 +8,7 @@ include:
   - base_resources/*.yml
   - test_ml/*.yml
   - test_spark_basic/*.yml
+  - lakebase/*.yml
 
 variables:
   node_type_id:

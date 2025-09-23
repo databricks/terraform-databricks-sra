@@ -1,0 +1,22 @@
+resources:
+  jobs:
+    lakebase:
+      name: lakebase
+      tasks:
+        - task_key: notebook_task
+          job_cluster_key: job_cluster
+          notebook_task:
+            notebook_path: ./lakebase_test.ipynb
+            base_parameters:
+              instance_name: ${resources.database_instances.instance.name}
+
+      # Note that this is not actually used since cluster_id is provided by the bundle for faster testing
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            spark_version: ${var.spark_version}
+            node_type_id: ${var.node_type_id}
+            data_security_mode: SINGLE_USER
+            autoscale:
+              min_workers: 1
+              max_workers: 2
