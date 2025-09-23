@@ -90,7 +90,7 @@ resource "azurerm_databricks_workspace" "webauth" {
   customer_managed_key_enabled          = var.is_kms_enabled
   infrastructure_encryption_enabled     = var.is_kms_enabled
   public_network_access_enabled         = !var.is_frontend_private_link_enabled
-  network_security_group_rules_required = var.is_frontend_private_link_enabled ? "NoAzureDatabricksRules" : "AllRules"
+  network_security_group_rules_required = "NoAzureDatabricksRules"
   default_storage_firewall_enabled      = var.boolean_create_private_dbfs
   access_connector_id                   = var.boolean_create_private_dbfs ? azurerm_databricks_access_connector.ws[0].id : null
 
