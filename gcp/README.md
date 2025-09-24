@@ -10,18 +10,23 @@ Note that the private service connect blocks were previously developed in this [
 
 # Component Breakdown and Description:
 
-In this section, we break down each of the components that we've included in this Security Reference Architecture.
+In this section, we break down each of the components that we've included and will be created (if not already exists) in this Security Reference Architecture.
 
 In various .tf scripts, we have included direct links to the Databricks Terraform documentation. The [official documentation](https://registry.terraform.io/providers/databricks/databricks/latest/docs) can be found here.
 
-## Infrastructure Deployment:
+## Core GCP Components:
+The following resources are created and must be present before creating the workspace on Databricks:
+- **Customer-managed VPC**: Using a [customer-managed VPC](https://docs.gcp.databricks.com/administration-guide/cloud-configurations/gcp/customer-managed-vpc.html) gives you direct control over network configurations, making it easier to meet strict internal security and compliance standards. This approach is required for Private Service Connect and allows you to consolidate multiple workspaces into a single network, which simplifies management and reduces the permissions Databricks needs in your account.
 
-- **Customer-managed VPC**: A [customer-managed VPC](https://docs.gcp.databricks.com/administration-guide/cloud-configurations/gcp/customer-managed-vpc.html) allows Databricks customer's to excersie more control over your network configures to comply with specific cloud security and governance standards that a customer's organization may require.
+- **Back-end GCP Private Connectivity**: GCP Private Service Connect establishes a private network route between different GCP environments. This template configures the [back-end connection](https://docs.databricks.com/gcp/en/security/network/classic/private-service-connect), using Databricks-specific VPC endpoints to ensure that communication between your classic compute plane and the Databricks control plane does not travel over the public internet. While a [front-end](https://docs.databricks.com/gcp/en/security/network/front-end/front-end-private-connect) option is also available to keep user traffic on the GCP backbone, this particular Terraform template does not include that configuration.
 
-- **GCP VPC Endpoints for GCS**: Using GCP Private Service Connect
-technology, a VPC endpoint is a service that connections a customer's VPC endpoint to GCP services while not traversing the public IP addresses.
+- **Cloud KMS Keys**: GCP Cloud KMS keys are created to support [customer-managed keys](https://docs.databricks.com/gcp/en/security/keys/customer-managed-keys) for encryption for following functionalities:
+    - Managed services: Data in the Databricks control plane (notebooks, secrets, and Databricks SQL query data).
+    - Workspace storage: The two workspace storage buckets and the GCE Persistent Disk volumes of compute resources.
 
-- **Back-end GCP PrivateLink Connectivity**: GCP PrivateLink provides a private network route from one GCP environment to another. [Back-end Private Service Connect](https://docs.databricks.com/administration-guide/cloud-configurations/aws/privatelink.html#overview) is configured so that communication between the customer's data plane and Databricks control plane does not traverse public IP addresses. This is accomplished through Databricks specific interface VPC endpoints. Front-end Private Link is available as well for customers to have their users traffic remain over the GCP backbone, however, this is not represented in this Terraform template.
+The following resources are created after the workspace creation:
+
+- **Cloud DNS**: [Private DNS zone](https://docs.databricks.com/gcp/en/security/network/classic/private-service-connect#step-9-configure-dns) are required for backend Private Service Connect (PSC) on GCP to ensure that traffic destined for internal services is resolved to the private IP addresses of the PSC endpoints within the VPC.
 
 
 # Getting Started:
@@ -48,4 +53,5 @@ export DATABRICKS_GOOGLE_SERVICE_ACCOUNT=<<Your GCP Service Account email>>
 ```
 # Network Diagram
 
-![Network Architecture](img.png)
+
+![Network Architecture](images/GCP_PSC.png)
