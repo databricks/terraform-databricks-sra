@@ -17,6 +17,7 @@ variables {
   }
 }
 
+# Run the test initializer to get outputs from the local state in the cloud directory
 run "test_initializer" {
   state_key = "test_initializer"
   command   = apply
@@ -25,6 +26,9 @@ run "test_initializer" {
   }
 }
 
+# Provision a small autoscaling classic cluster suitable for test jobs
+# Covers:
+# - Creating a classic cluster
 run "classic_cluster_spoke" {
   state_key = "classic_cluster_spoke"
   command   = apply
@@ -38,6 +42,9 @@ run "classic_cluster_spoke" {
   }
 }
 
+# Deploy the bundle located at `sra_bundle_test/bundle` via `databricks bundle deploy --auto-approve` and destroy it on cleanup
+# Covers:
+# - Creating jobs, notebooks, experiments, models, lakebase
 run "bundle_deploy" {
   state_key = "bundle_deploy"
   command   = apply
@@ -46,6 +53,13 @@ run "bundle_deploy" {
   }
 }
 
+# Run the Spark basic job
+# Covers:
+# - Running a Spark basic job
+# - Creating a UC Schema
+# - Creating a UC Table
+# - Writing to a UC Table
+# - Reading from a UC Table
 run "spark_basic" {
   state_key = "bundle_spark_basic"
   command   = apply
@@ -57,6 +71,14 @@ run "spark_basic" {
     working_dir     = run.bundle_deploy.working_dir
   }
 }
+
+# Run the ML workflow classic job
+# Covers:
+# - Creating a UC Table
+# - Writing to a UC Table
+# - Reading from a UC Table
+# - Registering a model (tests blob endpoints for storage accounts)
+# - Access to sample data (nyc taxi data)
 
 run "ml_workflow_classic" {
   state_key = "bundle_ml_workflow_classic"
@@ -70,6 +92,9 @@ run "ml_workflow_classic" {
   }
 }
 
+# Run the ML cleanup classic job
+# Covers:
+# - Deleting a model from classic
 run "ml_cleanup_classic" {
   state_key = "bundle_ml_cleanup_classic"
   command   = apply
@@ -84,6 +109,14 @@ run "ml_cleanup_classic" {
   }
 }
 
+# Run the ML workflow serverless job
+# Covers (from serverless):
+# - Creating a UC Table
+# - Writing to a UC Table
+# - Reading from a UC Table
+# - Registering a model (tests blob endpoints for storage accounts)
+# - Access to sample data (nyc taxi data)
+
 run "ml_workflow_serverless" {
   state_key = "bundle_ml_workflow_serverless"
   command   = apply
@@ -96,6 +129,9 @@ run "ml_workflow_serverless" {
   }
 }
 
+# Run the ML cleanup serverless job
+# Covers:
+# - Deleting a model from serverless
 run "ml_cleanup_serverless" {
   state_key = "bundle_ml_cleanup_serverless"
   command   = apply
@@ -111,6 +147,9 @@ run "ml_cleanup_serverless" {
 }
 
 
+# Run the Lakebase connectivity job
+# Covers:
+# - Connecting to Lakebase from classic
 run "lakebase_connectivity" {
   state_key = "bundle_lakebase_connectivity"
   command   = apply
