@@ -37,7 +37,7 @@ resource "databricks_mws_networks" "network_config" {
   
   provider     = databricks.accounts
   account_id   = var.databricks_account_id
-  network_name = "config-eu1-${random_string.suffix.result}"
+  network_name = "config-${var.google_region}-${random_string.suffix.result}"
   gcp_network_info {
     network_project_id    = var.google_project
     vpc_id                = var.use_existing_vpc ? var.existing_vpc_name : google_compute_network.dbx_private_vpc.name

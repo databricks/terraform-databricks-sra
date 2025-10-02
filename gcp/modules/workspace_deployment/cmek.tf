@@ -22,6 +22,7 @@ resource "google_kms_crypto_key" "databricks_key" {
 resource "databricks_mws_customer_managed_keys" "this" {
         
         provider = databricks.accounts
+        count = var.use_existing_cmek ? 0 : 1
         account_id   = var.databricks_account_id
         gcp_key_info {
             # kms_key_id   = var.use_existing_cmek? "projects/${var.google_project}/locations/${var.google_region}/keyRings/${var.keyring_name}-${random_string.suffix.result}/cryptoKeys/${var.key_name}-${random_string.suffix.result}": google_kms_crypto_key.databricks_key[0].id

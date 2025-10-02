@@ -21,12 +21,13 @@ resource "databricks_mws_workspaces" "this" {
   }
   private_access_settings_id = var.use_existing_pas? var.existing_pas_id:databricks_mws_private_access_settings.pas[0].private_access_settings_id
   network_id = databricks_mws_networks.network_config.network_id
-  storage_customer_managed_key_id = databricks_mws_customer_managed_keys.this.customer_managed_key_id
-  managed_services_customer_managed_key_id = databricks_mws_customer_managed_keys.this.customer_managed_key_id
+
+  storage_customer_managed_key_id = var.use_existing_cmek ? var.cmek_resource_id : databricks_mws_customer_managed_keys.this[0].customer_managed_key_id
+  managed_services_customer_managed_key_id = var.use_existing_cmek ? var.cmek_resource_id : databricks_mws_customer_managed_keys.this[0].customer_managed_key_id
 
   # this makes sure that the NAT is created for outbound traffic before creating the workspace
   # not needed if the workspace uses backend PSC (recommended)
-  depends_on = [ databricks_mws_customer_managed_keys.this]
+  #depends_on = [ databricks_mws_customer_managed_keys.this]
 }
 
 # Cleanup resource to handle Databricks-managed firewall rules
