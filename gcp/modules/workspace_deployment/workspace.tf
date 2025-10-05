@@ -4,7 +4,7 @@ resource "databricks_mws_private_access_settings" "pas" {
  count = var.use_existing_pas ? 0 : 1
  provider       = databricks.accounts
  private_access_settings_name = "pas-${random_string.suffix.result}"
- region                       = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
+ region                       = var.google_region
  public_access_enabled        = true
  private_access_level         = "ACCOUNT"
 }
@@ -13,7 +13,7 @@ resource "databricks_mws_workspaces" "this" {
   provider       = databricks.accounts
   account_id     = var.databricks_account_id
   workspace_name = var.workspace_name
-  location       = google_compute_subnetwork.network-with-private-secondary-ip-ranges.region
+  location       = var.google_region
   cloud_resource_container {
     gcp {
       project_id = var.google_project
@@ -34,11 +34,12 @@ resource "databricks_mws_workspaces" "this" {
 # This prevents the "network in use by firewall rule" error during destroy
 resource "null_resource" "workspace_firewall_cleanup" {
   # This resource is created after the workspace but destroyed before it
+  count = var.harden_network ? 1 : 0
   depends_on = [databricks_mws_workspaces.this]
   
   triggers = {
     workspace_id = databricks_mws_workspaces.this.workspace_id
-    network_name = google_compute_network.dbx_private_vpc.name
+    network_name = google_compute_network.dbx_private_vpc[0].name
     workspace_url = databricks_mws_workspaces.this.workspace_url
   }
   

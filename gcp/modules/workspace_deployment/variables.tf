@@ -142,6 +142,13 @@ variable "use_psc" {
     default = false
 }
 
+variable "use_existing_databricks_vpc_eps" {
+    # Flag to use existing Databricks VPC Endpoints for PSC
+    default = false
+}
+variable "existing_databricks_vpc_ep_workspace" {}
+variable "existing_databricks_vpc_ep_relay" {}
+
 variable "admin_user_email" {
     # Email address of the admin user to be added to the workspace
     type = string
