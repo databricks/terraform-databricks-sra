@@ -1,19 +1,19 @@
-databricks_account_id = "<databricks-account-id>" # Customer Databricks Account ID
-databricks_google_service_account = "<service-account-name>@<project-name>.iam.gserviceaccount.com>" #GCP Service Account with permissions to create the Databricks Workspace and neccesary GCP resources if needed.
-google_project = "<google-project-id>" #Google Cloud project id (GCP)
-google_region = "<google-region>" #Google Cloud region (GCP)
-ip_addresses = ["0.0.0.0/0"] #List of IP Addresses for IP Access List. Only connections from these IP addresses will be allowed to the workspace.
-workspace_name = "<workspace-name>" #Desired Databricks Workspace Name to be created.
-account_console_url = "https://accounts.gcp.databricks.com" #Databricks Account console url for GCP
+databricks_account_id = "<databricks-account-id>" #Required. Customer Databricks Account ID
+databricks_google_service_account = "<service-account-name>@<project-name>.iam.gserviceaccount.com>" #Required. GCP Service Account with permissions to create the Databricks Workspace and neccesary GCP resources if needed.
+google_project = "<google-project-id>" #Required. Google Cloud project id (GCP)
+google_region = "<google-region>" #Required. Google Cloud region (GCP)
+ip_addresses = ["0.0.0.0/0"] #Required. List of IP Addresses for IP Access List. Only connections from these IP addresses will be allowed to the workspace.
+workspace_name = "<workspace-name>" #Required. Desired Databricks Workspace Name to be created.
+account_console_url = "https://accounts.gcp.databricks.com" #Required. Databricks Account console url for GCP
 
-use_existing_vpc = true  #If set to true, the existing VPC and Subnet will be used. If set to false, a new VPC and Subnet will be created.
+use_existing_vpc = true  #Required. If set to true, the existing VPC and Subnet will be used. If set to false, a new VPC and Subnet will be created.
 existing_vpc_name = "<existing-vpc-name>" #Required if use_existing_vpc is true. Update this with the existing VPC Name in GCP.
 existing_subnet_name = "<existing-subnet-name>" #Required if use_existing_vpc is true. Update this with the existing Subnet Name in GCP.
-harden_network = false #If set to true, firewalls rules will be added to allow traffic only for databricks and google services.
+harden_network = false #Required. If set to true, firewalls rules will be added to allow traffic only for databricks and google services.
 
-use_psc = true #If set to true, the backend Private Service Connect will be used. If set to false, the Private Service Connect will not be used and the workspace will requires Internet Access (example through Cloud NAT) to be functional.
-use_existing_psc_eps = true #If set to true, the existing PSC Endpoints will be used. If set to false, new PSC Endpoints will be created.
-use_existing_databricks_vpc_eps = true #If set to true, the existing registered Databricks VPC Endpoints for PSC will be used. If PSC endpoints have already been registered / used by other workspaces, existing Databricks VPC endpoints must be used since a PSC cannot be registered more than once. If set to false, new Databricks VPC Endpoints for PSC will be created.
+use_psc = true #Required. If set to true, the backend Private Service Connect will be used. If set to false, the Private Service Connect will not be used and the workspace will requires Internet Access (example through Cloud NAT) to be functional.
+use_existing_psc_eps = true #Required. If set to true, the existing PSC Endpoints will be used. If set to false, new PSC Endpoints will be created.
+use_existing_databricks_vpc_eps = true #Required. If set to true, the existing registered Databricks VPC Endpoints for PSC will be used. If PSC endpoints have already been registered / used by other workspaces, existing Databricks VPC endpoints must be used since a PSC cannot be registered more than once. If set to false, new Databricks VPC Endpoints for PSC will be created.
 google_pe_subnet = "<google-pe-subnet-name>" #Required if use_existing_psc_eps is false. Update this with the PSC Subnet Name to be createdin GCP.
 
 workspace_pe = "<databricks-workspace-ep>" #Required if use_existing_psc_eps is false. Update this with the PSC Endpoint Name to be created in GCP.
@@ -26,10 +26,10 @@ relay_pe_ip_name = "<relay-ep-ip>" #Required if use_existing_psc_eps is false. U
 relay_service_attachment = "<projects/prod-gcp-us-east1/regions/us-east1/serviceAttachments/ngrok-psc-endpoint>" #Required if use_existing_psc_eps is false. Update this with the correct regional PSC Service Attachment from https://docs.databricks.com/gcp/en/resources/ip-domain-region
 existing_databricks_vpc_ep_relay = "<existing-databricks-vpc-ep-relay-id>" #Required if use_existing_databricks_vpc_eps is true. Update this with the existing Databricks VPC Endpoint ID for the relay endpoint in GCP.
 
-use_existing_pas = true #If set to true, the existing Private Access Settings will be used. If set to false, a new Private Access Settings will be created.
+use_existing_pas = true #Required. If set to true, the existing Private Access Settings will be used. If set to false, a new Private Access Settings will be created.
 existing_pas_id = "<existing-pas-id>" #Required if use_existing_pas is true. Update this with the existing Private Access Settings ID in GCP.
 
-use_existing_cmek = true #If set to true, the existing Databricks Encryption keys configuration  will be used. If set to false, a new one will be created.
+use_existing_cmek = true #Required. If set to true, the existing Databricks Encryption keys configuration  will be used. If set to false, a new one will be created.
 key_name = "<key_name>" #Required if use_existing_cmek is false. Update this with the desired KMS Key Name in GCP.
 keyring_name = "<keyring_name>" #Required if use_existing_cmek is false. Update this with the desired KMS Key Ring Name in GCP.
 cmek_resource_id = "<cmek-resource-id>" #Required if use_existing_cmek is true. Update this with existing KMS Key Resource ID in GCP.
