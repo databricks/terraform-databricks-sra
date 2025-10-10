@@ -1,0 +1,28 @@
+---
+sidebar_position: 1
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import Admonition from '@theme/Admonition';
+
+# Read Before Deploying
+
+## Key Considerations
+The **Security Reference Architecture (SRA)** is a purpose-built, simplified deployment pattern designed for highly secure and regulated customers.
+
+This architecture includes specific functionalities that may affect certain use cases, as outlined below.
+
+* **Azure Firewall**: [Azure Firewall](https://learn.microsoft.com/en-us/azure/firewall/overview) is deployed to securely manage and control outbound traffic from the classic compute plane. It provides centralized logging, monitoring, and policy enforcement while maintaining compliance with organizational security standards.
+    * To add packages to classic compute or serverless compute, set up a private repository for scanned packages or update firewall rules/network policies to specified domains.
+
+* **Hub-and-Spoke Network Topology**: The architecture employs a hub-and-spoke model:
+    * The **hub** VNet contains shared infrastructure and services.
+    * Each **spoke** Vnet houses isolated Azure Databricks workspaces for different business units or teams.
+
+    This topology enhances security by isolating workloads and controlling traffic flow between VNets.
+
+* **Private Connectivity**: Azure Databricks workspaces are deployed with VNet injection and Private Link, ensuring that all traffic between the workspace and Azure services remains within the Azure backbone network. Private endpoints are configured for services like Azure Storage, Event Hubs, and SQL Databases to prevent data exfiltration.
+
+* **Isolated Unity Catalog Securables**: Unity Catalog securables like catalogs, Storage Credentials, and External Locations are isolated to individual workspaces.
+    * To share securables between workspaces, update the resources using the `databricks_workspace_binding` resource.
+
+* **Security Analysis Tool (SAT)**: The [Security Analysis Tool (SAT)](https://databricks-industry-solutions.github.io/security-analysis-tool/) is enabled by default to continuously monitor the security posture of your Databricks environment. By default, SAT is installed in the **hub** workspace.

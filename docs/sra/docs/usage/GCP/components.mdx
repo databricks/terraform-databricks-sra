@@ -1,0 +1,20 @@
+---
+sidebar_position: 1
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import Admonition from '@theme/Admonition';
+
+# SRA Components Breakdown
+
+This section outlines the core components of the **Security Reference Architeture (SRA)**. Several `.tf` scripts contain direct links to the Databricks Terraform documention.
+The full Databricks Terraform Provider Documentation can be found [here](https://registry.terraform.io/providers/databricks/databricks/latest/docs).
+
+## Core GCP Components
+* **Customer-Managed VPC**: A [Customer-Managed VPC](https://docs.databricks.com/gcp/en/security/network/classic/customer-managed-vpc) provides full control over network configuration, routing, and segmentation. This setup is required for **Private Service Connect (PSC)** and enables centralized management of multiple workspaces within a single, compliant network environment.
+* **Back-End Private Service Connect (PSC)**: Establishes private connectivity between the Databricks control plane and the customer-managed VPC. This ensures that all control plane and compute plane communication remains on the Google Cloud backbone, eliminating public internet exposure.
+    >**NOTE**: Front-end PSC for user-to-workspace connectivity is **not** included in this deployment. 
+* **Cloud KMS Keys (CMEK)**: Implements customer-managed encryption keys for both control plane–managed services (such as notebooks, secrets, and Databricks SQL query data) and workspace storage (including Cloud Storage buckets and GCE Persistent Disks).
+
+After the workspace is created, the following components are provisioned:
+
+* **Cloud DNS**: Configures private DNS zones required for PSC to resolve internal Databricks service endpoints to private IPs within the VPC, maintaining isolation and secure communication between components.

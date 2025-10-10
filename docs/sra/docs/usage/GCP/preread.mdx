@@ -1,0 +1,29 @@
+---
+sidebar_position: 1
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import Admonition from '@theme/Admonition';
+
+# Read Before Deploying
+
+## Key Considerations
+The **Security Reference Architecture (SRA)** is a purpose-built, simplified deployment pattern designed for highly secure and regulated customers.
+
+This architecture includes specific functionalities that may affect certain use cases, as outlined below.
+
+* **Private Service Connect (PSC) Dependencies**: This deployment implements **back-end** Private Service Connect (PSC) to ensure all workspace-to-control-plane traffic stays on the Google Cloud backbone.
+    * DNS records are automatically configured through Private Cloud DNS zones.
+    * The template **does not** include front-end PSC (for user-to-workspace traffic). If your security posture requires full private connectivity for user access, front-end PSC must be configured separately following the [Databricks documentation](https://docs.databricks.com/gcp/en/security/network/classic/private-service-connect).
+
+* **Customer-Managed VPC Configuration**: The workspace is deployed into a [Customer-Managed VPC](https://docs.databricks.com/gcp/en/security/network/classic/customer-managed-vpc) to provide control over routing, firewall rules, and subnet segmentation.
+    * Ensure your organization’s security team reviews VPC peering or Shared VPC configurations before deployment.
+    * Adjust subnet CIDR ranges and routes as needed to align with your network design standards.
+
+* **Cloud KMS Integration**: Customer-managed encryption keys (CMEK) are created via Cloud KMS and attached to both managed services and workspace storage.
+
+## Customizations
+
+Terraform customizations are available to support the baseline deployment of the **Security Reference Architecture (SRA)**. 
+
+
+These extensions and examples can be found in the top-level `examples` folder.
