@@ -6,10 +6,9 @@ defaults:
 
 on:
   pull_request:
-    branches:
-      - main
     paths:
       - 'docs/**'
+      - '.github/workflows/docs-test-deploy.yml'
 
 jobs:
   test-deploy:
