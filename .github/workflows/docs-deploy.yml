@@ -2,7 +2,7 @@ name: Docs deploy to GitHub Pages
 
 defaults:
   run:
-    working-directory: ./docs
+    working-directory: ./docs/sra
 
 on:
   push:

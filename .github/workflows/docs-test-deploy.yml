@@ -2,7 +2,7 @@ name: Docs test deployment
 
 defaults:
   run:
-    working-directory: ./docs
+    working-directory: ./docs/sra
 
 on:
   pull_request:
