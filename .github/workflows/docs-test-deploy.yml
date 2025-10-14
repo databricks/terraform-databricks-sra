@@ -1,6 +1,8 @@
 name: Docs test deployment
 
-defaults.run.working-directory: ./docs
+defaults:
+  run:
+    working-directory: ./docs
 
 on:
   pull_request:

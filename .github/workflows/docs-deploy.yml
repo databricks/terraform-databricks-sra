@@ -1,6 +1,8 @@
 name: Docs deploy to GitHub Pages
 
-defaults.run.working-directory: ./docs
+defaults:
+  run:
+    working-directory: ./docs
 
 on:
   push:
