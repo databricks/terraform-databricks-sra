@@ -6,8 +6,8 @@ defaults:
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+      # - main
     paths:
       - 'docs/**'
       - '.github/workflows/docs-deploy.yml'
@@ -30,6 +30,9 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build website
         run: yarn build
+
+      - name: list files
+        run: tree .
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
