@@ -31,16 +31,6 @@ module "spoke" {
   depends_on = [module.hub]
 }
 
-moved {
-  from = databricks_account_network_policy.restrictive_network_policy
-  to   = module.hub.databricks_account_network_policy.restrictive_network_policy
-}
-
-moved {
-  from = databricks_mws_network_connectivity_config.this
-  to   = module.hub.databricks_mws_network_connectivity_config.this
-}
-
 module "spoke_catalog" {
   source = "./modules/catalog"
 
@@ -54,6 +44,7 @@ module "spoke_catalog" {
   subnet_id             = module.spoke.subnet_ids.privatelink
   tags                  = module.spoke.tags
   databricks_account_id = var.databricks_account_id
+  is_default_namespace  = true
 
   location     = var.location
   metastore_id = module.hub.metastore_id

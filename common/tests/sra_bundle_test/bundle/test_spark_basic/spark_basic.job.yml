@@ -1,0 +1,26 @@
+# The test_spark_basic job for sra_test_suite.
+resources:
+  jobs:
+    spark_basic:
+      name: spark_basic
+
+      tasks:
+        - task_key: classic_task
+          job_cluster_key: job_cluster
+          notebook_task:
+            notebook_path: ./spark_basic.ipynb
+
+        - task_key: serverless_task
+          notebook_task:
+            notebook_path: ./spark_basic.ipynb
+
+      # Note that this is not actually used since cluster_id is provided by the bundle for faster testing
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            spark_version: ${var.spark_version}
+            node_type_id: ${var.node_type_id}
+            data_security_mode: SINGLE_USER
+            autoscale:
+              min_workers: 1
+              max_workers: 2
