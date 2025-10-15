@@ -2,7 +2,7 @@ name: Docs deploy to GitHub Pages
 
 defaults:
   run:
-    working-directory: ./docs/sra
+    working-directory: '/docs/sra'
 
 on:
   push:
@@ -24,20 +24,17 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-          cache-dependency-path: ./docs/sra/yarn.lock
+          cache-dependency-path: 'docs/sra/yarn.lock'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build website
         run: yarn build
 
-      - name: list files
-        run: tree .
-
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./build
+          path: 'docs/sra/build'
 
   deploy:
     name: Deploy to GitHub Pages
