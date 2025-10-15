@@ -12,7 +12,7 @@ const config: Config = {
   url: 'https://databricks.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/security-reference-architecture/',
+  baseUrl: '/terraform-databricks-sra/',
   trailingSlash: true,
 
   // GitHub pages deployment config.
