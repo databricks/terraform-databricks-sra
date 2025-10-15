@@ -6,8 +6,8 @@ defaults:
 
 on:
   push:
-    # branches:
-      # - main
+    branches:
+      - main
     paths:
       - 'docs/**'
       - '.github/workflows/docs-deploy.yml'
