@@ -50,6 +50,9 @@ terraform.rc
 .direnv*
 .envrc*
 
+# Env files
+.env*
+
 *.hcl
 
 # Include tflint configurations for CI workflows
@@ -60,3 +63,4 @@ terraform.rc
 gcp/modules/workspace_deployment/fslakehouse-9b0f57986dbf.json
 gcp/modules/service_account/*.json
 **/service_account/*.json
+.cursorignore

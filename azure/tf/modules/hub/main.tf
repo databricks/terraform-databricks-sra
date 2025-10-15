@@ -10,6 +10,32 @@ locals {
   # Generate a random string for dbfs_name
   dbfs_name       = join("", ["dbstorage", random_string.dbfsnaming.result])
   managed_rg_name = join("", [module.naming.resource_group.name_unique, "adbmanaged"])
+
+  # The public_repos variable is used here to mirror firewall rules between classic and serverless for the spokes
+  spoke_internet_allowed_domains = [for dest in var.public_repos : dest if !startswith(dest, "*.")]
+  spoke_internet_allowed_destinations = [
+    for dest in local.spoke_internet_allowed_domains :
+    {
+      destination               = trimprefix(dest, "*."),
+      internet_destination_type = "DNS_NAME"
+    }
+  ]
+
+  # The hub_allowed_urls variable is used here to allow for hub to have a different allow list (primarily for SAT)
+  hub_internet_allowed_domains = [for dest in var.hub_allowed_urls : dest if !startswith(dest, "*.")]
+  hub_internet_allowed_destinations = [
+    for dest in local.hub_internet_allowed_domains :
+    {
+      destination               = trimprefix(dest, "*."),
+      internet_destination_type = "DNS_NAME"
+    }
+  ]
+
+  # We use this to make sure that if we provision the 10th NCC in a region, that it does not cause subsequent terraform
+  # plans/applies to fail due to the precondition on the NCC resource.
+  ncc_name          = "ncc-${var.location}-${var.resource_suffix}"
+  current_ncc_count = length([for k in data.databricks_mws_network_connectivity_configs.this.names : k if k != local.ncc_name])
+  ncc_region_limit  = 10
 }
 
 module "naming" {
@@ -43,4 +69,51 @@ resource "azurerm_subnet" "privatelink" {
   virtual_network_name = azurerm_virtual_network.this.name
 
   address_prefixes = [var.subnet_map["privatelink"]]
+}
+
+# Serverless Network
+# Used to validate that there are enough NCCs left in a region
+data "databricks_mws_network_connectivity_configs" "this" {
+  region = var.location
+}
+
+# This NCC is shared across all workspaces created by SRA
+resource "databricks_mws_network_connectivity_config" "this" {
+  name   = local.ncc_name
+  region = var.location
+
+  lifecycle {
+    precondition {
+      condition     = local.current_ncc_count < local.ncc_region_limit
+      error_message = "There are already ${local.ncc_region_limit} NCCs in ${var.location}!"
+    }
+  }
+}
+
+resource "databricks_account_network_policy" "restrictive_network_policy" {
+  network_policy_id = "np-${var.resource_suffix}-restrictive"
+  account_id        = var.databricks_account_id
+  egress = {
+    network_access = {
+      restriction_mode              = "RESTRICTED_ACCESS"
+      allowed_internet_destinations = local.spoke_internet_allowed_destinations
+      policy_enforcement = {
+        enforcement_mode = "ENFORCED"
+      }
+    }
+  }
+}
+
+resource "databricks_account_network_policy" "hub_policy" {
+  network_policy_id = "np-${var.resource_suffix}-hub"
+  account_id        = var.databricks_account_id
+  egress = {
+    network_access = {
+      restriction_mode              = "RESTRICTED_ACCESS"
+      allowed_internet_destinations = local.hub_internet_allowed_destinations
+      policy_enforcement = {
+        enforcement_mode = "ENFORCED"
+      }
+    }
+  }
 }

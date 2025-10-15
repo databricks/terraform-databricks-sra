@@ -47,13 +47,6 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
 
     # Define rules within the network rule collection
     rule {
-      name                  = "adb-services"
-      protocols             = ["TCP", "UDP"]
-      source_ip_groups      = [azurerm_ip_group.this.id]
-      destination_addresses = ["AzureDatabricks"]
-      destination_ports     = ["443"]
-    }
-    rule {
       name                  = "adb-storage"
       protocols             = ["TCP", "UDP"]
       source_ip_groups      = [azurerm_ip_group.this.id]

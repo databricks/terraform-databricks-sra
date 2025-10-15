@@ -34,18 +34,22 @@ module "subnet_addrs" {
     }
   ]
 }
-# Define module "hub" with the source "./modules/azure_hub"
+
+# Define module "hub" with the source "./modules/hub"
 # Pass the required variables to the module
 module "hub" {
-  source             = "./modules/hub"
-  location           = var.location
-  hub_vnet_cidr      = var.hub_vnet_cidr
-  subnet_map         = module.subnet_addrs.network_cidr_blocks
-  client_config      = data.azurerm_client_config.current
-  databricks_app_reg = data.azuread_service_principal.this
-  public_repos       = var.public_repos
-  tags               = var.tags
-  resource_suffix    = var.hub_resource_suffix
+  source                   = "./modules/hub"
+  location                 = var.location
+  hub_vnet_cidr            = var.hub_vnet_cidr
+  subnet_map               = module.subnet_addrs.network_cidr_blocks
+  client_config            = data.azurerm_client_config.current
+  databricks_app_reg       = data.azuread_service_principal.this
+  public_repos             = var.public_repos
+  hub_allowed_urls         = var.hub_allowed_urls
+  tags                     = var.tags
+  resource_suffix          = var.hub_resource_suffix
+  provisioner_principal_id = data.databricks_user.provisioner.id
+  databricks_account_id    = var.databricks_account_id
 
   #options
   is_kms_enabled           = true
@@ -59,15 +63,18 @@ module "hub_catalog" {
   # This catalog is only created if SAT is enabled. If SAT is provisioned in a spoke, this can be manually removed.
   count = var.sat_configuration.enabled ? 1 : 0
 
-  catalog_name        = var.sat_configuration.catalog_name
-  location            = var.location
-  metastore_id        = module.hub.metastore_id
-  dns_zone_ids        = [module.hub.dns_zone_ids.dfs]
-  ncc_id              = module.hub.ncc_id
-  resource_group_name = module.hub.resource_group_name
-  resource_suffix     = "${local.sat_workspace.resource_suffix}sat"
-  subnet_id           = module.hub.subnet_ids.privatelink
-  tags                = module.hub.tags
+  catalog_name          = var.sat_configuration.catalog_name
+  location              = var.location
+  metastore_id          = module.hub.metastore_id
+  dns_zone_ids          = module.hub.dns_zone_ids
+  ncc_id                = module.hub.ncc_id
+  ncc_name              = module.hub.ncc_name
+  resource_group_name   = module.hub.resource_group_name
+  resource_suffix       = "${local.sat_workspace.resource_suffix}sat"
+  subnet_id             = module.hub.subnet_ids.privatelink
+  tags                  = module.hub.tags
+  force_destroy         = var.sat_force_destroy
+  databricks_account_id = var.databricks_account_id
 
   providers = {
     databricks.workspace = databricks.hub

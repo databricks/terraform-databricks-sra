@@ -49,7 +49,7 @@ variable "subnet_id" {
 }
 
 variable "dns_zone_ids" {
-  type        = list(string)
+  type        = map(string)
   description = "(Required) IDs of the private DNS zones to place private endpoint records in"
 }
 
@@ -81,4 +81,14 @@ variable "catalog_isolation_mode" {
   type        = string
   description = "(Optional) Isolation mode for catalog. Must be one of: ISOLATED, OPEN"
   default     = "ISOLATED"
+}
+
+variable "ncc_name" {
+  type        = string
+  description = "Name of the NCC to use for this workspace"
+}
+
+variable "databricks_account_id" {
+  type        = string
+  description = "Databricks account ID"
 }

@@ -75,6 +75,11 @@ output "ncc_id" {
   value       = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
 }
 
+output "ncc_name" {
+  description = "NCC name of this workspace"
+  value       = databricks_mws_network_connectivity_config.this.name
+}
+
 output "subnet_ids" {
   description = "Subnet IDs"
   value = {
@@ -91,7 +96,7 @@ output "tags" {
 
 output "workspace_url" {
   description = "The URL of the Databricks workspace, used to access the Databricks environment."
-  value       = azurerm_databricks_workspace.webauth.workspace_url
+  value       = null_resource.admin_wait.triggers.workspace_url
 }
 
 output "workspace_id" {
@@ -102,4 +107,9 @@ output "workspace_id" {
 output "resource_suffix" {
   description = "Resource suffix to use for naming down stream resources"
   value       = var.resource_suffix
+}
+
+output "network_policy_id" {
+  description = "Network Policy ID"
+  value       = databricks_account_network_policy.restrictive_network_policy.network_policy_id
 }

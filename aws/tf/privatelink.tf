@@ -33,6 +33,14 @@ resource "aws_security_group" "privatelink" {
   }
 
   ingress {
+    description     = "Databricks - PrivateLink Endpoint SG - PostgreSQL - Lakebase"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg[0].id]
+  }
+
+  ingress {
     description     = "Databricks - Internal calls from the Databricks compute plane to the Databricks control plane API"
     from_port       = 8443
     to_port         = 8443
@@ -244,7 +252,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
 # Restrictive STS endpoint policy:
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
   count = var.network_configuration != "custom" ? 1 : 0
-  
+
   statement {
     actions = [
       "sts:AssumeRole",

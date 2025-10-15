@@ -46,6 +46,11 @@ variable "public_repos" {
   description = "(Required) List of public repository IP addresses to allow access to."
 }
 
+variable "hub_allowed_urls" {
+  type        = list(string)
+  description = "(Required) List of URLs to allow the hub workspace access to."
+}
+
 # Define the variable "tags" with type map of strings and a description
 variable "tags" {
   type        = map(string)
@@ -85,4 +90,14 @@ variable "is_frontend_private_link_enabled" {
   type        = bool
   description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
   default     = false
+}
+
+variable "provisioner_principal_id" {
+  type        = string
+  description = "Principal ID of the user running this terraform"
+}
+
+variable "databricks_account_id" {
+  type        = string
+  description = "Databricks account ID"
 }

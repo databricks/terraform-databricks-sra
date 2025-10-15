@@ -90,7 +90,9 @@ resource "azurerm_databricks_workspace" "webauth" {
   customer_managed_key_enabled          = var.is_kms_enabled
   infrastructure_encryption_enabled     = var.is_kms_enabled
   public_network_access_enabled         = !var.is_frontend_private_link_enabled
-  network_security_group_rules_required = var.is_frontend_private_link_enabled ? "NoAzureDatabricksRules" : "AllRules"
+  network_security_group_rules_required = "NoAzureDatabricksRules"
+  default_storage_firewall_enabled      = var.boolean_create_private_dbfs
+  access_connector_id                   = var.boolean_create_private_dbfs ? azurerm_databricks_access_connector.ws[0].id : null
 
   # This custom_parameters block specifies additional parameters for the databricks workspace
   custom_parameters {
@@ -104,6 +106,31 @@ resource "azurerm_databricks_workspace" "webauth" {
   }
 
   tags = var.tags
+}
+
+# Wait for 10 seconds after workspace creation to allow for APIs to become available
+resource "time_sleep" "workspace_wait" {
+  triggers = {
+    workspace_id = azurerm_databricks_workspace.webauth.workspace_id
+  }
+  create_duration  = "10s"
+  destroy_duration = "10s"
+}
+
+# Grant admin access to the provisioner account to the workspace, used for downstream workspace provider
+resource "databricks_mws_permission_assignment" "admin" {
+  workspace_id = time_sleep.workspace_wait.triggers.workspace_id
+  principal_id = var.provisioner_principal_id
+  permissions  = ["ADMIN"]
+}
+
+# This resource is used to output the workspace URL of the workspace AFTER the provisioner account has been granted admin
+# This removes the need to use depends_on in downstream modules that use this workspace in their aliased provider.
+resource "null_resource" "admin_wait" {
+  triggers = {
+    workspace_url = azurerm_databricks_workspace.webauth.workspace_url
+    workspace_id  = databricks_mws_permission_assignment.admin.workspace_id
+  }
 }
 
 resource "azurerm_management_lock" "webauth" {
@@ -204,4 +231,9 @@ resource "databricks_metastore_assignment" "webauth" {
 resource "databricks_mws_ncc_binding" "this" {
   network_connectivity_config_id = databricks_mws_network_connectivity_config.this.network_connectivity_config_id
   workspace_id                   = azurerm_databricks_workspace.webauth.workspace_id
+}
+
+resource "databricks_workspace_network_option" "this" {
+  network_policy_id = databricks_account_network_policy.hub_policy.network_policy_id
+  workspace_id      = azurerm_databricks_workspace.webauth.workspace_id
 }

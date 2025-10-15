@@ -44,15 +44,18 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Customer-managed VPC**: A [customer-managed VPC](https://docs.databricks.com/administration-guide/cloud-configurations/aws/customer-managed-vpc.html) allows Databricks customers to exercise more control over network configurations to comply with specific cloud security and governance standards required by their organization.
 
-- **S3 Buckets**: Two S3 buckets are created to support the following functionalities:
+- **S3 Buckets**: Three S3 buckets are created to support the following functionalities:
     - [Workspace Root Bucket](https://docs.databricks.com/en/admin/account-settings-e2/storage.html)
     - [Unity Catalog - Workspace Catalog](https://docs.databricks.com/en/catalogs/create-catalog.html)
+    - [Audit Log Delivery Bucket](https://docs.databricks.com/aws/en/admin/account-settings-e2/audit-aws-storage)
 
-- **IAM Roles**: Two IAM roles are created to support the following functionalities:
+- **IAM Roles**: Three IAM roles are created to support the following functionalities:
     - [Classic Compute (EC2) Provisioning](https://docs.databricks.com/en/admin/account-settings-e2/credentials.html)
     - [Data Access for Unity Catalog - Workspace Catalog](https://docs.databricks.com/en/connect/unity-catalog/cloud-storage/storage-credentials.html#step-1-create-an-iam-role)
+    - [Audit Log Delivery IAM Role](https://docs.databricks.com/aws/en/admin/account-settings-e2/audit-aws-credentials)
 
 - **AWS VPC Endpoints for S3, STS, and Kinesis**: Using AWS PrivateLink, a VPC endpoint connects a customer's VPC to AWS services without traversing public IP addresses. [S3, STS, and Kinesis endpoints](https://docs.databricks.com/administration-guide/cloud-configurations/aws/privatelink.html#step-5-add-vpc-endpoints-for-other-aws-services-recommended-but-optional) are best practices for enterprise Databricks deployments. Additional endpoints can be configured based on your use case (e.g., Amazon DynamoDB and AWS Glue).
+    - **NOTE**: Restrictive VPC endpoint policies have been implemented for S3, STS, and Kinesis. To access additional S3, STS, or Kinesis resources via the classic compute plane, please update these resources accordingly.
 
 - **Back-end AWS PrivateLink Connectivity**: AWS PrivateLink provides a private network route from one AWS environment to another. [Back-end PrivateLink](https://docs.databricks.com/administration-guide/cloud-configurations/aws/privatelink.html#overview) is configured so that communication between the customer's classic compute plane and the Databricks control plane does not traverse public IP addresses. This is accomplished through Databricks-specific interface VPC endpoints. Front-end PrivateLink is also available for customers to keep user traffic over the AWS backbone, though front-end PrivateLink is not included in this Terraform template.
 

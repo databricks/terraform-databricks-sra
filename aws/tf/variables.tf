@@ -56,6 +56,12 @@ variable "cmk_admin_arn" {
   default     = null
 }
 
+variable "compliance_standards" {
+  description = "List of compliance standards."
+  type        = list(string)
+  nullable    = true
+}
+
 variable "custom_private_subnet_ids" {
   description = "List of custom private subnet IDs"
   type        = list(string)
@@ -119,6 +125,13 @@ variable "deployment_name" {
   default     = null
   type        = string
   nullable    = true
+}
+
+variable "enable_compliance_security_profile" {
+  description = "Flag to enable the compliance security profile."
+  type        = bool
+  sensitive   = true
+  default     = false
 }
 
 variable "enable_security_analysis_tool" {
@@ -620,35 +633,35 @@ locals {
   # Backward compatibility variables - provide the same interface as the old simple map variables
   scc_relay = {
     for region, config in var.scc_relay_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_endpoint != null ? 
+      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_endpoint != null ?
       config.secondary_endpoint : config.primary_endpoint
     )
   }
-  
+
   workspace = {
     for region, config in var.workspace_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_endpoint != null ? 
+      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_endpoint != null ?
       config.secondary_endpoint : config.primary_endpoint
     )
   }
-  
+
   region_name = {
     for region, config in var.region_name_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_name != null ? 
+      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_name != null ?
       config.secondary_name : config.primary_name
     )
   }
-  
+
   system_table_bucket = {
     for region, config in var.system_table_bucket_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_bucket != null ? 
+      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_bucket != null ?
       config.secondary_bucket : config.primary_bucket
     )
   }
-  
+
   log_storage_bucket = {
     for region, config in var.log_storage_bucket_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_bucket != null ? 
+      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_bucket != null ?
       config.secondary_bucket : config.primary_bucket
     )
   }

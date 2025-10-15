@@ -20,7 +20,23 @@ variable "hub_resource_suffix" {
 variable "public_repos" {
   type        = list(string)
   description = "(Optional) List of public repository IP addresses to allow access to."
-  default     = ["python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org", "cran.r-project.org", "*.cran.r-project.org", "r-project.org"]
+  default     = ["python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org", "cran.r-project.org", "*.cran.r-project.org", "r-project.org", "management.azure.com", "login.microsoftonline.com"]
+
+  validation {
+    condition     = var.sat_configuration.enabled && !var.sat_configuration.run_on_serverless ? length(setsubtract(["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"], var.public_repos)) == 0 : true
+    error_message = "Since SAT is enabled, you must include SAT-required URLs in the hub_allowed_urls variable."
+  }
+}
+
+variable "hub_allowed_urls" {
+  type        = set(string)
+  description = "(Optional) List of URLs to allow the hub workspace access to."
+  default     = ["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"]
+
+  validation {
+    condition     = var.sat_configuration.enabled && var.sat_configuration.run_on_serverless ? length(setsubtract(["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"], var.hub_allowed_urls)) == 0 : true
+    error_message = "Since SAT is enabled, you must include SAT-required URLs in the hub_allowed_urls variable."
+  }
 }
 
 variable "spoke_config" {
@@ -60,7 +76,7 @@ variable "sat_configuration" {
     catalog_name      = optional(string, "sat")
     resource_suffix   = optional(string, "null")
     proxies           = optional(map(any), {})
-    run_on_serverless = optional(bool, true)
+    run_on_serverless = optional(bool, false)
   })
   default     = {}
   description = "(Optional) Configuration for the SAT customization"
@@ -79,4 +95,11 @@ variable "sat_service_principal" {
   }
   description = "(Optional) Service principal configuration for running SAT. If this is not provided, a service principal will be created. The created service principal name can be configured with the name field in this variable."
   sensitive   = true
+}
+
+# This variable is only used for development purposes - is should not be used/set if deploying SRA in a customer environment
+variable "sat_force_destroy" {
+  type        = bool
+  default     = false
+  description = "Used to allow Terraform to force destroy the SAT catalog. This is only used for testing SRA."
 }

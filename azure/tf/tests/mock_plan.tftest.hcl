@@ -1,3 +1,7 @@
+test {
+  parallel = true
+}
+
 # The below mocked providers have mock_data blocks anywhere a properly formatted GUID is used in the configuration
 # (i.e. access policies, role assignments, etc.)
 mock_provider "azurerm" {
@@ -29,27 +33,64 @@ mock_provider "azuread" {
   }
 }
 
-mock_provider "databricks" {}
+mock_provider "databricks" {
+  mock_data "databricks_user" {
+    defaults = {
+      id = 0
+    }
+  }
+}
 
 mock_provider "databricks" {
   alias = "SAT"
 }
 
 run "plan_test_defaults" {
-  command = plan
+  state_key = "defaults"
+  command   = plan
 }
 
 run "plan_test_no_sat" {
-  command = plan
+  state_key = "no_sat"
+  command   = plan
   variables {
     sat_configuration = {
       enabled = false
     }
+    hub_allowed_urls = []
+  }
+}
+
+run "plan_test_sat_broken_classic" {
+  state_key       = "sat_broken_classic"
+  command         = plan
+  expect_failures = [var.public_repos]
+  variables {
+    sat_configuration = {
+      enabled = true
+    }
+    public_repos     = []
+    hub_allowed_urls = []
+  }
+}
+
+run "plan_test_sat_broken_serverless" {
+  state_key       = "sat_broken_serverless"
+  command         = plan
+  expect_failures = [var.hub_allowed_urls]
+  variables {
+    sat_configuration = {
+      enabled           = true
+      run_on_serverless = true
+    }
+    public_repos     = []
+    hub_allowed_urls = []
   }
 }
 
 run "plan_test_sat_with_byosp" {
-  command = plan
+  state_key = "sat_byosp"
+  command   = plan
   variables {
     sat_service_principal = {
       client_id     = ""
@@ -59,7 +100,8 @@ run "plan_test_sat_with_byosp" {
 }
 
 run "plan_test_sat_nondefaults" {
-  command = plan
+  state_key = "sat_non_defaults"
+  command   = plan
   variables {
     sat_configuration = {
       resource_suffix   = "spoke_b"

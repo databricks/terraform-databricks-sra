@@ -15,17 +15,22 @@ resource "azurerm_private_endpoint" "dfs" {
   # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = module.naming.private_dns_zone_group.name
-    private_dns_zone_ids = var.dns_zone_ids
+    private_dns_zone_ids = [var.dns_zone_ids["dfs"]]
   }
 
   tags = var.tags
 }
 
-resource "databricks_mws_ncc_private_endpoint_rule" "dfs" {
-  network_connectivity_config_id = var.ncc_id
-  resource_id                    = azurerm_storage_account.unity_catalog.id
-  group_id                       = "dfs"
+module "ncc_dfs" {
+  source = "../self-approving-pe"
+
+  databricks_account_id            = var.databricks_account_id
+  group_id                         = "dfs"
+  network_connectivity_config_id   = var.ncc_id
+  resource_id                      = azurerm_storage_account.unity_catalog.id
+  network_connectivity_config_name = var.ncc_name
 }
+
 
 resource "azurerm_private_endpoint" "blob" {
   name                = "${module.naming.private_endpoint.name}-blob"
@@ -44,14 +49,18 @@ resource "azurerm_private_endpoint" "blob" {
   # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = module.naming.private_dns_zone_group.name
-    private_dns_zone_ids = var.dns_zone_ids
+    private_dns_zone_ids = [var.dns_zone_ids["blob"]]
   }
 
   tags = var.tags
 }
 
-resource "databricks_mws_ncc_private_endpoint_rule" "blob" {
-  network_connectivity_config_id = var.ncc_id
-  resource_id                    = azurerm_storage_account.unity_catalog.id
-  group_id                       = "blob"
+module "ncc_blob" {
+  source = "../self-approving-pe"
+
+  databricks_account_id            = var.databricks_account_id
+  group_id                         = "blob"
+  network_connectivity_config_id   = var.ncc_id
+  resource_id                      = azurerm_storage_account.unity_catalog.id
+  network_connectivity_config_name = var.ncc_name
 }

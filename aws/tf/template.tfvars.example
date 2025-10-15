@@ -41,7 +41,7 @@ network_configuration = "isolated"
 vpc_cidr_range           = "10.0.0.0/18"
 private_subnets_cidr     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
 privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
-sg_egress_ports          = [443, 2443, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
+sg_egress_ports          = [443, 2443, 5432, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
 # CUSTOM NETWORK CONFIGURATION
 # Required when using network_configuration = "custom"
@@ -71,6 +71,15 @@ enable_security_analysis_tool = false
 
 # CMK Admin ARN (required for non-root account CMK usage)
 # cmk_admin_arn = ""
+
+# Compliance Security Profile Setting
+# Standards: https://docs.databricks.com/aws/en/security/privacy/security-profile#compliance-security-profile-overview
+# NOTE: If you add HIPAA, it is your responsibility before you process PHI data to have a BAA agreement with Databricks.
+enable_compliance_security_profile = false
+
+# NOTE: This variable is necessary if and only if you do not set default compliance settings at the account level.
+# Avaiable compliance standards found here: https://pkg.go.dev/github.com/databricks/databricks-sdk-go/service/settings#ComplianceStandard
+compliance_standards = [ "Standard_A", "Standard_B" ]
 
 # Deployment name for the workspace (must be enabled by Databricks representative)
 deployment_name = null

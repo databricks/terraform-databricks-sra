@@ -1,0 +1,35 @@
+---
+sidebar_position: 1
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# Overview
+
+<div className='bg-gray-100 p-4 rounded-lg mb-6'>
+  <img src={useBaseUrl('/img/sra_overview.png')} alt="Security Functionality" />
+</div>
+
+The **Security Reference Architecture (SRA)** with Terraform provides a streamlined way to deploy Databricks workspaces and supporting cloud infrastructure with security best practices built in.
+Using the official Databricks Terraform provider, environments are programmatically set up with hardened configurations modeled after our most security-conscious customers. 
+The included templates are built on [Databricks Security Best Practices](https://www.databricks.com/trust/security-features#best-practices), providing a strong, prescriptive foundation for secure deployments.
+
+Beyond secure deployment, the **Security Reference Architecture (SRA)** supports governance by aligning with industry standards and compliance frameworks. 
+Automated infrastructure provisioning reduces operational overhead, while consistent, hardened configurations simplify audits and lower risk. 
+At the same time, the Terraform templates are flexible and extensible, enabling customization to meet unique organizational needs without compromising on security best practices.
+
+For additional security guidance, resources, and best practices, visit the [Databricks Security and Trust Center](https://www.databricks.com/trust)
+
+## Point-in-Time Solution
+> The **Security Reference Architecture (SRA)** - Terraform Templates is designed as a point-in-time solution that captures security best practices at the time of each release. 
+>
+> This project **does not** guarantee backward compatibility between versions; new releases are not drop-in replacements for existing codebases.
+
+## Project Support
+> The code in this project is provided **for exploration purposes only** and is **not formally supported** by Databricks under any Service Level Agreements (SLAs). It is provided **AS-IS**, without any warranties or guarantees.  
+>
+> Please **do not submit support tickets** to Databricks for issues related to the use of this project.  
+>
+> The source code provided is subject to the Databricks [LICENSE](https://github.com/databricks/terraform-databricks-sra/blob/main/LICENSE) . All third-party libraries included or referenced are subject to their respective licenses set forth in the project license.  
+>
+> Any issues or bugs found should be submitted as [GitHub Issues](https://github.com/databricks/terraform-databricks-sra/issues) on the project repository. While these will be reviewed as time permits, there are **no formal SLAs** for support.
+

@@ -64,11 +64,11 @@ resource "databricks_storage_credential" "workspace_catalog_storage_credential" 
 
 # Unity Catalog Trust Policy - Data Source
 data "databricks_aws_unity_catalog_assume_role_policy" "unity_catalog" {
-  aws_account_id = var.aws_account_id
-  aws_partition  = var.aws_assume_partition
-  role_name      = local.uc_iam_role
+  aws_account_id        = var.aws_account_id
+  aws_partition         = var.aws_assume_partition
+  role_name             = local.uc_iam_role
   unity_catalog_iam_arn = var.unity_catalog_iam_arn
-  external_id    = databricks_storage_credential.workspace_catalog_storage_credential.aws_iam_role[0].external_id
+  external_id           = databricks_storage_credential.workspace_catalog_storage_credential.aws_iam_role[0].external_id
 }
 
 # Unity Catalog Policy - Data Source
