@@ -1,4 +1,4 @@
-# Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/disable_default_legacy_access
+# Terraform Documentation: https://registry.terraform.io/providers/databricks/databricks/latest/docs/resources/disable_legacy_access_setting
 
 resource "databricks_disable_legacy_access_setting" "access" {
   disable_legacy_access {
