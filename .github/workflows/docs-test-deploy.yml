@@ -2,7 +2,7 @@ name: Docs test deployment
 
 defaults:
   run:
-    working-directory: '/docs/sra'
+    working-directory: 'docs/sra'
 
 on:
   pull_request:
@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 20
           cache: yarn
-          cache-dependency-path: '/docs/sra/yarn.lock'
+          cache-dependency-path: 'docs/sra/yarn.lock'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
