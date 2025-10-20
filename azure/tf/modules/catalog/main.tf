@@ -38,3 +38,13 @@ resource "databricks_catalog" "catalog" {
 
   provider = databricks.workspace
 }
+
+resource "databricks_default_namespace_setting" "this" {
+  count = var.is_default_namespace ? 1 : 0
+
+  namespace {
+    value = databricks_catalog.catalog.name
+  }
+
+  provider = databricks.workspace
+}

@@ -1,0 +1,8 @@
+resources:
+  schemas:
+    schema_classic:
+      name: ${bundle.name}_classic
+      catalog_name: ${var.catalog_name}
+    schema_serverless:
+      name: ${bundle.name}_serverless
+      catalog_name: ${var.catalog_name}
