@@ -1,43 +1,3 @@
-# Generate a random string for dbfsnaming
-resource "random_string" "dbfsnaming" {
-  special = false
-  upper   = false
-  length  = 13
-}
-
-# Define subnets using cidrsubnet function
-locals {
-  # Generate a random string for dbfs_name
-  dbfs_name       = join("", ["dbstorage", random_string.dbfsnaming.result])
-  managed_rg_name = join("", [module.naming.resource_group.name_unique, "adbmanaged"])
-
-  # The public_repos variable is used here to mirror firewall rules between classic and serverless for the spokes
-  spoke_internet_allowed_domains = [for dest in var.public_repos : dest if !startswith(dest, "*.")]
-  spoke_internet_allowed_destinations = [
-    for dest in local.spoke_internet_allowed_domains :
-    {
-      destination               = trimprefix(dest, "*."),
-      internet_destination_type = "DNS_NAME"
-    }
-  ]
-
-  # The hub_allowed_urls variable is used here to allow for hub to have a different allow list (primarily for SAT)
-  hub_internet_allowed_domains = [for dest in var.hub_allowed_urls : dest if !startswith(dest, "*.")]
-  hub_internet_allowed_destinations = [
-    for dest in local.hub_internet_allowed_domains :
-    {
-      destination               = trimprefix(dest, "*."),
-      internet_destination_type = "DNS_NAME"
-    }
-  ]
-
-  # We use this to make sure that if we provision the 10th NCC in a region, that it does not cause subsequent terraform
-  # plans/applies to fail due to the precondition on the NCC resource.
-  ncc_name          = "ncc-${var.location}-${var.resource_suffix}"
-  current_ncc_count = length([for k in data.databricks_mws_network_connectivity_configs.this.names : k if k != local.ncc_name])
-  ncc_region_limit  = 10
-}
-
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "~>0.4"
@@ -48,8 +8,7 @@ module "naming" {
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name
   location = var.location
-
-  tags = var.tags
+  tags     = var.tags
 }
 
 # Create the hub virtual network
@@ -58,62 +17,82 @@ resource "azurerm_virtual_network" "this" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.hub_vnet_cidr]
-
-  tags = var.tags
+  tags                = var.tags
 }
 
-# Create the privatelink subnet
+# Create subnets for WEBAUTH workspace
+resource "azurerm_subnet" "webauth_host" {
+  name                 = "webauth-host"
+  resource_group_name  = azurerm_resource_group.this.name
+  virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = [var.subnet_map["webauth-host"]]
+
+  delegation {
+    name = "databricks-host-subnet-delegation"
+    service_delegation {
+      name = "Microsoft.Databricks/workspaces"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+      ]
+    }
+  }
+}
+
+resource "azurerm_subnet" "webauth_container" {
+  name                 = "webauth-container"
+  resource_group_name  = azurerm_resource_group.this.name
+  virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = [var.subnet_map["webauth-container"]]
+
+  delegation {
+    name = "databricks-container-subnet-delegation"
+    service_delegation {
+      name = "Microsoft.Databricks/workspaces"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+        "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action",
+        "Microsoft.Network/virtualNetworks/subnets/unprepareNetworkPolicies/action",
+      ]
+    }
+  }
+}
+
 resource "azurerm_subnet" "privatelink" {
   name                 = "hub-privatelink"
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
-
-  address_prefixes = [var.subnet_map["privatelink"]]
+  address_prefixes     = [var.subnet_map["privatelink"]]
 }
 
-# Serverless Network
-# Used to validate that there are enough NCCs left in a region
-data "databricks_mws_network_connectivity_configs" "this" {
-  region = var.location
+# Create NSG for WEBAUTH workspace
+resource "azurerm_network_security_group" "webauth" {
+  name                = "webauth-nsg"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  tags                = var.tags
 }
 
-# This NCC is shared across all workspaces created by SRA
-resource "databricks_mws_network_connectivity_config" "this" {
-  name   = local.ncc_name
-  region = var.location
-
-  lifecycle {
-    precondition {
-      condition     = local.current_ncc_count < local.ncc_region_limit
-      error_message = "There are already ${local.ncc_region_limit} NCCs in ${var.location}!"
-    }
-  }
+# NSG associations
+resource "azurerm_subnet_network_security_group_association" "webauth_host" {
+  subnet_id                 = azurerm_subnet.webauth_host.id
+  network_security_group_id = azurerm_network_security_group.webauth.id
 }
 
-resource "databricks_account_network_policy" "restrictive_network_policy" {
-  network_policy_id = "np-${var.resource_suffix}-restrictive"
-  account_id        = var.databricks_account_id
-  egress = {
-    network_access = {
-      restriction_mode              = "RESTRICTED_ACCESS"
-      allowed_internet_destinations = local.spoke_internet_allowed_destinations
-      policy_enforcement = {
-        enforcement_mode = "ENFORCED"
-      }
-    }
-  }
+resource "azurerm_subnet_network_security_group_association" "webauth_container" {
+  subnet_id                 = azurerm_subnet.webauth_container.id
+  network_security_group_id = azurerm_network_security_group.webauth.id
 }
 
-resource "databricks_account_network_policy" "hub_policy" {
-  network_policy_id = "np-${var.resource_suffix}-hub"
-  account_id        = var.databricks_account_id
-  egress = {
-    network_access = {
-      restriction_mode              = "RESTRICTED_ACCESS"
-      allowed_internet_destinations = local.hub_internet_allowed_destinations
-      policy_enforcement = {
-        enforcement_mode = "ENFORCED"
-      }
-    }
-  }
+# Route table association for webauth host subnet
+resource "azurerm_subnet_route_table_association" "webauth_host" {
+  subnet_id      = azurerm_subnet.webauth_host.id
+  route_table_id = azurerm_route_table.this.id
+}
+
+# IP group CIDR for webauth host subnet
+resource "azurerm_ip_group_cidr" "webauth_host" {
+  ip_group_id = azurerm_ip_group.this.id
+  cidr        = var.subnet_map["webauth-host"]
 }

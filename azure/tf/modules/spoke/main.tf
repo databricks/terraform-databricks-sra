@@ -24,7 +24,6 @@ module "naming" {
   suffix  = [var.resource_suffix]
 }
 
-
 # Create a resource group
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name

@@ -42,14 +42,46 @@ variable "hub_allowed_urls" {
 variable "spoke_config" {
   type = map(object(
     {
-      resource_suffix          = string
-      cidr                     = string
-      tags                     = map(string)
-      is_unity_catalog_enabled = optional(bool, true)
-      storage_account_name     = optional(string, null)
+      resource_suffix         = string
+      cidr                    = string
+      tags                    = map(string)
+      storage_account_name    = optional(string, null)
+      route_table_id          = optional(string, null)
+      ipgroup_id              = optional(string, null)
+      hub_vnet_name           = optional(string, null)
+      hub_resource_group_name = optional(string, null)
+      hub_vnet_id             = optional(string, null)
     }
   ))
-  description = "(Required) List of spoke configurations"
+  description = "(Required) List of spoke configurations. When create_hub is false and spoke_network is used, hub-related fields (route_table_id, ipgroup_id, hub_vnet_name, hub_resource_group_name, hub_vnet_id) must be provided."
+}
+
+variable "workspace_config" {
+  type = map(object(
+    {
+      spoke_name = optional(string, null)
+      network_configuration = optional(object({
+        virtual_network_name                                 = string
+        private_subnet_name                                  = string
+        public_subnet_name                                   = string
+        private_subnet_network_security_group_association_id = string
+        public_subnet_network_security_group_association_id  = string
+        private_endpoint_subnet_name                         = string
+      }), null)
+      resource_group_name     = optional(string, null)
+      resource_suffix         = optional(string, null)
+      tags                    = optional(map(string), null)
+      dns_zone_ids            = optional(map(string), null)
+      ncc_id                  = optional(string, null)
+      ncc_name                = optional(string, null)
+      key_vault_id            = optional(string, null)
+      managed_disk_key_id     = optional(string, null)
+      managed_services_key_id = optional(string, null)
+      network_policy_id       = optional(string, null)
+      metastore_id            = optional(string, null)
+    }
+  ))
+  description = "(Required) List of workspace configurations. When create_hub is false, hub-related fields (ncc_id, ncc_name, key_vault_id, managed_disk_key_id, managed_services_key_id, network_policy_id, metastore_id) must be provided."
 }
 
 variable "tags" {
@@ -102,4 +134,10 @@ variable "sat_force_destroy" {
   type        = bool
   default     = false
   description = "Used to allow Terraform to force destroy the SAT catalog. This is only used for testing SRA."
+}
+
+variable "create_hub" {
+  type        = bool
+  description = "(Optional) Whether to create the hub infrastructure. If false, hub configuration must be provided via workspace_config and spoke_config."
+  default     = true
 }
