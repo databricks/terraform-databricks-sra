@@ -97,6 +97,12 @@ variable "workspace_config" {
       managed_services_key_id = optional(string, null)
       network_policy_id       = optional(string, null)
       metastore_id            = optional(string, null)
+      enhanced_security_compliance = optional(object({
+        automatic_cluster_update_enabled      = optional(bool, null)
+        compliance_security_profile_enabled   = optional(bool, null)
+        compliance_security_profile_standards = optional(list(string), null)
+        enhanced_security_monitoring_enabled  = optional(bool, null)
+      }), null)
     }
   ))
   description = "(Required) List of workspace configurations. When create_hub is false, hub-related fields (ncc_id, ncc_name, key_vault_id, managed_disk_key_id, managed_services_key_id, network_policy_id, metastore_id) must be provided."

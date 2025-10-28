@@ -121,3 +121,15 @@ variable "create_webauth_private_endpoint" {
   description = "(Optional) Whether to create the webauth (browser_authentication) private endpoint for SSO. Typically only used for hub WEBAUTH workspace."
   default     = false
 }
+
+variable "enhanced_security_compliance" {
+  description = "(Optional) Enhanced security compliance configuration."
+  type = object({
+    automatic_cluster_update_enabled      = optional(bool, null)
+    compliance_security_profile_enabled   = optional(bool, null)
+    compliance_security_profile_standards = optional(list(string), null)
+    enhanced_security_monitoring_enabled  = optional(bool, null)
+  })
+  nullable = false
+  default  = {}
+}

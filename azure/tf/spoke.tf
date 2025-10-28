@@ -23,12 +23,13 @@ module "spoke_workspace" {
   location                 = var.location
 
   #TODO: When unified provider releases, remove named keys
-  network_configuration = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].network_configuration : module.spoke_network[var.workspace_config["spoke"].spoke_name].network_configuration
-  resource_group_name   = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].resource_group_name : module.spoke_network[var.workspace_config["spoke"].spoke_name].resource_group_name
-  resource_suffix       = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].resource_suffix : module.spoke_network[var.workspace_config["spoke"].spoke_name].resource_suffix
-  tags                  = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].tags : module.spoke_network[var.workspace_config["spoke"].spoke_name].tags
-  dns_zone_ids          = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].dns_zone_ids : module.spoke_network[var.workspace_config["spoke"].spoke_name].dns_zone_ids
-  is_kms_enabled        = var.workspace_config["spoke"].is_kms_enabled
+  network_configuration        = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].network_configuration : module.spoke_network[var.workspace_config["spoke"].spoke_name].network_configuration
+  resource_group_name          = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].resource_group_name : module.spoke_network[var.workspace_config["spoke"].spoke_name].resource_group_name
+  resource_suffix              = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].resource_suffix : module.spoke_network[var.workspace_config["spoke"].spoke_name].resource_suffix
+  tags                         = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].tags : module.spoke_network[var.workspace_config["spoke"].spoke_name].tags
+  dns_zone_ids                 = var.workspace_config["spoke"].spoke_name == null ? var.workspace_config["spoke"].dns_zone_ids : module.spoke_network[var.workspace_config["spoke"].spoke_name].dns_zone_ids
+  is_kms_enabled               = var.workspace_config["spoke"].is_kms_enabled
+  enhanced_security_compliance = var.workspace_config["spoke"].enhanced_security_compliance
 
   ncc_id                  = var.create_hub ? module.hub[0].ncc_id : var.workspace_config["spoke"].ncc_id
   ncc_name                = var.create_hub ? module.hub[0].ncc_name : var.workspace_config["spoke"].ncc_name

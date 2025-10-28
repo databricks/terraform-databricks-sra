@@ -33,6 +33,13 @@ resource "azurerm_databricks_workspace" "this" {
   default_storage_firewall_enabled      = var.boolean_create_private_dbfs
   access_connector_id                   = var.boolean_create_private_dbfs ? azurerm_databricks_access_connector.ws[0].id : null
 
+  enhanced_security_compliance {
+    automatic_cluster_update_enabled      = var.enhanced_security_compliance.automatic_cluster_update_enabled
+    compliance_security_profile_enabled   = var.enhanced_security_compliance.compliance_security_profile_enabled
+    compliance_security_profile_standards = var.enhanced_security_compliance.compliance_security_profile_standards
+    enhanced_security_monitoring_enabled  = var.enhanced_security_compliance.enhanced_security_monitoring_enabled
+  }
+
   custom_parameters {
     storage_account_name                                 = local.dbfs_name
     no_public_ip                                         = true
