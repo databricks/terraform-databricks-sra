@@ -2,19 +2,36 @@ variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
 }
+
 variable "location" {
   type        = string
   description = "(Required) The Azure region for the hub and spoke deployment"
 }
 
+variable "create_hub" {
+  type        = bool
+  description = "(Optional) Whether to create the hub infrastructure. If false, hub configuration must be provided via workspace_config and spoke_config."
+  default     = true
+}
+
 variable "hub_vnet_cidr" {
   type        = string
-  description = "(Required) The CIDR block for the hub Virtual Network"
+  description = "(Optional) The CIDR block for the hub Virtual Network - required if create_hub is true"
+  default     = ""
+  validation {
+    condition     = var.create_hub ? length(var.hub_vnet_cidr) > 0 : true
+    error_message = "hub_vnet_cidr is required if create_hub is true"
+  }
 }
 
 variable "hub_resource_suffix" {
   type        = string
-  description = "(Required) Resource suffix for naming resources in hub"
+  description = "(Optional) Resource suffix for naming resources in hub - required if create_hub is true"
+  default     = ""
+  validation {
+    condition     = var.create_hub ? length(var.hub_resource_suffix) > 0 : true
+    error_message = "hub_resource_suffix is required if create_hub is true"
+  }
 }
 
 variable "public_repos" {
@@ -74,6 +91,7 @@ variable "workspace_config" {
       dns_zone_ids            = optional(map(string), null)
       ncc_id                  = optional(string, null)
       ncc_name                = optional(string, null)
+      is_kms_enabled          = optional(bool, true)
       key_vault_id            = optional(string, null)
       managed_disk_key_id     = optional(string, null)
       managed_services_key_id = optional(string, null)
@@ -93,7 +111,7 @@ variable "tags" {
 variable "databricks_metastore_id" {
   type        = string
   default     = ""
-  description = "Required if is_unity_catalog_enabled = false"
+  description = "Required if is_unity_catalog_enabled = true"
 }
 
 variable "subscription_id" {
@@ -134,10 +152,4 @@ variable "sat_force_destroy" {
   type        = bool
   default     = false
   description = "Used to allow Terraform to force destroy the SAT catalog. This is only used for testing SRA."
-}
-
-variable "create_hub" {
-  type        = bool
-  description = "(Optional) Whether to create the hub infrastructure. If false, hub configuration must be provided via workspace_config and spoke_config."
-  default     = true
 }

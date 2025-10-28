@@ -68,6 +68,7 @@ resource "null_resource" "admin_wait" {
   triggers = {
     workspace_url = azurerm_databricks_workspace.this.workspace_url
     workspace_id  = databricks_mws_permission_assignment.admin.workspace_id
+    metastore_id  = databricks_metastore_assignment.this.metastore_id
   }
 }
 
@@ -82,6 +83,8 @@ resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
 
 # Define an Azure Key Vault access policy for Databricks
 resource "azurerm_key_vault_access_policy" "dbstorage" {
+  count = var.is_kms_enabled ? 1 : 0
+
   key_vault_id = var.key_vault_id
   tenant_id    = azurerm_databricks_workspace.this.storage_account_identity[0].tenant_id
   object_id    = azurerm_databricks_workspace.this.storage_account_identity[0].principal_id
@@ -94,6 +97,8 @@ resource "azurerm_key_vault_access_policy" "dbstorage" {
 }
 
 resource "azurerm_key_vault_access_policy" "dbmanageddisk" {
+  count = var.is_kms_enabled ? 1 : 0
+
   key_vault_id = var.key_vault_id
   tenant_id    = azurerm_databricks_workspace.this.managed_disk_identity[0].tenant_id
   object_id    = azurerm_databricks_workspace.this.managed_disk_identity[0].principal_id
@@ -107,7 +112,6 @@ resource "azurerm_key_vault_access_policy" "dbmanageddisk" {
 
 # Define a Databricks metastore assignment
 resource "databricks_metastore_assignment" "this" {
-  count        = var.is_kms_enabled ? 1 : 0
   workspace_id = azurerm_databricks_workspace.this.workspace_id
   metastore_id = var.metastore_id
 }
