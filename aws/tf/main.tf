@@ -138,16 +138,6 @@ module "unity_catalog_catalog_creation" {
   depends_on = [module.unity_catalog_metastore_assignment]
 }
 
-# System Table Schemas Enablement
-module "system_table" {
-  count  = var.region == "us-gov-west-1" ? 0 : 1
-  source = "./modules/databricks_workspace/system_schema"
-  providers = {
-    databricks = databricks.created_workspace
-  }
-  depends_on = [module.unity_catalog_metastore_assignment]
-}
-
 # Restrictive Root Buckt Policy
 module "restrictive_root_bucket" {
   source = "./modules/databricks_workspace/restrictive_root_bucket"
