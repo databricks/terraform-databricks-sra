@@ -161,14 +161,14 @@ variable "private_subnets_cidr" {
   description = "CIDR blocks for private subnets."
   type        = list(string)
   nullable    = true
-  default     = [ null ]
+  default     = [null]
 }
 
 variable "privatelink_subnets_cidr" {
   description = "CIDR blocks for private link subnets."
   type        = list(string)
   nullable    = true
-  default     = [ null ]  
+  default     = [null]
 }
 
 variable "region" {
@@ -342,7 +342,7 @@ variable "sg_egress_ports" {
   description = "List of egress ports for security groups."
   type        = list(string)
   nullable    = true
-  default     = [ null ]
+  default     = [null]
 }
 
 variable "shared_datasets_bucket" {
