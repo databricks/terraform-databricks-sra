@@ -44,8 +44,11 @@ privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
 sg_egress_ports          = [443, 2443, 5432, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
 # CUSTOM NETWORK CONFIGURATION
-# Required when using network_configuration = "custom"
 # Uncomment and configure the following variables for custom networking:
+# Required when using network_configure = "custom"
+# Ensure that an STS interface endpoint, a Kinesis endpoint, and an S3 gateway endpoint are available within the VPC and associated with private subnet route tables.
+# Ensure that Private DNS names have been enabled for Databricks PrivateLink endpoints.
+
 # custom_vpc_id             = ""
 # custom_private_subnet_ids = ["", ""]
 # custom_sg_id              = ""
