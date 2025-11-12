@@ -161,12 +161,14 @@ variable "private_subnets_cidr" {
   description = "CIDR blocks for private subnets."
   type        = list(string)
   nullable    = true
+  default     = [null]
 }
 
 variable "privatelink_subnets_cidr" {
   description = "CIDR blocks for private link subnets."
   type        = list(string)
   nullable    = true
+  default     = [null]
 }
 
 variable "region" {
@@ -339,6 +341,8 @@ variable "scc_relay_config" {
 variable "sg_egress_ports" {
   description = "List of egress ports for security groups."
   type        = list(string)
+  nullable    = true
+  default     = [null]
 }
 
 variable "shared_datasets_bucket" {
@@ -516,6 +520,8 @@ variable "log_storage_bucket_config" {
 variable "vpc_cidr_range" {
   description = "CIDR range for the VPC."
   type        = string
+  nullable    = true
+  default     = null
 }
 
 # Workspace API PrivateLink Endpoint configuration
