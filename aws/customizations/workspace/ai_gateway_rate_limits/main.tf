@@ -6,43 +6,25 @@
 data "databricks_serving_endpoints" "all" {
 }
 
-# Get current workspace configuration for API calls
+# Get current workspace configuration
 data "databricks_current_config" "this" {
 }
 
-# Configure AI Gateway rate limits using the Databricks API
-# This uses curl with service principal OAuth authentication
-# Requires DATABRICKS_CLIENT_ID and DATABRICKS_CLIENT_SECRET environment variables
-resource "null_resource" "ai_gateway_rate_limits" {
+# Configure AI Gateway rate limits using the Databricks CLI
+# Authentication is inherited from the Databricks provider configuration via environment variables
+resource "terraform_data" "ai_gateway_rate_limits" {
   for_each = { for endpoint in data.databricks_serving_endpoints.all.endpoints : endpoint.name => endpoint }
 
-  triggers = {
+  input = {
     endpoint_name = each.value.name
-    # Re-run if the endpoint configuration changes
-    endpoint_hash = sha256(jsonencode(each.value))
+    command       = "databricks serving-endpoints put-ai-gateway \"${each.value.name}\" --json '{\"rate_limits\": [{\"key\": \"endpoint\", \"calls\": 0, \"renewal_period\": \"minute\"}]}'"
+    environment = {
+      DATABRICKS_HOST = data.databricks_current_config.this.host
+    }
   }
 
   provisioner "local-exec" {
-    command = <<-EOT
-      # Get OAuth token using service principal credentials
-      TOKEN=$(curl -s -X POST "${data.databricks_current_config.this.host}/oidc/v1/token" \
-        -H "Content-Type: application/x-www-form-urlencoded" \
-        -u "$${DATABRICKS_CLIENT_ID:-$${ARM_CLIENT_ID}}:$${DATABRICKS_CLIENT_SECRET:-$${ARM_CLIENT_SECRET}}" \
-        -d "grant_type=client_credentials&scope=all-apis" | jq -r '.access_token')
-      
-      # Configure AI Gateway rate limits
-      curl -X PUT "${data.databricks_current_config.this.host}/api/2.0/serving-endpoints/${each.value.name}/ai-gateway" \
-        -H "Authorization: Bearer $TOKEN" \
-        -H "Content-Type: application/json" \
-        -d '{
-          "rate_limits": [
-            {
-              "key": "endpoint",
-              "calls": 0,
-              "renewal_period": "minute"
-            }
-          ]
-        }'
-    EOT
+    command     = self.input.command
+    environment = self.input.environment
   }
 }
