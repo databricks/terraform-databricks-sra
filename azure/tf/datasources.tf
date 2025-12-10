@@ -14,5 +14,5 @@ data "azuread_service_principal" "this" {
 }
 
 data "databricks_user" "provisioner" {
-  user_name = data.azuread_user.current.mail
+  user_name = data.azuread_user.current.user_principal_name
 }

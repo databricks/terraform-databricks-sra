@@ -1,11 +1,12 @@
 # This module is loosely based on https://medium.com/@lbrown22_18418/auto-approving-private-endpoints-using-terraform-e79d9f61d5dd
 
 locals {
-  pe_name = [for pe in data.azapi_resource.this.output.properties.privateEndpointConnections : pe.name if endswith(pe.properties.privateEndpoint.id, databricks_mws_ncc_private_endpoint_rule.this.endpoint_name)][0]
+  pe_name            = [for pe in data.azapi_resource.this.output.properties.privateEndpointConnections : pe.name if endswith(pe.properties.privateEndpoint.id, databricks_mws_ncc_private_endpoint_rule.this.endpoint_name)][0]
+  ncc_description_id = var.network_connectivity_config_name == "" ? "NCC ID: ${var.network_connectivity_config_id}" : "NCC Name: ${var.network_connectivity_config_name}"
   update_body = {
     properties = {
       privateLinkServiceConnectionState = {
-        description = "Approved for Databricks NCC ${var.network_connectivity_config_name}"
+        description = "Approved for Databricks ${local.ncc_description_id}"
         status      = "Approved"
       }
     }

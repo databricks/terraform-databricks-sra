@@ -4,7 +4,7 @@ resource "databricks_metastore" "this" {
 
   name = "uc-metastore-${var.resource_suffix}"
   # owner         = "uc admins"
-  region        = azurerm_resource_group.this.location
+  region        = var.location
   force_destroy = true
 }
 
