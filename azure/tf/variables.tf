@@ -196,10 +196,9 @@ variable "subscription_id" {
 
 variable "sat_configuration" {
   type = object({
-    enabled           = optional(bool, true)
+    enabled           = optional(bool, false)
     schema_name       = optional(string, "sat")
     catalog_name      = optional(string, "sat")
-    resource_suffix   = optional(string, "null")
     proxies           = optional(map(any), {})
     run_on_serverless = optional(bool, false)
   })
