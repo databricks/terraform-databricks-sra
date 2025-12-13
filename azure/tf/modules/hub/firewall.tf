@@ -1,12 +1,49 @@
-# Define a subnet resource for the Azure Firewall
-resource "azurerm_subnet" "firewall" {
-  count = var.is_firewall_enabled ? 1 : 0
-
-  name                 = "AzureFirewallSubnet"
-  resource_group_name  = azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.this.name
-
-  address_prefixes = [var.subnet_map["firewall"]]
+locals {
+  firewall_application_rules = [
+    for rule in [
+      {
+        name              = "IPinfo"
+        source_ip_groups  = [azurerm_ip_group.this.id]
+        destination_fqdns = ["*.ipinfo.io", "ipinfo.io"]
+        protocols = toset([
+          {
+            port = "443",
+            type = "Https"
+          },
+          {
+            port = "8080",
+            type = "Http"
+          },
+          {
+            port = "80",
+            type = "Http"
+          }
+        ])
+      },
+      {
+        name              = "ganglia"
+        source_ip_groups  = [azurerm_ip_group.this.id]
+        destination_fqdns = ["cdnjs.cloudflare.com"]
+        protocols = toset([
+          {
+            port = "443",
+            type = "Https"
+          }
+        ])
+      },
+      length(var.public_repos) > 0 ? {
+        name              = "public-repos"
+        source_ip_groups  = [azurerm_ip_group.this.id]
+        destination_fqdns = var.public_repos
+        protocols = toset([
+          {
+            port = "443",
+            type = "Https"
+          }
+        ])
+      } : null
+    ] : rule if rule != null
+  ]
 }
 
 # Define a public IP resource for the Azure Firewall
@@ -14,8 +51,8 @@ resource "azurerm_public_ip" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
   name                = module.naming.public_ip.name_unique
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
   allocation_method   = "Static"
   sku                 = var.firewall_sku
   tags                = var.tags
@@ -26,8 +63,8 @@ resource "azurerm_firewall_policy" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
   name                = module.naming.firewall_policy.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = var.resource_group_name
+  location            = var.location
   tags                = var.tags
 }
 
@@ -78,45 +115,19 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
     action   = "Allow"
 
     # Define rules within the application rule collection
-    rule {
-      name              = "public-repos"
-      source_ip_groups  = [azurerm_ip_group.this.id]
-      destination_fqdns = var.public_repos
-      protocols {
-        port = "443"
-        type = "Https"
-      }
-      protocols {
-        port = "80"
-        type = "Http"
-      }
-    }
-
-    rule {
-      name              = "IPinfo"
-      source_ip_groups  = [azurerm_ip_group.this.id]
-      destination_fqdns = ["*.ipinfo.io", "ipinfo.io"]
-      protocols {
-        port = "443"
-        type = "Https"
-      }
-      protocols {
-        port = "8080"
-        type = "Http"
-      }
-      protocols {
-        port = "80"
-        type = "Http"
-      }
-    }
-
-    rule {
-      name              = "ganglia"
-      source_ip_groups  = [azurerm_ip_group.this.id]
-      destination_fqdns = ["cdnjs.cloudflare.com"]
-      protocols {
-        port = "443"
-        type = "Https"
+    dynamic "rule" {
+      for_each = local.firewall_application_rules
+      content {
+        name              = rule.value.name
+        source_ip_groups  = rule.value.source_ip_groups
+        destination_fqdns = rule.value.destination_fqdns
+        dynamic "protocols" {
+          for_each = rule.value.protocols
+          content {
+            port = protocols.value.port
+            type = protocols.value.type
+          }
+        }
       }
     }
   }
@@ -127,8 +138,8 @@ resource "azurerm_firewall" "this" {
   count = var.is_firewall_enabled ? 1 : 0
 
   name                = module.naming.firewall.name
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
   sku_name            = "AZFW_VNet"
   sku_tier            = var.firewall_sku
   firewall_policy_id  = azurerm_firewall_policy.this[0].id
@@ -137,7 +148,7 @@ resource "azurerm_firewall" "this" {
   # Define IP configuration for the firewall
   ip_configuration {
     name                 = "firewall-public-ip-config"
-    subnet_id            = azurerm_subnet.firewall[0].id
+    subnet_id            = module.hub_network.subnet_ids["AzureFirewallSubnet"]
     public_ip_address_id = azurerm_public_ip.this[0].id
   }
 
@@ -150,8 +161,8 @@ resource "azurerm_firewall" "this" {
 
 resource "azurerm_ip_group" "this" {
   name                = "${var.resource_suffix}-adb-subnets"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = var.resource_group_name
+  location            = var.location
   tags                = var.tags
 
   lifecycle {
@@ -162,8 +173,8 @@ resource "azurerm_ip_group" "this" {
 # Create an Azure route table resource
 resource "azurerm_route_table" "this" {
   name                = module.naming.route_table.name
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
 
   tags = var.tags
 }
@@ -173,7 +184,7 @@ resource "azurerm_route" "firewall_route" {
   count = var.is_firewall_enabled ? 1 : 0
 
   name                   = "to-firewall"
-  resource_group_name    = azurerm_resource_group.this.name
+  resource_group_name    = var.resource_group_name
   route_table_name       = azurerm_route_table.this.name
   address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"

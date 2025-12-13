@@ -2,41 +2,87 @@ variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
 }
+
+variable "databricks_metastore_id" {
+  type        = string
+  default     = null
+  description = "(Optional) Metastore ID to use for all workspaces created, required if create_hub is false"
+
+  validation {
+    condition     = var.create_hub ? true : var.databricks_metastore_id != null
+    error_message = "If var.create_hub is false, you must provide databricks_metastore_id"
+  }
+}
+
 variable "location" {
   type        = string
   description = "(Required) The Azure region for the hub and spoke deployment"
 }
 
+variable "create_hub" {
+  type        = bool
+  description = "(Optional) Whether to create the hub infrastructure. If false, hub configuration must be provided via workspace_config and spoke_config."
+  default     = true
+}
+
 variable "hub_vnet_cidr" {
   type        = string
-  description = "(Required) The CIDR block for the hub Virtual Network"
+  description = "(Optional) The CIDR block for the hub Virtual Network - required if create_hub is true"
+  default     = ""
+  validation {
+    condition     = var.create_hub ? length(var.hub_vnet_cidr) > 0 : true
+    error_message = "hub_vnet_cidr is required if create_hub is true"
+  }
+}
+
+variable "existing_hub_vnet" {
+  type = object({
+    route_table_id = string
+    vnet_id        = string
+  })
+  description = "(Optional) Existing hub VNET details, required if create_hub is false"
+  default     = null
 }
 
 variable "hub_resource_suffix" {
   type        = string
-  description = "(Required) Resource suffix for naming resources in hub"
-}
-
-variable "public_repos" {
-  type        = list(string)
-  description = "(Optional) List of public repository IP addresses to allow access to."
-  default     = ["python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org", "cran.r-project.org", "*.cran.r-project.org", "r-project.org", "management.azure.com", "login.microsoftonline.com"]
-
+  description = "(Optional) Resource suffix for naming resources in hub - required if create_hub is true"
+  default     = ""
   validation {
-    condition     = var.sat_configuration.enabled && !var.sat_configuration.run_on_serverless ? length(setsubtract(["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"], var.public_repos)) == 0 : true
-    error_message = "Since SAT is enabled, you must include SAT-required URLs in the hub_allowed_urls variable."
+    condition     = var.create_hub ? length(var.hub_resource_suffix) > 0 : true
+    error_message = "hub_resource_suffix is required if create_hub is true"
   }
 }
 
+# ------------------------------------------------------------------
+# The below variables control what URLs workspaces can access on the internet. By default, no workspace can access the
+# internet at all. Note that this means that SAT will not work by default unless the required URLs are added (see below)
+#
+# Common package registries: ["python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org", "cran.r-project.org", "*.cran.r-project.org", "r-project.org",]
+# SAT Required URLs (classic): ["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"]
+# SAT Required URLs (serverless): ["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"]
+# Note: This also applies to classic compute in the WEBAUTH workspace
+variable "allowed_fqdns" {
+  type        = list(string)
+  description = "(Optional) List of FQDNs to allow from spoke workspace."
+  default     = []
+  validation {
+    condition     = var.sat_configuration.enabled && !var.sat_configuration.run_on_serverless ? length(setsubtract(["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"], var.allowed_fqdns)) == 0 : true
+    error_message = "Since SAT is enabled and is not running on serverless, you must include SAT-required URLs in the allowed_fqdns variable."
+  }
+}
+
+# This is for allowing the hub workspace to access a separate list of URLs from serverless (e.g. for SAT)
 variable "hub_allowed_urls" {
   type        = set(string)
-  description = "(Optional) List of URLs to allow the hub workspace access to."
-  default     = ["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"]
+  description = "(Optional) List of URLs to allow serverless compute in the hub (webauth) workspace access to."
+  default     = []
 
   validation {
     condition     = var.sat_configuration.enabled && var.sat_configuration.run_on_serverless ? length(setsubtract(["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"], var.hub_allowed_urls)) == 0 : true
-    error_message = "Since SAT is enabled, you must include SAT-required URLs in the hub_allowed_urls variable."
+    error_message = "Since SAT is enabled and running on serverless you must include SAT-required URLs in the hub_allowed_urls variable."
   }
+}
 # ------------------------------------------------------------------
 # Workspace Variables
 variable "create_workspace_resource_group" {
@@ -51,17 +97,6 @@ variable "existing_resource_group_name" {
   default     = null
 }
 
-variable "spoke_config" {
-  type = map(object(
-    {
-      resource_suffix          = string
-      cidr                     = string
-      tags                     = map(string)
-      is_unity_catalog_enabled = optional(bool, true)
-      storage_account_name     = optional(string, null)
-    }
-  ))
-  description = "(Required) List of spoke configurations"
 variable "resource_suffix" {
   type        = string
   description = "(Required) Suffix to use for naming Azure resources (e.g. dbx-dev, sra, etc.)"
@@ -181,12 +216,6 @@ variable "tags" {
   type        = map(string)
   description = "(Optional) Map of tags to attach to resources"
   default     = {}
-}
-
-variable "databricks_metastore_id" {
-  type        = string
-  default     = ""
-  description = "Required if is_unity_catalog_enabled = false"
 }
 
 variable "subscription_id" {
