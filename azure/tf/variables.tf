@@ -159,6 +159,17 @@ variable "cmk_enabled" {
   description = "(Optional) Whether to enable customer-managed keys (CMK) for workspace encryption. When enabled, managed disks and services will be encrypted with customer-managed keys."
   default     = true
 }
+
+variable "workspace_security_compliance" {
+  type = object({
+    automatic_cluster_update_enabled      = optional(bool, null)
+    compliance_security_profile_enabled   = optional(bool, null)
+    compliance_security_profile_standards = optional(list(string), null)
+    enhanced_security_monitoring_enabled  = optional(bool, null)
+  })
+  description = "(Optional) Enhanced security compliance configuration for the workspace"
+  default     = null
+}
 }
 
 variable "tags" {
