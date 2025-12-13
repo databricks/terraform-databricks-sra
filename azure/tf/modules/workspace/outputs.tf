@@ -19,19 +19,6 @@ output "workspace" {
   description = "Full workspace object"
 }
 
-output "ipgroup_cidrs" {
-  description = "A map containing the CIDRs for the host and container IP groups, used for network segmentation in Azure."
-  value = {
-    ipgroup_host_cidr      = azurerm_ip_group_cidr.host.cidr
-    ipgroup_container_cidr = azurerm_ip_group_cidr.container.cidr
-  }
-}
-
-output "resource_group_name" {
-  description = "Name of deployed resource group"
-  value       = azurerm_resource_group.this.name
-}
-
 output "dbfs_storage_account_id" {
   description = "Resource ID of the DBFS storage account"
   value       = local.dbfs_sa_resource_id
@@ -39,19 +26,15 @@ output "dbfs_storage_account_id" {
 
 output "dns_zone_ids" {
   description = "Private DNS Zone IDs"
-  value = {
-    dfs     = var.boolean_create_private_dbfs ? azurerm_private_dns_zone.dbfs_dfs[0].id : "",
-    blob    = var.boolean_create_private_dbfs ? azurerm_private_dns_zone.dbfs_blob[0].id : "",
-    backend = azurerm_private_dns_zone.backend.id
-  }
+  value       = var.dns_zone_ids
 }
 
 output "subnet_ids" {
   description = "Subnet IDs"
   value = {
-    host        = azurerm_subnet.host.id
-    container   = azurerm_subnet.container.id
-    privatelink = azurerm_subnet.privatelink.id
+    host        = var.network_configuration.public_subnet_id
+    container   = var.network_configuration.private_subnet_id
+    privatelink = var.network_configuration.private_endpoint_subnet_id
   }
 }
 
@@ -73,4 +56,14 @@ output "resource_suffix" {
 output "tags" {
   description = "Tags of this spoke"
   value       = var.tags
+}
+
+output "webauth_private_endpoint_id" {
+  description = "ID of the webauth private endpoint, if created"
+  value       = var.create_webauth_private_endpoint ? azurerm_private_endpoint.webauth[0].id : null
+}
+
+output "resource_group_name" {
+  description = "Name of deployed resource group"
+  value       = azurerm_databricks_workspace.this.resource_group_name
 }
