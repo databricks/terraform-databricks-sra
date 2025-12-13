@@ -68,7 +68,7 @@ to Azure services without traversing public IP addresses.
 
 - **Private Link Connectivity**: Private Link provides a private network route from one Azure service to another.
 [Private Link](https://learn.microsoft.com/en-us/azure/private-link/private-link-overview) is configured
-so that communication between the customer's data plane and Databricks control plane does not traverse public IP addresses. Both front-end and back-end Private Link are set up in this template according
+so that communication between the customer's data plane and Databricks control plane does not traverse public IP addresses. Back-end Private Link is set up in this template according
 to the [Simplified Private Link](https://learn.microsoft.com/en-us/azure/databricks/security/network/classic/private-link-simplified) setup.
 
 - **Unity Catalog**:  [Unity Catalog](https://learn.microsoft.com/en-us/azure/databricks/data-governance/unity-catalog) is a unified governance solution for all data and AI assets including
