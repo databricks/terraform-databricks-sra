@@ -2,25 +2,14 @@ locals {
   dbfs_sa_resource_id = join("", [azurerm_databricks_workspace.this.managed_resource_group_id, "/providers/Microsoft.Storage/storageAccounts/", local.dbfs_name])
 }
 
-# Define a private DNS zone for the dbfs_dfs resource
-resource "azurerm_private_dns_zone" "dbfs_dfs" {
-  count = var.boolean_create_private_dbfs ? 1 : 0
-
-  name                = "privatelink.dfs.core.windows.net"
-  resource_group_name = azurerm_resource_group.this.name
-
-  tags       = var.tags
-  depends_on = [azurerm_databricks_workspace.this]
-}
-
 # Define a private endpoint for the dbfs_dfs resource
 resource "azurerm_private_endpoint" "dbfs_dfs" {
   count = var.boolean_create_private_dbfs ? 1 : 0
 
   name                = "dbfspe-dfs"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  subnet_id           = azurerm_subnet.privatelink.id
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.network_configuration.private_endpoint_subnet_id
 
   # Define the private service connection for the dbfs_dfs resource
   private_service_connection {
@@ -33,21 +22,8 @@ resource "azurerm_private_endpoint" "dbfs_dfs" {
   # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = "private-dns-zone-dbfs"
-    private_dns_zone_ids = [azurerm_private_dns_zone.dbfs_dfs[0].id]
+    private_dns_zone_ids = [var.dns_zone_ids.dfs]
   }
-
-  tags       = var.tags
-  depends_on = [azurerm_databricks_workspace.this]
-}
-
-# Define a virtual network link for the dbfs_dfs private DNS zone
-resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_dfs" {
-  count = var.boolean_create_private_dbfs ? 1 : 0
-
-  name                  = "dbfs-dfs"
-  resource_group_name   = azurerm_resource_group.this.name
-  private_dns_zone_name = azurerm_private_dns_zone.dbfs_dfs[0].name
-  virtual_network_id    = azurerm_virtual_network.this.id
 
   tags       = var.tags
   depends_on = [azurerm_databricks_workspace.this]
@@ -58,9 +34,9 @@ resource "azurerm_private_endpoint" "dbfspe_blob" {
   count = var.boolean_create_private_dbfs ? 1 : 0
 
   name                = "dbfs-blob"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  subnet_id           = azurerm_subnet.privatelink.id
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.network_configuration.private_endpoint_subnet_id
 
   # Define the private service connection for the dbfs_blob resource
   private_service_connection {
@@ -73,32 +49,8 @@ resource "azurerm_private_endpoint" "dbfspe_blob" {
   # Associate the private DNS zone with the private endpoint
   private_dns_zone_group {
     name                 = "private-dns-zone-dbfs"
-    private_dns_zone_ids = [azurerm_private_dns_zone.dbfs_blob[0].id]
+    private_dns_zone_ids = [var.dns_zone_ids.blob]
   }
-
-  tags       = var.tags
-  depends_on = [azurerm_databricks_workspace.this]
-}
-
-# Define a private DNS zone for the dbfs_blob resource
-resource "azurerm_private_dns_zone" "dbfs_blob" {
-  count = var.boolean_create_private_dbfs ? 1 : 0
-
-  name                = "privatelink.blob.core.windows.net"
-  resource_group_name = azurerm_resource_group.this.name
-
-  tags       = var.tags
-  depends_on = [azurerm_databricks_workspace.this]
-}
-
-# Define a virtual network link for the dbfs_blob private DNS zone
-resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_blob" {
-  count = var.boolean_create_private_dbfs ? 1 : 0
-
-  name                  = "dbfs-blob"
-  resource_group_name   = azurerm_resource_group.this.name
-  private_dns_zone_name = azurerm_private_dns_zone.dbfs_blob[0].name
-  virtual_network_id    = azurerm_virtual_network.this.id
 
   tags       = var.tags
   depends_on = [azurerm_databricks_workspace.this]
@@ -132,7 +84,7 @@ resource "azurerm_databricks_access_connector" "ws" {
 
   # "ws" is used in the name to indicate that this access connector is for workspace storage
   name                = "id-databricks-ws-${var.resource_suffix}"
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = var.resource_group_name
   location            = var.location
   identity {
     type = "SystemAssigned"

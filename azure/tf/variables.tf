@@ -37,6 +37,18 @@ variable "hub_allowed_urls" {
     condition     = var.sat_configuration.enabled && var.sat_configuration.run_on_serverless ? length(setsubtract(["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"], var.hub_allowed_urls)) == 0 : true
     error_message = "Since SAT is enabled, you must include SAT-required URLs in the hub_allowed_urls variable."
   }
+# ------------------------------------------------------------------
+# Workspace Variables
+variable "create_workspace_resource_group" {
+  type        = string
+  description = "(Optional) Should a resource group be created for this workspace? If false, resource_group_name must be provided."
+  default     = true
+}
+
+variable "existing_resource_group_name" {
+  type        = string
+  description = "(Optional) Existing resource group name, if using one"
+  default     = null
 }
 
 variable "spoke_config" {
@@ -50,6 +62,97 @@ variable "spoke_config" {
     }
   ))
   description = "(Required) List of spoke configurations"
+variable "resource_suffix" {
+  type        = string
+  description = "(Required) Suffix to use for naming Azure resources (e.g. dbx-dev, sra, etc.)"
+}
+
+variable "create_workspace_vnet" {
+  type        = bool
+  description = "(Optional) Whether to create SRA-managed workspace VNET. If false, workspace_vnet must be provided."
+  default     = true
+}
+
+variable "workspace_vnet" {
+  type = object({
+    cidr     = string
+    new_bits = optional(number, null)
+  })
+  description = "(Optional) Spoke network configuration - required when create_workspace_vnet is true."
+  default     = null
+
+  validation {
+    condition     = var.create_workspace_vnet ? var.workspace_vnet != null : true
+    error_message = "workspace_vnet must be provided when create_workspace_vnet is true"
+  }
+  validation {
+    condition     = !var.create_workspace_vnet ? var.workspace_vnet == null : true
+    error_message = "workspace_vnet must not be provided when create_workspace_vnet is false"
+  }
+}
+
+variable "existing_workspace_vnet" {
+  type = object({
+    network_configuration = object({
+      virtual_network_id                                   = string
+      private_subnet_id                                    = string
+      public_subnet_id                                     = string
+      private_endpoint_subnet_id                           = string
+      private_subnet_network_security_group_association_id = string
+      public_subnet_network_security_group_association_id  = string
+    })
+    dns_zone_ids = object({
+      backend = string
+      dfs     = string
+      blob    = string
+    })
+  })
+  description = "(Optional) Existing network configuration - required when create_workspace_vnet is false"
+  default     = null
+
+  validation {
+    condition     = !var.create_workspace_vnet ? var.existing_workspace_vnet != null : true
+    error_message = "existing_workspace_vnet must be provided when create_workspace_vnet is false"
+  }
+
+  validation {
+    condition     = var.create_workspace_vnet ? var.existing_workspace_vnet == null : true
+    error_message = "existing_workspace_vnet should only be provided when create_workspace_vnet is false"
+  }
+}
+
+variable "hub_settings" {
+  type = object({
+    ncc_id            = string
+    ncc_name          = string
+    network_policy_id = string
+
+    key_vault_id            = optional(string, null)
+    managed_disk_key_id     = optional(string, null)
+    managed_services_key_id = optional(string, null)
+  })
+  description = "(Conditional) Hub settings - required when create_hub is false"
+  default     = null
+
+  validation {
+    condition     = var.create_hub || var.hub_settings != null
+    error_message = "hub_settings must be provided when create_hub is false"
+  }
+
+  validation {
+    condition     = !var.create_hub || var.hub_settings == null
+    error_message = "hub_settings should only be provided when create_hub is true"
+  }
+
+  validation {
+    condition = var.create_hub || var.hub_settings == null || !var.cmk_enabled || (
+      var.hub_settings.key_vault_id != null &&
+      var.hub_settings.managed_disk_key_id != null &&
+      var.hub_settings.managed_services_key_id != null
+    )
+    error_message = "When create_hub is false and cmk_enabled is true, key_vault_id, managed_disk_key_id, and managed_services_key_id must be provided in hub_settings"
+  }
+}
 }
 
 variable "tags" {
