@@ -8,18 +8,7 @@ terraform {
       source  = "databricks/databricks"
       version = ">=1.24.1"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = ">=3.0"
-    }
-    null = {
-      source  = "hashicorp/null"
-      version = ">=3.0"
-    }
-    time = {
-      source  = "hashicorp/time"
-      version = ">=0.13"
-    }
   }
   required_version = ">=1.9.8"
 }
+

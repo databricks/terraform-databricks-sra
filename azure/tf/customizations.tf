@@ -1,9 +1,9 @@
 locals {
-  create_sat_sp     = var.sat_configuration.enabled && var.sat_service_principal.client_id == ""
+  create_sat_sp     = var.sat_configuration.enabled && var.sat_service_principal.client_id == "" && var.create_hub
   sat_client_id     = local.create_sat_sp ? azuread_service_principal.sat[0].client_id : var.sat_service_principal.client_id
   sat_client_secret = local.create_sat_sp ? azuread_service_principal_password.sat[0].value : var.sat_service_principal.client_secret
-  sat_workspace     = module.hub
-  sat_catalog       = var.sat_configuration.enabled ? module.hub_catalog[0] : {}
+  sat_workspace     = var.create_hub && length(module.webauth_workspace) > 0 ? module.webauth_workspace[0] : null
+  sat_catalog       = var.sat_configuration.enabled && var.create_hub ? module.hub_catalog[0] : null
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ resource "azurerm_role_assignment" "sat_can_read_subscription" {
 # This is modularized to allow for easy count and provider arguments
 module "sat" {
   source = "./modules/sat"
-  count  = var.sat_configuration.enabled ? 1 : 0
+  count  = var.sat_configuration.enabled && var.create_hub ? 1 : 0
 
   # Update this as needed
   catalog_name = local.sat_catalog.catalog_name

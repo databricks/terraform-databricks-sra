@@ -2,8 +2,8 @@ resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
   name                     = module.naming.key_vault.name_unique
-  location                 = azurerm_resource_group.this.location
-  resource_group_name      = azurerm_resource_group.this.name
+  location                 = var.location
+  resource_group_name      = var.resource_group_name
   tenant_id                = var.client_config.tenant_id
   purge_protection_enabled = true
 
@@ -106,7 +106,7 @@ resource "azurerm_private_dns_zone" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
   name                = "privatelink.vaultcore.azure.net"
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = var.resource_group_name
 
   tags = var.tags
 }
@@ -115,9 +115,9 @@ resource "azurerm_private_endpoint" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
   name                = "${module.naming.private_endpoint.name}-kv"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  subnet_id           = azurerm_subnet.privatelink.id
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = module.hub_network.subnet_ids["privatelink"]
 
   private_service_connection {
     name                           = "keyvault"
@@ -138,9 +138,9 @@ resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
   name                  = "${var.resource_suffix}-keyvault-vnetlink"
-  resource_group_name   = azurerm_resource_group.this.name
+  resource_group_name   = var.resource_group_name
   private_dns_zone_name = azurerm_private_dns_zone.key_vault[0].name
-  virtual_network_id    = azurerm_virtual_network.this.id
+  virtual_network_id    = module.hub_network.vnet_id
 
   tags = var.tags
 }

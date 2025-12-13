@@ -1,54 +1,21 @@
-# Define the variable "location" with type string and a description
 variable "location" {
   type        = string
-  description = "(Required) The location for the resources in this module"
+  description = "(Required) The location for the hub deployment"
 }
 
-variable "is_kms_enabled" {
-  type        = bool
-  description = "(Optional - default to true) Enable KMS (Azure Key Vault) encryption for resources"
-  default     = true
-}
-
-variable "is_firewall_enabled" {
-  type        = bool
-  description = "(Optional - default to true) Enable Firewall for resources"
-  default     = true
-}
-
-variable "is_unity_catalog_enabled" {
-  type        = bool
-  description = "(Optional - default to true) Enable creation of new UC"
-  default     = true
-}
-
-# Define the variable "hub_vnet_cidr" with type string and a description
-variable "hub_vnet_cidr" {
-
-  type        = string
-  description = "(Required) The CIDR block for the hub Virtual Network"
-
-  # Add validation for the CIDR block
-  validation {
-    condition     = tonumber(split("/", var.hub_vnet_cidr)[1]) < 24
-    error_message = "CIDR block must be at least as large as /23"
-  }
-}
-
-variable "subnet_map" {
-  type        = map(string)
-  description = "(Required) Map of subnet names to CIDR blocks"
-}
-
-# Define the variable "public_repos" with type list of strings and a description
 variable "public_repos" {
   type        = list(string)
-  description = "(Required) List of public repository IP addresses to allow access to."
+  description = "(Required) List of public repository URLs to allow for spokes"
 }
 
 variable "hub_allowed_urls" {
-  type        = list(string)
-  description = "(Required) List of URLs to allow the hub workspace access to."
+  type        = set(string)
+  description = "(Required) List of URLs to allow the hub workspace access to"
+}
+
+variable "resource_suffix" {
+  type        = string
+  description = "(Required) Naming resource_suffix for resources"
 }
 
 # Define the variable "tags" with type map of strings and a description
@@ -58,16 +25,27 @@ variable "tags" {
   default     = {}
 }
 
+variable "databricks_account_id" {
+  type        = string
+  description = "(Required) Databricks account ID"
+}
+
+variable "is_firewall_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable Firewall for resources"
+  default     = true
+}
+
 variable "firewall_sku" {
   type        = string
   description = "(Optional) SKU tier of the Firewall. Possible values are Premium, Standard and Basic"
   default     = "Standard"
 }
 
-variable "resource_suffix" {
-  type        = string
-  description = "(Optional) Naming resource_suffix for resources"
-  default     = "hub"
+variable "is_kms_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable KMS (Azure Key Vault) encryption for resources"
+  default     = true
 }
 
 variable "client_config" {
@@ -75,29 +53,36 @@ variable "client_config" {
   description = "(Required) Result of data block `azurerm_client_config current`"
 }
 
+variable "is_unity_catalog_enabled" {
+  type        = bool
+  description = "(Optional - default to true) Enable creation of new UC"
+  default     = true
+}
+
 variable "databricks_app_reg" {
   type        = any
   description = "(Required) Result of data block data.azuread_application_published_app_ids.well_known.result['AzureDataBricks']"
 }
 
-variable "boolean_create_private_dbfs" {
-  description = "Whether to enable Private DBFS, all Private DBFS resources will depend on Workspace"
-  type        = bool
-  default     = true
-}
-
-variable "is_frontend_private_link_enabled" {
-  type        = bool
-  description = "(Optional - default to false) Enable frontend Private Link for Databricks workspace. When true, disables public network access."
-  default     = false
-}
-
-variable "provisioner_principal_id" {
+variable "resource_group_name" {
   type        = string
-  description = "Principal ID of the user running this terraform"
+  description = "(Required) Name of the resource group to use for this firewall"
 }
 
-variable "databricks_account_id" {
+variable "vnet_cidr" {
   type        = string
-  description = "Databricks account ID"
+  description = "(Required) The CIDR block for the hub Virtual Network"
+  validation {
+    condition     = tonumber(split("/", var.vnet_cidr)[1]) > 15 && tonumber(split("/", var.vnet_cidr)[1]) < 25
+    error_message = "CIDR block must be between /16 and /24, inclusive"
+  }
+}
+
+variable "virtual_network_peerings" {
+  type = map(object({
+    name                      = optional(string, "")
+    remote_virtual_network_id = string
+  }))
+  description = "(Optional) Map of virtual network peers to create from hub to spokes"
+  default     = {}
 }
