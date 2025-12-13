@@ -153,6 +153,12 @@ variable "hub_settings" {
     error_message = "When create_hub is false and cmk_enabled is true, key_vault_id, managed_disk_key_id, and managed_services_key_id must be provided in hub_settings"
   }
 }
+
+variable "cmk_enabled" {
+  type        = bool
+  description = "(Optional) Whether to enable customer-managed keys (CMK) for workspace encryption. When enabled, managed disks and services will be encrypted with customer-managed keys."
+  default     = true
+}
 }
 
 variable "tags" {
