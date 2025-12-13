@@ -1,21 +1,25 @@
 output "hub_network_subnets" {
   description = "Subnets created in the hub network"
-  value       = module.subnet_addrs.network_cidr_blocks
+  value       = var.create_hub ? module.hub[0].network_cidr_blocks : null
 }
 
 output "hub_resource_group_name" {
   description = "Name of created hub resource group"
-  value       = module.hub.resource_group_name
+  value       = var.create_hub ? azurerm_resource_group.hub[0].name : null
 }
 
 output "hub_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
-  value       = [module.hub.resource_group_name, module.hub.workspace_url]
+  value       = var.create_hub ? [azurerm_resource_group.hub[0].name, module.webauth_workspace[0].workspace_url] : null
 }
 
 output "spoke_workspace_info" {
-  description = "URLs for the one (or more) deployed Databricks Workspaces"
-  value       = [module.spoke.resource_group_name, module.spoke.workspace_url]
+  description = "Information for the deployed spoke Databricks Workspace"
+  value = {
+    resource_group_name = module.spoke_workspace.resource_group_name
+    workspace_url       = module.spoke_workspace.workspace_url
+    workspace_id        = module.spoke_workspace.workspace_id
+  }
 }
 
 output "spoke_workspace_catalog" {

@@ -14,7 +14,7 @@ provider "databricks" {
 
 provider "databricks" {
   alias = "hub"
-  host  = module.hub.workspace_url
+  host  = var.create_hub && length(module.webauth_workspace) > 0 ? module.webauth_workspace[0].workspace_url : "https://placeholder.azuredatabricks.net"
 }
 
 # Spoke provider (required for creating a catalog in the spoke workspace)
