@@ -170,6 +170,11 @@ variable "workspace_security_compliance" {
   description = "(Optional) Enhanced security compliance configuration for the workspace"
   default     = null
 }
+
+variable "workspace_name_overrides" {
+  type        = map(string)
+  description = "(Optional) Override names for workspace resources. Keys should match naming module outputs."
+  default     = {}
 }
 
 variable "tags" {
