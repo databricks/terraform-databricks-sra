@@ -96,6 +96,7 @@ run "plan_test_sat_nondefaults" {
   state_key = "sat_non_defaults"
   command   = plan
   variables {
+    allowed_fqdns = ["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"]
     sat_configuration = {
       enabled           = true
       proxies           = { "http_proxy" : "http://localhost:80" }
