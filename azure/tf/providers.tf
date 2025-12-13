@@ -17,10 +17,10 @@ provider "databricks" {
   host  = module.hub.workspace_url
 }
 
-# Add additional spoke providers as necessary (required for creating a catalog in a spoke)
+# Spoke provider (required for creating a catalog in the spoke workspace)
 provider "databricks" {
   alias = "spoke"
-  host  = module.spoke.workspace_url
+  host  = module.spoke_workspace.workspace_url
 }
 
 # These blocks are not required by terraform, but they are here to silence TFLint warnings

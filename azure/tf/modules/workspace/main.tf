@@ -1,7 +1,26 @@
+locals {
+  dbfs_name       = join("", ["dbstorage", random_string.dbfsnaming.result])
+  managed_rg_name = join("", [module.naming.resource_group.name_unique, "adbmanaged"])
+  public_subnet   = provider::azurerm::parse_resource_id(var.network_configuration.public_subnet_id)
+  private_subnet  = provider::azurerm::parse_resource_id(var.network_configuration.private_subnet_id)
+}
+
+module "naming" {
+  source  = "Azure/naming/azurerm"
+  version = "~>0.4"
+  suffix  = [var.resource_suffix]
+}
+
+resource "random_string" "dbfsnaming" {
+  special = false
+  upper   = false
+  length  = 13
+}
+
 # Define an Azure Databricks workspace resource
 resource "azurerm_databricks_workspace" "this" {
-  name                        = module.naming.databricks_workspace.name
-  resource_group_name         = azurerm_resource_group.this.name
+  name                        = lookup(var.name_overrides, "databricks_workspace", module.naming.databricks_workspace.name)
+  resource_group_name         = var.resource_group_name
   managed_resource_group_name = local.managed_rg_name
   location                    = var.location
   sku                         = "premium"
@@ -16,14 +35,21 @@ resource "azurerm_databricks_workspace" "this" {
   default_storage_firewall_enabled      = var.boolean_create_private_dbfs
   access_connector_id                   = var.boolean_create_private_dbfs ? azurerm_databricks_access_connector.ws[0].id : null
 
+  enhanced_security_compliance {
+    automatic_cluster_update_enabled      = var.enhanced_security_compliance.automatic_cluster_update_enabled
+    compliance_security_profile_enabled   = var.enhanced_security_compliance.compliance_security_profile_enabled
+    compliance_security_profile_standards = var.enhanced_security_compliance.compliance_security_profile_standards
+    enhanced_security_monitoring_enabled  = var.enhanced_security_compliance.enhanced_security_monitoring_enabled
+  }
+
   custom_parameters {
     storage_account_name                                 = local.dbfs_name
     no_public_ip                                         = true
-    virtual_network_id                                   = azurerm_virtual_network.this.id
-    public_subnet_name                                   = azurerm_subnet.host.name
-    private_subnet_name                                  = azurerm_subnet.container.name
-    public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.host.id
-    private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.container.id
+    virtual_network_id                                   = var.network_configuration.virtual_network_id
+    public_subnet_name                                   = local.public_subnet.resource_name
+    private_subnet_name                                  = local.private_subnet.resource_name
+    public_subnet_network_security_group_association_id  = var.network_configuration.public_subnet_network_security_group_association_id
+    private_subnet_network_security_group_association_id = var.network_configuration.private_subnet_network_security_group_association_id
   }
 
   tags = var.tags
@@ -51,6 +77,7 @@ resource "null_resource" "admin_wait" {
   triggers = {
     workspace_url = azurerm_databricks_workspace.this.workspace_url
     workspace_id  = databricks_mws_permission_assignment.admin.workspace_id
+    metastore_id  = databricks_metastore_assignment.this.metastore_id
   }
 }
 
@@ -63,8 +90,9 @@ resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
   depends_on = [azurerm_key_vault_access_policy.dbstorage]
 }
 
-# Define an Azure Key Vault access policy for Databricks
 resource "azurerm_key_vault_access_policy" "dbstorage" {
+  count = var.is_kms_enabled ? 1 : 0
+
   key_vault_id = var.key_vault_id
   tenant_id    = azurerm_databricks_workspace.this.storage_account_identity[0].tenant_id
   object_id    = azurerm_databricks_workspace.this.storage_account_identity[0].principal_id
@@ -77,6 +105,8 @@ resource "azurerm_key_vault_access_policy" "dbstorage" {
 }
 
 resource "azurerm_key_vault_access_policy" "dbmanageddisk" {
+  count = var.is_kms_enabled ? 1 : 0
+
   key_vault_id = var.key_vault_id
   tenant_id    = azurerm_databricks_workspace.this.managed_disk_identity[0].tenant_id
   object_id    = azurerm_databricks_workspace.this.managed_disk_identity[0].principal_id
@@ -90,7 +120,6 @@ resource "azurerm_key_vault_access_policy" "dbmanageddisk" {
 
 # Define a Databricks metastore assignment
 resource "databricks_metastore_assignment" "this" {
-  count        = var.is_kms_enabled ? 1 : 0
   workspace_id = azurerm_databricks_workspace.this.workspace_id
   metastore_id = var.metastore_id
 }

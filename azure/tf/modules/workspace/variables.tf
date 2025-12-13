@@ -1,3 +1,20 @@
+variable "network_configuration" {
+  type = object({
+    virtual_network_id                                   = string
+    private_subnet_id                                    = string
+    public_subnet_id                                     = string
+    private_endpoint_subnet_id                           = string
+    private_subnet_network_security_group_association_id = string
+    public_subnet_network_security_group_association_id  = string
+  })
+  description = "The network configuration for the workspace"
+}
+
+variable "resource_group_name" {
+  type        = string
+  description = "(Required) The name of the resource group to deploy the workspace to"
+}
+
 variable "is_kms_enabled" {
   type        = bool
   description = "(Optional - default to true) Enable KMS (Azure Key Vault) encryption for resources"
@@ -22,63 +39,14 @@ variable "location" {
   description = "(Required) The location for the spoke deployment"
 }
 
-variable "vnet_cidr" {
-  # Note: following chart assumes a Vnet between /16 and /24, inclusive
-
-  # | Subnet Size (CIDR) | Maximum ADB Cluster Nodes |
-  # | /17	| 32763 |
-  # | /18	| 16379 |
-  # | /19	| 8187 |
-  # | /20	| 4091 |
-  # | /21	| 2043 |
-  # | /22	| 1019 |
-  # | /23	| 507 |
-  # | /24	| 251 |
-  # | /25	| 123 |
-  # | /26	| 59 |
-
-  type        = string
-  description = "(Required) The CIDR block for the spoke Virtual Network"
-  # default     = "10.2.1.0/24"
-  validation {
-    condition     = tonumber(split("/", var.vnet_cidr)[1]) > 15 && tonumber(split("/", var.vnet_cidr)[1]) < 25
-    error_message = "CIDR block must be between /16 and /24, inclusive"
-  }
-}
-
 variable "key_vault_id" {
   type        = string
   description = "(Required) ID of the Azure Key Vault containing the keys for CMK"
-
-}
-variable "route_table_id" {
-  type        = string
-  description = "(Required) The ID of the route table to associate with the Databricks subnets"
 }
 
 variable "metastore_id" {
   type        = string
   description = "(Required) The ID of the metastore to associate with the Databricks workspace"
-}
-
-variable "ipgroup_id" {
-  type        = string
-  description = "(Required) The ID of the IP Group used for firewall egress rules"
-}
-
-variable "hub_vnet_name" {
-  type        = string
-  description = "(Required) The name of the hub VNet to peer"
-}
-
-variable "hub_resource_group_name" {
-  type        = string
-  description = "(Required) The name of the hub Resource Group to peer"
-}
-
-variable "hub_vnet_id" {
-  type        = string
-  description = "(Required) The ID of the hub VNet to peer"
 }
 
 variable "managed_disk_key_id" {
@@ -125,4 +93,44 @@ variable "provisioner_principal_id" {
 variable "databricks_account_id" {
   type        = string
   description = "Databricks account ID"
+}
+
+variable "dns_zone_ids" {
+  type = object({
+    backend = string
+    dfs     = string
+    blob    = string
+  })
+  description = "Private DNS zone IDs for backend, dfs, and blob"
+}
+
+variable "name_overrides" {
+  type        = map(string)
+  description = "(Optional) Override names for resources. Keys should match naming module outputs (e.g., 'databricks_workspace', 'private_endpoint', 'resource_group')."
+  nullable    = false
+  default     = {}
+}
+
+variable "create_backend_private_endpoint" {
+  type        = bool
+  description = "(Optional) Whether to create the backend private endpoint. Set to false if managing PEs externally."
+  default     = true
+}
+
+variable "create_webauth_private_endpoint" {
+  type        = bool
+  description = "(Optional) Whether to create the webauth (browser_authentication) private endpoint for SSO. Typically only used for hub WEBAUTH workspace."
+  default     = false
+}
+
+variable "enhanced_security_compliance" {
+  description = "(Optional) Enhanced security compliance configuration."
+  type = object({
+    automatic_cluster_update_enabled      = optional(bool, null)
+    compliance_security_profile_enabled   = optional(bool, null)
+    compliance_security_profile_standards = optional(list(string), null)
+    enhanced_security_monitoring_enabled  = optional(bool, null)
+  })
+  nullable = false
+  default  = {}
 }
