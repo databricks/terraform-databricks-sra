@@ -9,6 +9,7 @@ variables {
   open_test_job   = false
   environment = {
     DATABRICKS_HOST          = run.test_initializer.outputs.spoke_workspace_info["workspace_url"]
+    DATABRICKS_BUNDLE_ENGINE = "direct"
     BUNDLE_VAR_node_type_id  = run.classic_cluster_spoke.node_type_id
     BUNDLE_VAR_spark_version = run.classic_cluster_spoke.spark_version
     BUNDLE_VAR_sra_tag       = var.sra_tag
