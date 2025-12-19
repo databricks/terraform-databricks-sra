@@ -35,7 +35,7 @@ module "webauth_workspace" {
   source = "./modules/workspace"
   count  = var.create_hub ? 1 : 0
 
-  provisioner_principal_id = data.databricks_user.provisioner.id
+  provisioner_principal_id = data.azurerm_client_config.current.object_id
   databricks_account_id    = var.databricks_account_id
   location                 = var.location
 
