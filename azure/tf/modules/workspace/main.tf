@@ -65,10 +65,11 @@ resource "time_sleep" "workspace_wait" {
 }
 
 # Grant admin access to the provisioner account to the workspace, used for downstream workspace provider
-resource "databricks_mws_permission_assignment" "admin" {
-  workspace_id = time_sleep.workspace_wait.triggers.workspace_id
-  principal_id = var.provisioner_principal_id
-  permissions  = ["ADMIN"]
+resource "azurerm_role_assignment" "contributor" {
+  role_definition_name = "contributor"
+  scope                = azurerm_databricks_workspace.this.id
+  principal_id         = var.provisioner_principal_id
+  description          = "This is granted by the Databricks SRA Terraform module. It grants workspace admin to the provisioner principal of the workspace."
 }
 
 # This resource is used to output the workspace URL of the workspace AFTER the provisioner account has been granted admin
@@ -76,7 +77,7 @@ resource "databricks_mws_permission_assignment" "admin" {
 resource "null_resource" "admin_wait" {
   triggers = {
     workspace_url = azurerm_databricks_workspace.this.workspace_url
-    workspace_id  = databricks_mws_permission_assignment.admin.workspace_id
+    workspace_id  = azurerm_role_assignment.contributor.scope
     metastore_id  = databricks_metastore_assignment.this.metastore_id
   }
 }
