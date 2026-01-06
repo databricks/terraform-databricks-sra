@@ -48,7 +48,8 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
         Resource = [
           "arn:${var.aws_partition}:s3:::${var.root_s3_bucket}/${var.region_name}-prod/0_databricks_dev",
           "arn:${var.aws_partition}:s3:::${var.root_s3_bucket}/ephemeral/${var.region_name}-prod/${var.workspace_id}/*",
-          "arn:${var.aws_partition}:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}.*/*"
+          "arn:${var.aws_partition}:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}.*/*",
+          "arn:${var.aws_partition}:s3:::${var.root_s3_bucket}/${var.region_name}-prod/${var.workspace_id}/*"
         ],
         Condition = {
           StringEquals = {
