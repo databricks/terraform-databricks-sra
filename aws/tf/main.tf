@@ -173,7 +173,7 @@ module "compliance_security_profile" {
   compliance_standards = var.compliance_standards
 }
 
-# Create Create Cluster
+# Create Cluster
 module "cluster_configuration" {
   source = "./modules/databricks_workspace/classic_cluster"
   providers = {
@@ -216,3 +216,4 @@ module "security_analysis_tool" {
 
   depends_on = [module.unity_catalog_catalog_creation]
 }
+
