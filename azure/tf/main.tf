@@ -1,3 +1,9 @@
+locals {
+  cmk_keyvault_id             = var.cmk_enabled ? (var.create_hub ? module.hub[0].key_vault_id : var.existing_cmk_ids.key_vault_id) : null
+  cmk_managed_disk_key_id     = var.cmk_enabled ? (var.create_hub ? module.hub[0].managed_disk_key_id : var.existing_cmk_ids.managed_disk_key_id) : null
+  cmk_managed_services_key_id = var.cmk_enabled ? (var.create_hub ? module.hub[0].managed_services_key_id : var.existing_cmk_ids.managed_services_key_id) : null
+}
+
 resource "azurerm_resource_group" "hub" {
   count = var.create_hub ? 1 : 0
 
@@ -22,7 +28,7 @@ module "hub" {
   location                 = var.location
   public_repos             = var.allowed_fqdns
   resource_suffix          = var.hub_resource_suffix
-  is_kms_enabled           = true
+  is_kms_enabled           = var.cmk_enabled
   is_firewall_enabled      = true
   client_config            = data.azurerm_client_config.current
   databricks_app_reg       = data.azuread_service_principal.this
@@ -49,16 +55,17 @@ module "webauth_workspace" {
   }
 
   # Account level settings
+  # Note that these do not allow for supplying var.existing_... variables since the webauth workspace is only created when create_hub is true
   ncc_id            = module.hub[0].ncc_id
   ncc_name          = module.hub[0].ncc_name
   network_policy_id = module.hub[0].network_policy_id
   metastore_id      = module.hub[0].metastore_id
 
   # KMS Settings
-  is_kms_enabled          = true
-  managed_disk_key_id     = module.hub[0].managed_disk_key_id
-  managed_services_key_id = module.hub[0].managed_services_key_id
-  key_vault_id            = module.hub[0].key_vault_id
+  is_kms_enabled          = var.cmk_enabled
+  managed_disk_key_id     = local.cmk_managed_disk_key_id
+  managed_services_key_id = local.cmk_managed_services_key_id
+  key_vault_id            = local.cmk_keyvault_id
 
   depends_on = [module.hub]
 }
