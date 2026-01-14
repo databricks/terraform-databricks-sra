@@ -51,9 +51,9 @@ module "spoke_workspace" {
   key_vault_id            = local.cmk_keyvault_id
 
   # Account parameters
-  ncc_id                   = var.create_hub ? module.hub[0].ncc_id : var.hub_settings.ncc_id
-  ncc_name                 = var.create_hub ? module.hub[0].ncc_name : var.hub_settings.ncc_name
-  network_policy_id        = var.create_hub ? module.hub[0].network_policy_id : var.hub_settings.network_policy_id
+  ncc_id                   = var.create_hub ? module.hub[0].ncc_id : var.existing_ncc_id
+  ncc_name                 = var.create_hub ? module.hub[0].ncc_name : var.existing_ncc_name
+  network_policy_id        = var.create_hub ? module.hub[0].network_policy_id : var.existing_network_policy_id
   metastore_id             = var.create_hub ? module.hub[0].metastore_id : var.databricks_metastore_id
   provisioner_principal_id = data.azurerm_client_config.current.object_id
   databricks_account_id    = var.databricks_account_id
