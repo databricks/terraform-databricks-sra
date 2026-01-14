@@ -37,11 +37,18 @@ resource "azurerm_subnet_route_table_association" "workspace_subnets" {
   route_table_id = var.route_table_id
 }
 
-resource "azurerm_ip_group_cidr" "workspace_subnets" {
-  for_each = var.workspace_subnets.add_to_ip_group ? azurerm_subnet.workspace_subnets : {}
+resource "azurerm_ip_group_cidr" "workspace_subnet_host" {
+  count = var.workspace_subnets.add_to_ip_group ? 1 : 0
 
   ip_group_id = var.ipgroup_id
-  cidr        = each.value.address_prefixes[0]
+  cidr        = azurerm_subnet.workspace_subnets["host"].address_prefixes[0]
+}
+
+resource "azurerm_ip_group_cidr" "workspace_subnet_container" {
+  count = var.workspace_subnets.add_to_ip_group ? 1 : 0
+
+  ip_group_id = var.ipgroup_id
+  cidr        = azurerm_subnet.workspace_subnets["container"].address_prefixes[0]
 }
 
 # Create the privatelink subnet

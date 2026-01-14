@@ -124,13 +124,13 @@ run "plan_test_byo_hub_with_spoke" {
 
     # BYO hub integration
     # Note: spoke.tf references existing_hub_vnet which may need to be defined
-    hub_settings = {
-      ncc_id                  = "mock-ncc-id"
-      ncc_name                = "mock-ncc"
+    existing_ncc_id            = "mock-ncc-id"
+    existing_ncc_name          = "mock-ncc"
+    existing_network_policy_id = "mock-policy-id"
+    existing_cmk_ids = {
       key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
       managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
       managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
-      network_policy_id       = "mock-policy-id"
     }
 
     # Provide existing hub vnet info if needed
@@ -174,14 +174,13 @@ run "plan_test_byo_hub_byo_network" {
     # Use existing resource group
     existing_resource_group_name = "rg-test"
 
-    # BYO hub integration
-    hub_settings = {
-      ncc_id                  = "mock-ncc-id"
-      ncc_name                = "mock-ncc"
+    existing_ncc_id            = "mock-ncc-id"
+    existing_ncc_name          = "mock-ncc"
+    existing_network_policy_id = "mock-policy-id"
+    existing_cmk_ids = {
       key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
       managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
       managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
-      network_policy_id       = "mock-policy-id"
     }
   }
 }

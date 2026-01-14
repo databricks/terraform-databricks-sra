@@ -156,22 +156,31 @@ variable "existing_workspace_vnet" {
   }
 }
 
-variable "hub_settings" {
-  type = object({
-    ncc_id            = string
-    ncc_name          = string
-    network_policy_id = string
-
-    key_vault_id            = optional(string, null)
-    managed_disk_key_id     = optional(string, null)
-    managed_services_key_id = optional(string, null)
-  })
-  description = "(Conditional) Hub settings - required when create_hub is false"
+variable "existing_ncc_id" {
+  type        = string
+  description = "(Optional) ID of an existing NCC to use, required if create_hub is false"
   default     = null
 
   validation {
-    condition     = var.create_hub || var.hub_settings != null
-    error_message = "hub_settings must be provided when create_hub is false"
+    condition     = var.create_hub ? true : var.existing_ncc_id != null
+    error_message = "If create_hub is false, then you must provide existing_ncc_id"
+  }
+}
+
+variable "existing_ncc_name" {
+  type        = string
+  description = "(Optional) Name of NCC to use"
+  default     = null
+}
+
+variable "existing_network_policy_id" {
+  type        = string
+  description = "(Optional) ID of the network policy to use, required if create_hub is false"
+  default     = null
+
+  validation {
+    condition     = var.create_hub ? true : var.existing_network_policy_id != null
+    error_message = "If create_hub is false, then you must provide existing_network_policy_id"
   }
 }
 
@@ -189,12 +198,6 @@ variable "existing_cmk_ids" {
     error_message = "existing_cmk_ids must be provided when create_hub is false and cmk_enabled is true"
   }
   validation {
-    condition = var.create_hub || var.hub_settings == null || !var.cmk_enabled || (
-      var.hub_settings.key_vault_id != null &&
-      var.hub_settings.managed_disk_key_id != null &&
-      var.hub_settings.managed_services_key_id != null
-    )
-    error_message = "When create_hub is false and cmk_enabled is true, key_vault_id, managed_disk_key_id, and managed_services_key_id must be provided in hub_settings"
     condition     = var.create_hub ? var.existing_cmk_ids == null : true
     error_message = "existing_cmk_ids must not be provided when create_hub is true"
   }
