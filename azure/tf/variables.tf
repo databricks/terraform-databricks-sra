@@ -173,12 +173,21 @@ variable "hub_settings" {
     condition     = var.create_hub || var.hub_settings != null
     error_message = "hub_settings must be provided when create_hub is false"
   }
+}
+
+variable "existing_cmk_ids" {
+  type = object({
+    key_vault_id            = string
+    managed_disk_key_id     = string
+    managed_services_key_id = string
+  })
+  description = "(Optional) Existing CMK IDs - required when create_hub is false and cmk_enabled is true"
+  default = null
 
   validation {
-    condition     = !var.create_hub || var.hub_settings == null
-    error_message = "hub_settings should only be provided when create_hub is true"
+    condition     = !var.create_hub && var.cmk_enabled ? var.existing_cmk_ids != null : true
+    error_message = "existing_cmk_ids must be provided when create_hub is false and cmk_enabled is true"
   }
-
   validation {
     condition = var.create_hub || var.hub_settings == null || !var.cmk_enabled || (
       var.hub_settings.key_vault_id != null &&
@@ -186,6 +195,8 @@ variable "hub_settings" {
       var.hub_settings.managed_services_key_id != null
     )
     error_message = "When create_hub is false and cmk_enabled is true, key_vault_id, managed_disk_key_id, and managed_services_key_id must be provided in hub_settings"
+    condition     = var.create_hub ? var.existing_cmk_ids == null : true
+    error_message = "existing_cmk_ids must not be provided when create_hub is true"
   }
 }
 

@@ -46,9 +46,9 @@ module "spoke_workspace" {
 
   # KMS parameters
   is_kms_enabled          = var.cmk_enabled
-  managed_disk_key_id     = var.create_hub ? module.hub[0].managed_disk_key_id : var.hub_settings.managed_disk_key_id
-  managed_services_key_id = var.create_hub ? module.hub[0].managed_services_key_id : var.hub_settings.managed_services_key_id
-  key_vault_id            = var.create_hub ? module.hub[0].key_vault_id : var.hub_settings.key_vault_id
+  managed_disk_key_id     = local.cmk_managed_disk_key_id
+  managed_services_key_id = local.cmk_managed_services_key_id
+  key_vault_id            = local.cmk_keyvault_id
 
   # Account parameters
   ncc_id                   = var.create_hub ? module.hub[0].ncc_id : var.hub_settings.ncc_id
