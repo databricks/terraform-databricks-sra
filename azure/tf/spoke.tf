@@ -100,6 +100,8 @@ module "spoke_catalog" {
   ncc_id                = module.spoke_workspace.ncc_id
   ncc_name              = module.spoke_workspace.ncc_name
 
+  force_destroy = var.catalog_force_destroy
+
   providers = {
     databricks.workspace = databricks.spoke
   }
