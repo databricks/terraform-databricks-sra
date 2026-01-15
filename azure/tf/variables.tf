@@ -191,7 +191,7 @@ variable "existing_cmk_ids" {
     managed_services_key_id = string
   })
   description = "(Optional) Existing CMK IDs - required when create_hub is false and cmk_enabled is true"
-  default = null
+  default     = null
 
   validation {
     condition     = !var.create_hub && var.cmk_enabled ? var.existing_cmk_ids != null : true
@@ -269,4 +269,10 @@ variable "sat_force_destroy" {
   type        = bool
   default     = false
   description = "Used to allow Terraform to force destroy the SAT catalog. This is only used for testing SRA."
+}
+
+variable "catalog_force_destroy" {
+  type        = bool
+  default     = false
+  description = "Used to allow Terraform to force destroy the catalog. This is only used for testing SRA."
 }
