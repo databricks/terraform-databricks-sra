@@ -213,11 +213,16 @@ variable "workspace_security_compliance" {
   type = object({
     automatic_cluster_update_enabled      = optional(bool, null)
     compliance_security_profile_enabled   = optional(bool, null)
-    compliance_security_profile_standards = optional(list(string), null)
+    compliance_security_profile_standards = optional(list(string), [])
     enhanced_security_monitoring_enabled  = optional(bool, null)
   })
   description = "(Optional) Enhanced security compliance configuration for the workspace"
   default     = null
+
+  validation {
+    condition     = var.workspace_security_compliance != null && length(var.workspace_security_compliance.compliance_security_profile_standards) > 0 ? var.workspace_security_compliance.compliance_security_profile_enabled == true : true
+    error_message = "If a compliance standard is provided in var.workspace_security_compliance.compliance_security_profile_standards, var.workspace_security_compliance.compliance_security_profile_enabled must be true."
+  }
 }
 
 variable "workspace_name_overrides" {
