@@ -3,6 +3,15 @@ locals {
   managed_rg_name = join("", [module.naming.resource_group.name_unique, "adbmanaged"])
   public_subnet   = provider::azurerm::parse_resource_id(var.network_configuration.public_subnet_id)
   private_subnet  = provider::azurerm::parse_resource_id(var.network_configuration.private_subnet_id)
+  csp_update_body = {
+    properties = {
+      enhancedSecurityCompliance = {
+        complianceSecurityProfile = {
+          complianceStandards = var.enhanced_security_compliance.compliance_security_profile_standards
+        }
+      }
+    }
+  }
 }
 
 module "naming" {
@@ -38,7 +47,7 @@ resource "azurerm_databricks_workspace" "this" {
   enhanced_security_compliance {
     automatic_cluster_update_enabled      = var.enhanced_security_compliance.automatic_cluster_update_enabled
     compliance_security_profile_enabled   = var.enhanced_security_compliance.compliance_security_profile_enabled
-    compliance_security_profile_standards = var.enhanced_security_compliance.compliance_security_profile_standards
+    compliance_security_profile_standards = [] # Note that this is always an empty list, as a separate azapi resource manages this
     enhanced_security_monitoring_enabled  = var.enhanced_security_compliance.enhanced_security_monitoring_enabled
   }
 
@@ -52,7 +61,18 @@ resource "azurerm_databricks_workspace" "this" {
     private_subnet_network_security_group_association_id = var.network_configuration.private_subnet_network_security_group_association_id
   }
 
+  lifecycle {
+    ignore_changes = [enhanced_security_compliance[0].compliance_security_profile_standards]
+  }
+
   tags = var.tags
+}
+
+resource "azapi_update_resource" "this" {
+  count       = var.enhanced_security_compliance.compliance_security_profile_standards == null ? 0 : 1
+  type        = "Microsoft.Databricks/workspaces@2025-03-01-preview"
+  resource_id = azurerm_databricks_workspace.this.id
+  body        = local.csp_update_body
 }
 
 # Wait for 10 seconds after workspace creation to allow for APIs to become available

@@ -18,8 +18,10 @@ workspace_vnet = {
 
 # Optional: Enhanced security compliance
 # workspace_security_compliance = {
-#   automatic_cluster_update_enabled = true
-#   compliance_security_profile_enabled = true
+#   compliance_security_profile_enabled   = true
+#   compliance_security_profile_standards = ["HIPAA"]
+#   enhanced_security_monitoring_enabled  = true
+#   automatic_cluster_update_enabled      = true
 # }
 
 subscription_id = "ffffffff-ffff-ffff-ffff-ffffffffffff"

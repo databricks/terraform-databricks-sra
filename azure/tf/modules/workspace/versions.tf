@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">=3.65.0"
     }
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">=2.0"
+    }
     databricks = {
       source  = "databricks/databricks"
       version = ">=1.24.1"
