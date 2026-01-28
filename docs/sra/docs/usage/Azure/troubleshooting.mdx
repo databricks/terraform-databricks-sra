@@ -1,0 +1,416 @@
+---
+sidebar_position: 1
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import Admonition from '@theme/Admonition';
+
+# Troubleshooting
+
+Common issues and solutions when deploying the Azure SRA.
+
+---
+
+## Provider Authentication Issues
+
+### Azure CLI Tenant ID Error
+
+**Error:**
+```bash
+Error: cannot create mws network connectivity config:
+io.jsonwebtoken.IncorrectClaimException: Expected iss claim to be:
+https://sts.windows.net/00000000-0000-0000-0000-000000000000/, but was:
+https://sts.windows.net/ffffffff-ffff-ffff-ffff-ffffffffffff/
+```
+
+**Cause:** Running Terraform in a tenant where you are a guest user, or with multiple Azure accounts configured.
+
+**Solution:**
+
+Set the Azure Tenant ID by exporting the ARM_TENANT_ID environment variable:
+
+```bash
+export ARM_TENANT_ID="00000000-0000-0000-0000-000000000000"
+```
+
+Alternatively, set the tenant ID directly in the Databricks provider configuration:
+
+```hcl
+provider "databricks" {
+  azure_tenant_id = "00000000-0000-0000-0000-000000000000"
+  # ... other config
+}
+```
+
+---
+
+## Workspace Access Issues
+
+### Cannot Read Current User Error
+
+**Error:**
+```bash
+Error: cannot read current user: Unauthorized access to Org: 0000000000000000
+
+  with module.sat[0].module.sat.data.databricks_current_user.me,
+  on .terraform/modules/sat.sat/terraform/common/data.tf line 1,
+  in data "databricks_current_user" "me":
+   1: data "databricks_current_user" "me" {}
+```
+
+**Cause:** The user or service principal running Terraform does not have access to the newly created workspace yet.
+
+**Solution for User Identity:**
+
+1. Log in to the newly created workspace by clicking "Launch Workspace" in the Azure portal
+2. Ensure this is done as the **same user** running Terraform
+3. Re-run `terraform apply`
+
+**Solution for Service Principal:**
+
+The SRA automatically grants workspace admin permissions to the deploying service principal. This error should not occur with service principal authentication. If it does, verify:
+
+1. The service principal is correctly configured in the Databricks provider
+2. The service principal has sufficient permissions in the Azure subscription
+3. The `databricks_permission_assignment` resources are being created
+```
+
+---
+
+## Validation Errors
+
+### SAT URL Validation Error (Classic Compute)
+
+**Error:**
+```bash
+Error: Since SAT is enabled and is not running on serverless, you must
+include SAT-required URLs in the allowed_fqdns variable.
+```
+
+**Cause:** SAT is enabled on classic compute but required URLs are missing from `allowed_fqdns`.
+
+**Solution:**
+
+Add the required URLs to `allowed_fqdns`:
+
+```hcl
+sat_configuration = {
+  enabled = true
+  run_on_serverless = false  # Default
+}
+
+allowed_fqdns = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",
+  "*.python.org",
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org"
+]
+```
+
+### SAT URL Validation Error (Serverless)
+
+**Error:**
+```bash
+Error: Since SAT is enabled and running on serverless you must include
+SAT-required URLs in the hub_allowed_urls variable.
+```
+
+**Cause:** SAT is enabled on serverless but required URLs are missing from `hub_allowed_urls`.
+
+**Solution:**
+
+Add the required URLs to `hub_allowed_urls` (note: no wildcards):
+
+```hcl
+sat_configuration = {
+  enabled = true
+  run_on_serverless = true
+}
+
+hub_allowed_urls = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",
+  "pypi.org",
+  "pythonhosted.org"
+]
+```
+
+### Missing Metastore ID Error
+
+**Error:**
+```bash
+Error: If var.create_hub is false, you must provide databricks_metastore_id
+```
+
+**Cause:** You set `create_hub = false` but didn't provide an existing metastore ID.
+
+**Solution:**
+
+Provide the metastore ID from your existing hub:
+
+```hcl
+create_hub              = false
+databricks_metastore_id = "your-metastore-id-here"
+```
+
+To find your metastore ID, use the Databricks CLI or Azure portal.
+
+### Missing NCC or Network Policy ID Error
+
+**Error:**
+```bash
+Error: If create_hub is false, then you must provide existing_ncc_id
+
+Error: If create_hub is false, then you must provide existing_network_policy_id
+```
+
+**Cause:** You're using BYO hub mode but didn't provide the required NCC and network policy IDs.
+
+**Solution:**
+
+Provide both IDs from your existing hub:
+
+```hcl
+create_hub                 = false
+existing_ncc_id            = "your-ncc-id"
+existing_network_policy_id = "your-network-policy-id"
+```
+
+### Missing CMK IDs Error
+
+**Error:**
+```bash
+Error: existing_cmk_ids must be provided when create_hub is false and
+cmk_enabled is true
+```
+
+**Cause:** You're using BYO hub mode with CMK enabled but didn't provide existing CMK IDs.
+
+**Solution 1: Provide existing CMK IDs**
+
+```hcl
+create_hub  = false
+cmk_enabled = true
+
+existing_cmk_ids = {
+  key_vault_id            = "/subscriptions/.../Microsoft.KeyVault/vaults/kv-hub"
+  managed_disk_key_id     = "https://kv-hub.vault.azure.net/keys/cmk-disk/abc123"
+  managed_services_key_id = "https://kv-hub.vault.azure.net/keys/cmk-services/def456"
+}
+```
+
+**Solution 2: Disable CMK**
+
+If your organization doesn't require CMK:
+
+```hcl
+create_hub  = false
+cmk_enabled = false
+```
+
+### Workspace VNET Configuration Error
+
+**Error:**
+```bash
+Error: workspace_vnet must be provided when create_workspace_vnet is true
+
+Error: existing_workspace_vnet must be provided when create_workspace_vnet is false
+```
+
+**Cause:** Mismatch between `create_workspace_vnet` setting and provided network configuration.
+
+**Solution for SRA-managed network:**
+
+```hcl
+create_workspace_vnet = true
+
+workspace_vnet = {
+  cidr = "10.0.4.0/22"
+}
+```
+
+**Solution for BYO network:**
+
+```hcl
+create_workspace_vnet = false
+
+existing_workspace_vnet = {
+  network_configuration = {
+    virtual_network_id         = "/subscriptions/.../virtualNetworks/vnet-spoke"
+    private_subnet_id          = "/subscriptions/.../subnets/container"
+    public_subnet_id           = "/subscriptions/.../subnets/host"
+    private_endpoint_subnet_id = "/subscriptions/.../subnets/private-endpoints"
+    # ... (full configuration)
+  }
+  dns_zone_ids = {
+    backend = "/subscriptions/.../privateDnsZones/privatelink.azuredatabricks.net"
+    dfs     = "/subscriptions/.../privateDnsZones/privatelink.dfs.core.windows.net"
+    blob    = "/subscriptions/.../privateDnsZones/privatelink.blob.core.windows.net"
+  }
+}
+```
+
+### CSP Standards Without Profile Enabled
+
+**Error:**
+```bash
+Error: If a compliance standard is provided in
+var.workspace_security_compliance.compliance_security_profile_standards,
+var.workspace_security_compliance.compliance_security_profile_enabled must be true.
+```
+
+**Cause:** You specified compliance standards but didn't enable the compliance security profile.
+
+**Solution:**
+
+Enable the profile when specifying standards:
+
+```hcl
+workspace_security_compliance = {
+  compliance_security_profile_enabled   = true  # Required!
+  compliance_security_profile_standards = ["HIPAA"]
+}
+```
+
+---
+
+## Network Issues
+
+### Classic Compute Cannot Access Internet
+
+**Symptom:** Classic compute clusters cannot install packages or access external URLs. Errors like:
+
+```
+Could not reach pypi.org
+Connection timed out
+```
+
+**Cause:** The default SRA configuration has no internet access for security.
+
+**Solution:**
+
+Add required URLs to `allowed_fqdns`:
+
+```hcl
+# For Python packages
+allowed_fqdns = [
+  "python.org",
+  "*.python.org",
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org"
+]
+```
+
+```hcl
+# For R packages
+allowed_fqdns = [
+  "cran.r-project.org",
+  "*.cran.r-project.org",
+  "r-project.org"
+]
+```
+
+See [Network Egress Configuration](./configuration.mdx#network-egress) for more details.
+
+### Serverless Cannot Access Internet (Hub Workspace)
+
+**Symptom:** Serverless compute in the hub workspace cannot install packages or access external URLs.
+
+**Cause:** The default SRA configuration has no internet access for hub serverless.
+
+**Solution:**
+
+Add required URLs to `hub_allowed_urls` (no wildcards supported):
+
+```hcl
+hub_allowed_urls = [
+  "python.org",
+  "pypi.org",
+  "pythonhosted.org"
+]
+```
+
+### Serverless Cannot Access Internet (Spoke Workspace)
+
+**Symptom:** Serverless compute in spoke workspaces cannot access external URLs.
+
+**Cause:** The default SRA configuration has no internet access for spoke serverless.
+
+**Solution:**
+
+Add required URLs to `allowed_fqdns` (wildcards supported):
+
+```hcl
+allowed_fqdns = [
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org"
+]
+```
+---
+
+## Terraform State Issues
+
+### Resource Already Exists
+
+**Symptom:**
+```bash
+Error: A resource with the ID "..." already exists
+
+Error: resource already exists and cannot be created
+```
+
+**Cause:** Resource exists in Azure but not in Terraform state (often from a previous failed deployment).
+
+**Solution:**
+
+Import the existing resource into Terraform state:
+
+```bash
+terraform import <resource_type>.<resource_name> <azure_resource_id>
+```
+
+**Examples:**
+
+```bash
+# Import resource group
+terraform import azurerm_resource_group.spoke \
+  /subscriptions/<sub-id>/resourceGroups/rg-spoke
+
+# Import workspace
+terraform import module.spoke_workspace.azurerm_databricks_workspace.this \
+  /subscriptions/<sub-id>/resourceGroups/<rg-name>/providers/Microsoft.Databricks/workspaces/<workspace-name>
+```
+
+**Alternative:** If the resource was from a previously failed deployment and can be safely deleted, you can delete the resource and retry `terraform apply`.
+
+---
+## Getting More Help
+
+If you encounter issues not covered here:
+
+1. **Check GitHub Issues:** [databricks/terraform-databricks-sra/issues](https://github.com/databricks/terraform-databricks-sra/issues)
+
+2. **Review Terraform Documentation:**
+   - [Databricks Provider](https://registry.terraform.io/providers/databricks/databricks/latest/docs)
+   - [AzureRM Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
+
+3. **Enable Debug Logging:**
+   ```bash
+   export TF_LOG=DEBUG
+   terraform apply 2>&1 | tee terraform-debug.log
+   ```
+
+4. **Open a GitHub Issue** with:
+   - Your deployment mode
+   - Sanitized terraform.tfvars (remove sensitive values)
+   - Full error message
+   - Debug logs (if applicable)
+   - Steps to reproduce

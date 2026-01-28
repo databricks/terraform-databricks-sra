@@ -9,16 +9,21 @@ import Admonition from '@theme/Admonition';
 ## SRA Installation and Deployment Steps
 Follow the steps below to deploy the **Security Reference Architecture (SRA)** using Terraform:
 
-1. Clone the [SRA](https://github.com/databricks/terraform-databricks-sra) repository. 
-2. Install [Terraform](https://developer.hashicorp.com/terraform/install). 
-3. Navigate to the `azure` -> `tf` folder and open up the `template.tfvars.example` file. 
-    * Fill in the required values for all of the variables and relevant feature flags that are required for the deployment. 
-    * Rename the file to `terraform.tfvars`. 
+1. Clone the [SRA](https://github.com/databricks/terraform-databricks-sra) repository.
+2. Install [Terraform](https://developer.hashicorp.com/terraform/install).
+3. Navigate to the `azure` -> `tf` folder and choose the appropriate template file based on your deployment mode:
+    * **Mode 1 - Full SRA-managed**: `template.example.tfvars` (default, creates hub and spoke)
+    * **Mode 2 - Bring-your-own hub**: `template_byo_hub.example.tfvars` (uses existing hub infrastructure)
+    * **Mode 3 - Bring-your-own hub and spoke**: `template_byo_spoke_network.example.tfvars` (uses existing hub and spoke networks - most restrictive)
+
+    See [Deployment Modes](./deploymentmodes.mdx) for detailed guidance on choosing the right mode for your environment.
+
+    * Fill in the required values for all of the variables and relevant feature flags that are required for the deployment.
+    * Rename the file to `terraform.tfvars`.
 4. From the terminal, ensure you are in the correct working directory for the `tf` folder. 
 5. Run `terraform init`.
-6. Run `terraform validate`. 
-7. Run `terraform plan`. 
-8. Run `terraform apply`.
+6. Run `terraform plan`.
+7. Run `terraform apply`.
 
 # Provider Initialization with Azure CLI and Possible Errors
 If using the [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli), a possible error that can be encountered is:
@@ -56,13 +61,12 @@ The following steps outline essential security configurations that should be imp
 
 * **Implement a Front-End Mitigation Strategy**:
     * **IP Access Lists**: [IP Access Lists](https://learn.microsoft.com/en-us/azure/databricks/security/network/front-end/ip-access-list) enhance security by providing control over which networks can connect to your Azure Databricks account and workspaces.
-    * **Front-End PrivateLink**: [Front-End PrivateLink](https://learn.microsoft.com/en-us/azure/databricks/security/network/classic/private-link-standard) establishes a private connection to the Databricks web application over the Azure backbone, preventing exposure to the public internet.
+    * **Front-End PrivateLink**: [Front-End PrivateLink](https://learn.microsoft.com/en-us/azure/databricks/security/network/front-end/front-end-private-connect) establishes a private connection to the Databricks web application over the Azure backbone, preventing exposure to the public internet.
 ## Additional Security Recommendations
 
 * **Segment Workspaces for Data Separation**: Use distinct workspaces for different teams or functions (e.g., security, marketing) to enforce data access boundaries and reduce risk exposure.
 * **Avoid Storing Production Datasets in Databricks File Store (DBFS)**: The DBFS root is accessible to all users in a workspace. Use external storage locations for production data and databases to ensure proper access control and auditing.
 * **Back Up Assets from the Databricks Control Plane**: Regularly export and back up notebooks, jobs, and configurations using tools such as the [Databricks Terraform Exporter](https://registry.terraform.io/providers/databricks/databricks/latest/docs/guides/experimental-exporter).
-* **Regularly Restart Classic Compute Clusters**: Restart clusters periodically to ensure the latest compute images and security patches are applied. Databricks recommends that admins restart clusters manually during a scheduled maintenance window to minimze the risk of disrupting a scheduled job or workflows.
 * **Implement a Tagging Strategy**: [Cluster and pool tags](https://learn.microsoft.com/en-us/azure/databricks/admin/account-settings/usage-detail-tags) enable organizations to monitor costs and accurately attribute Databricks usage to specific business units or teams. These tags propagate to detailed DBU usage reports, supporting cost analysis and internal chargeback processes.
 * **Integrate CI/CD and Code Management**: Evaluate workflow needs for Git-based version control and CI/CD automation. Incorporate code scanning, permission enforcement, and secret detection to enhance governance and operational efficiency.
-* **Run and Monitor the Security Analyis Tool (SAT)**: [SAT](https://databricks-industry-solutions.github.io/security-analysis-tool/) analyzes your Databricks account and workspace configurations, providing recommendations to help you follow Databricks' security best practices.
+* **Run and Monitor the Security Analysis Tool (SAT)**: [SAT](https://databricks-industry-solutions.github.io/security-analysis-tool/) analyzes your Databricks account and workspace configurations, providing recommendations to help you follow Databricks' security best practices.
