@@ -1,0 +1,343 @@
+---
+sidebar_position: 1
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import Admonition from '@theme/Admonition';
+
+# Deployment Modes
+
+Azure SRA supports three deployment modes to accommodate different organizational requirements and existing infrastructure.
+
+## Overview
+
+<div className='bg-gray-100 p-4 rounded-lg mb-6'>
+
+| Mode | Hub | Spoke Network | Use Case |
+|------|-----|---------------|----------|
+| **Mode 1: Full SRA** | SRA creates | SRA creates | Greenfield deployments |
+| **Mode 2: Bring-your-own hub** | You provide | SRA creates | Existing hub, new spoke |
+| **Mode 3: Bring-your-own hub + spoke** | You provide | You provide | Existing infrastructure (most restrictive) |
+
+</div>
+
+---
+
+## Mode 1: Full SRA (Default)
+
+### Description
+SRA creates and manages all infrastructure including the hub VNET, Key Vault, firewall, and spoke workspace network.
+
+### When to Use
+- Greenfield deployments with no existing Azure infrastructure
+- You want SRA to manage all networking and security components
+- Simplest deployment path
+
+### Configuration
+```hcl
+create_hub            = true  # Default
+create_workspace_vnet = true  # Default
+```
+
+### Required Variables
+
+```hcl
+databricks_account_id = "00000000-0000-0000-0000-000000000000"
+location              = "westus2"
+subscription_id       = "ffffffff-ffff-ffff-ffff-ffffffffffff"
+resource_suffix       = "spoke"
+hub_resource_suffix   = "srahub"
+hub_vnet_cidr         = "10.0.0.0/22"
+
+workspace_vnet = {
+  cidr = "10.0.4.0/22"
+}
+
+tags = {
+  Owner = "user@example.com"
+}
+```
+
+### Template File
+Use `template.example.tfvars` as your starting point.
+
+### What Gets Created
+- Hub resource group with networking infrastructure
+- Hub Virtual Network with firewall and routing
+- Azure Key Vault with customer-managed keys (CMK)
+- WEBAUTH workspace (hub workspace) for account-level services
+- Spoke resource group and Virtual Network
+- Network peering between hub and spoke
+- Spoke workspace with Unity Catalog
+- Network Connectivity Configuration (NCC) and Network Policy
+
+---
+
+## Mode 2: Bring-your-own Hub
+
+### Description
+You provide an existing hub infrastructure (VNET, Key Vault, metastore, NCC, network policy). The SRA creates only the spoke workspace with a managed spoke network.
+
+### When to Use
+- You have existing hub Azure infrastructure
+- Multiple teams share a common hub
+- You want centralized control of hub resources
+- Deploying additional workspaces to an existing SRA hub
+
+### Configuration
+```hcl
+create_hub = false
+```
+
+### Required Variables
+
+<Admonition type="warning" title="Additional Requirements">
+
+When `create_hub = false`, you must provide several additional variables from your existing hub infrastructure.
+
+</Admonition>
+
+```hcl
+# Disable hub creation
+create_hub = false
+
+# Basic configuration
+location        = "westus2"
+subscription_id = "ffffffff-ffff-ffff-ffff-ffffffffffff"
+resource_suffix = "spoke"
+
+# REQUIRED: Existing metastore from your hub
+databricks_metastore_id = "00000000-0000-0000-0000-000000000000"
+
+# REQUIRED: Existing hub VNET details (for spoke network peering)
+existing_hub_vnet = {
+  route_table_id = "/subscriptions/.../providers/Microsoft.Network/routeTables/rt-hub"
+  vnet_id        = "/subscriptions/.../providers/Microsoft.Network/virtualNetworks/vnet-hub"
+}
+
+# REQUIRED: Existing NCC and network policy
+existing_ncc_id            = "your-ncc-id"
+existing_network_policy_id = "your-network-policy-id"
+
+# REQUIRED if cmk_enabled = true (default)
+existing_cmk_ids = {
+  key_vault_id            = "/subscriptions/.../providers/Microsoft.KeyVault/vaults/kv-hub"
+  managed_disk_key_id     = "https://kv-hub.vault.azure.net/keys/cmk-disk/version"
+  managed_services_key_id = "https://kv-hub.vault.azure.net/keys/cmk-services/version"
+}
+
+tags = {
+  Owner = "user@example.com"
+}
+```
+
+### Template File
+Use `template_byo_hub.example.tfvars` as your starting point.
+
+### What Gets Created
+- Spoke workspace and related resources
+- Resource group for spoke
+- Spoke Virtual Network
+- Network peering to existing hub
+- Uses existing NCC, network policy, and metastore
+
+### Important Notes
+
+<Admonition type="info" title="CMK Configuration">
+
+If `cmk_enabled = true` (default), you must provide `existing_cmk_ids`. Alternatively, you can disable CMK:
+
+```hcl
+cmk_enabled = false
+```
+
+</Admonition>
+
+<Admonition type="warning" title="SAT Not Available">
+
+The Security Analysis Tool (SAT) can only be deployed when `create_hub = true`. If you need SAT with a BYO hub deployment, you must deploy it separately.
+
+</Admonition>
+
+---
+
+## Mode 3: Bring-your-own Hub and Spoke Network
+
+### Description
+You provide both existing hub and spoke infrastructure. SRA is only responsible for creating the spoke workspace and related resources.
+
+### When to Use
+- You have both hub and spoke networks already created in Azure
+
+### Configuration
+```hcl
+create_hub            = false # You provide hub
+create_workspace_vnet = false # You provide spoke network
+```
+
+### Required Variables
+
+<Admonition type="warning" title="Additional Requirements">
+
+When bringing your own hub and spoke, you must provide all hub and spoke infrastructure details. This combines all requirements from Mode 2 with spoke network details.
+
+</Admonition>
+
+```hcl
+# Disable hub and spoke creation
+create_hub            = false
+create_workspace_vnet = false
+
+# Basic configuration
+databricks_account_id = "00000000-0000-0000-0000-000000000000"
+location              = "westus2"
+subscription_id       = "ffffffff-ffff-ffff-ffff-ffffffffffff"
+resource_suffix       = "spoke"
+
+# REQUIRED: Existing metastore from your hub
+databricks_metastore_id = "00000000-0000-0000-0000-000000000000"
+
+# REQUIRED: Existing hub VNET details (for spoke network peering)
+existing_hub_vnet = {
+  route_table_id = "/subscriptions/.../providers/Microsoft.Network/routeTables/rt-hub"
+  vnet_id        = "/subscriptions/.../providers/Microsoft.Network/virtualNetworks/vnet-hub"
+}
+
+# REQUIRED: Existing NCC and network policy
+existing_ncc_id            = "your-ncc-id"
+existing_network_policy_id = "your-network-policy-id"
+
+# REQUIRED if cmk_enabled = true (default)
+existing_cmk_ids = {
+  key_vault_id            = "/subscriptions/.../providers/Microsoft.KeyVault/vaults/kv-hub"
+  managed_disk_key_id     = "https://kv-hub.vault.azure.net/keys/cmk-disk/version"
+  managed_services_key_id = "https://kv-hub.vault.azure.net/keys/cmk-services/version"
+}
+
+# REQUIRED: BYO workspace network configuration
+existing_workspace_vnet = {
+  network_configuration = {
+    virtual_network_id                                   = "/subscriptions/.../virtualNetworks/vnet-spoke"
+    private_subnet_id                                    = "/subscriptions/.../subnets/container"
+    public_subnet_id                                     = "/subscriptions/.../subnets/host"
+    private_endpoint_subnet_id                           = "/subscriptions/.../subnets/private-endpoints"
+    private_subnet_network_security_group_association_id = "/subscriptions/.../subnets/container"
+    public_subnet_network_security_group_association_id  = "/subscriptions/.../subnets/host"
+  }
+  dns_zone_ids = {
+    backend = "/subscriptions/.../privateDnsZones/privatelink.azuredatabricks.net"
+    dfs     = "/subscriptions/.../privateDnsZones/privatelink.dfs.core.windows.net"
+    blob    = "/subscriptions/.../privateDnsZones/privatelink.blob.core.windows.net"
+  }
+}
+
+# Network egress
+allowed_fqdns    = []
+hub_allowed_urls = []
+
+tags = {
+  Owner = "user@example.com"
+}
+```
+
+### Template File
+Use `template_byo_spoke_network.example.tfvars` as your starting point.
+
+### What Gets Created
+- Spoke workspace and related resources
+
+---
+
+## Deployment Mode Decision Tree
+
+```
+START: Do you have existing hub infrastructure (VNET, Firewall, etc.)?
+  │
+  ├─ NO → Mode 1: Full SRA
+  │        (SRA creates both hub and spoke)
+  │
+  └─ YES → Do you have an existing spoke network?
+           │
+           ├─ NO → Mode 2: BYO Hub
+           │        (SRA creates spoke)
+           │
+           └─ YES → Mode 3: BYO Hub + Spoke
+                    (SRA only creates workspace)
+```
+
+---
+
+## Variable Dependencies
+
+### Mode 1 (Full SRA-managed)
+**Required:**
+- `databricks_account_id`
+- `location`
+- `subscription_id`
+- `resource_suffix`
+- `hub_resource_suffix`
+- `hub_vnet_cidr`
+- `workspace_vnet.cidr`
+
+### Mode 2 (BYO Hub)
+**Required:**
+- `databricks_account_id`
+- `location`
+- `subscription_id`
+- `resource_suffix`
+- `databricks_metastore_id` ⚠️
+- `existing_ncc_id` ⚠️
+- `existing_network_policy_id` ⚠️
+- `existing_hub_vnet` ⚠️
+- `existing_cmk_ids` (if `cmk_enabled = true`) ⚠️
+
+### Mode 3 (BYO Hub + Spoke)
+**Required:**
+- `databricks_account_id`
+- `location`
+- `subscription_id`
+- `resource_suffix`
+- `databricks_metastore_id` ⚠️
+- `existing_ncc_id` ⚠️
+- `existing_network_policy_id` ⚠️
+- `existing_hub_vnet` ⚠️
+- `existing_cmk_ids` (if `cmk_enabled = true`) ⚠️
+- `existing_workspace_vnet` ⚠️
+
+---
+
+## Validation Rules
+
+Terraform enforces these validation rules:
+
+1. **If `create_hub = false`:**
+   - Must provide `databricks_metastore_id`
+   - Must provide `existing_ncc_id`
+   - Must provide `existing_network_policy_id`
+   - Must provide `existing_hub_vnet`
+   - Must provide `existing_cmk_ids` if `cmk_enabled = true`
+   - Must NOT provide `existing_cmk_ids` if `cmk_enabled = false`
+
+2. **If `create_hub = true`:**
+   - Must provide `hub_vnet_cidr`
+   - Must provide `hub_resource_suffix`
+   - Must NOT provide `existing_cmk_ids`
+
+3. **If `create_workspace_vnet = true`:**
+   - Must provide `workspace_vnet`
+   - Must NOT provide `existing_workspace_vnet`
+
+4. **If `create_workspace_vnet = false`:**
+   - Must provide `existing_workspace_vnet`
+   - Must NOT provide `workspace_vnet`
+
+---
+
+## Next Steps
+
+After selecting your deployment mode:
+
+1. Copy the appropriate template file to `terraform.tfvars`
+2. Fill in required variables based on your mode
+3. Review [Configuration Reference](./configuration.mdx) for optional features
+4. Follow [Getting Started](./gettingstarted.mdx) deployment steps
+5. Review [Troubleshooting](./troubleshooting.mdx) if you encounter issues

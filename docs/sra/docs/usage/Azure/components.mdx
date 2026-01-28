@@ -19,77 +19,10 @@ The full Databricks Terraform Provider Documentation can be found [here](https:/
 * **Network Connectivity Configuration**: Serverless network connectivity is managed with [network connectivity configurations (NCC)](https://learn.microsoft.com/en-us/azure/databricks/security/network/serverless-network-security/#ncc), which are account-level regional constructs that are used to manage private endpoints creation and firewall enablement at scale. An NCC is created and attached to the workspace, which contains a list of stable Azure service subnets, which will be used by the serverless compute in that workspace to connect the Azure resource using service endpoints.
 * **Restrictive Network Policy**: [Network Policies](https://learn.microsoft.com/en-us/azure/databricks/security/network/serverless-network-security/network-policies) implement egress controls for serverless compute by enforcing a restrictive network policy that permits outbound traffic only to required data buckets.
 
-## Adding Additional Spokes
-To add additional spokes to this configuration, follow the steps below.
-
-1. **Add a New Key to the `spoke config` Variable**
-```hcl
-# Terraform variables (for example, terraform.tfvars)
-spoke_config = {
-  spoke = {
-    resource_suffix = "spoke"
-    cidr            = "10.1.0.0/20"
-    tags = {
-      environment = "dev"
-    },
-  },
-  spoke_b = { # <----- Add a new spoke config
-    resource_suffix = "spoke_b"
-    cidr            = "10.2.0.0/20"
-    tags = {
-      environment = "test"
-    }
-  }
-}
-```
-2. **Add a New Provider in `providers.tf` for the New Spoke**
-```hcl
-# providers.tf
-
-# New spoke provider
-provider "databricks" {
-  alias = "spoke_b"
-  host  = module.spoke_b.workspace_url
-}
-```
-3. **Copy the `spoke.tf` File**: Copy `spoke.tf` to a new file (for example, `spoke_b.tf`).
-4. **Modify the Module Names and References**:
-```hcl
-# spoke_b.tf
-
-module "spoke_b" { # <----- Modify the name of the module to something unique
-  source = "./modules/spoke"
-
-  # Update these per spoke
-  resource_suffix = var.spoke_config["spoke_b"].resource_suffix
-  vnet_cidr       = var.spoke_config["spoke_b"].cidr
-  tags            = var.spoke_config["spoke_b"].tags
-
-  depends_on = [module.hub]
-}
-
-module "spoke_b_catalog" {
-  source = "./modules/catalog"
-
-  # Update these per catalog for the catalog's spoke
-  catalog_name        = module.spoke_b.resource_suffix
-  dns_zone_ids        = [module.spoke_b.dns_zone_ids["dfs"]]
-  ncc_id              = module.spoke_b.ncc_id
-  resource_group_name = module.spoke_b.resource_group_name
-  resource_suffix     = module.spoke_b.resource_suffix
-  subnet_id           = module.spoke_b.subnet_ids.privatelink
-  tags                = module.spoke_b.tags
-
-  providers = {
-    databricks.workspace = databricks.spoke_b
-  }
-}
-```
-5. **Apply the Configuration**: `terraform apply`. 
 
 ## Security Analysis Tool (SAT)
 
-The [Security Analysis Tool (SAT)](https://databricks-industry-solutions.github.io/security-analysis-tool/) is enabled by default to continuously monitor the security posture of your Databricks environment. By default, SAT is installed in the **hub** workspace, also known as the `WEB_AUTH` workspace. 
+The [Security Analysis Tool (SAT)](https://databricks-industry-solutions.github.io/security-analysis-tool/) is disabled by default. You can enable SAT to continuously monitor the security posture of your Databricks environment. By default, SAT is installed in the **hub** workspace when enabled, also known as the `WEB_AUTH` workspace.
 
 # Changing the SAT Workspace
 To deploy the **Security Analysis Tool (SAT)** in a different workspace, three modifications are required in `customizations.tf`:
@@ -109,12 +42,12 @@ providers = {
    ```hcl
 # Default
 locals {
-    sat_workspace = module.hub
+    sat_workspace = var.create_hub && length(module.webauth_workspace) > 0 ? module.webauth_workspace[0] : null
 }
 
 # Modified
 locals {
-    sat_workspace = module.spoke
+    sat_workspace = module.spoke_workspace
 }
 ```
    3. **Update the `databricks_permission_assignment.sat_workspace_admin` resource**
@@ -133,7 +66,7 @@ resource "databricks_permission_assignment" "sat_workspace_admin" {
     provider = databricks.spoke
 }
 ```
->**NOTE**: The **Security Analysis Tool (SAT)** is designed to be deployed **once per Azure subscription**. To deploy SAT in multiple regions, provision SAT in multiple spokes using the same modifications above.
+>**NOTE**: The **Security Analysis Tool (SAT)** is designed to be deployed **once per Azure subscription**.
 
 # SAT Service Principal
 Some users may not have permissions to create Entra ID service principals. In this case, a pre-existing service principal can be used:

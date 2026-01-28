@@ -4,9 +4,7 @@ subscription_id       = "ffffffff-ffff-ffff-ffff-ffffffffffff"
 resource_suffix       = "spokenonet"
 
 # Hub configuration (SRA-managed)
-create_hub          = true
-hub_resource_suffix = "srahub"
-hub_vnet_cidr       = "10.0.0.0/22"
+create_hub = false
 
 # Network mode: BYO spoke network instead of SRA-managed
 create_workspace_vnet = false
