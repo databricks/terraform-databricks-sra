@@ -25,4 +25,65 @@ This architecture includes specific functionalities that may affect certain use 
 * **Isolated Unity Catalog Securables**: Unity Catalog securables like catalogs, Storage Credentials, and External Locations are isolated to individual workspaces.
     * To share securables between workspaces, update the resources using the `databricks_workspace_binding` resource.
 
-* **Security Analysis Tool (SAT)**: The [Security Analysis Tool (SAT)](https://databricks-industry-solutions.github.io/security-analysis-tool/) is enabled by default to continuously monitor the security posture of your Databricks environment. By default, SAT is installed in the **hub** workspace.
+* **Security Analysis Tool (SAT)**: The [Security Analysis Tool (SAT)](https://databricks-industry-solutions.github.io/security-analysis-tool/) is **disabled by default** to support highly restricted no-egress deployments.
+    * When enabled, SAT is installed in the **hub** (webauth) workspace by default.
+    * SAT can be enabled by setting `sat_configuration.enabled = true` in your configuration.
+    * Requires specific network egress rules (see [Network Egress Control](#network-egress-control) below).
+    * See the [Components](./components.mdx#security-analysis-tool-sat) page for detailed configuration options.
+
+## Network Egress Control
+
+By default, SRA implements a **zero-trust network egress policy** where workspaces have **no internet access** from classic or serverless compute. This prevents data exfiltration and ensures compliance with strict security requirements.
+
+### Allowing Internet Access
+
+To enable access to specific FQDNs for package installation or external services, you must explicitly configure network egress rules.
+
+**For spoke workspace (classic and serverless), and hub classic:**
+```hcl
+allowed_fqdns = [
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org"
+]
+```
+
+**For hub workspace serverless (used for SAT):**
+```hcl
+hub_allowed_urls = [
+  "pypi.org",
+  "pythonhosted.org"  # No wildcards supported
+]
+```
+
+### SAT URL Requirements
+
+If enabling SAT, you must include SAT-required URLs in your configuration.
+
+**For SAT on classic compute:**
+```hcl
+allowed_fqdns = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",
+  "*.python.org",
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org"
+]
+```
+
+**For SAT on serverless compute:**
+```hcl
+hub_allowed_urls = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",
+  "pypi.org",
+  "pythonhosted.org"
+]
+```
+
+For complete configuration details, see [Network Egress Configuration](./configuration.mdx#network-egress).

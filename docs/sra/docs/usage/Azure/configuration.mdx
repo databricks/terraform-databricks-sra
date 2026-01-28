@@ -1,0 +1,692 @@
+---
+sidebar_position: 1
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import Admonition from '@theme/Admonition';
+
+# Configuration Reference
+
+Complete reference for all Azure SRA configuration options.
+
+## Table of Contents
+- [Core Configuration](#core-configuration)
+- [Network Egress](#network-egress)
+- [Security & Compliance](#security--compliance)
+- [Customer-Managed Keys (CMK)](#customer-managed-keys-cmk)
+- [Security Analysis Tool (SAT)](#security-analysis-tool-sat)
+- [Resource Naming](#resource-naming)
+- [Service Principal Deployment](#service-principal-deployment)
+- [Testing Variables](#testing-variables)
+- [Variable Dependencies](#variable-dependencies)
+
+---
+
+## Core Configuration
+
+### Required Variables
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `databricks_account_id` | string | Databricks account ID for account-level operations |
+| `location` | string | Azure region (e.g., `"westus2"`, `"eastus"`) |
+| `subscription_id` | string | Azure subscription ID to deploy into |
+| `resource_suffix` | string | Suffix for naming workspace resources (e.g., `"spoke"`, `"prod"`) |
+
+**Example:**
+```hcl
+databricks_account_id = "00000000-0000-0000-0000-000000000000"
+location              = "westus2"
+subscription_id       = "ffffffff-ffff-ffff-ffff-ffffffffffff"
+resource_suffix       = "spoke"
+```
+
+### Hub Configuration
+
+| Variable | Type | Default | Required When | Description |
+|----------|------|---------|---------------|-------------|
+| `create_hub` | bool | `true` | Always | Whether to create hub infrastructure |
+| `hub_resource_suffix` | string | `""` | `create_hub = true` | Hub resource naming suffix |
+| `hub_vnet_cidr` | string | `""` | `create_hub = true` | Hub VNET CIDR block |
+
+**Example:**
+```hcl
+create_hub          = true
+hub_resource_suffix = "srahub"
+hub_vnet_cidr       = "10.0.0.0/22"
+```
+
+### Workspace (Spoke) Network Configuration
+
+| Variable | Type | Default | Required When | Description |
+|----------|------|---------|---------------|-------------|
+| `create_workspace_vnet` | bool | `true` | Always | Whether to create spoke VNET |
+| `workspace_vnet` | object | `null` | `create_workspace_vnet = true` | Spoke network configuration |
+| `existing_workspace_vnet` | object | `null` | `create_workspace_vnet = false` | Existing network details |
+
+**Example (SRA-managed spoke network):**
+```hcl
+create_workspace_vnet = true
+
+workspace_vnet = {
+  cidr     = "10.0.4.0/22"
+  new_bits = 4  # Optional: for subnet sizing
+}
+```
+
+**Example (Bring-your-own hub and spoke network):**
+```hcl
+create_workspace_vnet = false
+
+existing_workspace_vnet = {
+  network_configuration = {
+    virtual_network_id                                   = "/subscriptions/.../virtualNetworks/vnet-spoke"
+    private_subnet_id                                    = "/subscriptions/.../subnets/container"
+    public_subnet_id                                     = "/subscriptions/.../subnets/host"
+    private_endpoint_subnet_id                           = "/subscriptions/.../subnets/private-endpoints"
+    private_subnet_network_security_group_association_id = "/subscriptions/.../subnets/container"
+    public_subnet_network_security_group_association_id  = "/subscriptions/.../subnets/host"
+  }
+  dns_zone_ids = {
+    backend = "/subscriptions/.../privateDnsZones/privatelink.azuredatabricks.net"
+    dfs     = "/subscriptions/.../privateDnsZones/privatelink.dfs.core.windows.net"
+    blob    = "/subscriptions/.../privateDnsZones/privatelink.blob.core.windows.net"
+  }
+}
+```
+
+### Tags
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `tags` | map(string) | `{}` | Tags to apply to all resources |
+
+**Example:**
+```hcl
+tags = {
+  Owner       = "user@example.com"
+  Environment = "production"
+  CostCenter  = "engineering"
+}
+```
+
+---
+
+## Network Egress
+
+Control what internet resources your workspaces can access.
+
+<Admonition type="warning" title="Default: Zero Internet Access">
+
+By default, SRA implements a **zero-trust network egress policy** where all workspaces have **no internet access**. You must explicitly allow access to specific FQDNs.
+
+</Admonition>
+
+### allowed_fqdns
+
+**Type:** `list(string)`
+**Default:** `[]` (no internet access)
+**Applies to:** Spoke workspace (classic and serverless compute)
+
+List of FQDNs that spoke workspace can access. **Supports wildcards** (e.g., `*.pypi.org`).
+
+**Example - Python Packages:**
+```hcl
+allowed_fqdns = [
+  "python.org",
+  "*.python.org",
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org"
+]
+```
+
+**Example - R Packages:**
+```hcl
+allowed_fqdns = [
+  "cran.r-project.org",
+  "*.cran.r-project.org",
+  "r-project.org"
+]
+```
+
+### hub_allowed_urls
+
+**Type:** `set(string)`
+**Default:** `[]` (no internet access)
+**Applies to:** Hub workspace serverless compute only
+
+List of URLs for hub workspace serverless. **No wildcard support**.
+
+**Example:**
+```hcl
+hub_allowed_urls = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",      # No wildcard
+  "pypi.org",
+  "pythonhosted.org"
+]
+```
+
+### Key Differences
+
+| Feature | `allowed_fqdns` | `hub_allowed_urls` |
+|---------|-----------------|-------------------|
+| **Scope** | Spoke workspace and hub workspace classic | Hub workspace serverless |
+| **Classic Compute** | Yes (hub and spoke) | No |
+| **Serverless Compute** | Yes (spoke only) | Yes (hub only) |
+
+### SAT URL Requirements
+
+If you enable SAT, you must include specific URLs based on the compute type:
+
+**For SAT on Classic Compute:**
+```hcl
+sat_configuration = {
+  enabled = true
+  run_on_serverless = false  # Default
+}
+
+allowed_fqdns = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",
+  "*.python.org",
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org"
+]
+```
+
+**For SAT on Serverless:**
+```hcl
+sat_configuration = {
+  enabled = true
+  run_on_serverless = true
+}
+
+hub_allowed_urls = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",
+  "pypi.org",
+  "pythonhosted.org"
+]
+```
+
+<Admonition type="info" title="Validation">
+
+Terraform will validate that SAT-required URLs are present if SAT is enabled.
+
+</Admonition>
+
+---
+
+## Security & Compliance
+
+The SRA supports advanced security and compliance features through the `workspace_security_compliance` configuration.
+
+### workspace_security_compliance
+
+**Type:** `object`
+**Default:** `null` (all features disabled)
+
+Configure Compliance Security Profile (CSP), Enhanced Security Monitoring (ESM), and Enhanced Security Compliance (ESC) features.
+
+**Available Fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `compliance_security_profile_enabled` | bool | `null` | Enable Compliance Security Profile |
+| `compliance_security_profile_standards` | list(string) | `[]` | Compliance standards (e.g., `["HIPAA"]`) |
+| `enhanced_security_monitoring_enabled` | bool | `null` | Enable Enhanced Security Monitoring |
+| `automatic_cluster_update_enabled` | bool | `null` | Enable automatic cluster updates |
+
+### Compliance Security Profile (CSP)
+
+Enables Databricks Compliance Security Profile.
+
+**Example - HIPAA Compliance:**
+```hcl
+workspace_security_compliance = {
+  compliance_security_profile_enabled   = true
+  compliance_security_profile_standards = ["HIPAA"]
+}
+```
+
+**Available Standards:**
+- Review [Databricks documentation](https://learn.microsoft.com/en-us/azure/databricks/security/privacy/security-profile) for all available standards.
+
+<Admonition type="warning" title="Validation Rule">
+
+If you specify `compliance_security_profile_standards`, you **must** set `compliance_security_profile_enabled = true`.
+
+</Admonition>
+
+### Enhanced Security Monitoring (ESM)
+
+Enables enhanced security monitoring.
+
+**Example:**
+```hcl
+workspace_security_compliance = {
+  enhanced_security_monitoring_enabled = true
+}
+```
+
+### Complete Example
+
+Enable all security and compliance features:
+
+```hcl
+workspace_security_compliance = {
+  compliance_security_profile_enabled   = true
+  compliance_security_profile_standards = ["HIPAA"]
+  enhanced_security_monitoring_enabled  = true
+  automatic_cluster_update_enabled      = true
+}
+```
+
+## Customer-Managed Keys (CMK)
+
+Controls enabling customer-managed keys features.
+
+### cmk_enabled
+
+**Type:** `bool`
+**Default:** `true`
+
+Whether to enable customer-managed keys for workspace encryption.
+
+**When enabled (default):**
+- CMK is enabled wherever possible
+- Keys are managed in an Azure Key Vault in the hub environment (created by SRA if `create_hub = true`)
+
+**To disable CMK:**
+```hcl
+cmk_enabled = false
+```
+
+**Why disable CMK?**
+- Simplified key management requirements
+- Organizational policy doesn't require CMK
+
+### existing_cmk_ids
+
+**Type:** `object`
+**Default:** `null`
+**Required when:** `create_hub = false` AND `cmk_enabled = true`
+
+Provide existing CMK key IDs when using a bring-your-own hub deployment with CMK enabled.
+
+**Structure:**
+```hcl
+existing_cmk_ids = {
+  key_vault_id            = "/subscriptions/.../Microsoft.KeyVault/vaults/kv-hub"
+  managed_disk_key_id     = "https://kv-hub.vault.azure.net/keys/cmk-disk/abc123"
+  managed_services_key_id = "https://kv-hub.vault.azure.net/keys/cmk-services/def456"
+}
+```
+
+**Fields:**
+- `key_vault_id` - Azure Resource ID of the Key Vault containing the keys
+- `managed_disk_key_id` - Full key URL for encrypting managed disks
+- `managed_services_key_id` - Full key URL for encrypting managed services
+
+<Admonition type="warning" title="Validation Rules">
+
+1. If `create_hub = false` and `cmk_enabled = true`, you **must** provide `existing_cmk_ids`
+2. If `create_hub = true`, you **must not** provide `existing_cmk_ids` (SRA creates keys)
+
+</Admonition>
+
+### Example Configurations
+
+**Mode 1 (Full SRA-managed with CMK):**
+```hcl
+create_hub  = true
+cmk_enabled = true  # Default
+
+# No existing_cmk_ids needed - SRA creates keys
+```
+
+**Mode 1 (Full SRA-managed without CMK):**
+```hcl
+create_hub  = true
+cmk_enabled = false
+
+# No CMK resources created
+```
+
+**Mode 2 (BYO Hub with CMK):**
+```hcl
+create_hub  = false
+cmk_enabled = true
+
+existing_cmk_ids = {
+  key_vault_id            = "/subscriptions/.../vaults/kv-hub"
+  managed_disk_key_id     = "https://kv-hub.vault.azure.net/keys/..."
+  managed_services_key_id = "https://kv-hub.vault.azure.net/keys/..."
+}
+```
+
+**Mode 2 (BYO Hub without CMK):**
+```hcl
+create_hub  = false
+cmk_enabled = false
+
+# No existing_cmk_ids needed
+```
+
+---
+
+## Security Analysis Tool (SAT)
+
+Configure the Security Analysis Tool for continuous security monitoring.
+
+<Admonition type="warning" title="Disabled by Default">
+
+SAT is **disabled by default** to support highly restricted no-egress deployments. Enable by setting `sat_configuration.enabled = true`.
+
+</Admonition>
+
+### sat_configuration
+
+**Type:** `object`
+**Default:** `{ enabled = false }`
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `enabled` | bool | `false` | Enable SAT deployment |
+| `run_on_serverless` | bool | `false` | Run on serverless (vs classic compute) |
+| `schema_name` | string | `"sat"` | Schema name for SAT tables |
+| `catalog_name` | string | `"sat"` | Catalog name for SAT resources |
+| `proxies` | map(any) | `{}` | HTTP Proxy configuration for SAT operations |
+
+### Enable SAT on Classic Compute
+
+**Configuration:**
+```hcl
+sat_configuration = {
+  enabled = true
+  run_on_serverless = false  # Default
+}
+
+# REQUIRED: Network egress for classic compute SAT
+allowed_fqdns = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",
+  "*.python.org",
+  "pypi.org",
+  "*.pypi.org",
+  "pythonhosted.org",
+  "*.pythonhosted.org"
+]
+```
+
+**Behavior:**
+- Deployed in hub (WEBAUTH) workspace by default
+- Can inspect all workspaces in the subscription
+- Requires classic compute cluster
+
+### Enable SAT on Serverless
+
+**Configuration:**
+```hcl
+sat_configuration = {
+  enabled = true
+  run_on_serverless = true
+}
+
+# REQUIRED: Network egress for serverless SAT
+hub_allowed_urls = [
+  "management.azure.com",
+  "login.microsoftonline.com",
+  "python.org",
+  "pypi.org",
+  "pythonhosted.org"
+]
+```
+
+<Admonition type="warning" title="Serverless Limitation">
+
+When running SAT on serverless, it can **only inspect the workspace it's deployed in**. Use classic compute to inspect multiple workspaces across the subscription.
+
+</Admonition>
+
+### Customize SAT Catalog and Schema
+
+**Configuration:**
+```hcl
+sat_configuration = {
+  enabled       = true
+  catalog_name  = "security_monitoring"
+  schema_name   = "analysis_results"
+}
+```
+
+### sat_service_principal
+
+**Type:** `object`
+**Default:** `{ name = "spSAT" }`
+
+Configure or provide an existing service principal for SAT operations.
+
+<Admonition type="info" title="Service Principal Requirements">
+
+Some users may not have permissions to create Entra ID service principals. In this case, provide an existing service principal credentials.
+
+</Admonition>
+
+**Option 1: Let SRA create the service principal (default)**
+```hcl
+# Uses default name "spSAT"
+sat_service_principal = {}
+
+# Or customize the name
+sat_service_principal = {
+  name = "spSATDev"
+}
+```
+
+**Option 2: Use existing service principal**
+```hcl
+sat_service_principal = {
+  client_id     = "00000000-0000-0000-0000-000000000000"
+  client_secret = "your-service-principal-secret"
+}
+```
+
+<Admonition type="warning" title="Important">
+
+When providing `client_id`, you **must** also provide `client_secret`. Both fields are required together.
+
+</Admonition>
+
+### SAT Availability
+
+SAT can only be deployed when `create_hub = true`. If using Mode 2 (BYO Hub), SAT must be deployed separately in your existing hub workspace.
+
+---
+
+## Resource Naming
+
+Customize names of specific Azure resources to meet your organization's naming conventions.
+
+### workspace_name_overrides
+
+**Type:** `map(string)`
+**Default:** `{}`
+
+Override default names for workspace and related resources. Keys should match the resource types you want to customize.
+
+**Available Override Keys:**
+
+| Key | Resource | Azure Naming Constraints |
+|-----|----------|--------------------------|
+| `databricks_workspace` | Databricks workspace | 3-64 chars, alphanumeric and hyphens |
+| `private_endpoint` | Private endpoints (base name) | 1-80 chars, alphanumeric, hyphens, underscores |
+| `storage_account` | Storage account | 3-24 chars, lowercase letters and numbers only |
+| `resource_group` | Resource group | 1-90 chars, alphanumeric, hyphens, underscores, periods |
+
+**Example - Custom Workspace Name:**
+```hcl
+workspace_name_overrides = {
+  databricks_workspace = "dbx-prod-analytics"
+}
+```
+
+**Example - Multiple Overrides:**
+```hcl
+workspace_name_overrides = {
+  databricks_workspace = "dbx-prod-workspace"
+  storage_account      = "sadbxprod001"
+  resource_group       = "rg-databricks-prod"
+}
+```
+
+<Admonition type="tip" title="Naming Conventions">
+
+When overriding names:
+- Ensure names comply with Azure resource naming constraints (i.e. Storage account names must be globally unique)
+- Private endpoint names have suffixes added (`-backend`, `-webauth`)
+- Consider your organization's naming policies and tagging strategy
+
+</Admonition>
+---
+
+## Service Principal Deployment
+
+Deploy SRA using a service principal instead of a user identity.
+
+<Admonition type="tip" title="Automated Deployments">
+
+Service principal deployment is recommended for CI/CD pipelines and automated deployments where user interactive login is not feasible.
+
+</Admonition>
+
+### Authentication Setup
+
+To configure authentication for the Databricks provider, see the provider documentation [here](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure).
+
+### Required Permissions
+
+The principal deploying SRA needs:
+
+**Azure Permissions:**
+- `Contributor` role on the subscription
+Alternatively, see [this](https://learn.microsoft.com/en-us/azure/databricks/admin/admin-concepts#azure-admins) doc on creating a custom role
+- If SRA is creating a service principal for SAT during deployment, you will need the permissions documented [here](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application_registration).
+
+**Databricks Permissions:**
+- Account admin permissions in the Databricks account
+
+### Workspace Admin Assignment
+
+SRA automatically grants the deploying principal (user or service principal) workspace admin permissions. No additional configuration needed.
+
+**Behavior:**
+- User identity: Granted admin on first workspace launch
+- Service principal: Automatically granted admin during deployment
+
+### Troubleshooting
+
+See [Troubleshooting - Service Principal Issues](./troubleshooting.mdx#service-principal-issues) for common problems and solutions.
+
+---
+
+## Testing Variables
+
+<Admonition type="danger" title="Testing Environments Only">
+
+These variables are for **testing and development environments only**. Do not use in production as they can lead to accidental data loss.
+
+</Admonition>
+
+### catalog_force_destroy
+
+**Type:** `bool`
+**Default:** `false`
+
+Allows Terraform to force destroy spoke workspace catalogs, bypassing Databricks' protection against accidental catalog deletion.
+
+**Configuration:**
+```hcl
+catalog_force_destroy = true  # Testing only!
+```
+
+**What it does:**
+- Enables `terraform destroy` to delete catalogs containing data
+- Skips the manual confirmation normally required
+- Useful for automated testing and rapid iteration
+
+**Production risk:**
+Catalogs contain schemas, tables, views, and metadata. Enabling force destroy in production could lead to accidental data loss if `terraform destroy` is run unintentionally.
+
+### sat_force_destroy
+
+**Type:** `bool`
+**Default:** `false`
+
+Allows Terraform to force destroy the SAT catalog.
+
+**Configuration:**
+```hcl
+sat_force_destroy = true  # Testing only!
+```
+
+**Use case:**
+In testing/development environments where you need to repeatedly create and destroy infrastructure, these flags enable faster iteration.
+
+### Example - Testing Environment
+
+```hcl
+# terraform.tfvars for testing environment
+
+# Enable force destroy for testing environments
+catalog_force_destroy = true
+sat_force_destroy     = true
+```
+
+---
+
+## Variable Dependencies
+
+### Cross-Variable Requirements
+
+Understanding variable dependencies helps avoid configuration errors.
+
+| If you set... | Then you must also set... | Why |
+|---------------|---------------------------|-----|
+| `create_hub = false` | `databricks_metastore_id` | Spoke needs metastore reference |
+| `create_hub = false` | `existing_ncc_id` | Spoke needs NCC for serverless |
+| `create_hub = false` | `existing_network_policy_id` | Spoke needs network policy |
+| `create_hub = false` | `existing_hub_vnet` | Spoke needs hub VNET for peering |
+| `create_hub = false` AND `cmk_enabled = true` | `existing_cmk_ids` | Spoke needs CMK keys for encryption |
+| `create_workspace_vnet = true` | `workspace_vnet` | SRA needs CIDR for spoke network |
+| `create_workspace_vnet = false` | `existing_workspace_vnet` | Workspace needs existing network details |
+| `sat_configuration.enabled = true` AND `run_on_serverless = false` | SAT URLs in `allowed_fqdns` | Classic SAT needs internet access |
+| `sat_configuration.enabled = true` AND `run_on_serverless = true` | SAT URLs in `hub_allowed_urls` | Serverless SAT needs internet access |
+| `compliance_security_profile_standards = [...]` | `compliance_security_profile_enabled = true` | Standards require profile enabled |
+
+### Mutual Exclusions
+
+Some variables cannot be used together:
+
+| Cannot use together | Reason |
+|---------------------|--------|
+| `workspace_vnet` AND `existing_workspace_vnet` | Choose one: SRA-managed or existing |
+| `create_hub = true` AND `existing_cmk_ids` | SRA creates CMK when creating hub |
+| `hub_vnet_cidr` when `create_hub = false` | Not creating hub, don't need hub CIDR |
+
+---
+
+## Next Steps
+
+- Review [Deployment Modes](./deploymentmodes.mdx) to choose your architecture
+- See [Components](./components.mdx) for detailed feature documentation
+- Follow [Getting Started](./gettingstarted.mdx) for deployment steps
+- Check [Troubleshooting](./troubleshooting.mdx) if you encounter issues
