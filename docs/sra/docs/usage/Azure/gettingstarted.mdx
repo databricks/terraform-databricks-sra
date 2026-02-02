@@ -14,7 +14,7 @@ Follow the steps below to deploy the **Security Reference Architecture (SRA)** u
 3. Navigate to the `azure` -> `tf` folder and choose the appropriate template file based on your deployment mode:
     * **Mode 1 - Full SRA-managed**: `template.example.tfvars` (default, creates hub and spoke)
     * **Mode 2 - Bring-your-own hub**: `template_byo_hub.example.tfvars` (uses existing hub infrastructure)
-    * **Mode 3 - Bring-your-own hub and spoke**: `template_byo_spoke_network.example.tfvars` (uses existing hub and spoke networks - most restrictive)
+    * **Mode 3 - Bring-your-own hub and spoke**: `template_byo_spoke_network.example.tfvars` (uses existing hub and spoke networks)
 
     See [Deployment Modes](./deploymentmodes.mdx) for detailed guidance on choosing the right mode for your environment.
 
@@ -25,36 +25,7 @@ Follow the steps below to deploy the **Security Reference Architecture (SRA)** u
 6. Run `terraform plan`.
 7. Run `terraform apply`.
 
-# Provider Initialization with Azure CLI and Possible Errors
-If using the [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli), a possible error that can be encountered is:
-```bash
-Error: cannot create mws network connectivity config: io.jsonwebtoken.IncorrectClaimException: Expected iss claim to be: https://sts.windows.net/00000000-0000-0000-0000-000000000000/, but was: https://sts.windows.net/ffffffff-ffff-ffff-ffff-ffffffffffff/
-```
-This typically happens if you are running Terraform in a tenant where you are a **guest user**, or if you have **multiple Azure accounts** configured.
-
-To resolve this error, set the Azure Tenant ID by exporting the ARM_TENANT_ID environment variable:
-```bash
-export ARM_TENANT_ID="00000000-0000-0000-0000-000000000000"
-```
-Alternatively, you can set the tenant ID directly in the **Databricks provider** configuration (see the provider documentation for details).
-
-You may also encounter errors like the following when Terraform begins provisioning workspace resources:
-```bash
-╷
-│ Error: cannot read current user: Unauthorized access to Org: 0000000000000000
-│ 
-│   with module.sat[0].module.sat.data.databricks_current_user.me,
-│   on .terraform/modules/sat.sat/terraform/common/data.tf line 1, in data "databricks_current_user" "me":
-│    1: data "databricks_current_user" "me" {}
-│ 
-```
-To fix this error:
-
-1. Log in to the newly created **spoke** workspace by clicking `Launch Workspace` in the Azure portal.
-
-2. Ensure this is done as the **same user** running Terraform.
-
-3. Alternatively, grant **workspace admin** permissions to the Terraform user after the first user launches the workspace.
+If you encounter errors during any of the above terraform steps, check the [troubleshooting guide](./troubleshooting.mdx).
 
 ## Critical Next Steps
 The following steps outline essential security configurations that should be implemented after the initial deployment to further harden and operationalize the Databricks environment.

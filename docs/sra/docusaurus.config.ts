@@ -51,6 +51,12 @@ const config: Config = {
     'docusaurus-lunr-search'
   ],
 
+  themes: ['@docusaurus/theme-mermaid'],
+
+  markdown: {
+    mermaid: true,
+  },
+
   presets: [
     [
       'classic',
@@ -104,6 +110,12 @@ const config: Config = {
     prism: {
       theme: prismThemes.oneLight,
       darkTheme: prismThemes.oneDark,
+    },
+    mermaid: {
+      theme: { light: 'neutral', dark: 'dark' },
+      options: {
+        maxTextSize: 50000,
+      },
     },
     zoom: {
       selector: 'article img',

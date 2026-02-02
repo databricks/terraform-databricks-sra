@@ -5,20 +5,6 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import Admonition from '@theme/Admonition';
 
 # Configuration Reference
-
-Complete reference for all Azure SRA configuration options.
-
-## Table of Contents
-- [Core Configuration](#core-configuration)
-- [Network Egress](#network-egress)
-- [Security & Compliance](#security--compliance)
-- [Customer-Managed Keys (CMK)](#customer-managed-keys-cmk)
-- [Security Analysis Tool (SAT)](#security-analysis-tool-sat)
-- [Resource Naming](#resource-naming)
-- [Service Principal Deployment](#service-principal-deployment)
-- [Testing Variables](#testing-variables)
-- [Variable Dependencies](#variable-dependencies)
-
 ---
 
 ## Core Configuration
@@ -28,7 +14,7 @@ Complete reference for all Azure SRA configuration options.
 | Variable | Type | Description |
 |----------|------|-------------|
 | `databricks_account_id` | string | Databricks account ID for account-level operations |
-| `location` | string | Azure region (e.g., `"westus2"`, `"eastus"`) |
+| `location` | string | Azure region (e.g., `"westus"`, `"eastus2"`) |
 | `subscription_id` | string | Azure subscription ID to deploy into |
 | `resource_suffix` | string | Suffix for naming workspace resources (e.g., `"spoke"`, `"prod"`) |
 
@@ -233,15 +219,15 @@ The SRA supports advanced security and compliance features through the `workspac
 **Type:** `object`
 **Default:** `null` (all features disabled)
 
-Configure Compliance Security Profile (CSP), Enhanced Security Monitoring (ESM), and Enhanced Security Compliance (ESC) features.
+Configures Enhanced Security Compliance (ESC) features.
 
 **Available Fields:**
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `compliance_security_profile_enabled` | bool | `null` | Enable Compliance Security Profile |
+| `compliance_security_profile_enabled` | bool | `null` | Enable Compliance Security Profile (CSP) |
 | `compliance_security_profile_standards` | list(string) | `[]` | Compliance standards (e.g., `["HIPAA"]`) |
-| `enhanced_security_monitoring_enabled` | bool | `null` | Enable Enhanced Security Monitoring |
+| `enhanced_security_monitoring_enabled` | bool | `null` | Enable Enhanced Security Monitoring (ESM) |
 | `automatic_cluster_update_enabled` | bool | `null` | Enable automatic cluster updates |
 
 ### Compliance Security Profile (CSP)
@@ -308,10 +294,6 @@ Whether to enable customer-managed keys for workspace encryption.
 ```hcl
 cmk_enabled = false
 ```
-
-**Why disable CMK?**
-- Simplified key management requirements
-- Organizational policy doesn't require CMK
 
 ### existing_cmk_ids
 
@@ -556,45 +538,6 @@ When overriding names:
 - Consider your organization's naming policies and tagging strategy
 
 </Admonition>
----
-
-## Service Principal Deployment
-
-Deploy SRA using a service principal instead of a user identity.
-
-<Admonition type="tip" title="Automated Deployments">
-
-Service principal deployment is recommended for CI/CD pipelines and automated deployments where user interactive login is not feasible.
-
-</Admonition>
-
-### Authentication Setup
-
-To configure authentication for the Databricks provider, see the provider documentation [here](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure).
-
-### Required Permissions
-
-The principal deploying SRA needs:
-
-**Azure Permissions:**
-- `Contributor` role on the subscription
-Alternatively, see [this](https://learn.microsoft.com/en-us/azure/databricks/admin/admin-concepts#azure-admins) doc on creating a custom role
-- If SRA is creating a service principal for SAT during deployment, you will need the permissions documented [here](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application_registration).
-
-**Databricks Permissions:**
-- Account admin permissions in the Databricks account
-
-### Workspace Admin Assignment
-
-SRA automatically grants the deploying principal (user or service principal) workspace admin permissions. No additional configuration needed.
-
-**Behavior:**
-- User identity: Granted admin on first workspace launch
-- Service principal: Automatically granted admin during deployment
-
-### Troubleshooting
-
-See [Troubleshooting - Service Principal Issues](./troubleshooting.mdx#service-principal-issues) for common problems and solutions.
 
 ---
 

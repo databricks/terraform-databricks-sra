@@ -1,0 +1,116 @@
+---
+sidebar_position: 2
+---
+import Admonition from '@theme/Admonition';
+
+# Mode 1: Full SRA (Default)
+
+## Description
+SRA creates and manages all infrastructure including the hub VNET, Key Vault, firewall, and spoke workspace network.
+
+## What Gets Created
+
+<div className='rounded-lg mb-6 overflow-hidden'>
+<table className='w-full'>
+  <thead className='bg-gray-100'>
+    <tr>
+      <th className='p-3 text-left'>Resource</th>
+      <th className='p-3 text-left'>Component</th>
+      <th className='p-3 text-center'>Created by SRA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr className='!bg-green-50'>
+      <td className='p-3' rowSpan={4}><strong>Hub Resource Group</strong></td>
+      <td className='p-3'>Hub VNET + Azure Firewall</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>Webauth Workspace</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>CMK KeyVault</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>Route Table</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3' rowSpan={4}><strong>Spoke Resource Group</strong></td>
+      <td className='p-3'>Workspace</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>Spoke VNET</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>Back-end Private Endpoint</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>UC Storage Account</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3' rowSpan={3}><strong>Account Console</strong></td>
+      <td className='p-3'>NCC (Network Connectivity Config)</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>Network Policy</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>Metastore</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+## Configuration
+```hcl
+create_hub            = true  # Default
+create_workspace_vnet = true  # Default
+```
+
+## Required Variables
+
+```hcl
+databricks_account_id = "00000000-0000-0000-0000-000000000000"
+location              = "westus2"
+subscription_id       = "ffffffff-ffff-ffff-ffff-ffffffffffff"
+resource_suffix       = "spoke"
+hub_resource_suffix   = "srahub"
+hub_vnet_cidr         = "10.0.0.0/22"
+
+workspace_vnet = {
+  cidr = "10.0.4.0/22"
+}
+
+tags = {
+  Owner = "user@example.com"
+}
+```
+
+### Required Variable Summary
+- `databricks_account_id`
+- `location`
+- `subscription_id`
+- `resource_suffix`
+- `hub_resource_suffix`
+- `hub_vnet_cidr`
+- `workspace_vnet.cidr`
+
+## Template Variables File
+Use `template.example.tfvars` as the template for this type of deployment.
+
+## Next Steps
+
+1. Copy `template.example.tfvars` to `terraform.tfvars`
+2. Fill in required variables
+3. Review [Configuration Reference](./configuration.mdx) for optional features
+4. Follow [Getting Started](./gettingstarted.mdx) deployment steps
