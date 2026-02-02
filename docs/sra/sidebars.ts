@@ -81,7 +81,21 @@ const sidebars = {
           items: [
             { type: 'doc', id: 'usage/Azure/preread', label: 'Read Before Deploying' },
             { type: 'doc', id: 'usage/Azure/components', label: 'SRA Components Breakdown' },
-            { type: 'doc', id: 'usage/Azure/gettingstarted', label: 'Getting Started' }
+            { type: 'doc', id: 'usage/Azure/gettingstarted', label: 'Getting Started' },
+            {
+              type: 'category',
+              label: 'Deployment Modes',
+              link: { type: 'doc', id: 'usage/Azure/deploymentmodes' },
+              collapsible: true,
+              collapsed: false,
+              items: [
+                { type: 'doc', id: 'usage/Azure/mode1-full-sra', label: 'Mode 1: Full SRA' },
+                { type: 'doc', id: 'usage/Azure/mode2-byo-hub', label: 'Mode 2: BYO Hub' },
+                { type: 'doc', id: 'usage/Azure/mode3-byo-hub-spoke', label: 'Mode 3: BYO Hub + Spoke' },
+              ]
+            },
+            { type: 'doc', id: 'usage/Azure/configuration', label: 'Configuration' },
+            { type: 'doc', id: 'usage/Azure/troubleshooting', label: 'Troubleshooting' }
           ],
         },
         {

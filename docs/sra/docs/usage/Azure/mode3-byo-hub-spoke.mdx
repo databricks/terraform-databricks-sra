@@ -1,0 +1,179 @@
+---
+sidebar_position: 4
+---
+import Admonition from '@theme/Admonition';
+
+# Mode 3: Bring-your-own Hub and Spoke Network
+
+## Description
+You provide both existing hub and spoke infrastructure. SRA is only responsible for creating the spoke workspace and related resources.
+
+## What Gets Created
+
+<div className='rounded-lg mb-6 overflow-hidden'>
+<table className='w-full'>
+  <thead className='bg-gray-100'>
+    <tr>
+      <th className='p-3 text-left'>Resource</th>
+      <th className='p-3 text-left'>Component</th>
+      <th className='p-3 text-center'>Created by SRA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr className='bg-gray-50'>
+      <td className='p-3' rowSpan={4}><strong>Hub Resource Group</strong></td>
+      <td className='p-3'>Hub VNET + Azure Firewall</td>
+      <td className='p-3 text-center'>✗ (You provide)</td>
+    </tr>
+    <tr className='bg-gray-50'>
+      <td className='p-3'>Webauth Workspace</td>
+      <td className='p-3 text-center'>✗ (You provide)</td>
+    </tr>
+    <tr className='bg-gray-50'>
+      <td className='p-3'>CMK KeyVault</td>
+      <td className='p-3 text-center'>✗ (You provide)</td>
+    </tr>
+    <tr className='bg-gray-50'>
+      <td className='p-3'>Route Table</td>
+      <td className='p-3 text-center'>✗ (You provide)</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3' rowSpan={4}><strong>Spoke Resource Group</strong></td>
+      <td className='p-3'>Workspace</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='bg-gray-50'>
+      <td className='p-3'>Spoke VNET</td>
+      <td className='p-3 text-center'>✗ (You provide)</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>Back-end Private Endpoint</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='!bg-green-50'>
+      <td className='p-3'>UC Storage Account</td>
+      <td className='p-3 text-center'>✓</td>
+    </tr>
+    <tr className='bg-gray-50'>
+      <td className='p-3' rowSpan={3}><strong>Account Console</strong></td>
+      <td className='p-3'>NCC (Network Connectivity Config)</td>
+      <td className='p-3 text-center'>✗ (You provide)</td>
+    </tr>
+    <tr className='bg-gray-50'>
+      <td className='p-3'>Network Policy</td>
+      <td className='p-3 text-center'>✗ (You provide)</td>
+    </tr>
+    <tr className='bg-gray-50'>
+      <td className='p-3'>Metastore</td>
+      <td className='p-3 text-center'>✗ (You provide)</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+## Configuration
+```hcl
+create_hub            = false # You provide hub
+create_workspace_vnet = false # You provide spoke network
+```
+
+## Required Variables
+
+<Admonition type="warning" title="Additional Requirements">
+
+When bringing your own hub and spoke, you must provide all hub and spoke infrastructure details. This combines all requirements from Mode 2 with spoke network details.
+
+</Admonition>
+
+```hcl
+# Disable hub and spoke creation
+create_hub            = false
+create_workspace_vnet = false
+
+# Basic configuration
+databricks_account_id = "00000000-0000-0000-0000-000000000000"
+location              = "westus2"
+subscription_id       = "ffffffff-ffff-ffff-ffff-ffffffffffff"
+resource_suffix       = "spoke"
+
+# REQUIRED: Existing metastore from your hub
+databricks_metastore_id = "00000000-0000-0000-0000-000000000000"
+
+# REQUIRED: Existing hub VNET details (for spoke network peering)
+existing_hub_vnet = {
+  route_table_id = "/subscriptions/.../providers/Microsoft.Network/routeTables/rt-hub"
+  vnet_id        = "/subscriptions/.../providers/Microsoft.Network/virtualNetworks/vnet-hub"
+}
+
+# REQUIRED: Existing NCC and network policy
+existing_ncc_id            = "your-ncc-id"
+existing_network_policy_id = "your-network-policy-id"
+
+# REQUIRED if cmk_enabled = true (default)
+existing_cmk_ids = {
+  key_vault_id            = "/subscriptions/.../providers/Microsoft.KeyVault/vaults/kv-hub"
+  managed_disk_key_id     = "https://kv-hub.vault.azure.net/keys/cmk-disk/version"
+  managed_services_key_id = "https://kv-hub.vault.azure.net/keys/cmk-services/version"
+}
+
+# REQUIRED: BYO workspace network configuration
+existing_workspace_vnet = {
+  network_configuration = {
+    virtual_network_id                                   = "/subscriptions/.../virtualNetworks/vnet-spoke"
+    private_subnet_id                                    = "/subscriptions/.../subnets/container"
+    public_subnet_id                                     = "/subscriptions/.../subnets/host"
+    private_endpoint_subnet_id                           = "/subscriptions/.../subnets/private-endpoints"
+    private_subnet_network_security_group_association_id = "/subscriptions/.../subnets/container"
+    public_subnet_network_security_group_association_id  = "/subscriptions/.../subnets/host"
+  }
+  dns_zone_ids = {
+    backend = "/subscriptions/.../privateDnsZones/privatelink.azuredatabricks.net"
+    dfs     = "/subscriptions/.../privateDnsZones/privatelink.dfs.core.windows.net"
+    blob    = "/subscriptions/.../privateDnsZones/privatelink.blob.core.windows.net"
+  }
+}
+
+# Network egress
+allowed_fqdns    = []
+hub_allowed_urls = []
+
+tags = {
+  Owner = "user@example.com"
+}
+```
+
+### Required Variable Summary
+- `databricks_account_id`
+- `location`
+- `subscription_id`
+- `resource_suffix`
+- `databricks_metastore_id`
+- `existing_ncc_id`
+- `existing_network_policy_id`
+- `existing_hub_vnet`
+- `existing_cmk_ids` (if `cmk_enabled = true`)
+- `existing_workspace_vnet`
+
+## Template File
+Use `template_byo_spoke_network.example.tfvars` as your starting point.
+
+## Validation Rules
+
+When `create_hub = false`:
+- Must provide `databricks_metastore_id`
+- Must provide `existing_ncc_id`
+- Must provide `existing_network_policy_id`
+- Must provide `existing_hub_vnet`
+- Must provide `existing_cmk_ids` if `cmk_enabled = true`
+- Must NOT provide `existing_cmk_ids` if `cmk_enabled = false`
+
+When `create_workspace_vnet = false`:
+- Must provide `existing_workspace_vnet`
+- Must NOT provide `workspace_vnet`
+
+## Next Steps
+
+1. Copy `template_byo_spoke_network.example.tfvars` to `terraform.tfvars`
+2. Fill in required variables from your existing infrastructure
+3. Review [Configuration Reference](./configuration.mdx) for optional features
+4. Follow [Getting Started](./gettingstarted.mdx) deployment steps

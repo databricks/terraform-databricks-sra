@@ -12,11 +12,11 @@ The **Security Reference Architecture (SRA)** is a purpose-built, simplified dep
 This architecture includes specific functionalities that may affect certain use cases, as outlined below.
 
 * **Azure Firewall**: [Azure Firewall](https://learn.microsoft.com/en-us/azure/firewall/overview) is deployed to securely manage and control outbound traffic from the classic compute plane. It provides centralized logging, monitoring, and policy enforcement while maintaining compliance with organizational security standards.
-    * To add packages to classic compute or serverless compute, set up a private repository for scanned packages or update firewall rules/network policies to specified domains.
+    * To add packages (such as from PyPi or Cran) to classic compute or serverless compute, set up a private repository for scanned packages or update firewall rules/network policies to specified domains. See [Network Egress Configuration](./configuration.mdx#network-egress) for more information on configuring SRA for package installation.
 
 * **Hub-and-Spoke Network Topology**: The architecture employs a hub-and-spoke model:
     * The **hub** VNet contains shared infrastructure and services.
-    * Each **spoke** Vnet houses isolated Azure Databricks workspaces for different business units or teams.
+    * The **spoke** Vnet houses the Azure Databricks workspace deployed by SRA. SRA can be used more than once for new workspaces for different business units or teams.
 
     This topology enhances security by isolating workloads and controlling traffic flow between VNets.
 
@@ -28,62 +28,22 @@ This architecture includes specific functionalities that may affect certain use 
 * **Security Analysis Tool (SAT)**: The [Security Analysis Tool (SAT)](https://databricks-industry-solutions.github.io/security-analysis-tool/) is **disabled by default** to support highly restricted no-egress deployments.
     * When enabled, SAT is installed in the **hub** (webauth) workspace by default.
     * SAT can be enabled by setting `sat_configuration.enabled = true` in your configuration.
-    * Requires specific network egress rules (see [Network Egress Control](#network-egress-control) below).
+    * Requires specific network egress rules (see [SAT URL Requirements](./configuration.mdx#sat-url-requirements)).
     * See the [Components](./components.mdx#security-analysis-tool-sat) page for detailed configuration options.
 
-## Network Egress Control
+---
+## Prerequisites
+### Required Permissions
 
-By default, SRA implements a **zero-trust network egress policy** where workspaces have **no internet access** from classic or serverless compute. This prevents data exfiltration and ensures compliance with strict security requirements.
+The principal deploying SRA needs:
 
-### Allowing Internet Access
+**Azure Permissions:**
+- `Contributor` role on the subscription. Alternatively, see [this](https://learn.microsoft.com/en-us/azure/databricks/admin/admin-concepts#azure-admins) doc on creating a custom role
+- If SRA is creating a service principal for SAT during deployment, you will need the permissions documented [here](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/application_registration).
 
-To enable access to specific FQDNs for package installation or external services, you must explicitly configure network egress rules.
+**Databricks Permissions:**
+- Account admin permissions in the Databricks account
 
-**For spoke workspace (classic and serverless), and hub classic:**
-```hcl
-allowed_fqdns = [
-  "pypi.org",
-  "*.pypi.org",
-  "pythonhosted.org",
-  "*.pythonhosted.org"
-]
-```
+### Authentication Setup
 
-**For hub workspace serverless (used for SAT):**
-```hcl
-hub_allowed_urls = [
-  "pypi.org",
-  "pythonhosted.org"  # No wildcards supported
-]
-```
-
-### SAT URL Requirements
-
-If enabling SAT, you must include SAT-required URLs in your configuration.
-
-**For SAT on classic compute:**
-```hcl
-allowed_fqdns = [
-  "management.azure.com",
-  "login.microsoftonline.com",
-  "python.org",
-  "*.python.org",
-  "pypi.org",
-  "*.pypi.org",
-  "pythonhosted.org",
-  "*.pythonhosted.org"
-]
-```
-
-**For SAT on serverless compute:**
-```hcl
-hub_allowed_urls = [
-  "management.azure.com",
-  "login.microsoftonline.com",
-  "python.org",
-  "pypi.org",
-  "pythonhosted.org"
-]
-```
-
-For complete configuration details, see [Network Egress Configuration](./configuration.mdx#network-egress).
+To configure authentication for the Databricks provider, see the provider documentation [here](https://registry.terraform.io/providers/databricks/databricks/latest/docs#special-configurations-for-azure).
