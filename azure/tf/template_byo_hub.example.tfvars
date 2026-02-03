@@ -1,6 +1,6 @@
 # BYO Hub (no hub created by SRA)
 create_hub              = false
-create_workspace_vnet   = false
+create_workspace_vnet   = true
 databricks_metastore_id = "00000000-0000-0000-0000-000000000000"
 
 # Basic configuration
