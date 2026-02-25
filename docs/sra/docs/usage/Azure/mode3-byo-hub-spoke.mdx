@@ -61,7 +61,7 @@ You provide both existing hub and spoke infrastructure. SRA is only responsible 
     </tr>
     <tr className='bg-gray-50'>
       <td className='p-3'>Network Policy</td>
-      <td className='p-3 text-center'>✗ (You provide)</td>
+      <td className='p-3 text-center'>✗ / ✓ (Optional — see Mode 2)</td>
     </tr>
     <tr className='bg-gray-50'>
       <td className='p-3'>Metastore</td>
@@ -105,8 +105,10 @@ existing_hub_vnet = {
   vnet_id        = "/subscriptions/.../providers/Microsoft.Network/virtualNetworks/vnet-hub"
 }
 
-# REQUIRED: Existing NCC and network policy
-existing_ncc_id            = "your-ncc-id"
+# REQUIRED: Existing NCC
+existing_ncc_id = "your-ncc-id"
+
+# REQUIRED: Provide an existing network policy OR set create_spoke_network_policy = true to have SRA create one
 existing_network_policy_id = "your-network-policy-id"
 
 # REQUIRED if cmk_enabled = true (default)
@@ -149,7 +151,7 @@ tags = {
 - `resource_suffix`
 - `databricks_metastore_id`
 - `existing_ncc_id`
-- `existing_network_policy_id`
+- `existing_network_policy_id` OR `create_spoke_network_policy = true`
 - `existing_hub_vnet`
 - `existing_cmk_ids` (if `cmk_enabled = true`)
 - `existing_workspace_vnet`
@@ -162,7 +164,8 @@ Use `template_byo_spoke_network.example.tfvars` as your starting point.
 When `create_hub = false`:
 - Must provide `databricks_metastore_id`
 - Must provide `existing_ncc_id`
-- Must provide `existing_network_policy_id`
+- Must provide `existing_network_policy_id` OR set `create_spoke_network_policy = true`
+- Must NOT provide `existing_network_policy_id` when `create_spoke_network_policy = true`
 - Must provide `existing_hub_vnet`
 - Must provide `existing_cmk_ids` if `cmk_enabled = true`
 - Must NOT provide `existing_cmk_ids` if `cmk_enabled = false`

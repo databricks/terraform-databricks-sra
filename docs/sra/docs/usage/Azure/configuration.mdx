@@ -364,6 +364,60 @@ cmk_enabled = false
 
 ---
 
+## BYO Hub: Optional SRA-managed Infrastructure
+
+When `create_hub = false`, SRA can optionally manage firewall rules and network policies on your existing hub infrastructure rather than requiring you to provide them externally.
+
+### create_spoke_firewall_rules
+
+**Type:** `bool`
+**Default:** `false`
+**Only valid when:** `create_hub = false`
+
+When `true`, SRA creates an Azure Firewall rule collection group on your existing hub firewall for spoke classic compute egress. An IP group for the spoke subnets is also created automatically.
+
+**Required with:** `existing_firewall_policy_id`
+
+```hcl
+create_spoke_firewall_rules = true
+existing_firewall_policy_id = "/subscriptions/.../firewallPolicies/fp-hub"
+```
+
+Allowed egress destinations are controlled by `allowed_fqdns`, mirroring the classic compute firewall rules that Mode 1 creates in the hub.
+
+### existing_firewall_policy_id
+
+**Type:** `string`
+**Default:** `null`
+**Required when:** `create_spoke_firewall_rules = true`
+
+The Azure Resource ID of the existing hub firewall policy to attach spoke rules to.
+
+### create_spoke_network_policy
+
+**Type:** `bool`
+**Default:** `false`
+**Only valid when:** `create_hub = false`
+
+When `true`, SRA creates a `databricks_account_network_policy` for spoke serverless compute. This makes `existing_network_policy_id` unnecessary (and forbidden). The NCC (`existing_ncc_id`) must still be provided as it is a shared regional resource.
+
+```hcl
+create_spoke_network_policy = true
+existing_ncc_id             = "your-ncc-id"
+```
+
+Allowed egress destinations are sourced from `allowed_fqdns`
+
+<Admonition type="warning" title="Validation Rules">
+
+- `create_spoke_firewall_rules = true` requires `existing_firewall_policy_id`
+- `create_spoke_network_policy = true` requires that `existing_network_policy_id` is **not** set
+- Both flags can only be `true` when `create_hub = false`
+
+</Admonition>
+
+---
+
 ## Security Analysis Tool (SAT)
 
 Configure the Security Analysis Tool for continuous security monitoring.
@@ -606,7 +660,8 @@ Understanding variable dependencies helps avoid configuration errors.
 |---------------|---------------------------|-----|
 | `create_hub = false` | `databricks_metastore_id` | Spoke needs metastore reference |
 | `create_hub = false` | `existing_ncc_id` | Spoke needs NCC for serverless |
-| `create_hub = false` | `existing_network_policy_id` | Spoke needs network policy |
+| `create_hub = false` | `existing_network_policy_id` OR `create_spoke_network_policy = true` | Spoke needs network policy for serverless |
+| `create_spoke_firewall_rules = true` | `existing_firewall_policy_id` | SRA needs the hub firewall policy to attach rules to |
 | `create_hub = false` | `existing_hub_vnet` | Spoke needs hub VNET for peering |
 | `create_hub = false` AND `cmk_enabled = true` | `existing_cmk_ids` | Spoke needs CMK keys for encryption |
 | `create_workspace_vnet = true` | `workspace_vnet` | SRA needs CIDR for spoke network |
@@ -624,6 +679,9 @@ Some variables cannot be used together:
 | `workspace_vnet` AND `existing_workspace_vnet` | Choose one: SRA-managed or existing |
 | `create_hub = true` AND `existing_cmk_ids` | SRA creates CMK when creating hub |
 | `hub_vnet_cidr` when `create_hub = false` | Not creating hub, don't need hub CIDR |
+| `create_spoke_network_policy = true` AND `existing_network_policy_id` | Choose one: SRA-created or existing network policy |
+| `create_spoke_firewall_rules = true` when `create_hub = true` | Firewall rules managed by hub module when hub is created |
+| `create_spoke_network_policy = true` when `create_hub = true` | Network policy managed by hub module when hub is created |
 
 ---
 

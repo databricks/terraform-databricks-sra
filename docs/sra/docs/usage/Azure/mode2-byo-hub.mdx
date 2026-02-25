@@ -6,7 +6,7 @@ import Admonition from '@theme/Admonition';
 # Mode 2: Bring-your-own Hub
 
 ## Description
-You provide an existing hub infrastructure (VNET, Key Vault, metastore, NCC, network policy). SRA creates only the spoke workspace with a managed spoke network.
+You provide an existing hub infrastructure (VNET, Key Vault, metastore, NCC). SRA creates the spoke workspace with a managed spoke network. Optionally, SRA can also manage firewall rules and network policies for each spoke.
 
 ## What Gets Created
 
@@ -61,7 +61,7 @@ You provide an existing hub infrastructure (VNET, Key Vault, metastore, NCC, net
     </tr>
     <tr className='bg-gray-50'>
       <td className='p-3'>Network Policy</td>
-      <td className='p-3 text-center'>✗ (You provide)</td>
+      <td className='p-3 text-center'>✗ / ✓ (Optional — see below)</td>
     </tr>
     <tr className='bg-gray-50'>
       <td className='p-3'>Metastore</td>
@@ -102,8 +102,10 @@ existing_hub_vnet = {
   vnet_id        = "/subscriptions/.../providers/Microsoft.Network/virtualNetworks/vnet-hub"
 }
 
-# REQUIRED: Existing NCC and network policy
-existing_ncc_id            = "your-ncc-id"
+# REQUIRED: Existing NCC
+existing_ncc_id = "your-ncc-id"
+
+# REQUIRED: Provide an existing network policy OR set create_spoke_network_policy = true to have SRA create one
 existing_network_policy_id = "your-network-policy-id"
 
 # REQUIRED if cmk_enabled = true (default)
@@ -125,7 +127,7 @@ tags = {
 - `resource_suffix`
 - `databricks_metastore_id`
 - `existing_ncc_id`
-- `existing_network_policy_id`
+- `existing_network_policy_id` OR `create_spoke_network_policy = true`
 - `existing_hub_vnet`
 - `existing_cmk_ids` (if `cmk_enabled = true`)
 
@@ -150,15 +152,43 @@ The Security Analysis Tool (SAT) can only be deployed when `create_hub = true`. 
 
 </Admonition>
 
+## Optional: SRA-managed Firewall Rules and Network Policy
+
+When using a BYO hub, SRA can optionally manage firewall rules and network policies on your existing hub infrastructure.
+
+<Admonition type="info" title="Firewall Rules (Classic Compute)">
+
+Set `create_spoke_firewall_rules = true` to have SRA create firewall rules for spoke classic compute on your existing hub firewall. Requires `existing_firewall_policy_id`.
+
+```hcl
+create_spoke_firewall_rules = true
+existing_firewall_policy_id = "/subscriptions/.../firewallPolicies/fp-hub"
+```
+
+</Admonition>
+
+<Admonition type="info" title="Network Policy (Serverless)">
+
+Set `create_spoke_network_policy = true` to have SRA create a Databricks network policy for spoke serverless compute. When set, `existing_network_policy_id` must not be provided. The NCC (`existing_ncc_id`) must still be supplied as it is a shared regional resource.
+
+```hcl
+create_spoke_network_policy = true
+existing_ncc_id             = "your-ncc-id"
+```
+
+</Admonition>
+
 ## Validation Rules
 
 When `create_hub = false`:
 - Must provide `databricks_metastore_id`
 - Must provide `existing_ncc_id`
-- Must provide `existing_network_policy_id`
+- Must provide `existing_network_policy_id` OR set `create_spoke_network_policy = true`
+- Must NOT provide `existing_network_policy_id` when `create_spoke_network_policy = true`
 - Must provide `existing_hub_vnet`
 - Must provide `existing_cmk_ids` if `cmk_enabled = true`
 - Must NOT provide `existing_cmk_ids` if `cmk_enabled = false`
+- `create_spoke_firewall_rules` requires `existing_firewall_policy_id`
 
 ## Next Steps
 

@@ -53,13 +53,15 @@ flowchart TD
 ### [Mode 2: Bring-your-own Hub](./mode2-byo-hub.mdx)
 - **Best for:** Teams with existing hub infrastructure
 - **SRA creates:** Spoke resources only
-- **You provide:** Hub VNET, Key Vault, metastore, NCC, network policy
+- **You provide:** Hub VNET, Key Vault, metastore, NCC
+- **Optional:** SRA can manage firewall rules (`create_spoke_firewall_rules`) and network policy (`create_spoke_network_policy`) on your existing hub
 - **Template:** `template_byo_hub.example.tfvars`
 
 ### [Mode 3: Bring-your-own Hub + Spoke](./mode3-byo-hub-spoke.mdx)
 - **Best for:** Organizations with fully existing infrastructure
 - **SRA creates:** Workspace and related resources only
-- **You provide:** Hub VNET, Key Vault, metastore, NCC, network policy, spoke VNET
+- **You provide:** Hub VNET, Key Vault, metastore, NCC, spoke VNET
+- **Optional:** SRA can manage firewall rules (`create_spoke_firewall_rules`) and network policy (`create_spoke_network_policy`) on your existing hub
 - **Template:** `template_byo_spoke_network.example.tfvars`
 
 ## Next Steps
