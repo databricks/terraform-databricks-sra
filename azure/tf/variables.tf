@@ -175,12 +175,17 @@ variable "existing_ncc_name" {
 
 variable "existing_network_policy_id" {
   type        = string
-  description = "(Optional) ID of the network policy to use, required if create_hub is false"
+  description = "(Optional) ID of the network policy to use. Required if create_hub is false and create_spoke_network_policy is false."
   default     = null
 
   validation {
-    condition     = var.create_hub ? true : var.existing_network_policy_id != null
-    error_message = "If create_hub is false, then you must provide existing_network_policy_id"
+    condition     = var.create_hub ? true : (var.create_spoke_network_policy || var.existing_network_policy_id != null)
+    error_message = "If create_hub is false, you must either provide existing_network_policy_id or set create_spoke_network_policy to true."
+  }
+
+  validation {
+    condition     = var.create_spoke_network_policy ? var.existing_network_policy_id == null : true
+    error_message = "existing_network_policy_id must not be provided when create_spoke_network_policy is true. The network policy will be managed by SRA."
   }
 }
 
@@ -280,4 +285,45 @@ variable "catalog_force_destroy" {
   type        = bool
   default     = false
   description = "Used to allow Terraform to force destroy the catalog. This is only used for testing SRA."
+}
+
+# ------------------------------------------------------------------
+# Spoke Firewall Rules (BYO Hub with firewall management)
+# These variables are used when create_hub = false but you still want
+# SRA to manage firewall rules for spoke workspaces on an existing firewall.
+variable "create_spoke_firewall_rules" {
+  type        = bool
+  description = "(Optional) Whether to create firewall rules for spoke workspaces when using a BYO hub. Only valid when create_hub is false."
+  default     = false
+
+  validation {
+    condition     = var.create_spoke_firewall_rules ? !var.create_hub : true
+    error_message = "create_spoke_firewall_rules can only be true when create_hub is false. When create_hub is true, firewall rules are managed by the hub module."
+  }
+}
+
+variable "existing_firewall_policy_id" {
+  type        = string
+  description = "(Optional) The ID of the existing Azure Firewall Policy to attach spoke rules to. Required when create_spoke_firewall_rules is true."
+  default     = null
+
+  validation {
+    condition     = var.create_spoke_firewall_rules ? var.existing_firewall_policy_id != null : true
+    error_message = "existing_firewall_policy_id is required when create_spoke_firewall_rules is true."
+  }
+}
+
+# ------------------------------------------------------------------
+# Spoke Network Policy (BYO Hub with serverless management)
+# These variables are used when create_hub = false but you still want
+# SRA to manage network policies for spoke serverless compute.
+variable "create_spoke_network_policy" {
+  type        = bool
+  description = "(Optional) Whether to create a network policy for spoke serverless compute when using a BYO hub. Only valid when create_hub is false."
+  default     = false
+
+  validation {
+    condition     = var.create_spoke_network_policy ? !var.create_hub : true
+    error_message = "create_spoke_network_policy can only be true when create_hub is false. When create_hub is true, network policies are managed by the hub module."
+  }
 }
