@@ -83,3 +83,8 @@ output "network_cidr_blocks" {
   description = "CIDR allocations in hub network"
   value       = module.hub_network.network_cidr_blocks
 }
+
+output "firewall_policy_id" {
+  description = "Firewall policy ID"
+  value       = length(azurerm_firewall_policy.this) > 0 ? azurerm_firewall_policy.this[0].id : null
+}

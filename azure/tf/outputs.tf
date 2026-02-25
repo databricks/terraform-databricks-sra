@@ -26,3 +26,18 @@ output "spoke_workspace_catalog" {
   description = "Name of the catalog created for the spoke workspace"
   value       = module.spoke_catalog.catalog_name
 }
+
+output "spoke_workspace_network_cidr_blocks" {
+  description = "CIDR blocks of the spoke workspace"
+  value       = length(module.spoke_network) > 0 ? module.spoke_network[0].network_cidr_blocks : {}
+}
+
+output "spoke_firewall_rule_collection_group_id" {
+  description = "ID of the spoke firewall rule collection group, if created"
+  value       = length(azurerm_firewall_policy_rule_collection_group.spoke) > 0 ? azurerm_firewall_policy_rule_collection_group.spoke[0].id : null
+}
+
+output "spoke_network_policy_id" {
+  description = "ID of the spoke network policy, if created"
+  value       = length(databricks_account_network_policy.spoke) > 0 ? databricks_account_network_policy.spoke[0].network_policy_id : null
+}
