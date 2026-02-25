@@ -12,21 +12,8 @@ tags = {
   Owner = "user@example.com"
 }
 
-# BYO workspace network configuration
-existing_workspace_vnet = {
-  network_configuration = {
-    virtual_network_id                                   = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/virtualNetworks/vnet-example"
-    private_subnet_id                                    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/virtualNetworks/vnet-example/subnets/container"
-    public_subnet_id                                     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/virtualNetworks/vnet-example/subnets/host"
-    private_subnet_network_security_group_association_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/virtualNetworks/vnet-example/subnets/container"
-    public_subnet_network_security_group_association_id  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/virtualNetworks/vnet-example/subnets/host"
-    private_endpoint_subnet_id                           = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/virtualNetworks/vnet-example/subnets/private-endpoints"
-  }
-  dns_zone_ids = {
-    backend = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/privateDnsZones/privatelink.azuredatabricks.net"
-    dfs     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/privateDnsZones/privatelink.dfs.core.windows.net"
-    blob    = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-example/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
-  }
+workspace_vnet = {
+  cidr = "10.1.0.0/24"
 }
 
 # Use existing resource group
@@ -44,6 +31,17 @@ existing_hub_vnet = {
   route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
   vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
 }
+
+# Optional: Create firewall rules on existing hub firewall for spoke classic compute traffic
+# Requires an existing firewall policy ID from your hub. An IP group will be created automatically.
+# create_spoke_firewall_rules = true
+# existing_firewall_policy_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/firewallPolicies/fp-external"
+
+# Optional: Create a Databricks network policy for spoke serverless compute
+# existing_ncc_id must still be provided (NCC is a shared regional resource managed by the hub).
+# create_spoke_network_policy = true
+# existing_ncc_id   = "ncc-00000000-0000-0000-0000-000000000000"
+# existing_ncc_name = "ncc-westus2-myhub"
 
 # Network egress configuration
 allowed_fqdns    = []
