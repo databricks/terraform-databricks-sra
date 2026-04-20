@@ -2,10 +2,10 @@ variable "sa_name" {
   description = "The name of the service account"
   type        = string
   default     = "databricks-workspace-creator"
-  }
+}
 
 variable "project" {
-  type    = string
+  type = string
 }
 
 variable "delegate_from" {

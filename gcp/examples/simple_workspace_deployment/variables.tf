@@ -17,6 +17,13 @@ variable "google_project" {}
 variable "databricks_account_id" {}
 variable "key_name" {}
 variable "keyring_name" {}
+
+variable "use_cmek" {
+  description = "Enable Customer-Managed Encryption Keys"
+  type        = bool
+  default     = false
+}
+
 variable "use_existing_cmek" {}
 variable "cmek_resource_id" {}
 

@@ -1,5 +1,5 @@
 resource "google_service_account" "workspace_creator" {
-  account_id   = "${var.sa_name}"
+  account_id   = var.sa_name
   display_name = "Service Account for Databricks Provisioning"
 }
 

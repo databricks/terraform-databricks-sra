@@ -1,7 +1,7 @@
 module "service_account" {
-  source                      = "../../modules/service_account/"
+  source        = "../../modules/service_account/"
   project       = var.project
-  prefix = var.prefix
+  prefix        = var.prefix
   delegate_from = var.delegate_from
 }
 

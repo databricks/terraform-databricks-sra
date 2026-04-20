@@ -1,12 +1,10 @@
-
-
 resource "databricks_mws_private_access_settings" "pas" {
- count = var.use_existing_pas ? 0 : 1
- provider       = databricks.accounts
- private_access_settings_name = "pas-${random_string.suffix.result}"
- region                       = var.google_region
- public_access_enabled        = true
- private_access_level         = "ACCOUNT"
+  count                        = (!var.use_existing_pas && (var.use_psc || var.use_frontend_psc)) ? 1 : 0
+  provider                     = databricks.accounts
+  private_access_settings_name = "${var.resource_prefix}-pas-${local.deployment_suffix}"
+  region                       = var.google_region
+  public_access_enabled        = true
+  private_access_level         = "ACCOUNT"
 }
 
 resource "databricks_mws_workspaces" "this" {
@@ -14,76 +12,61 @@ resource "databricks_mws_workspaces" "this" {
   account_id     = var.databricks_account_id
   workspace_name = var.workspace_name
   location       = var.google_region
-  cloud_resource_container {
-    gcp {
-      project_id = var.google_project
+
+  # Serverless workspaces set compute_mode explicitly and skip network config.
+  compute_mode = var.serverless_workspace_deployment ? "SERVERLESS" : null
+
+  # cloud_resource_container only applies to non-serverless workspaces.
+  dynamic "cloud_resource_container" {
+    for_each = var.serverless_workspace_deployment ? [] : [1]
+    content {
+      gcp {
+        project_id = var.google_project
+      }
     }
   }
-  private_access_settings_id = var.use_existing_pas? var.existing_pas_id:databricks_mws_private_access_settings.pas[0].private_access_settings_id
-  network_id = databricks_mws_networks.network_config.network_id
 
-  storage_customer_managed_key_id = var.use_existing_cmek ? var.cmek_resource_id : databricks_mws_customer_managed_keys.this[0].customer_managed_key_id
-  managed_services_customer_managed_key_id = var.use_existing_cmek ? var.cmek_resource_id : databricks_mws_customer_managed_keys.this[0].customer_managed_key_id
+  private_access_settings_id = (var.use_psc || var.use_frontend_psc) ? (
+    var.use_existing_pas ? var.existing_pas_id : databricks_mws_private_access_settings.pas[0].private_access_settings_id
+  ) : null
 
-  # this makes sure that the NAT is created for outbound traffic before creating the workspace
-  # not needed if the workspace uses backend PSC (recommended)
-  #depends_on = [ databricks_mws_customer_managed_keys.this]
+  network_id = var.serverless_workspace_deployment ? null : databricks_mws_networks.network_config[0].network_id
+
+  # CMEK keys:
+  # - storage CMEK: classic workspaces only (not applicable to serverless)
+  # - managed-services CMEK: both serverless and classic
+  storage_customer_managed_key_id = (var.use_cmek && !var.serverless_workspace_deployment) ? (
+    var.use_existing_cmek ? var.cmek_resource_id : databricks_mws_customer_managed_keys.this[0].customer_managed_key_id
+  ) : null
+  managed_services_customer_managed_key_id = var.use_cmek ? (
+    var.use_existing_cmek ? var.cmek_resource_id : databricks_mws_customer_managed_keys.this[0].customer_managed_key_id
+  ) : null
+
+  depends_on = [
+    google_compute_firewall.db_subnet_ingress,
+  ]
 }
 
-# Cleanup resource to handle Databricks-managed firewall rules
-# This prevents the "network in use by firewall rule" error during destroy
-resource "null_resource" "workspace_firewall_cleanup" {
-  # This resource is created after the workspace but destroyed before it
-  count = var.harden_network ? 1 : 0
+# Workspace-level hardening configuration.
+resource "databricks_workspace_conf" "this" {
+  count    = var.serverless_workspace_deployment ? 0 : 1
+  provider = databricks.workspace
+
+  custom_config = {
+    "enableIpAccessLists"    = "true"
+    "enableVerboseAuditLogs" = "true"
+    "enableDbfsFileBrowser"  = "false"
+    "maxTokenLifetimeDays"   = "90"
+  }
+
   depends_on = [databricks_mws_workspaces.this]
-  
-  triggers = {
-    workspace_id = databricks_mws_workspaces.this.workspace_id
-    network_name = google_compute_network.dbx_private_vpc[0].name
-    workspace_url = databricks_mws_workspaces.this.workspace_url
-  }
-  
-  provisioner "local-exec" {
-    when = destroy
-    command = <<-EOT
-      #!/bin/bash
-      set -e
-      
-      WORKSPACE_ID="${self.triggers.workspace_id}"
-      NETWORK_NAME="${self.triggers.network_name}"
-      
-      echo "🧹 Cleaning up Databricks-managed firewall rules for workspace $WORKSPACE_ID"
-      
-      # Find firewall rules created by Databricks for this workspace
-      FIREWALL_RULES=$(gcloud compute firewall-rules list \
-        --filter="name:databricks-$WORKSPACE_ID*" \
-        --format="value(name)" 2>/dev/null || true)
-      
-      if [ -n "$FIREWALL_RULES" ]; then
-        echo "📋 Found Databricks-managed firewall rules:"
-        echo "$FIREWALL_RULES"
-        
-        # Delete each firewall rule
-        while IFS= read -r rule; do
-          if [ -n "$rule" ]; then
-            echo "🗑️  Deleting firewall rule: $rule"
-            gcloud compute firewall-rules delete "$rule" --quiet 2>/dev/null || {
-              echo "⚠️  Warning: Could not delete firewall rule $rule (may already be deleted)"
-            }
-          fi
-        done <<< "$FIREWALL_RULES"
-        
-        echo "✅ Firewall cleanup completed"
-        sleep 3  # Allow time for changes to propagate
-      else
-        echo "ℹ️  No Databricks-managed firewall rules found for workspace $WORKSPACE_ID"
-      fi
-    EOT
-    
-    # Set environment for gcloud authentication
-    environment = {
-      GOOGLE_APPLICATION_CREDENTIALS = "/Users/aleksander.callebat/Documents/Databricks/fslakehouse-a08a713a0473.json"
-    }
-  }
 }
 
+# Account-level permission assignment APIs are not immediately available after
+# workspace creation. This short sleep (chained after workspace_conf) gives the
+# API time to become ready before admin assignments run.
+resource "time_sleep" "wait_for_workspace_apis" {
+  count           = var.serverless_workspace_deployment ? 0 : 1
+  create_duration = "5s"
+  depends_on      = [databricks_workspace_conf.this]
+}
