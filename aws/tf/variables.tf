@@ -74,6 +74,12 @@ variable "custom_relay_vpce_id" {
   default     = null
 }
 
+variable "custom_service_direct_vpce_id" {
+  description = "Custom Service Direct VPC Endpoint ID"
+  type        = string
+  default     = null
+}
+
 variable "custom_sg_id" {
   description = "Custom security group ID"
   type        = string
@@ -334,6 +340,77 @@ variable "scc_relay_config" {
       primary_endpoint   = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-05f27abef1a1a3faa"
       secondary_endpoint = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-05c210a2feea23ad7"
       region_type        = "govcloud"
+    }
+  }
+}
+
+# Service Direct PrivateLink Endpoint configuration
+# This variable allows mapping regions to the service-direct endpoint properties:
+# - primary_endpoint: The main endpoint service name (required)
+# - region_type: Optional region type (defaults to "commercial")
+#
+# Note: Service Direct endpoints are not available in GovCloud regions.
+#
+# Example usage:
+# var.service_direct_config["us-east-1"].primary_endpoint   # Get primary endpoint
+# var.service_direct_config["us-east-1"].region_type        # Get region type
+variable "service_direct_config" {
+  description = "Service Direct PrivateLink Endpoint configuration with multiple properties per region"
+  type = map(object({
+    primary_endpoint = string
+    region_type      = optional(string, "commercial")
+  }))
+  default = {
+    "ap-northeast-1" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-northeast-1.vpce-svc-00645ba5aa920181a"
+    }
+    "ap-northeast-2" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-northeast-2.vpce-svc-0eda2860bd3ffdc62"
+    }
+    "ap-south-1" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-south-1.vpce-svc-0f8cf0950ddb2df95"
+    }
+    "ap-southeast-1" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-southeast-1.vpce-svc-095bb0c17301d018c"
+    }
+    "ap-southeast-2" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-southeast-2.vpce-svc-0bad186019cff33de"
+    }
+    "ap-southeast-3" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-southeast-3.vpce-svc-028527b0920c3e620"
+    }
+    "ca-central-1" = {
+      primary_endpoint = "com.amazonaws.vpce.ca-central-1.vpce-svc-0a677b49b6d71cf54"
+    }
+    "eu-central-1" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-central-1.vpce-svc-040453426d7a48946"
+    }
+    "eu-north-1" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-north-1.vpce-svc-034c0ab59f7a99d04"
+    }
+    "eu-west-1" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-1.vpce-svc-0a5d3be4f026f5bd7"
+    }
+    "eu-west-2" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-2.vpce-svc-000fc680ee188fcf6"
+    }
+    "eu-west-3" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-3.vpce-svc-041f8eb165985a7eb"
+    }
+    "sa-east-1" = {
+      primary_endpoint = "com.amazonaws.vpce.sa-east-1.vpce-svc-09d56640b3fed29b8"
+    }
+    "us-east-1" = {
+      primary_endpoint = "com.amazonaws.vpce.us-east-1.vpce-svc-0a1a39ada4ec3bcdc"
+    }
+    "us-east-2" = {
+      primary_endpoint = "com.amazonaws.vpce.us-east-2.vpce-svc-052fbd90ec8e1af31"
+    }
+    "us-west-1" = {
+      primary_endpoint = "com.amazonaws.vpce.us-west-1.vpce-svc-070673a01d3f28066"
+    }
+    "us-west-2" = {
+      primary_endpoint = "com.amazonaws.vpce.us-west-2.vpce-svc-0d7fe235ba1abe9d2"
     }
   }
 }

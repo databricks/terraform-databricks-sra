@@ -53,8 +53,9 @@ module "databricks_mws_workspace" {
   vpc_id             = var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id
   subnet_ids         = var.custom_private_subnet_ids != null ? var.custom_private_subnet_ids : module.vpc[0].private_subnets
   security_group_ids = var.custom_sg_id != null ? [var.custom_sg_id] : [aws_security_group.sg[0].id]
-  backend_rest       = var.custom_workspace_vpce_id != null ? var.custom_workspace_vpce_id : aws_vpc_endpoint.backend_rest[0].id
-  backend_relay      = var.custom_relay_vpce_id != null ? var.custom_relay_vpce_id : aws_vpc_endpoint.backend_relay[0].id
+  general_access                       = var.custom_workspace_vpce_id != null ? var.custom_workspace_vpce_id : aws_vpc_endpoint.general_access[0].id
+  scc_tunnel_dataplane_relay_access    = var.custom_relay_vpce_id != null ? var.custom_relay_vpce_id : aws_vpc_endpoint.scc_tunnel_dataplane_relay_access[0].id
+  service_direct                       = var.custom_service_direct_vpce_id != null ? var.custom_service_direct_vpce_id : try(aws_vpc_endpoint.service_direct[0].id, null)
 
   # Cross-Account Role
   cross_account_role_arn = aws_iam_role.cross_account_role.arn

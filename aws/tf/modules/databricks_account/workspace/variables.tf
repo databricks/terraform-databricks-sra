@@ -1,11 +1,17 @@
-variable "backend_relay" {
-  description = "ID of the backend relay API interface endpoint."
+variable "scc_tunnel_dataplane_relay_access" {
+  description = "ID of the SCC tunnel dataplane relay access interface endpoint."
   type        = string
 }
 
-variable "backend_rest" {
-  description = "ID of the backend rest API interface endpoint."
+variable "general_access" {
+  description = "ID of the general access API interface endpoint."
   type        = string
+}
+
+variable "service_direct" {
+  description = "ID of the service direct API interface endpoint. Not available in GovCloud regions."
+  type        = string
+  default     = null
 }
 
 variable "bucket_name" {
