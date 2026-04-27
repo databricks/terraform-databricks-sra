@@ -127,11 +127,11 @@ resource "google_compute_firewall" "to_databricks_control_plane" {
   depends_on = [
     google_compute_network.dbx_private_vpc,
   ]
-  name      = "to-databricks-control-plane-${local.subnet_name}"
-  direction = "EGRESS"
-  priority  = 1000
+  name               = "to-databricks-control-plane-${local.subnet_name}"
+  direction          = "EGRESS"
+  priority           = 1000
   destination_ranges = var.databricks_control_plane_ips
-  source_ranges = []
+  source_ranges      = []
   allow {
     protocol = "tcp"
     ports    = ["443", "8443-8451"]

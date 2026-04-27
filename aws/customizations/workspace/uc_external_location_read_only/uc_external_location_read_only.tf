@@ -73,7 +73,7 @@ resource "databricks_external_location" "data_example" {
   read_only       = true
   comment         = "Read only external location for ${var.read_only_data_bucket}"
   isolation_mode  = "ISOLATION_MODE_ISOLATED"
-  depends_on = [ time_sleep.wait_60_seconds ]
+  depends_on      = [time_sleep.wait_60_seconds]
 }
 
 // External Location Grant
