@@ -10,6 +10,8 @@ workspace_vnet = {
   cidr = "10.0.4.0/22"
 }
 
+catalog_storage_container_name = "yourstoragecontainer"
+
 # Network mode: create_workspace_vnet defaults to true for SRA-managed network
 # create_workspace_vnet = true
 

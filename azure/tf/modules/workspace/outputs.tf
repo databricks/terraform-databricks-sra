@@ -1,7 +1,8 @@
-# The value of the "workspace_url" property represents the URL of the Databricks workspace
+# Use the ARM workspace URL directly for consumers (e.g. databricks provider `host`). It matches the value in
+# null_resource.admin_wait triggers; avoid routing provider config through null_resource state, which can go stale.
 output "workspace_url" {
-  description = "The URL of the Databricks workspace, used to access the Databricks environment."
-  value       = null_resource.admin_wait.triggers.workspace_url
+  description = "HTTPS URL of the Databricks workspace (Azure workspace API host)."
+  value       = azurerm_databricks_workspace.this.workspace_url
 }
 
 output "workspace_id" {

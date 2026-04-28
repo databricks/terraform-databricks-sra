@@ -14,6 +14,12 @@ variable "databricks_metastore_id" {
   }
 }
 
+variable "catalog_storage_container_name" {
+  type        = string
+  default     = "unitycatalog"
+  description = "Blob container name inside the Unity Catalog backing storage account (module catalog azurerm_storage_container)."
+}
+
 variable "location" {
   type        = string
   description = "(Required) The Azure region for the hub and spoke deployment"

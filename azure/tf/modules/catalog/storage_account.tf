@@ -11,7 +11,7 @@ resource "azurerm_databricks_access_connector" "unity_catalog" {
 
 # Define an Azure Storage Account resource
 resource "azurerm_storage_account" "unity_catalog" {
-  name                            = local.storage_account_name
+  name                            = "ivanovichstoragespoke"#local.storage_account_name
   resource_group_name             = var.resource_group_name
   location                        = var.location
   account_tier                    = "Standard"
