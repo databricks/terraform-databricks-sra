@@ -376,7 +376,7 @@ resource "aws_vpc_endpoint" "service_direct" {
   service_name        = var.service_direct_config[var.region].primary_endpoint
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
-  subnet_ids          = module.vpc[0].intra_subnets
+  subnet_ids          = slice(module.vpc[0].intra_subnets, 0, 2)
   private_dns_enabled = true
   tags = {
     Name    = "${var.resource_prefix}-databricks-service-direct"

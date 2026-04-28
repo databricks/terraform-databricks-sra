@@ -9,9 +9,9 @@ variable "general_access" {
 }
 
 variable "service_direct" {
-  description = "ID of the service direct API interface endpoint. Not available in GovCloud regions."
-  type        = string
-  default     = null
+  description = "List of service direct API interface endpoint IDs. Not available in GovCloud regions."
+  type        = list(string)
+  default     = []
 }
 
 variable "bucket_name" {

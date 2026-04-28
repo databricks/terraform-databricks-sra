@@ -43,9 +43,9 @@ resource "databricks_mws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
 
 # Service Direct VPC Endpoint Configuration
 resource "databricks_mws_vpc_endpoint" "service_direct" {
-  count               = var.service_direct != null ? 1 : 0
+  count               = length(var.service_direct) > 0 ? 1 : 0
   account_id          = var.databricks_account_id
-  aws_vpc_endpoint_id = var.service_direct
+  aws_vpc_endpoint_id = var.service_direct[0]
   vpc_endpoint_name   = "${var.resource_prefix}-vpce-service-direct-${var.vpc_id}"
   region              = var.region
 }
