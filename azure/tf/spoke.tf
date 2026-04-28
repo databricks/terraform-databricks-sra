@@ -4,7 +4,7 @@ locals {
   # Unity Catalog backing storage account: leading chars from sanitized resource_suffix + fixed-length random suffix.
   # Azure storage names allow at most 24 lowercase letters/digits; hyphens and other chars are stripped from the suffix first.
   catalog_storage_random_len       = 16
-  catalog_storage_sanitized_suffix = regexreplace(lower(var.resource_suffix), "[^a-z0-9]", "")
+  catalog_storage_sanitized_suffix = replace(lower(var.resource_suffix), "/[^a-z0-9]/", "")
   catalog_storage_prefix_max_len   = 24 - local.catalog_storage_random_len
   spoke_catalog_storage_account_name = substr(
     "${substr(local.catalog_storage_sanitized_suffix, 0, local.catalog_storage_prefix_max_len)}${random_string.catalog_storage_entropy.result}",
