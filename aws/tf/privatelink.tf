@@ -363,7 +363,7 @@ resource "aws_vpc_endpoint" "general_access" {
   subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
   tags = {
-    Name    = "${var.resource_prefix}-databricks-backend-rest"
+    Name    = "${var.resource_prefix}-databricks-general-access"
     Project = var.resource_prefix
   }
 }
@@ -395,7 +395,7 @@ resource "aws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
   subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
   tags = {
-    Name    = "${var.resource_prefix}-databricks-backend-relay"
+    Name    = "${var.resource_prefix}-databricks-dataplane-relay"
     Project = var.resource_prefix
   }
 }
