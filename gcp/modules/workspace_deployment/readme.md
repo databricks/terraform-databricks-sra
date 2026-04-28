@@ -41,7 +41,7 @@ All module-created resources use the format:
 ```
 
 - `resource_prefix` defaults to `databricks` and is configurable via `var.resource_prefix`.
-- `deployment_suffix` is derived from `var.deployment_id` (first 8 chars) if set, otherwise a random 8-char suffix is generated.
+- `deployment_suffix` is a random 6-char alphanumeric string generated once and stored in state.
 
 ## Variables
 
@@ -52,7 +52,6 @@ All module-created resources use the format:
 - `google_project`, `google_region` — GCP project and region.
 - `account_console_url` — Defaults to `https://accounts.gcp.databricks.com`.
 - `workspace_name` — Name of the workspace to create.
-- `deployment_id` — Optional. Unique ID used for naming. If empty, a random suffix is generated.
 - `resource_prefix` — Prefix for all resources. Defaults to `databricks`.
 
 ### Compute mode
@@ -65,6 +64,7 @@ All module-created resources use the format:
 - `existing_vpc_name`, `existing_subnet_name` — Required when `use_existing_vpc = true`.
 - `nodes_ip_cidr_range` — CIDR for nodes (immutable after creation).
 - `harden_network` — Enables a set of egress/ingress firewall rules. A new `db-<subnet>-ingress` rule is created (for non-serverless, non-BYO-VPC deployments only) so that Databricks does not create its own firewall rule. When `use_existing_vpc = true` the module creates **no** GCP firewalls — you are responsible for providing the rules Databricks requires on the VPC you bring.
+- `databricks_control_plane_ips` — Regional control-plane IPs used in the egress firewall rule when `harden_network = true` and `use_psc = false`. Look up the values for your region at [IP addresses and domains](https://docs.databricks.com/gcp/en/resources/ip-domain-region).
 
 ### PSC / connectivity
 
@@ -170,7 +170,7 @@ Variables:
 - `workspace_id` — Workspace ID.
 - `workspace_name` — Workspace name.
 - `region` — GCP region.
-- `deployment_suffix` — Effective naming suffix used by the module.
+- `deployment_suffix` — Random suffix used for resource naming.
 - `databricks_host` — Deprecated alias for `workspace_url`.
 
 ## Upgrading from a previous version of this module

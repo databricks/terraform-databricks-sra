@@ -130,9 +130,7 @@ resource "google_compute_firewall" "to_databricks_control_plane" {
   name      = "to-databricks-control-plane-${local.subnet_name}"
   direction = "EGRESS"
   priority  = 1000
-  destination_ranges = [
-    # ADD REGIONAL IPS as listed here: https://docs.databricks.com/gcp/en/resources/ip-domain-region
-  ]
+  destination_ranges = var.databricks_control_plane_ips
   source_ranges = []
   allow {
     protocol = "tcp"

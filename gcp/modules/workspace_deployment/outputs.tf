@@ -25,6 +25,6 @@ output "databricks_host" {
 }
 
 output "deployment_suffix" {
-  description = "Suffix applied to resource names (either derived from deployment_id or random)."
+  description = "Random suffix applied to resource names."
   value       = local.deployment_suffix
 }

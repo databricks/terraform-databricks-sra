@@ -11,7 +11,6 @@ account_console_url               = "https://accounts.gcp.databricks.com"
 # ============================================================
 # Naming (optional)
 # ============================================================
-# deployment_id   = "<uuid-from-backend>"    # first 8 chars used as suffix; leave empty to auto-generate
 # resource_prefix = "databricks"             # prefix for all resources created by this module
 
 # ============================================================
@@ -28,6 +27,10 @@ account_console_url               = "https://accounts.gcp.databricks.com"
 # nodes_ip_cidr_range  = "10.0.0.0/16"
 # harden_network       = true
 # ip_addresses         = ["0.0.0.0/0"]
+
+# Control-plane IPs for egress firewall (required when harden_network = true and use_psc = false).
+# Look up the IPs for your region: https://docs.databricks.com/gcp/en/resources/ip-domain-region
+# databricks_control_plane_ips = ["x.x.x.x/32", "y.y.y.y/32"]
 
 # ============================================================
 # PSC

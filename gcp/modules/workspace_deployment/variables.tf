@@ -35,14 +35,6 @@ variable "databricks_google_service_account_key" {
 }
 
 ##### NAMING VARIABLES #####
-variable "deployment_id" {
-  # Unique deployment ID used for naming. If empty, a random suffix is generated.
-  # When provided (e.g., a UUID from a backend), the first 8 characters are used.
-  type        = string
-  default     = ""
-  description = "Unique deployment ID. Leave empty to auto-generate a random 8-char suffix."
-}
-
 variable "resource_prefix" {
   # Prefix applied to resource names. Final format: <prefix>-<resource>-<deployment_suffix>
   type        = string
@@ -51,17 +43,15 @@ variable "resource_prefix" {
 }
 
 resource "random_string" "suffix" {
-  # Fallback suffix when var.deployment_id is not provided.
-  # Length kept at 6 to match the legacy behavior so existing deployments do
-  # not see the suffix regenerate on upgrade.
-  count   = var.deployment_id == "" ? 1 : 0
+  # Random suffix for resource naming. Length kept at 6 to match legacy behavior
+  # so existing deployments do not see the suffix regenerate on upgrade.
   special = false
   upper   = false
   length  = 6
 }
 
 locals {
-  deployment_suffix = var.deployment_id != "" ? substr(var.deployment_id, 0, 8) : random_string.suffix[0].result
+  deployment_suffix = random_string.suffix.result
 }
 
 ##### NETWORKING VARIABLES #####
@@ -130,6 +120,15 @@ variable "hive_metastore_ip" {
   # For the value of the regional Hive Metastore IP, refer to the Databricks documentation:
   # https://docs.gcp.databricks.com/en/resources/ip-domain-region.html
   default = "34.76.244.202" # Value for europe-west1 region
+}
+
+variable "databricks_control_plane_ips" {
+  # Regional control-plane IPs used in the egress firewall rule (non-PSC mode only).
+  # Look up the IPs for your region at:
+  # https://docs.databricks.com/gcp/en/resources/ip-domain-region
+  type        = list(string)
+  default     = []
+  description = "Databricks control-plane IPs for your region. Required when harden_network = true and use_psc = false. See https://docs.databricks.com/gcp/en/resources/ip-domain-region"
 }
 
 # Users can connect to workspace only from these IP addresses
