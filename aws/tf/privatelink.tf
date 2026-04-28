@@ -368,22 +368,6 @@ resource "aws_vpc_endpoint" "general_access" {
   }
 }
 
-# Databricks Service Direct endpoint - skipped in custom operation mode and unavailable in GovCloud
-resource "aws_vpc_endpoint" "service_direct" {
-  count = var.network_configuration != "custom" && contains(keys(var.service_direct_config), var.region) ? 1 : 0
-
-  vpc_id              = module.vpc[0].vpc_id
-  service_name        = var.service_direct_config[var.region].primary_endpoint
-  vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_security_group.privatelink[0].id]
-  subnet_ids          = module.vpc[0].intra_subnets
-  private_dns_enabled = true
-  tags = {
-    Name    = "${var.resource_prefix}-databricks-service-direct"
-    Project = var.resource_prefix
-  }
-}
-
 # Databricks SCC endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
   count = var.network_configuration != "custom" ? 1 : 0
