@@ -10,7 +10,9 @@ workspace_vnet = {
   cidr = "10.0.4.0/22"
 }
 
-catalog_storage_container_name = "yourstoragecontainer"
+# catalog_storage_container_name = "unitycatalog"
+
+# UC root storage account name is derived from resource_suffix (hyphens stripped) + a 16-char random suffix (see spoke.tf).
 
 # Network mode: create_workspace_vnet defaults to true for SRA-managed network
 # create_workspace_vnet = true

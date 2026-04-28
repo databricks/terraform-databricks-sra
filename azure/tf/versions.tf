@@ -24,6 +24,10 @@ terraform {
       source  = "hashicorp/time"
       version = "~>0.13"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~>3.0"
+    }
   }
   required_version = "~>1.11"
 }
