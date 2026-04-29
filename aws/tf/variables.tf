@@ -344,6 +344,22 @@ variable "scc_relay_config" {
   }
 }
 
+# Service Direct PrivateLink limited AZ regions
+# Some regions only support service-direct PrivateLink in specific availability zones.
+# Regions not listed here support all availability zones.
+#
+# Reference: https://docs.databricks.com/aws/en/security/network/front-end/service-direct-privatelink#availability-zone-support
+variable "service_direct_limited_az_regions" {
+  description = "Regions with limited AZ support for service-direct PrivateLink. Maps region to list of supported AZ IDs."
+  type        = map(list(string))
+  default = {
+    "ap-northeast-1" = ["apne1-az1", "apne1-az2", "apne1-az4"]
+    "ap-northeast-2" = ["apne2-az1", "apne2-az3"]
+    "us-east-1"      = ["use1-az1", "use1-az2", "use1-az4"]
+    "us-west-2"      = ["usw2-az1", "usw2-az2", "usw2-az3"]
+  }
+}
+
 # Service Direct PrivateLink Endpoint configuration
 # This variable allows mapping regions to the service-direct endpoint properties:
 # - primary_endpoint: The main endpoint service name (required)
