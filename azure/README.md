@@ -9,7 +9,7 @@
 5. Run `terraform init`
 6. Run `terraform validate`
 7. From `tf` directory, run `terraform plan -var-file <YOUR_VAR_FILE>`, if edited directly, the command would be `terraform plan -var-file template.tfvars.example`
-8. Run `terraform apply -var-file <YOUR_VAR_FILE`
+8. Run `terraform apply -var-file <YOUR_VAR_FILE>`
 
 ## Note on provider initialization with Azure CLI
 If you are using [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli),
