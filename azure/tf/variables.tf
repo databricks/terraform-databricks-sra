@@ -3,6 +3,15 @@ variable "databricks_account_id" {
   description = "(Required) The Databricks account ID target for account-level operations"
 }
 
+variable "tenant_id" {
+  type = string
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "(Required) Azure Subscription ID to deploy into"
+}
+
 variable "databricks_metastore_id" {
   type        = string
   default     = null
@@ -12,12 +21,6 @@ variable "databricks_metastore_id" {
     condition     = var.create_hub ? true : var.databricks_metastore_id != null
     error_message = "If var.create_hub is false, you must provide databricks_metastore_id"
   }
-}
-
-variable "catalog_storage_container_name" {
-  type        = string
-  default     = "unitycatalog"
-  description = "Blob container name inside the Unity Catalog backing storage account (module catalog azurerm_storage_container)."
 }
 
 variable "location" {
@@ -243,11 +246,6 @@ variable "tags" {
   default     = {}
 }
 
-variable "subscription_id" {
-  type        = string
-  description = "(Required) Azure Subscription ID to deploy into"
-}
-
 variable "sat_configuration" {
   type = object({
     enabled           = optional(bool, false)
@@ -286,4 +284,10 @@ variable "catalog_force_destroy" {
   type        = bool
   default     = false
   description = "Used to allow Terraform to force destroy the catalog. This is only used for testing SRA."
+}
+
+variable "catalog_storage_container_name" {
+  type        = string
+  default     = "unitycatalog"
+  description = "Blob container name inside the Unity Catalog backing storage account (module catalog azurerm_storage_container)."
 }
