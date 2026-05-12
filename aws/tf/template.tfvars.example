@@ -61,6 +61,13 @@ create_service_direct_vpce = false
 # custom_scc_relay_vpce_id       = ""
 # custom_service_direct_vpce_id  = ""    # Optional
 
+# If your AWS VPC endpoints are ALREADY registered with Databricks (e.g. shared across multiple workspaces),
+# provide the Databricks-side MWS VPC endpoint IDs here instead. When set, the corresponding *_vpce_id
+# above is ignored and SRA will skip registering the AWS VPC endpoint with Databricks.
+# custom_general_access_mws_vpce_id  = ""
+# custom_scc_relay_mws_vpce_id       = ""
+# custom_service_direct_mws_vpce_id  = ""
+
 # -----------------------------------------------------------------------------
 # Feature Flags
 # -----------------------------------------------------------------------------

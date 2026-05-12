@@ -27,6 +27,7 @@ resource "databricks_mws_storage_configurations" "this" {
 
 # General Access VPC Endpoint Configuration
 resource "databricks_mws_vpc_endpoint" "general_access" {
+  count               = var.general_access_mws_vpce_id == null ? 1 : 0
   account_id          = var.databricks_account_id
   aws_vpc_endpoint_id = var.general_access
   vpc_endpoint_name   = "${var.resource_prefix}-vpce-general-access-${var.vpc_id}"
@@ -35,6 +36,7 @@ resource "databricks_mws_vpc_endpoint" "general_access" {
 
 # SCC Tunnel Dataplane Relay Access VPC Endpoint Configuration
 resource "databricks_mws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
+  count               = var.scc_relay_mws_vpce_id == null ? 1 : 0
   account_id          = var.databricks_account_id
   aws_vpc_endpoint_id = var.scc_tunnel_dataplane_relay_access
   vpc_endpoint_name   = "${var.resource_prefix}-vpce-dataplane-relay-access-${var.vpc_id}"
@@ -43,7 +45,7 @@ resource "databricks_mws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
 
 # Service Direct VPC Endpoint Configuration
 resource "databricks_mws_vpc_endpoint" "service_direct" {
-  count               = length(var.service_direct) > 0 ? 1 : 0
+  count               = var.service_direct_mws_vpce_id == null && length(var.service_direct) > 0 ? 1 : 0
   account_id          = var.databricks_account_id
   aws_vpc_endpoint_id = var.service_direct[0]
   vpc_endpoint_name   = "${var.resource_prefix}-vpce-service-direct-${var.vpc_id}"
@@ -58,8 +60,8 @@ resource "databricks_mws_networks" "this" {
   subnet_ids         = var.subnet_ids
   vpc_id             = var.vpc_id
   vpc_endpoints {
-    dataplane_relay = [databricks_mws_vpc_endpoint.scc_tunnel_dataplane_relay_access.vpc_endpoint_id]
-    rest_api        = [databricks_mws_vpc_endpoint.general_access.vpc_endpoint_id]
+    dataplane_relay = [var.scc_relay_mws_vpce_id != null ? var.scc_relay_mws_vpce_id : databricks_mws_vpc_endpoint.scc_tunnel_dataplane_relay_access[0].vpc_endpoint_id]
+    rest_api        = [var.general_access_mws_vpce_id != null ? var.general_access_mws_vpce_id : databricks_mws_vpc_endpoint.general_access[0].vpc_endpoint_id]
   }
 }
 

@@ -68,6 +68,12 @@ variable "create_service_direct_vpce" {
   default     = false
 }
 
+variable "custom_general_access_mws_vpce_id" {
+  description = "Pre-registered Databricks MWS VPC Endpoint ID for General Access. If set, the AWS VPC endpoint is not re-registered with Databricks; this ID is wired directly into the workspace network configuration."
+  type        = string
+  default     = null
+}
+
 variable "custom_general_access_vpce_id" {
   description = "Custom General Access VPC Endpoint ID"
   type        = string
@@ -80,8 +86,20 @@ variable "custom_private_subnet_ids" {
   default     = null
 }
 
+variable "custom_scc_relay_mws_vpce_id" {
+  description = "Pre-registered Databricks MWS VPC Endpoint ID for SCC Tunnel Dataplane Relay Access. If set, the AWS VPC endpoint is not re-registered with Databricks; this ID is wired directly into the workspace network configuration."
+  type        = string
+  default     = null
+}
+
 variable "custom_scc_relay_vpce_id" {
   description = "Custom SCC Tunnel Dataplane Relay Access VPC Endpoint ID"
+  type        = string
+  default     = null
+}
+
+variable "custom_service_direct_mws_vpce_id" {
+  description = "Pre-registered Databricks MWS VPC Endpoint ID for Service Direct. If set, the AWS VPC endpoint is not re-registered with Databricks."
   type        = string
   default     = null
 }

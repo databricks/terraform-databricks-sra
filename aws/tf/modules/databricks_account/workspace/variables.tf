@@ -1,17 +1,39 @@
 variable "scc_tunnel_dataplane_relay_access" {
-  description = "ID of the SCC tunnel dataplane relay access interface endpoint."
+  description = "AWS VPC endpoint ID for the SCC tunnel dataplane relay access. Ignored when scc_relay_mws_vpce_id is set."
   type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "scc_relay_mws_vpce_id" {
+  description = "Pre-registered Databricks MWS VPC endpoint ID for the SCC tunnel dataplane relay access. If set, registration of the AWS VPC endpoint is skipped."
+  type        = string
+  default     = null
 }
 
 variable "general_access" {
-  description = "ID of the general access API interface endpoint."
+  description = "AWS VPC endpoint ID for the general access (REST API) interface endpoint. Ignored when general_access_mws_vpce_id is set."
   type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "general_access_mws_vpce_id" {
+  description = "Pre-registered Databricks MWS VPC endpoint ID for the general access (REST API) endpoint. If set, registration of the AWS VPC endpoint is skipped."
+  type        = string
+  default     = null
 }
 
 variable "service_direct" {
-  description = "List of service direct API interface endpoint IDs. Not available in GovCloud regions."
+  description = "List of service direct API interface AWS VPC endpoint IDs. Not available in GovCloud regions. Ignored when service_direct_mws_vpce_id is set."
   type        = list(string)
   default     = []
+}
+
+variable "service_direct_mws_vpce_id" {
+  description = "Pre-registered Databricks MWS VPC endpoint ID for the service direct endpoint. If set, registration of the AWS VPC endpoint is skipped."
+  type        = string
+  default     = null
 }
 
 variable "bucket_name" {
