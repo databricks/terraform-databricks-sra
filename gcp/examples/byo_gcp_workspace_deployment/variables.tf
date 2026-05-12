@@ -34,6 +34,12 @@ variable "use_existing_vpc" {
 }
 variable "harden_network" {}
 
+variable "use_cmek" {
+  description = "Enable Customer-Managed Encryption Keys"
+  type        = bool
+  default     = false
+}
+
 variable "use_existing_cmek" {
   description = "Use existing cmek"
   type        = bool

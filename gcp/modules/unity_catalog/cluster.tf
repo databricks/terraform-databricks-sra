@@ -29,7 +29,7 @@ locals {
 }
 
 resource "databricks_cluster_policy" "example" {
-  provider = databricks.workspace
+  provider   = databricks.workspace
   name       = "Example Cluster Policy"
   definition = jsonencode(local.default_policy)
 }

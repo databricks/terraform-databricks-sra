@@ -1,50 +1,204 @@
 ---
-page_title: "Workspace Deployment GCP SRA Modue"
+page_title: "Workspace Deployment GCP SRA Module"
 ---
 
-# Module to deploy a Databricks workspace 
+# Module to deploy a Databricks workspace on GCP
 
-This module is provided as-is and you can use this guide as the basis for your custom Terraform module. This module is meant to be used either to provision a workspace with all the required GCP objects associated or to leverage existing objects, thus enabling use cases where CMEK, PSCs, and other artefacts that require higher privileges need to be provisionned through an external process and can't be provisionned through terraform.
-The example folder aims at illustrating this through different use cases.
+This module provisions a Databricks workspace on Google Cloud. It supports:
+
+- **Classic and serverless** workspaces.
+- **Create-from-scratch** or **bring-your-own** for VPC, PSC endpoints, Private Access Settings, CMEK keys, and DNS zones.
+- **Three DNS modes** for PSC workspaces: module creates zone + records, module creates records in an existing zone, or module creates nothing (manual DNS).
+- **Hardened network** with optional firewall rules.
+- **Workspace hardening** (IP access lists, verbose audit logs, DBFS file browser disabled, 90-day token lifetime).
+- **Optional resource_owner admin assignment** at the workspace level.
 
 ## Requirements
-Running this module has the following requirements :
-- Recent version of Terraform 
-- Access to recent versions the Databricks Provider (```databricks/databricks```) and the google Provider (```hashicorp/google```)
-- A Google Service Account with the GCP privileges defined in the module service_account and added to the Databricks Account Console as a **User** with the account admin privileges
-- Depending on how much you are allowed to provision through this module, the values for the following variables
+
+- Recent version of Terraform (>= 1.5 recommended).
+- Databricks provider `>= 1.113.0` and Google provider `>= 5.43.1`.
+- A Google Service Account with the IAM roles required by the `service_account` module and added to the Databricks Account Console as an account admin.
+- A GCS bucket to hold remote state (the backend is configured as `gcs` — see `providers.tf`).
+
+## Remote state (GCS)
+
+The module declares a partial `gcs` backend. Provide the bucket/prefix at `terraform init` time, e.g.:
+
+```bash
+terraform init \
+  -backend-config="bucket=my-tfstate-bucket" \
+  -backend-config="prefix=databricks/workspace_deployment"
+```
+
+If you want to use a different backend, override `providers.tf` in your consuming configuration or remove the `backend "gcs" {}` block.
+
+## Resource naming
+
+All module-created resources use the format:
+
+```
+<resource_prefix>-<resource>-<deployment_suffix>
+```
+
+- `resource_prefix` defaults to `databricks` and is configurable via `var.resource_prefix`.
+- `deployment_suffix` is a random 6-char alphanumeric string generated once and stored in state.
 
 ## Variables
 
-This module uses the following variables in configurations:
+### General
 
-- `databricks_account_id`: The ID per Databricks GCP account used for accessing account management APIs. After the GCP account is created, this is available after logging into [https://accounts.cloud.databricks.com](https://accounts.cloud.databricks.com).
-- `databricks_google_service_account`: Service account used for programatically interacting with cloud infrastructure. More documentation [here](https://cloud.google.com/iam/docs/service-accounts)
-- `google_project` - The name of the GCP project where the workspace is deployed.
-- `google_region` - Region in which infrastructure is spun up.
-- `account_console_url` - Databricks account console URL (always the same for a given cloud)
-- `workspace_name` - Name you want to give to the Databricks workspace you are creating
-- `use_existing_vpc` - Flag determining if you will be creating the VPC as a part of this module (you may provide an existing one).
-- `existing_vpc_name` - Name of the VPC if use_existing_vpc=true. If use_existing_vpc=false, we are generating a random name.
-- `existing_subnet_name` - Name of the subnet if use_existing_vpc=true. If use_existing_vpc=false, we are generating a random name.
-- `nodes_ip_cidr_range` - CIDR range for nodes. See https://docs.databricks.com/gcp/en/admin/cloud-configurations/gcp/network-sizing for sizing details. This is important as it can't be changed after the workspace is created.
-- `use_existing_PSC_EP` - Flag determining if you will be creating PSC Endpoints as a part of this module (you may provide an existing one). 
-- `google_pe_subnet` - Name of the subnet where the PSC Endpoints will be provided
-- `google_pe_subnet_ip_cidr_range` - CIDR of the PE subnet. Needed only if use_existing_PSC_EP=false
-- `workspace_pe` - Name of the PSC endpoint used for the workspace communication. If you are creating it you may decide its value. 
-- `relay_pe` - Name of the PSC endpoint used for the SCC relay communication. If you are creating it you may decide its value. 
-- `workspace_pe_ip_name` - Name of the workspace private endpoint IP.If use_existing_PSC_EP = true, not needed. If use_existing_PSC_EP = true, you may decide its value.
-- `relay_pe_ip_name` - Name of the Relay IP. If use_existing_PSC_EP = true, not needed. If use_existing_PSC_EP = true, you may decide its value.
-- `harden_network` - Flag determining if we are closing VPC access by default and only opening the minimum required communication.
-- `hive_metastore_ip` - IP to the regional Metastore. This value can be found here - https://docs.gcp.databricks.com/en/resources/ip-domain-region.html#addresses-for-default-metastore. The module will create an Egress opening to this IP Address. This will be soon deprecated as we are shifting away from this communication.
-- `ip_addresses` - list of IP addresses from which to access the workspace.
-- `use_existing_pas` - flag to use an existing Private Access Settings (Databricks Object)
-- `existing_pas_id` - if above is true, the ID of the setting (found in the account console)
-- `relay_service_attachment` - Relay service attachment. regional values - https://docs.gcp.databricks.com/resources/supported-regions.html#psc
-- `workspace_service_attachment` - Workspace service attachment. Regional values - https://docs.gcp.databricks.com/resources/supported-regions.html#psc
+- `databricks_account_id` — Databricks account ID.
+- `databricks_google_service_account` — Service account used to impersonate.
+- `google_project`, `google_region` — GCP project and region.
+- `account_console_url` — Defaults to `https://accounts.gcp.databricks.com`.
+- `workspace_name` — Name of the workspace to create.
+- `resource_prefix` — Prefix for all resources. Defaults to `databricks`.
 
-- `use_existing_cmek` - flag ("true" or "false") allowing for either the mode where you provide the resource ID to your CMEK resource, or let the module create a new one by providing key_name and keyring_name
-- `key_name` & `keyring_name` - name to be given to the CMEK used by Databricks for encryption. Not useful if bringing an existing `cmek_resource_id`
-- `cmek_resource_id` - ID to your existing CMEK. Only needed if use_existing_cmek = true
+### Compute mode
 
+- `serverless_workspace_deployment` — When `true`, skips all VPC/PSC/network configuration and deploys a serverless workspace.
 
+### Networking
+
+- `use_existing_vpc` — Reuse an existing VPC.
+- `existing_vpc_name`, `existing_subnet_name` — Required when `use_existing_vpc = true`.
+- `nodes_ip_cidr_range` — CIDR for nodes (immutable after creation).
+- `harden_network` — Enables a set of egress/ingress firewall rules. A new `db-<subnet>-ingress` rule is created (for non-serverless, non-BYO-VPC deployments only) so that Databricks does not create its own firewall rule. When `use_existing_vpc = true` the module creates **no** GCP firewalls — you are responsible for providing the rules Databricks requires on the VPC you bring.
+- `databricks_control_plane_ips` — Regional control-plane IPs used in the egress firewall rule when `harden_network = true` and `use_psc = false`. Look up the values for your region at [IP addresses and domains](https://docs.databricks.com/gcp/en/resources/ip-domain-region).
+
+### PSC / connectivity
+
+- `use_psc` — Enable backend Private Service Connect.
+- `use_frontend_psc` — Enable frontend Private Service Connect.
+- `use_existing_PSC_EP`, `existing_workspace_psc_endpoint_ip` — Reuse an existing PSC endpoint and its IP.
+- `workspace_pe`, `relay_pe`, `workspace_pe_ip_name`, `relay_pe_ip_name`, `workspace_service_attachment`, `relay_service_attachment` — PSC-related names and attachments.
+- `google_pe_subnet_ip_cidr_range` — CIDR for the PSC endpoint subnet.
+- `use_existing_databricks_vpc_eps`, `existing_databricks_vpc_ep_workspace`, `existing_databricks_vpc_ep_relay` — Reuse existing Databricks VPC endpoints.
+- `use_existing_pas`, `existing_pas_id` — Reuse an existing Private Access Settings.
+
+### DNS (three modes)
+
+| `create_dns_zone` | `existing_dns_zone_name` | Behavior |
+|---|---|---|
+| `true` | ignored | Module creates a private DNS zone (`var.dns_zone_name`) for `gcp.databricks.com.` and writes workspace + tunnel A-records into it. |
+| `false` | set | Module writes A-records into the existing zone you provide. |
+| `false` | empty (default) | Module creates nothing — you manage DNS manually. |
+
+When DNS is managed (mode 1 or 2), the module creates **three** A-records:
+
+| Record | Points to | Purpose |
+|---|---|---|
+| `<workspace_id>.<shard>.gcp.databricks.com.` | Workspace PSC IP | Workspace web UI and REST API |
+| `dp-<workspace_id>.<shard>.gcp.databricks.com.` | Workspace PSC IP | Data plane workspace URL |
+| `tunnel.<region>.gcp.databricks.com.` | Relay PSC IP | SCC relay — cluster VMs use this to establish the secure tunnel back to the control plane |
+
+Variables:
+
+- `create_dns_zone` — defaults to `false`.
+- `dns_zone_name` — defaults to `databricks-private-zone`.
+- `existing_dns_zone_name` — defaults to `""`.
+- `existing_relay_psc_endpoint_ip` — IP of an existing relay PSC endpoint (only needed when `use_existing_PSC_EP = true`).
+
+> **Important — Private Google Access and `googleapis.com` DNS:**
+> PSC workspaces require the VPC to have access to Google APIs (GCS, IAM, KMS,
+> Container Registry, etc.) via Private Google Access. This module enables
+> `private_ip_google_access = true` on the workspace subnet it creates, and the
+> hardened firewall allows egress to `199.36.153.4/30` (restricted Google APIs).
+>
+> However, **you must also ensure that the VPC can resolve `*.googleapis.com`
+> to the restricted (or private) Google APIs range**. If your VPC does not
+> have a private DNS zone for `googleapis.com` pointing to `199.36.153.4/30`
+> (restricted) or `199.36.153.8/30` (private), the cluster VMs will fail to
+> reach GCS and other Google services during bootstrap — even though the
+> firewall allows the traffic.
+>
+> This module does **not** create the `googleapis.com` DNS zone because it is
+> typically shared across all workloads in a VPC, not scoped to a single
+> Databricks workspace. You can create it with:
+>
+> ```hcl
+> resource "google_dns_managed_zone" "googleapis" {
+>   name        = "googleapis"
+>   project     = var.google_project
+>   dns_name    = "googleapis.com."
+>   visibility  = "private"
+>   private_visibility_config {
+>     networks { network_url = google_compute_network.your_vpc.self_link }
+>   }
+> }
+> resource "google_dns_record_set" "googleapis_a" {
+>   project      = var.google_project
+>   name         = "restricted.googleapis.com."
+>   type         = "A"
+>   ttl          = 300
+>   managed_zone = google_dns_managed_zone.googleapis.name
+>   rrdatas      = ["199.36.153.4", "199.36.153.5", "199.36.153.6", "199.36.153.7"]
+> }
+> resource "google_dns_record_set" "googleapis_cname" {
+>   project      = var.google_project
+>   name         = "*.googleapis.com."
+>   type         = "CNAME"
+>   ttl          = 300
+>   managed_zone = google_dns_managed_zone.googleapis.name
+>   rrdatas      = ["restricted.googleapis.com."]
+> }
+> ```
+>
+> For BYO-VPC deployments, verify this zone already exists in your VPC before
+> deploying with PSC + hardened network.
+
+### CMEK
+
+- `use_cmek` — Master flag (defaults to `false`).
+- `use_existing_cmek` — Reuse an existing CMEK; requires `cmek_resource_id`.
+- `key_name`, `keyring_name` — Names used when creating a new CMEK.
+- `cmek_resource_id` — Full resource ID of an existing CMEK.
+
+### Admin assignment
+
+- `resource_owner` — Email of a user to be granted workspace ADMIN.
+- `skip_user_lookup` — Set `true` during destroy if the user no longer exists.
+
+### Unity Catalog / Metastore
+
+- `regional_metastore_id` — If set, the workspace is attached to this metastore.
+- `default_catalog_name` — Existing catalog to set as the workspace's default namespace. Defaults to `"default_catalog"` (the Databricks auto-created catalog). Set to any other existing catalog name to point the workspace at it, or `""` to skip managing the default namespace. **The module does not create the catalog** — it must already exist in the metastore.
+
+## Outputs
+
+- `workspace_url` — Workspace URL.
+- `workspace_id` — Workspace ID.
+- `workspace_name` — Workspace name.
+- `region` — GCP region.
+- `deployment_suffix` — Random suffix used for resource naming.
+- `databricks_host` — Deprecated alias for `workspace_url`.
+
+## Upgrading from a previous version of this module
+
+This revision renames most module-managed GCP resources to a uniform
+`${resource_prefix}-<resource>-${deployment_suffix}` scheme (e.g. the VPC went
+from `databricks-workspace-vpc-<suffix>` to `databricks-vpc-<suffix>`). The
+random suffix length was preserved (6 chars) so the **suffix itself does not
+change**, but the names still differ.
+
+If you have an existing state, `terraform plan` will show those resources being
+destroyed and recreated — which would tear the workspace down. You have two
+options:
+
+1. **Accept the recreation** (simplest). Destroy and redeploy in a maintenance
+   window.
+2. **Preserve state with `terraform state mv`**. For every renamed resource,
+   rename the address in state, e.g.:
+
+   ```bash
+   terraform state mv \
+     'module.customer_managed_vpc.google_compute_network.dbx_private_vpc[0]' \
+     'module.customer_managed_vpc.google_compute_network.dbx_private_vpc[0]'   # no-op example
+   ```
+
+   and update the GCP resource name via a one-off `terraform apply` + API
+   rename, or simply set `var.resource_prefix` to `"databricks-workspace"` (for
+   VPC/subnet) — note that router/NAT/PAS/PE-subnet/network-config names still
+   differ and cannot be reconciled without state surgery.
+
+For brand-new deployments, no migration is required.

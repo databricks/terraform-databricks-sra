@@ -1,4 +1,4 @@
 provider "google" {
-    alias = "google-for-sa"
+  alias   = "google-for-sa"
   project = var.project
 }

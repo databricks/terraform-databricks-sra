@@ -13,7 +13,7 @@ data "google_client_openid_userinfo" "me" {}
 # }
 
 resource "random_string" "prefix" {
-    length  = 8
-    upper   = false
-    special = false
+  length  = 8
+  upper   = false
+  special = false
 }
