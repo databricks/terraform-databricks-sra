@@ -80,6 +80,13 @@ variable "custom_general_access_vpce_id" {
   default     = null
 }
 
+variable "custom_metastore_name" {
+  description = "Optional name for the Unity Catalog metastore created by this deployment. If left blank/null, defaults to \"${"$"}{var.region}-unity-catalog\"."
+  type        = string
+  default     = null
+  nullable    = true
+}
+
 variable "custom_private_subnet_ids" {
   description = "List of custom private subnet IDs"
   type        = list(string)

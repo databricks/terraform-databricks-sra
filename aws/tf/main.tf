@@ -9,8 +9,9 @@ module "unity_catalog_metastore_creation" {
     databricks = databricks.mws
   }
 
-  region           = var.region
-  metastore_exists = var.metastore_exists
+  region                = var.region
+  metastore_exists      = var.metastore_exists
+  custom_metastore_name = var.custom_metastore_name
 }
 
 # Create Network Connectivity Connection Object

@@ -51,6 +51,7 @@ variables {
   custom_scc_relay_mws_vpce_id      = null
   custom_service_direct_mws_vpce_id = null
   workspace_display_name            = null
+  custom_metastore_name             = null
   databricks_account_id             = "databricks-account-id"
   deployment_name                   = "test-deployment"
   metastore_exists                  = false

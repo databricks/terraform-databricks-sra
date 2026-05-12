@@ -81,6 +81,10 @@ audit_log_delivery_exists = false
 # If a regional metastore exists
 metastore_exists = false
 
+# Optional name for the Unity Catalog metastore created by this deployment.
+# If left blank, defaults to "${var.region}-unity-catalog".
+# custom_metastore_name = ""
+
 # Enable the security analysis tool
 enable_security_analysis_tool = false
 
