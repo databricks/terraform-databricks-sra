@@ -58,11 +58,12 @@ variables {
   cmk_admin_arn                 = "arn:aws:iam::123456789012:role/DatabricksCMKAdmin"
   deployment_name               = "my-databricks-workspace"
   compliance_standards          = ["PCI_DSS"]
-  custom_vpc_id                 = null
-  custom_private_subnet_ids     = null
-  custom_sg_id                  = null
-  custom_relay_vpce_id          = null
-  custom_workspace_vpce_id      = null
+  custom_vpc_id                  = null
+  custom_private_subnet_ids      = null
+  custom_sg_id                   = null
+  custom_general_access_vpce_id  = null
+  custom_scc_relay_vpce_id       = null
+  custom_service_direct_vpce_id  = null
 
   # New variables for GovCloud support
   databricks_gov_shard     = null

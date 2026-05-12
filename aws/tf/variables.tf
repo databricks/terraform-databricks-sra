@@ -62,14 +62,20 @@ variable "compliance_standards" {
   nullable    = true
 }
 
+variable "custom_general_access_vpce_id" {
+  description = "Custom General Access VPC Endpoint ID"
+  type        = string
+  default     = null
+}
+
 variable "custom_private_subnet_ids" {
   description = "List of custom private subnet IDs"
   type        = list(string)
   default     = null
 }
 
-variable "custom_relay_vpce_id" {
-  description = "Custom Relay VPC Endpoint ID"
+variable "custom_scc_relay_vpce_id" {
+  description = "Custom SCC Tunnel Dataplane Relay Access VPC Endpoint ID"
   type        = string
   default     = null
 }
@@ -88,12 +94,6 @@ variable "custom_sg_id" {
 
 variable "custom_vpc_id" {
   description = "Custom VPC ID"
-  type        = string
-  default     = null
-}
-
-variable "custom_workspace_vpce_id" {
-  description = "Custom Workspace VPC Endpoint ID"
   type        = string
   default     = null
 }
