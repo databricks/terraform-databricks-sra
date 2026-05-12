@@ -399,9 +399,9 @@ locals {
   ) : []
 }
 
-# Databricks Service Direct endpoint - skipped in custom operation mode and unavailable in GovCloud
+# Databricks Service Direct endpoint - opt-in via var.create_service_direct_vpce, skipped in custom operation mode and unavailable in GovCloud
 resource "aws_vpc_endpoint" "service_direct" {
-  count = var.network_configuration != "custom" && contains(keys(var.service_direct_config), var.region) ? 1 : 0
+  count = var.create_service_direct_vpce && var.network_configuration != "custom" && contains(keys(var.service_direct_config), var.region) ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
   service_name        = var.service_direct_config[var.region].primary_endpoint

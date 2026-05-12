@@ -62,6 +62,12 @@ variable "compliance_standards" {
   nullable    = true
 }
 
+variable "create_service_direct_vpce" {
+  description = "Whether to create a Service Direct VPC endpoint for the workspace. Service Direct is a front-end endpoint that can be shared across workspaces in the same VPC, so customers typically reuse one rather than creating per-workspace."
+  type        = bool
+  default     = false
+}
+
 variable "custom_general_access_vpce_id" {
   description = "Custom General Access VPC Endpoint ID"
   type        = string

@@ -43,6 +43,11 @@ private_subnets_cidr     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
 privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
 sg_egress_ports          = [443, 2443, 5432, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
+# Service Direct is a front-end endpoint that can be shared across workspaces in the same VPC.
+# Set to true only if you want SRA to create a new Service Direct VPC endpoint for this workspace.
+# Unavailable in GovCloud regions.
+create_service_direct_vpce = false
+
 # CUSTOM NETWORK CONFIGURATION
 # Uncomment and configure the following variables for custom networking:
 # Required when using network_configure = "custom"

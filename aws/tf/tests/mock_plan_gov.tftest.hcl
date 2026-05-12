@@ -41,6 +41,7 @@ mock_provider "databricks" {
 variables {
   aws_account_id                = "123456789012"
   cmk_admin_arn                 = "arn:aws-us-gov:iam::123456789012:role/CMKAdminRole"
+  create_service_direct_vpce    = false
   custom_private_subnet_ids     = ["subnet-0abcd1234efgh5678", "subnet-1abcd1234efgh5678"]
   custom_scc_relay_vpce_id      = "vpce-0abcd1234efgh5678"
   custom_sg_id                  = "sg-0abcd1234efgh5678"

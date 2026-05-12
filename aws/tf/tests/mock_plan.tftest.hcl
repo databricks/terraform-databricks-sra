@@ -58,6 +58,7 @@ variables {
   cmk_admin_arn                 = "arn:aws:iam::123456789012:role/DatabricksCMKAdmin"
   deployment_name               = "my-databricks-workspace"
   compliance_standards          = ["PCI_DSS"]
+  create_service_direct_vpce     = false
   custom_vpc_id                  = null
   custom_private_subnet_ids      = null
   custom_sg_id                   = null
