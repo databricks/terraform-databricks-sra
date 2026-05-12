@@ -97,7 +97,7 @@ resource "databricks_mws_private_access_settings" "pas" {
 resource "databricks_mws_workspaces" "workspace" {
   account_id                               = var.databricks_account_id
   aws_region                               = var.region
-  workspace_name                           = var.resource_prefix
+  workspace_name                           = coalesce(var.workspace_display_name, var.resource_prefix)
   deployment_name                          = var.deployment_name
   credentials_id                           = databricks_mws_credentials.this.credentials_id
   storage_configuration_id                 = databricks_mws_storage_configurations.this.storage_configuration_id

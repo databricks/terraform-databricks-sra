@@ -641,6 +641,13 @@ variable "vpc_cidr_range" {
   default     = null
 }
 
+variable "workspace_display_name" {
+  description = "Optional human-readable name for the workspace as shown in the Databricks UI. If not set, defaults to var.resource_prefix."
+  type        = string
+  default     = null
+  nullable    = true
+}
+
 # Workspace API PrivateLink Endpoint configuration
 # This variable allows mapping regions to multiple endpoint properties:
 # - primary_endpoint: The main endpoint service name (required)

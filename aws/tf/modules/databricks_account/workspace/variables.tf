@@ -112,3 +112,10 @@ variable "workspace_storage_key_alias" {
   description = "CMK for workspace storage alias."
   type        = string
 }
+
+variable "workspace_display_name" {
+  description = "Optional human-readable name for the workspace as shown in the Databricks UI. If null, falls back to resource_prefix."
+  type        = string
+  default     = null
+  nullable    = true
+}

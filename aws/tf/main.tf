@@ -44,10 +44,11 @@ module "databricks_mws_workspace" {
   }
 
   # Basic Configuration
-  databricks_account_id = var.databricks_account_id
-  resource_prefix       = var.resource_prefix
-  region                = var.region
-  deployment_name       = var.deployment_name
+  databricks_account_id  = var.databricks_account_id
+  resource_prefix        = var.resource_prefix
+  region                 = var.region
+  deployment_name        = var.deployment_name
+  workspace_display_name = var.workspace_display_name
 
   # Network Configuration
   vpc_id                            = var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id

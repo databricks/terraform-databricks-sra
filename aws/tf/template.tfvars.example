@@ -29,6 +29,9 @@ databricks_account_id = ""
 # Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles)
 resource_prefix = ""
 
+# Optional human-readable name shown in the Databricks UI. Defaults to resource_prefix if unset.
+# workspace_display_name = ""
+
 # -----------------------------------------------------------------------------
 # Network Configuration
 # -----------------------------------------------------------------------------

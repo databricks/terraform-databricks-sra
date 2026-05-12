@@ -68,6 +68,7 @@ variables {
   custom_general_access_mws_vpce_id = null
   custom_scc_relay_mws_vpce_id      = null
   custom_service_direct_mws_vpce_id = null
+  workspace_display_name            = null
 
   # New variables for GovCloud support
   databricks_gov_shard     = null
