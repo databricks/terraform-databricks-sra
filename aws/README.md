@@ -39,6 +39,8 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
    - **NOTE**: A Unity Catalog-only configuration is required for any clusters running without access to the public internet. Please see the official documentation [here](https://docs.databricks.com/aws/en/data-governance/unity-catalog/disable-hms).
 
 - **Custom**: Selecting 'custom' allows you to specify your own VPC ID, subnet IDs, security group IDs, and PrivateLink endpoint IDs. This mode is recommended when networking assets are created in different pipelines or pre-assigned by a centralized infrastructure team.
+    - **Bring AWS PrivateLink endpoint IDs**: Set `custom_general_access_vpce_id`, `custom_scc_relay_vpce_id`, and (optionally) `custom_service_direct_vpce_id`. SRA will register them with Databricks on your behalf.
+    - **Bring already-registered Databricks MWS endpoint IDs**: Set `custom_general_access_mws_vpce_id`, `custom_scc_relay_mws_vpce_id`, and (optionally) `custom_service_direct_mws_vpce_id`. Use this path when the VPC endpoints have already been registered with the Databricks account (e.g., for sharing across multiple workspaces in the same VPC). SRA skips the registration step and wires these IDs straight into the workspace network configuration.
 
 ### Core AWS Components
 
@@ -60,6 +62,8 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Back-end AWS PrivateLink Connectivity**: AWS PrivateLink provides a private network route from one AWS environment to another. [Back-end PrivateLink](https://docs.databricks.com/administration-guide/cloud-configurations/aws/privatelink.html#overview) is configured so that communication between the customer's classic compute plane and the Databricks control plane does not traverse public IP addresses. This is accomplished through Databricks-specific interface VPC endpoints. Front-end PrivateLink is also available for customers to keep user traffic over the AWS backbone, though front-end PrivateLink is not included in this Terraform template.
 
+- **Service Direct (opt-in)**: A front-end PrivateLink interface VPC endpoint that enables clients to reach the workspace UI/API privately. Service Direct endpoints are commonly shared across workspaces in the same VPC, so SRA does not create one by default. Set `create_service_direct_vpce = true` to have SRA create and register a new Service Direct endpoint for this deployment. Not available in GovCloud regions.
+
 - **Scoped-down IAM Policy for the Databricks cross-account role**: A [cross-account role](https://docs.databricks.com/administration-guide/account-api/iam-role.html) is needed for users, jobs, and other third-party tools to spin up Databricks clusters within the customer's classic compute plane. This role can be scoped down to function only within the classic compute plane's VPC, subnets, and security group.
 
 - **AWS KMS Keys**: Three AWS KMS keys are created to support the following functionalities:
@@ -79,6 +83,13 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
    - **NOTE**: Audit log delivery can only be configured twice for a single account. It's recommended that once it is configured, you set *audit_log_delivery_exists* = *true* for subsequent runs.
 
 - **Restrictive Network Policy**: [Network policies](https://docs.databricks.com/aws/en/security/network/serverless-network-security/manage-network-policies) provide egress controls for serverless compute. A restrictive network policy is implemented on the workspace, allowing outbound traffic only to required data buckets.
+
+### Optional Naming Overrides
+
+By default the workspace and Unity Catalog metastore are named from `resource_prefix` and `region`. Two optional tfvars let you override those names without changing `resource_prefix`:
+
+- `workspace_display_name`: Human-readable workspace name shown in the Databricks UI. Defaults to `resource_prefix` when unset.
+- `custom_metastore_name`: Name of the Unity Catalog metastore created by this deployment. Defaults to `${var.region}-unity-catalog` when unset. Only used when `metastore_exists = false`.
 
 ---
 
