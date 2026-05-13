@@ -352,6 +352,17 @@ module "vpc_endpoints" {
   }
 }
 
+# Preserve state across rename: backend_rest -> general_access, backend_relay -> scc_tunnel_dataplane_relay_access
+moved {
+  from = aws_vpc_endpoint.backend_rest
+  to   = aws_vpc_endpoint.general_access
+}
+
+moved {
+  from = aws_vpc_endpoint.backend_relay
+  to   = aws_vpc_endpoint.scc_tunnel_dataplane_relay_access
+}
+
 # Databricks REST endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "general_access" {
   count = var.network_configuration != "custom" ? 1 : 0

@@ -25,6 +25,17 @@ resource "databricks_mws_storage_configurations" "this" {
   storage_configuration_name = "${var.resource_prefix}-storage"
 }
 
+# Preserve state across rename and count addition: backend_rest -> general_access[0], backend_relay -> scc_tunnel_dataplane_relay_access[0]
+moved {
+  from = databricks_mws_vpc_endpoint.backend_rest
+  to   = databricks_mws_vpc_endpoint.general_access[0]
+}
+
+moved {
+  from = databricks_mws_vpc_endpoint.backend_relay
+  to   = databricks_mws_vpc_endpoint.scc_tunnel_dataplane_relay_access[0]
+}
+
 # General Access VPC Endpoint Configuration
 resource "databricks_mws_vpc_endpoint" "general_access" {
   count               = var.general_access_mws_vpce_id == null ? 1 : 0
