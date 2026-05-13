@@ -29,10 +29,11 @@ resource "databricks_secret" "client_secret" {
 }
 
 module "sat" {
-  source = "git::https://github.com/databricks-industry-solutions/security-analysis-tool.git//terraform/common?ref=d57d08288afff59ee14b248d8218d443eae1001e"
+  source = "git::https://github.com/databricks-industry-solutions/security-analysis-tool.git//terraform/common?ref=v0.8.0"
 
   account_console_id   = var.databricks_account_id
   analysis_schema_name = var.analysis_schema_name
+  cloud_type           = "aws"
   proxies              = var.proxies
   run_on_serverless    = var.run_on_serverless
   workspace_id         = var.workspace_id
