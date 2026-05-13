@@ -65,7 +65,8 @@ audit_log_delivery_exists = false
 # If a regional metastore exists
 metastore_exists = false
 
-# Enable the security analysis tool
+# Enable the security analysis tool (review configurations + credentials in main.tf and the official SAT documentation prior to enabling)
+# SAT documentation can be found here: https://databricks-industry-solutions.github.io/security-analysis-tool/
 enable_security_analysis_tool = false
 
 # -----------------------------------------------------------------------------

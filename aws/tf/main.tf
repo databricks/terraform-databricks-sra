@@ -188,7 +188,8 @@ module "cluster_configuration" {
 }
 
 # =============================================================================
-# Security Analysis Tool  - PyPI must be enabled in network policy resource to function.
+# Security Analysis Tool  - review the documentation for more information on the configuration as network egress is required for certain SAT functionality and features.
+# https://databricks-industry-solutions.github.io/security-analysis-tool/
 # =============================================================================
 
 module "security_analysis_tool" {
@@ -211,8 +212,9 @@ module "security_analysis_tool" {
   workspace_id         = module.databricks_mws_workspace.workspace_id
 
   # Configuration Variables
-  proxies           = {}
-  run_on_serverless = true
+  proxies                         = {}
+  run_on_serverless               = true #if set to true, all SAT workflows will run on serverless compute.
+  sql_warehouse_enable_serverless = true #if set to true, the SAT SQL Warehouse will be enabled on serverless compute and is used by the SAT dashboard
 
   depends_on = [module.unity_catalog_catalog_creation]
 }
