@@ -84,6 +84,10 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Restrictive Network Policy**: [Network policies](https://docs.databricks.com/aws/en/security/network/serverless-network-security/manage-network-policies) provide egress controls for serverless compute. A restrictive network policy is implemented on the workspace, allowing outbound traffic only to required data buckets.
 
+### SRA Usage Telemetry
+
+Each Databricks provider block sets `user_agent_extra = "terraform-databricks-sra/aws/v${local.sra_version}"`. This tag is appended to the `User-Agent` HTTP header on Databricks API calls so Databricks can measure SRA adoption. No additional data is collected — just the tag string. To opt out, override the `user_agent_extra` value in your local copy of the provider block.
+
 ### Optional Naming Overrides
 
 By default the workspace and Unity Catalog metastore are named from `resource_prefix` and `region`. Two optional tfvars let you override those names without changing `resource_prefix`:

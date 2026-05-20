@@ -20,7 +20,7 @@ provider "google" {
 # SRA template version — bump on each major release of this repo.
 # Surfaced via user_agent_extra so Databricks-side telemetry can identify SRA deployments.
 locals {
-  sra_version = "1.0"
+  sra_version = "1.0.0"
 }
 
 provider "databricks" {
