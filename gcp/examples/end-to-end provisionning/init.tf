@@ -27,9 +27,16 @@ provider "google" {
   region  = var.google_region
 }
 
+# SRA template version — bump on each major release of this repo.
+# Surfaced via user_agent_extra so Databricks-side telemetry can identify SRA deployments.
+locals {
+  sra_version = "1.0"
+}
+
 # Databricks provider for account operations.
 provider "databricks" {
-  alias      = "accounts"
-  host       = "https://accounts.gcp.databricks.com"
-  account_id = var.databricks_account_id
+  alias            = "accounts"
+  host             = "https://accounts.gcp.databricks.com"
+  account_id       = var.databricks_account_id
+  user_agent_extra = "terraform-databricks-sra/gcp/v${local.sra_version}"
 }

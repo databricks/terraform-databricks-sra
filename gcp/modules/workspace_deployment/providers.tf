@@ -30,12 +30,19 @@ provider "google" {
   impersonate_service_account = var.databricks_google_service_account != "" ? var.databricks_google_service_account : null
 }
 
+# SRA template version — bump on each major release of this repo.
+# Surfaced via user_agent_extra so Databricks-side telemetry can identify SRA deployments.
+locals {
+  sra_version = "1.0"
+}
+
 # Databricks provider in "accounts" mode to provision a new workspace.
 provider "databricks" {
   alias                  = "accounts"
   host                   = var.account_console_url
   google_service_account = var.databricks_google_service_account
   account_id             = var.databricks_account_id
+  user_agent_extra       = "terraform-databricks-sra/gcp/v${local.sra_version}"
 }
 
 # Databricks provider scoped to the deployed workspace.
@@ -43,4 +50,5 @@ provider "databricks" {
   alias                  = "workspace"
   host                   = databricks_mws_workspaces.this.workspace_url
   google_service_account = var.databricks_google_service_account
+  user_agent_extra       = "terraform-databricks-sra/gcp/v${local.sra_version}"
 }
