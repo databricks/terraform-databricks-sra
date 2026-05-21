@@ -30,22 +30,14 @@ provider "aws" {
 # export DATABRICKS_CLIENT_ID=CLIENT_ID
 # export DATABRICKS_CLIENT_SECRET=CLIENT_SECRET
 
-# SRA template version — bump on each major release of this repo.
-# Surfaced via user_agent_extra so Databricks-side telemetry can identify SRA deployments.
-locals {
-  sra_version = "1.0.0"
+provider "databricks" {
+  alias      = "mws"
+  host       = local.computed_databricks_provider_host
+  account_id = var.databricks_account_id
 }
 
 provider "databricks" {
-  alias            = "mws"
-  host             = local.computed_databricks_provider_host
-  account_id       = var.databricks_account_id
-  user_agent_extra = "terraform-databricks-sra/aws/v${local.sra_version}"
-}
-
-provider "databricks" {
-  alias            = "created_workspace"
-  host             = module.databricks_mws_workspace.workspace_url
-  account_id       = var.databricks_account_id
-  user_agent_extra = "terraform-databricks-sra/aws/v${local.sra_version}"
+  alias      = "created_workspace"
+  host       = module.databricks_mws_workspace.workspace_url
+  account_id = var.databricks_account_id
 }
