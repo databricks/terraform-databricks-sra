@@ -29,6 +29,9 @@ databricks_account_id = ""
 # Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles)
 resource_prefix = ""
 
+# Optional human-readable name shown in the Databricks UI. Defaults to resource_prefix if unset.
+# workspace_display_name = ""
+
 # -----------------------------------------------------------------------------
 # Network Configuration
 # -----------------------------------------------------------------------------
@@ -43,17 +46,30 @@ private_subnets_cidr     = ["10.0.0.0/22", "10.0.4.0/22", "10.0.8.0/22"]
 privatelink_subnets_cidr = ["10.0.28.0/26", "10.0.28.64/26", "10.0.28.128/26"]
 sg_egress_ports          = [443, 2443, 5432, 6666, 8443, 8444, 8445, 8446, 8447, 8448, 8449, 8450, 8451]
 
+# Service Direct is a front-end endpoint that can be shared across workspaces in the same VPC.
+# Set to true only if you want SRA to create a new Service Direct VPC endpoint for this workspace.
+# Unavailable in GovCloud regions.
+create_service_direct_vpce = false
+
 # CUSTOM NETWORK CONFIGURATION
 # Uncomment and configure the following variables for custom networking:
 # Required when using network_configure = "custom"
 # Ensure that an STS interface endpoint, a Kinesis endpoint, and an S3 gateway endpoint are available within the VPC and associated with private subnet route tables.
 # Ensure that Private DNS names have been enabled for Databricks PrivateLink endpoints.
 
-# custom_vpc_id             = ""
-# custom_private_subnet_ids = ["", ""]
-# custom_sg_id              = ""
-# custom_relay_vpce_id      = ""
-# custom_workspace_vpce_id  = ""
+# custom_vpc_id                  = ""
+# custom_private_subnet_ids      = ["", ""]
+# custom_sg_id                   = ""
+# custom_general_access_vpce_id  = ""
+# custom_scc_relay_vpce_id       = ""
+# custom_service_direct_vpce_id  = ""    # Optional
+
+# If your AWS VPC endpoints are ALREADY registered with Databricks (e.g. shared across multiple workspaces),
+# provide the Databricks-side MWS VPC endpoint IDs here instead. When set, the corresponding *_vpce_id
+# above is ignored and SRA will skip registering the AWS VPC endpoint with Databricks.
+# custom_general_access_mws_vpce_id  = ""
+# custom_scc_relay_mws_vpce_id       = ""
+# custom_service_direct_mws_vpce_id  = ""
 
 # -----------------------------------------------------------------------------
 # Feature Flags
@@ -64,6 +80,10 @@ audit_log_delivery_exists = false
 
 # If a regional metastore exists
 metastore_exists = false
+
+# Optional name for the Unity Catalog metastore created by this deployment.
+# If left blank, defaults to "${var.region}-unity-catalog".
+# custom_metastore_name = ""
 
 # Enable the security analysis tool
 enable_security_analysis_tool = false

@@ -9,8 +9,9 @@ module "unity_catalog_metastore_creation" {
     databricks = databricks.mws
   }
 
-  region           = var.region
-  metastore_exists = var.metastore_exists
+  region                = var.region
+  metastore_exists      = var.metastore_exists
+  custom_metastore_name = var.custom_metastore_name
 }
 
 # Create Network Connectivity Connection Object
@@ -44,17 +45,22 @@ module "databricks_mws_workspace" {
   }
 
   # Basic Configuration
-  databricks_account_id = var.databricks_account_id
-  resource_prefix       = var.resource_prefix
-  region                = var.region
-  deployment_name       = var.deployment_name
+  databricks_account_id  = var.databricks_account_id
+  resource_prefix        = var.resource_prefix
+  region                 = var.region
+  deployment_name        = var.deployment_name
+  workspace_display_name = var.workspace_display_name
 
   # Network Configuration
-  vpc_id             = var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id
-  subnet_ids         = var.custom_private_subnet_ids != null ? var.custom_private_subnet_ids : module.vpc[0].private_subnets
-  security_group_ids = var.custom_sg_id != null ? [var.custom_sg_id] : [aws_security_group.sg[0].id]
-  backend_rest       = var.custom_workspace_vpce_id != null ? var.custom_workspace_vpce_id : aws_vpc_endpoint.backend_rest[0].id
-  backend_relay      = var.custom_relay_vpce_id != null ? var.custom_relay_vpce_id : aws_vpc_endpoint.backend_relay[0].id
+  vpc_id                            = var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id
+  subnet_ids                        = var.custom_private_subnet_ids != null ? var.custom_private_subnet_ids : module.vpc[0].private_subnets
+  security_group_ids                = var.custom_sg_id != null ? [var.custom_sg_id] : [aws_security_group.sg[0].id]
+  general_access                    = var.custom_general_access_mws_vpce_id != null ? null : (var.custom_general_access_vpce_id != null ? var.custom_general_access_vpce_id : aws_vpc_endpoint.general_access[0].id)
+  general_access_mws_vpce_id        = var.custom_general_access_mws_vpce_id
+  scc_tunnel_dataplane_relay_access = var.custom_scc_relay_mws_vpce_id != null ? null : (var.custom_scc_relay_vpce_id != null ? var.custom_scc_relay_vpce_id : aws_vpc_endpoint.scc_tunnel_dataplane_relay_access[0].id)
+  scc_relay_mws_vpce_id             = var.custom_scc_relay_mws_vpce_id
+  service_direct                    = var.custom_service_direct_mws_vpce_id != null ? [] : (var.custom_service_direct_vpce_id != null ? [var.custom_service_direct_vpce_id] : aws_vpc_endpoint.service_direct[*].id)
+  service_direct_mws_vpce_id        = var.custom_service_direct_mws_vpce_id
 
   # Cross-Account Role
   cross_account_role_arn = aws_iam_role.cross_account_role.arn

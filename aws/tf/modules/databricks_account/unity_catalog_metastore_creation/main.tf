@@ -8,7 +8,7 @@ data "databricks_metastore" "this" {
 
 resource "databricks_metastore" "this" {
   count         = var.metastore_exists ? 0 : 1
-  name          = "${var.region}-unity-catalog"
+  name          = coalesce(var.custom_metastore_name, "${var.region}-unity-catalog")
   region        = var.region
   force_destroy = true
 }

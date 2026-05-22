@@ -352,8 +352,19 @@ module "vpc_endpoints" {
   }
 }
 
+# Preserve state across rename: backend_rest -> general_access, backend_relay -> scc_tunnel_dataplane_relay_access
+moved {
+  from = aws_vpc_endpoint.backend_rest
+  to   = aws_vpc_endpoint.general_access
+}
+
+moved {
+  from = aws_vpc_endpoint.backend_relay
+  to   = aws_vpc_endpoint.scc_tunnel_dataplane_relay_access
+}
+
 # Databricks REST endpoint - skipped in custom operation mode
-resource "aws_vpc_endpoint" "backend_rest" {
+resource "aws_vpc_endpoint" "general_access" {
   count = var.network_configuration != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
@@ -363,13 +374,13 @@ resource "aws_vpc_endpoint" "backend_rest" {
   subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
   tags = {
-    Name    = "${var.resource_prefix}-databricks-backend-rest"
+    Name    = "${var.resource_prefix}-databricks-general-access"
     Project = var.resource_prefix
   }
 }
 
 # Databricks SCC endpoint - skipped in custom operation mode
-resource "aws_vpc_endpoint" "backend_relay" {
+resource "aws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
   count = var.network_configuration != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
@@ -379,7 +390,38 @@ resource "aws_vpc_endpoint" "backend_relay" {
   subnet_ids          = module.vpc[0].intra_subnets
   private_dns_enabled = true
   tags = {
-    Name    = "${var.resource_prefix}-databricks-backend-relay"
+    Name    = "${var.resource_prefix}-databricks-dataplane-relay"
+    Project = var.resource_prefix
+  }
+}
+
+# Look up AZ IDs for intra subnets to filter for service-direct limited AZ regions
+data "aws_subnet" "intra" {
+  count = var.network_configuration != "custom" ? length(module.vpc[0].intra_subnets) : 0
+  id    = module.vpc[0].intra_subnets[count.index]
+}
+
+locals {
+  service_direct_subnets = var.network_configuration != "custom" && contains(keys(var.service_direct_config), var.region) ? (
+    contains(keys(var.service_direct_limited_az_regions), var.region) ? [
+      for s in data.aws_subnet.intra : s.id
+      if contains(var.service_direct_limited_az_regions[var.region], s.availability_zone_id)
+    ] : module.vpc[0].intra_subnets
+  ) : []
+}
+
+# Databricks Service Direct endpoint - opt-in via var.create_service_direct_vpce, skipped in custom operation mode and unavailable in GovCloud
+resource "aws_vpc_endpoint" "service_direct" {
+  count = var.create_service_direct_vpce && var.network_configuration != "custom" && contains(keys(var.service_direct_config), var.region) ? 1 : 0
+
+  vpc_id              = module.vpc[0].vpc_id
+  service_name        = var.service_direct_config[var.region].primary_endpoint
+  vpc_endpoint_type   = "Interface"
+  security_group_ids  = [aws_security_group.privatelink[0].id]
+  subnet_ids          = local.service_direct_subnets
+  private_dns_enabled = true
+  tags = {
+    Name    = "${var.resource_prefix}-databricks-service-direct"
     Project = var.resource_prefix
   }
 }

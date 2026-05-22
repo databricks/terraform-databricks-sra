@@ -25,19 +25,41 @@ resource "databricks_mws_storage_configurations" "this" {
   storage_configuration_name = "${var.resource_prefix}-storage"
 }
 
-# Backend REST VPC Endpoint Configuration
-resource "databricks_mws_vpc_endpoint" "backend_rest" {
+# Preserve state across rename and count addition: backend_rest -> general_access[0], backend_relay -> scc_tunnel_dataplane_relay_access[0]
+moved {
+  from = databricks_mws_vpc_endpoint.backend_rest
+  to   = databricks_mws_vpc_endpoint.general_access[0]
+}
+
+moved {
+  from = databricks_mws_vpc_endpoint.backend_relay
+  to   = databricks_mws_vpc_endpoint.scc_tunnel_dataplane_relay_access[0]
+}
+
+# General Access VPC Endpoint Configuration
+resource "databricks_mws_vpc_endpoint" "general_access" {
+  count               = var.general_access_mws_vpce_id == null ? 1 : 0
   account_id          = var.databricks_account_id
-  aws_vpc_endpoint_id = var.backend_rest
-  vpc_endpoint_name   = "${var.resource_prefix}-vpce-backend-${var.vpc_id}"
+  aws_vpc_endpoint_id = var.general_access
+  vpc_endpoint_name   = "${var.resource_prefix}-vpce-general-access-${var.vpc_id}"
   region              = var.region
 }
 
-# Backend Rest VPC Endpoint Configuration
-resource "databricks_mws_vpc_endpoint" "backend_relay" {
+# SCC Tunnel Dataplane Relay Access VPC Endpoint Configuration
+resource "databricks_mws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
+  count               = var.scc_relay_mws_vpce_id == null ? 1 : 0
   account_id          = var.databricks_account_id
-  aws_vpc_endpoint_id = var.backend_relay
-  vpc_endpoint_name   = "${var.resource_prefix}-vpce-relay-${var.vpc_id}"
+  aws_vpc_endpoint_id = var.scc_tunnel_dataplane_relay_access
+  vpc_endpoint_name   = "${var.resource_prefix}-vpce-dataplane-relay-access-${var.vpc_id}"
+  region              = var.region
+}
+
+# Service Direct VPC Endpoint Configuration
+resource "databricks_mws_vpc_endpoint" "service_direct" {
+  count               = var.service_direct_mws_vpce_id == null && length(var.service_direct) > 0 ? 1 : 0
+  account_id          = var.databricks_account_id
+  aws_vpc_endpoint_id = var.service_direct[0]
+  vpc_endpoint_name   = "${var.resource_prefix}-vpce-service-direct-${var.vpc_id}"
   region              = var.region
 }
 
@@ -49,8 +71,8 @@ resource "databricks_mws_networks" "this" {
   subnet_ids         = var.subnet_ids
   vpc_id             = var.vpc_id
   vpc_endpoints {
-    dataplane_relay = [databricks_mws_vpc_endpoint.backend_relay.vpc_endpoint_id]
-    rest_api        = [databricks_mws_vpc_endpoint.backend_rest.vpc_endpoint_id]
+    dataplane_relay = [var.scc_relay_mws_vpce_id != null ? var.scc_relay_mws_vpce_id : databricks_mws_vpc_endpoint.scc_tunnel_dataplane_relay_access[0].vpc_endpoint_id]
+    rest_api        = [var.general_access_mws_vpce_id != null ? var.general_access_mws_vpce_id : databricks_mws_vpc_endpoint.general_access[0].vpc_endpoint_id]
   }
 }
 
@@ -86,7 +108,7 @@ resource "databricks_mws_private_access_settings" "pas" {
 resource "databricks_mws_workspaces" "workspace" {
   account_id                               = var.databricks_account_id
   aws_region                               = var.region
-  workspace_name                           = var.resource_prefix
+  workspace_name                           = coalesce(var.workspace_display_name, var.resource_prefix)
   deployment_name                          = var.deployment_name
   credentials_id                           = databricks_mws_credentials.this.credentials_id
   storage_configuration_id                 = databricks_mws_storage_configurations.this.storage_configuration_id
