@@ -23,7 +23,7 @@ run "test_initializer" {
   command   = apply
   module {
     source = "../../common/tests/test_initializer"
-  } 
+  }
 }
 
 # Provision a small autoscaling classic cluster suitable for test jobs
