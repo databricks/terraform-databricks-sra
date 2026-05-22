@@ -59,3 +59,8 @@ variable "run_on_serverless" {
   description = "Flag to run SAT initializer/Driver on Serverless"
   type        = bool
 }
+
+variable "sql_warehouse_enable_serverless" {
+  description = "Flag to run the SAT SQL Warehouse (used by SAT dashboards) on Serverless Compute"
+  type        = bool
+}
