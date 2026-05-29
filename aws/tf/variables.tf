@@ -178,6 +178,154 @@ variable "enable_security_analysis_tool" {
   default     = false
 }
 
+# General Access (Workspace API) PrivateLink Endpoint configuration
+# This variable allows mapping regions to multiple endpoint properties:
+# - primary_endpoint: The main endpoint service name (required)
+# - secondary_endpoint: An optional secondary endpoint service name
+# - region_type: Optional region type (defaults to "commercial", can be "govcloud")
+#
+# Example usage:
+# var.general_access_config["us-gov-west-1"].primary_endpoint   # Get primary endpoint
+# var.general_access_config["us-gov-west-1"].secondary_endpoint # Get secondary endpoint (if exists)
+# var.general_access_config["us-gov-west-1"].region_type        # Get region type
+variable "general_access_config" {
+  description = "General Access (Workspace API) PrivateLink Endpoint configuration with multiple properties per region"
+  type = map(object({
+    primary_endpoint   = string
+    secondary_endpoint = optional(string)
+    region_type        = optional(string, "commercial")
+  }))
+  default = {
+    "ap-northeast-1" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-northeast-1.vpce-svc-02691fd610d24fd64"
+    }
+    "ap-northeast-2" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-northeast-2.vpce-svc-0babb9bde64f34d7e"
+    }
+    "ap-south-1" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-south-1.vpce-svc-0dbfe5d9ee18d6411"
+    }
+    "ap-southeast-1" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-southeast-1.vpce-svc-02535b257fc253ff4"
+    }
+    "ap-southeast-2" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-southeast-2.vpce-svc-0b87155ddd6954974"
+    }
+    "ap-southeast-3" = {
+      primary_endpoint = "com.amazonaws.vpce.ap-southeast-3.vpce-svc-07a698e7e9ccfd04a"
+    }
+    "ca-central-1" = {
+      primary_endpoint = "com.amazonaws.vpce.ca-central-1.vpce-svc-0205f197ec0e28d65"
+    }
+    "eu-central-1" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-central-1.vpce-svc-081f78503812597f7"
+    }
+    "eu-west-1" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-1.vpce-svc-0da6ebf1461278016"
+    }
+    "eu-west-2" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-2.vpce-svc-01148c7cdc1d1326c"
+    }
+    "eu-west-3" = {
+      primary_endpoint = "com.amazonaws.vpce.eu-west-3.vpce-svc-008b9368d1d011f37"
+    }
+    "sa-east-1" = {
+      primary_endpoint = "com.amazonaws.vpce.sa-east-1.vpce-svc-0bafcea8cdfe11b66"
+    }
+    "us-east-1" = {
+      primary_endpoint = "com.amazonaws.vpce.us-east-1.vpce-svc-09143d1e626de2f04"
+    }
+    "us-east-2" = {
+      primary_endpoint = "com.amazonaws.vpce.us-east-2.vpce-svc-041dc2b4d7796b8d3"
+    }
+    "us-west-2" = {
+      primary_endpoint = "com.amazonaws.vpce.us-west-2.vpce-svc-0129f463fcfbc46c5"
+    }
+    "us-west-1" = {
+      primary_endpoint = "com.amazonaws.vpce.us-west-1.vpce-svc-09bb6ca26208063f2"
+    }
+    "us-gov-west-1" = {
+      primary_endpoint   = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-0f25e28401cbc9418"
+      secondary_endpoint = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-08fddf710780b2a54"
+      region_type        = "govcloud"
+    }
+  }
+}
+
+# Log storage bucket configuration
+# This variable allows mapping regions to multiple bucket properties:
+# - primary_bucket: The main bucket name (required)
+# - secondary_bucket: An optional secondary bucket name (e.g., for DoD)
+# - region_type: Optional region type (defaults to "commercial", can be "govcloud")
+#
+# Example usage:
+# var.log_storage_bucket_config["us-gov-west-1"].primary_bucket   # Get primary bucket (civilian)
+# var.log_storage_bucket_config["us-gov-west-1"].secondary_bucket # Get secondary bucket (DoD)
+# var.log_storage_bucket_config["us-gov-west-1"].region_type      # Get region type
+variable "log_storage_bucket_config" {
+  description = "Log storage bucket configuration with multiple properties per region"
+  type = map(object({
+    primary_bucket   = string
+    secondary_bucket = optional(string)
+    region_type      = optional(string, "commercial")
+  }))
+  default = {
+    "ap-northeast-1" = {
+      primary_bucket = "databricks-prod-storage-tokyo"
+    }
+    "ap-northeast-2" = {
+      primary_bucket = "databricks-prod-storage-seoul"
+    }
+    "ap-south-1" = {
+      primary_bucket = "databricks-prod-storage-mumbai"
+    }
+    "ap-southeast-1" = {
+      primary_bucket = "databricks-prod-storage-singapore"
+    }
+    "ap-southeast-2" = {
+      primary_bucket = "databricks-prod-storage-sydney"
+    }
+    "ap-southeast-3" = {
+      primary_bucket = "databricks-prod-storage-jakarta"
+    }
+    "ca-central-1" = {
+      primary_bucket = "databricks-prod-storage-montreal"
+    }
+    "eu-central-1" = {
+      primary_bucket = "databricks-prod-storage-frankfurt"
+    }
+    "eu-west-1" = {
+      primary_bucket = "databricks-prod-storage-ireland"
+    }
+    "eu-west-2" = {
+      primary_bucket = "databricks-prod-storage-london"
+    }
+    "eu-west-3" = {
+      primary_bucket = "databricks-prod-storage-paris"
+    }
+    "sa-east-1" = {
+      primary_bucket = "databricks-prod-storage-saopaulo"
+    }
+    "us-east-1" = {
+      primary_bucket = "databricks-prod-storage-virginia"
+    }
+    "us-east-2" = {
+      primary_bucket = "databricks-prod-storage-ohio"
+    }
+    "us-west-1" = {
+      primary_bucket = "databricks-prod-storage-oregon"
+    }
+    "us-west-2" = {
+      primary_bucket = "databricks-prod-storage-oregon"
+    }
+    "us-gov-west-1" = {
+      primary_bucket   = "databricks-prod-storage-pendleton"
+      secondary_bucket = "databricks-prod-storage-pendleton-dod"
+      region_type      = "govcloud"
+    }
+  }
+}
+
 variable "metastore_exists" {
   description = "If a metastore exists"
   type        = bool
@@ -375,22 +523,6 @@ variable "scc_relay_config" {
   }
 }
 
-# Service Direct PrivateLink limited AZ regions
-# Some regions only support service-direct PrivateLink in specific availability zones.
-# Regions not listed here support all availability zones.
-#
-# Reference: https://docs.databricks.com/aws/en/security/network/front-end/service-direct-privatelink#availability-zone-support
-variable "service_direct_limited_az_regions" {
-  description = "Regions with limited AZ support for service-direct PrivateLink. Maps region to list of supported AZ IDs."
-  type        = map(list(string))
-  default = {
-    "ap-northeast-1" = ["apne1-az1", "apne1-az2", "apne1-az4"]
-    "ap-northeast-2" = ["apne2-az1", "apne2-az3"]
-    "us-east-1"      = ["use1-az1", "use1-az2", "use1-az4"]
-    "us-west-2"      = ["usw2-az1", "usw2-az2", "usw2-az3"]
-  }
-}
-
 # Service Direct PrivateLink Endpoint configuration
 # This variable allows mapping regions to the service-direct endpoint properties:
 # - primary_endpoint: The main endpoint service name (required)
@@ -459,6 +591,22 @@ variable "service_direct_config" {
     "us-west-2" = {
       primary_endpoint = "com.amazonaws.vpce.us-west-2.vpce-svc-0d7fe235ba1abe9d2"
     }
+  }
+}
+
+# Service Direct PrivateLink limited AZ regions
+# Some regions only support service-direct PrivateLink in specific availability zones.
+# Regions not listed here support all availability zones.
+#
+# Reference: https://docs.databricks.com/aws/en/security/network/front-end/service-direct-privatelink#availability-zone-support
+variable "service_direct_limited_az_regions" {
+  description = "Regions with limited AZ support for service-direct PrivateLink. Maps region to list of supported AZ IDs."
+  type        = map(list(string))
+  default = {
+    "ap-northeast-1" = ["apne1-az1", "apne1-az2", "apne1-az4"]
+    "ap-northeast-2" = ["apne2-az1", "apne2-az3"]
+    "us-east-1"      = ["use1-az1", "use1-az2", "use1-az4"]
+    "us-west-2"      = ["usw2-az1", "usw2-az2", "usw2-az3"]
   }
 }
 
@@ -567,80 +715,6 @@ variable "system_table_bucket_config" {
   }
 }
 
-# Log storage bucket configuration
-# This variable allows mapping regions to multiple bucket properties:
-# - primary_bucket: The main bucket name (required)
-# - secondary_bucket: An optional secondary bucket name (e.g., for DoD)
-# - region_type: Optional region type (defaults to "commercial", can be "govcloud")
-#
-# Example usage:
-# var.log_storage_bucket_config["us-gov-west-1"].primary_bucket   # Get primary bucket (civilian)
-# var.log_storage_bucket_config["us-gov-west-1"].secondary_bucket # Get secondary bucket (DoD)
-# var.log_storage_bucket_config["us-gov-west-1"].region_type      # Get region type
-variable "log_storage_bucket_config" {
-  description = "Log storage bucket configuration with multiple properties per region"
-  type = map(object({
-    primary_bucket   = string
-    secondary_bucket = optional(string)
-    region_type      = optional(string, "commercial")
-  }))
-  default = {
-    "ap-northeast-1" = {
-      primary_bucket = "databricks-prod-storage-tokyo"
-    }
-    "ap-northeast-2" = {
-      primary_bucket = "databricks-prod-storage-seoul"
-    }
-    "ap-south-1" = {
-      primary_bucket = "databricks-prod-storage-mumbai"
-    }
-    "ap-southeast-1" = {
-      primary_bucket = "databricks-prod-storage-singapore"
-    }
-    "ap-southeast-2" = {
-      primary_bucket = "databricks-prod-storage-sydney"
-    }
-    "ap-southeast-3" = {
-      primary_bucket = "databricks-prod-storage-jakarta"
-    }
-    "ca-central-1" = {
-      primary_bucket = "databricks-prod-storage-montreal"
-    }
-    "eu-central-1" = {
-      primary_bucket = "databricks-prod-storage-frankfurt"
-    }
-    "eu-west-1" = {
-      primary_bucket = "databricks-prod-storage-ireland"
-    }
-    "eu-west-2" = {
-      primary_bucket = "databricks-prod-storage-london"
-    }
-    "eu-west-3" = {
-      primary_bucket = "databricks-prod-storage-paris"
-    }
-    "sa-east-1" = {
-      primary_bucket = "databricks-prod-storage-saopaulo"
-    }
-    "us-east-1" = {
-      primary_bucket = "databricks-prod-storage-virginia"
-    }
-    "us-east-2" = {
-      primary_bucket = "databricks-prod-storage-ohio"
-    }
-    "us-west-1" = {
-      primary_bucket = "databricks-prod-storage-oregon"
-    }
-    "us-west-2" = {
-      primary_bucket = "databricks-prod-storage-oregon"
-    }
-    "us-gov-west-1" = {
-      primary_bucket   = "databricks-prod-storage-pendleton"
-      secondary_bucket = "databricks-prod-storage-pendleton-dod"
-      region_type      = "govcloud"
-    }
-  }
-}
-
 variable "vpc_cidr_range" {
   description = "CIDR range for the VPC."
   type        = string
@@ -653,80 +727,6 @@ variable "workspace_display_name" {
   type        = string
   default     = null
   nullable    = true
-}
-
-# Workspace API PrivateLink Endpoint configuration
-# This variable allows mapping regions to multiple endpoint properties:
-# - primary_endpoint: The main endpoint service name (required)
-# - secondary_endpoint: An optional secondary endpoint service name
-# - region_type: Optional region type (defaults to "commercial", can be "govcloud")
-#
-# Example usage:
-# var.workspace_config["us-gov-west-1"].primary_endpoint   # Get primary endpoint
-# var.workspace_config["us-gov-west-1"].secondary_endpoint # Get secondary endpoint (if exists)
-# var.workspace_config["us-gov-west-1"].region_type        # Get region type
-variable "workspace_config" {
-  description = "Workspace API PrivateLink Endpoint configuration with multiple properties per region"
-  type = map(object({
-    primary_endpoint   = string
-    secondary_endpoint = optional(string)
-    region_type        = optional(string, "commercial")
-  }))
-  default = {
-    "ap-northeast-1" = {
-      primary_endpoint = "com.amazonaws.vpce.ap-northeast-1.vpce-svc-02691fd610d24fd64"
-    }
-    "ap-northeast-2" = {
-      primary_endpoint = "com.amazonaws.vpce.ap-northeast-2.vpce-svc-0babb9bde64f34d7e"
-    }
-    "ap-south-1" = {
-      primary_endpoint = "com.amazonaws.vpce.ap-south-1.vpce-svc-0dbfe5d9ee18d6411"
-    }
-    "ap-southeast-1" = {
-      primary_endpoint = "com.amazonaws.vpce.ap-southeast-1.vpce-svc-02535b257fc253ff4"
-    }
-    "ap-southeast-2" = {
-      primary_endpoint = "com.amazonaws.vpce.ap-southeast-2.vpce-svc-0b87155ddd6954974"
-    }
-    "ap-southeast-3" = {
-      primary_endpoint = "com.amazonaws.vpce.ap-southeast-3.vpce-svc-07a698e7e9ccfd04a"
-    }
-    "ca-central-1" = {
-      primary_endpoint = "com.amazonaws.vpce.ca-central-1.vpce-svc-0205f197ec0e28d65"
-    }
-    "eu-central-1" = {
-      primary_endpoint = "com.amazonaws.vpce.eu-central-1.vpce-svc-081f78503812597f7"
-    }
-    "eu-west-1" = {
-      primary_endpoint = "com.amazonaws.vpce.eu-west-1.vpce-svc-0da6ebf1461278016"
-    }
-    "eu-west-2" = {
-      primary_endpoint = "com.amazonaws.vpce.eu-west-2.vpce-svc-01148c7cdc1d1326c"
-    }
-    "eu-west-3" = {
-      primary_endpoint = "com.amazonaws.vpce.eu-west-3.vpce-svc-008b9368d1d011f37"
-    }
-    "sa-east-1" = {
-      primary_endpoint = "com.amazonaws.vpce.sa-east-1.vpce-svc-0bafcea8cdfe11b66"
-    }
-    "us-east-1" = {
-      primary_endpoint = "com.amazonaws.vpce.us-east-1.vpce-svc-09143d1e626de2f04"
-    }
-    "us-east-2" = {
-      primary_endpoint = "com.amazonaws.vpce.us-east-2.vpce-svc-041dc2b4d7796b8d3"
-    }
-    "us-west-2" = {
-      primary_endpoint = "com.amazonaws.vpce.us-west-2.vpce-svc-0129f463fcfbc46c5"
-    }
-    "us-west-1" = {
-      primary_endpoint = "com.amazonaws.vpce.us-west-1.vpce-svc-09bb6ca26208063f2"
-    }
-    "us-gov-west-1" = {
-      primary_endpoint   = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-0f25e28401cbc9418"
-      secondary_endpoint = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-08fddf710780b2a54"
-      region_type        = "govcloud"
-    }
-  }
 }
 
 # Combined locals block for all computed values
@@ -766,40 +766,4 @@ locals {
   unity_catalog_iam_arn = var.region == "us-gov-west-1" ? (
     var.databricks_gov_shard == "dod" ? "arn:aws-us-gov:iam::170661010020:role/unity-catalog-prod-UCMasterRole-1DI6DL6ZP26AS" : "arn:aws-us-gov:iam::044793339203:role/unity-catalog-prod-UCMasterRole-1QRFA8SGY15OJ"
   ) : "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
-
-  # Backward compatibility variables - provide the same interface as the old simple map variables
-  scc_relay = {
-    for region, config in var.scc_relay_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_endpoint != null ?
-      config.secondary_endpoint : config.primary_endpoint
-    )
-  }
-
-  workspace = {
-    for region, config in var.workspace_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_endpoint != null ?
-      config.secondary_endpoint : config.primary_endpoint
-    )
-  }
-
-  region_name = {
-    for region, config in var.region_name_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_name != null ?
-      config.secondary_name : config.primary_name
-    )
-  }
-
-  system_table_bucket = {
-    for region, config in var.system_table_bucket_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_bucket != null ?
-      config.secondary_bucket : config.primary_bucket
-    )
-  }
-
-  log_storage_bucket = {
-    for region, config in var.log_storage_bucket_config : region => (
-      region == "us-gov-west-1" && var.databricks_gov_shard == "dod" && config.secondary_bucket != null ?
-      config.secondary_bucket : config.primary_bucket
-    )
-  }
 }

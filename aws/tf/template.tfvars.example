@@ -102,7 +102,7 @@ enable_security_analysis_tool = false
 enable_compliance_security_profile = false
 
 # NOTE: This variable is necessary if and only if you do not set default compliance settings at the account level.
-# Avaiable compliance standards found here: https://pkg.go.dev/github.com/databricks/databricks-sdk-go/service/settings#ComplianceStandard
+# Available compliance standards found here: https://pkg.go.dev/github.com/databricks/databricks-sdk-go/service/settings#ComplianceStandard
 compliance_standards = [ "Standard_A", "Standard_B" ]
 
 # Deployment name for the workspace (must be enabled by Databricks representative)

@@ -368,7 +368,7 @@ resource "aws_vpc_endpoint" "general_access" {
   count = var.network_configuration != "custom" ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
-  service_name        = var.databricks_gov_shard == "dod" ? var.workspace_config[var.region].secondary_endpoint : var.workspace_config[var.region].primary_endpoint
+  service_name        = var.databricks_gov_shard == "dod" ? var.general_access_config[var.region].secondary_endpoint : var.general_access_config[var.region].primary_endpoint
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
   subnet_ids          = module.vpc[0].intra_subnets
