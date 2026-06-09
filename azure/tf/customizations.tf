@@ -65,9 +65,8 @@ module "sat" {
 
   depends_on = [local.sat_catalog]
 
-  # Change the provider if needed
   providers = {
-    databricks = databricks.hub
+    databricks.workspace = databricks.sat
   }
 }
 
@@ -85,5 +84,7 @@ resource "databricks_permission_assignment" "sat_workspace_admin" {
   permissions  = ["ADMIN"]
   principal_id = module.sat[0].service_principal_id
 
-  provider = databricks.hub
+  provider_config {
+    workspace_id = local.sat_workspace.workspace_id
+  }
 }

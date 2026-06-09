@@ -79,8 +79,11 @@ resource "databricks_disable_legacy_dbfs_setting" "webauth" {
     value = true
   }
 
+  provider_config {
+    workspace_id = module.webauth_workspace[0].workspace_id
+  }
+
   depends_on = [module.webauth_workspace]
-  provider   = databricks.hub
 }
 
 resource "databricks_disable_legacy_access_setting" "webauth" {
@@ -90,8 +93,11 @@ resource "databricks_disable_legacy_access_setting" "webauth" {
     value = true
   }
 
+  provider_config {
+    workspace_id = module.webauth_workspace[0].workspace_id
+  }
+
   depends_on = [module.webauth_workspace]
-  provider   = databricks.hub
 }
 
 module "hub_catalog" {
@@ -116,10 +122,7 @@ module "hub_catalog" {
   metastore_id          = module.hub[0].metastore_id
   ncc_id                = module.hub[0].ncc_id
   ncc_name              = module.hub[0].ncc_name
+  workspace_id          = module.webauth_workspace[0].workspace_id
 
   force_destroy = var.sat_force_destroy
-
-  providers = {
-    databricks.workspace = databricks.hub
-  }
 }

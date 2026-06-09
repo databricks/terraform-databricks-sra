@@ -61,6 +61,11 @@ variable "metastore_id" {
   description = "(Required) The ID of the metastore to associate with the Databricks workspace"
 }
 
+variable "workspace_id" {
+  type        = string
+  description = "(Required) Workspace ID of the Databricks workspace this catalog belongs to"
+}
+
 variable "catalog_name" {
   type        = string
   description = "(Required) Name of the catalog to create"
