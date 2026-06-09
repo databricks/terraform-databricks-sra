@@ -66,8 +66,11 @@ resource "databricks_disable_legacy_dbfs_setting" "spoke" {
     value = true
   }
 
+  provider_config {
+    workspace_id = module.spoke_workspace.workspace_id
+  }
+
   depends_on = [module.spoke_workspace]
-  provider   = databricks.spoke
 }
 
 resource "databricks_disable_legacy_access_setting" "spoke" {
@@ -75,8 +78,11 @@ resource "databricks_disable_legacy_access_setting" "spoke" {
     value = true
   }
 
+  provider_config {
+    workspace_id = module.spoke_workspace.workspace_id
+  }
+
   depends_on = [module.spoke_workspace]
-  provider   = databricks.spoke
 }
 
 
@@ -99,12 +105,9 @@ module "spoke_catalog" {
   metastore_id          = var.create_hub ? module.hub[0].metastore_id : var.databricks_metastore_id
   ncc_id                = module.spoke_workspace.ncc_id
   ncc_name              = module.spoke_workspace.ncc_name
+  workspace_id          = module.spoke_workspace.workspace_id
 
   force_destroy = var.catalog_force_destroy
-
-  providers = {
-    databricks.workspace = databricks.spoke
-  }
 }
 # ---------------
 # Firewall rules
