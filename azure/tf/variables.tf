@@ -110,10 +110,11 @@ variable "create_workspace_vnet" {
 
 variable "workspace_vnet" {
   type = object({
-    cidr     = string
-    new_bits = optional(number, null)
+    cidr               = string
+    new_bits           = optional(number, null)
+    encryption_enabled = optional(bool, false)
   })
-  description = "(Optional) Spoke network configuration - required when create_workspace_vnet is true."
+  description = "(Optional) Spoke network configuration - required when create_workspace_vnet is true. encryption_enabled toggles Azure VNET encryption (AllowUnencrypted enforcement) on the spoke VNET; it is force-enabled when workspace_security_compliance.compliance_security_profile_enabled is true."
   default     = null
 
   validation {

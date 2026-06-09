@@ -63,6 +63,8 @@ In various .tf scripts, we have included direct links to the Databricks Terrafor
 allows Databricks customers to exercise more control over your network configures to comply with specific cloud security and governance standards that a
 customer's organization may require.
 
+- **Vnet Encryption**: [Azure VNET encryption](https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-encryption-overview) transparently encrypts traffic between supported VM SKUs on the spoke VNET. Off by default; opt in via `workspace_vnet.encryption_enabled = true`. Force-enabled when `workspace_security_compliance.compliance_security_profile_enabled = true`. The spoke VNET is created with `AllowUnencrypted` enforcement so workloads on SKUs that do not support encryption continue to function.
+
 - **Private Endpoints**: Using Private Link technology, a [private endpoint](https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview) is a service that connects a customer's Vnet
 to Azure services without traversing public IP addresses.
 

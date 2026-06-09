@@ -25,6 +25,7 @@ module "spoke_network" {
   route_table_id           = var.create_hub ? module.hub[0].route_table_id : var.existing_hub_vnet.route_table_id
   ipgroup_id               = var.create_hub ? module.hub[0].ipgroup_id : (var.create_spoke_firewall_rules ? azurerm_ip_group.spoke[0].id : null)
   virtual_network_peerings = var.create_hub ? { hub = { remote_virtual_network_id = module.hub[0].vnet_id } } : { hub = { remote_virtual_network_id = var.existing_hub_vnet.vnet_id } }
+  encryption_enabled       = var.workspace_vnet.encryption_enabled || try(var.workspace_security_compliance.compliance_security_profile_enabled, false) == true
   workspace_subnets = {
     new_bits        = var.workspace_vnet.new_bits
     add_to_ip_group = var.create_hub || var.create_spoke_firewall_rules
