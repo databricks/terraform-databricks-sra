@@ -14,6 +14,7 @@ tags = {
 
 workspace_vnet = {
   cidr = "10.1.0.0/24"
+  # encryption_enabled = true  # Auto-enabled when workspace_security_compliance.compliance_security_profile_enabled = true
 }
 
 # Use existing resource group

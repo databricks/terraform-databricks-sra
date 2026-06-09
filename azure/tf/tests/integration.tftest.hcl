@@ -3,18 +3,20 @@ test {
 }
 
 variables {
-  databricks_host = run.test_initializer.outputs.spoke_workspace_info["workspace_url"]
-  sra_tag         = "SRA Test Suite"
-  catalog_name    = run.test_initializer.outputs.spoke_workspace_catalog
-  open_test_job   = false
+  databricks_host   = run.test_initializer.outputs.spoke_workspace_info["workspace_url"]
+  sra_tag           = "SRA Test Suite"
+  catalog_name      = run.test_initializer.outputs.spoke_workspace_catalog
+  open_test_job     = false
+  auth_profile_name = "tmp-azure-sra-testing"
   environment = {
-    DATABRICKS_HOST          = run.test_initializer.outputs.spoke_workspace_info["workspace_url"]
-    DATABRICKS_BUNDLE_ENGINE = "direct"
-    BUNDLE_VAR_node_type_id  = run.classic_cluster_spoke.node_type_id
-    BUNDLE_VAR_spark_version = run.classic_cluster_spoke.spark_version
-    BUNDLE_VAR_sra_tag       = var.sra_tag
-    BUNDLE_VAR_catalog_name  = var.catalog_name
-    BUNDLE_VAR_cluster_id    = run.classic_cluster_spoke.cluster_id
+    DATABRICKS_HOST           = run.test_initializer.outputs.spoke_workspace_info["workspace_url"]
+    DATABRICKS_BUNDLE_ENGINE  = "direct"
+    DATABRICKS_CONFIG_PROFILE = var.auth_profile_name
+    BUNDLE_VAR_node_type_id   = run.classic_cluster_spoke.node_type_id
+    BUNDLE_VAR_spark_version  = run.classic_cluster_spoke.spark_version
+    BUNDLE_VAR_sra_tag        = var.sra_tag
+    BUNDLE_VAR_catalog_name   = var.catalog_name
+    BUNDLE_VAR_cluster_id     = run.classic_cluster_spoke.cluster_id
   }
 }
 
@@ -24,6 +26,19 @@ run "test_initializer" {
   command   = apply
   module {
     source = "../../common/tests/test_initializer"
+  }
+}
+
+# Create an ephemeral Databricks CLI auth profile for the bundle commands to use
+run "auth_profile" {
+  state_key = "auth_profile"
+  command   = apply
+  module {
+    source = "../../common/tests/auth_profile"
+  }
+  variables {
+    auth_profile_name = var.auth_profile_name
+    host              = "https://${run.test_initializer.outputs.spoke_workspace_info["workspace_url"]}"
   }
 }
 

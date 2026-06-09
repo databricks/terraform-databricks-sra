@@ -82,6 +82,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "encryption_enabled" {
+  type        = bool
+  description = "(Optional) Whether to enable VNET encryption (AllowUnencrypted enforcement) on the spoke virtual network."
+  default     = false
+}
+
 variable "virtual_network_peerings" {
   type = map(object({
     name                      = optional(string, "")

@@ -8,6 +8,7 @@ tags = {
 }
 workspace_vnet = {
   cidr = "10.0.4.0/22"
+  # encryption_enabled = true  # Auto-enabled when workspace_security_compliance.compliance_security_profile_enabled = true
 }
 
 # Network mode: create_workspace_vnet defaults to true for SRA-managed network

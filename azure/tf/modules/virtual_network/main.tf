@@ -40,6 +40,13 @@ resource "azurerm_virtual_network" "this" {
   resource_group_name = var.resource_group_name
   address_space       = [var.vnet_cidr]
 
+  dynamic "encryption" {
+    for_each = var.encryption_enabled ? [1] : []
+    content {
+      enforcement = "AllowUnencrypted"
+    }
+  }
+
   tags = var.tags
 }
 
