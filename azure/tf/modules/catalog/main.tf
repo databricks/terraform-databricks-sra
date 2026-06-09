@@ -19,15 +19,20 @@ resource "databricks_storage_credential" "unity_catalog" {
     access_connector_id = azurerm_databricks_access_connector.unity_catalog.id
   }
 
-  provider = databricks.workspace
+  provider_config {
+    workspace_id = var.workspace_id
+  }
 }
+
 resource "databricks_external_location" "external_location" {
   credential_name = databricks_storage_credential.unity_catalog.name
   name            = azurerm_storage_account.unity_catalog.name
   force_destroy   = var.force_destroy
   url             = local.uc_abfss_url
 
-  provider = databricks.workspace
+  provider_config {
+    workspace_id = var.workspace_id
+  }
 }
 
 resource "databricks_catalog" "catalog" {
@@ -36,7 +41,9 @@ resource "databricks_catalog" "catalog" {
   force_destroy  = var.force_destroy
   isolation_mode = var.catalog_isolation_mode
 
-  provider = databricks.workspace
+  provider_config {
+    workspace_id = var.workspace_id
+  }
 }
 
 resource "databricks_default_namespace_setting" "this" {
@@ -46,5 +53,7 @@ resource "databricks_default_namespace_setting" "this" {
     value = databricks_catalog.catalog.name
   }
 
-  provider = databricks.workspace
+  provider_config {
+    workspace_id = var.workspace_id
+  }
 }

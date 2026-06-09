@@ -6,7 +6,7 @@ terraform {
     }
     databricks = {
       source  = "databricks/databricks"
-      version = "~>1.81"
+      version = "~>1.116"
     }
     azuread = {
       source  = "hashicorp/azuread"
