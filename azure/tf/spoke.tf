@@ -60,32 +60,6 @@ module "spoke_workspace" {
   databricks_account_id    = var.databricks_account_id
 }
 
-#TODO: The below resources are temporary until the unified provider releases. At that time, they will be merged in to
-# the workspace module.
-resource "databricks_disable_legacy_dbfs_setting" "spoke" {
-  disable_legacy_dbfs {
-    value = true
-  }
-
-  provider_config {
-    workspace_id = module.spoke_workspace.workspace_id
-  }
-
-  depends_on = [module.spoke_workspace]
-}
-
-resource "databricks_disable_legacy_access_setting" "spoke" {
-  disable_legacy_access {
-    value = true
-  }
-
-  provider_config {
-    workspace_id = module.spoke_workspace.workspace_id
-  }
-
-  depends_on = [module.spoke_workspace]
-}
-
 
 module "spoke_catalog" {
   source = "./modules/catalog"
