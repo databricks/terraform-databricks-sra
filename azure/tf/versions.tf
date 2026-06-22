@@ -5,8 +5,9 @@ terraform {
       version = "~>4.9"
     }
     databricks = {
-      source  = "databricks/databricks"
-      version = "~>1.116"
+      source = "databricks/databricks"
+      # Version 1.114 released a regression that has yet to be fixed. This pin will be updated when that is fixed.
+      version = "<1.114.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
