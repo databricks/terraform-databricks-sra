@@ -37,19 +37,19 @@ module "hub" {
   resource_group_name      = azurerm_resource_group.hub[0].name
 }
 
-module "webauth_workspace" {
-  source = "./modules/workspace"
+module "serverless_workspace" {
+  source = "./modules/serverless_workspace"
   count  = var.create_hub ? 1 : 0
 
   provisioner_principal_id = data.azurerm_client_config.current.object_id
   databricks_account_id    = var.databricks_account_id
   location                 = var.location
 
-  network_configuration = module.hub[0].network_configuration
-  dns_zone_ids          = module.hub[0].dns_zone_ids
-  resource_group_name   = azurerm_resource_group.hub[0].name
-  resource_suffix       = module.hub[0].resource_suffix
-  tags                  = module.hub[0].tags
+  private_endpoint_subnet_id = module.hub[0].network_configuration.private_endpoint_subnet_id
+  dns_zone_ids               = module.hub[0].dns_zone_ids
+  resource_group_name        = azurerm_resource_group.hub[0].name
+  resource_suffix            = module.hub[0].resource_suffix
+  tags                       = module.hub[0].tags
   name_overrides = {
     "databricks_workspace" = "WEBAUTH_DO_NOT_DELETE_${upper(var.location)}"
   }
@@ -58,46 +58,15 @@ module "webauth_workspace" {
   # Note that these do not allow for supplying var.existing_... variables since the webauth workspace is only created when create_hub is true
   ncc_id            = module.hub[0].ncc_id
   ncc_name          = module.hub[0].ncc_name
-  network_policy_id = module.hub[0].network_policy_id
+  network_policy_id = module.hub[0].hub_network_policy_id
   metastore_id      = module.hub[0].metastore_id
 
-  # KMS Settings
+  # KMS Settings — serverless-only, so managed-disk CMK is not applicable.
   is_kms_enabled          = var.cmk_enabled
-  managed_disk_key_id     = local.cmk_managed_disk_key_id
   managed_services_key_id = local.cmk_managed_services_key_id
   key_vault_id            = local.cmk_keyvault_id
 
   depends_on = [module.hub]
-}
-
-#TODO: The below resources are temporary until the unified provider releases. At that time, they will be merged in to
-# the workspace module.
-resource "databricks_disable_legacy_dbfs_setting" "webauth" {
-  count = var.create_hub ? 1 : 0
-
-  disable_legacy_dbfs {
-    value = true
-  }
-
-  provider_config {
-    workspace_id = module.webauth_workspace[0].workspace_id
-  }
-
-  depends_on = [module.webauth_workspace]
-}
-
-resource "databricks_disable_legacy_access_setting" "webauth" {
-  count = var.create_hub ? 1 : 0
-
-  disable_legacy_access {
-    value = true
-  }
-
-  provider_config {
-    workspace_id = module.webauth_workspace[0].workspace_id
-  }
-
-  depends_on = [module.webauth_workspace]
 }
 
 module "hub_catalog" {
@@ -110,7 +79,7 @@ module "hub_catalog" {
   is_default_namespace = true
 
   # Azure/Network settings
-  dns_zone_ids        = module.webauth_workspace[0].dns_zone_ids
+  dns_zone_ids        = module.serverless_workspace[0].dns_zone_ids
   location            = var.location
   resource_group_name = azurerm_resource_group.hub[0].name
   resource_suffix     = "${local.sat_workspace.resource_suffix}sat"
@@ -122,7 +91,7 @@ module "hub_catalog" {
   metastore_id          = module.hub[0].metastore_id
   ncc_id                = module.hub[0].ncc_id
   ncc_name              = module.hub[0].ncc_name
-  workspace_id          = module.webauth_workspace[0].workspace_id
+  workspace_id          = module.serverless_workspace[0].workspace_id
 
   force_destroy = var.sat_force_destroy
 }

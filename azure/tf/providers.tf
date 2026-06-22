@@ -16,7 +16,7 @@ provider "databricks" {
 # (databricks-industry-solutions/security-analysis-tool).
 provider "databricks" {
   alias = "sat"
-  host  = var.create_hub && length(module.webauth_workspace) > 0 ? module.webauth_workspace[0].workspace_url : "https://placeholder.azuredatabricks.net"
+  host  = var.create_hub && length(module.serverless_workspace) > 0 ? module.serverless_workspace[0].workspace_url : "https://placeholder.azuredatabricks.net"
 }
 
 # These blocks are not required by terraform, but they are here to silence TFLint warnings
