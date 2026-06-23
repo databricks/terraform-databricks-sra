@@ -62,6 +62,12 @@ variable "compliance_standards" {
   nullable    = true
 }
 
+variable "context_based_ingress_ip_acl" {
+  description = "Optional list of IP addresses/CIDRs used to limit access to the workspace based on IPs. Added to the network policy as ingress rules. Leave empty to apply no IP-based ingress restriction."
+  type        = list(string)
+  default     = []
+}
+
 variable "create_service_direct_vpce" {
   description = "Whether to create a Service Direct VPC endpoint for the workspace. Service Direct is a front-end endpoint that can be shared across workspaces in the same VPC, so customers typically reuse one rather than creating per-workspace."
   type        = bool

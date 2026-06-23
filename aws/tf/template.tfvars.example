@@ -51,6 +51,11 @@ sg_egress_ports          = [443, 2443, 5432, 6666, 8443, 8444, 8445, 8446, 8447,
 # Unavailable in GovCloud regions.
 create_service_direct_vpce = false
 
+# Optional list of IP addresses/CIDRs used to limit access to the workspace based on IPs.
+# Added to the network policy as ingress rules. Leave empty ([]) to apply no IP-based ingress restriction.
+# NOTE: Verify that all IPs are correct before enabling this feature to prevent a lockout scenario.
+context_based_ingress_ip_acl = []
+
 # CUSTOM NETWORK CONFIGURATION
 # Uncomment and configure the following variables for custom networking:
 # Required when using network_configure = "custom"
@@ -83,6 +88,7 @@ metastore_exists = false
 
 # Enable the security analysis tool (review configurations + credentials in main.tf and the official SAT documentation prior to enabling)
 # SAT documentation can be found here: https://databricks-industry-solutions.github.io/security-analysis-tool/
+# Enabling this will add pypi.org and files.pythonhosted.org to the network policy egress allow list so SAT can install its dependencies.
 enable_security_analysis_tool = false
 
 # Optional name for the Unity Catalog metastore created by this deployment.
