@@ -65,3 +65,6 @@ gcp/modules/workspace_deployment/fslakehouse-9b0f57986dbf.json
 gcp/modules/service_account/*.json
 **/service_account/*.json
 .cursorignore
+
+# Claude Code personal/local settings
+.claude/settings.local.json
