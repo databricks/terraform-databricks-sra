@@ -62,7 +62,9 @@ variable "hub_resource_suffix" {
 # The below variables control what URLs workspaces can access on the internet. By default, no workspace can access the
 # internet at all. Note that this means that SAT will not work by default unless the required URLs are added (see below)
 #
-# Common package registries: ["python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org", "cran.r-project.org", "*.cran.r-project.org", "r-project.org",]
+# Common package registries: ["python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org", "cran.r-project.org", "*.cran.r-project.org", "r-project.org", ]
+# Scala/Java (Maven Central): ["repo1.maven.org", "*.maven.org", "repo.maven.apache.org", "*.maven.apache.org"]
+#   (add "repos.spark-packages.org" if installing Spark Packages, which Databricks also searches by default)
 # SAT Required URLs (classic): ["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"]
 # SAT Required URLs (serverless): ["management.azure.com", "login.microsoftonline.com", "python.org", "pypi.org", "pythonhosted.org"]
 # Note: This also applies to classic compute in the WEBAUTH workspace
