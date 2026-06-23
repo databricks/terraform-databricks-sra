@@ -282,6 +282,12 @@ variable "sat_force_destroy" {
   description = "Used to allow Terraform to force destroy the SAT catalog. This is only used for testing SRA."
 }
 
+variable "metastore_force_destroy" {
+  type        = bool
+  default     = false
+  description = "Used to allow Terraform to force destroy the metastore. This is only used for testing SRA."
+}
+
 variable "catalog_force_destroy" {
   type        = bool
   default     = false

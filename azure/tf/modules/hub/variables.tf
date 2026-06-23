@@ -86,3 +86,9 @@ variable "virtual_network_peerings" {
   description = "(Optional) Map of virtual network peers to create from hub to spokes"
   default     = {}
 }
+
+variable "force_destroy" {
+  type        = bool
+  description = "(Optional) Run a force destroy on the metastore if it is not empty. ONLY WORKS IF SET WHEN METASTORE IS CREATED"
+  default     = false
+}
