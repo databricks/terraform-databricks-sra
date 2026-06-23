@@ -56,23 +56,23 @@ output "vnet_id" {
 
 output "public_subnet_network_security_group_association_id" {
   description = "ID of the public subnet network security group association"
-  value       = azurerm_subnet_network_security_group_association.workspace_subnets["host"].id
+  value       = try(azurerm_subnet_network_security_group_association.workspace_subnets["host"].id, null)
 }
 
 output "private_subnet_network_security_group_association_id" {
   description = "ID of the private subnet network security group association"
-  value       = azurerm_subnet_network_security_group_association.workspace_subnets["container"].id
+  value       = try(azurerm_subnet_network_security_group_association.workspace_subnets["container"].id, null)
 }
 
 output "network_configuration" {
   description = "Network configuration for use with the workspace module"
   value = {
     virtual_network_id                                   = azurerm_virtual_network.this.id
-    private_subnet_id                                    = azurerm_subnet.workspace_subnets["container"].id
-    public_subnet_id                                     = azurerm_subnet.workspace_subnets["host"].id
+    private_subnet_id                                    = try(azurerm_subnet.workspace_subnets["container"].id, null)
+    public_subnet_id                                     = try(azurerm_subnet.workspace_subnets["host"].id, null)
     private_endpoint_subnet_id                           = azurerm_subnet.privatelink.id
-    private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.workspace_subnets["container"].id
-    public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.workspace_subnets["host"].id
+    private_subnet_network_security_group_association_id = try(azurerm_subnet_network_security_group_association.workspace_subnets["container"].id, null)
+    public_subnet_network_security_group_association_id  = try(azurerm_subnet_network_security_group_association.workspace_subnets["host"].id, null)
   }
 }
 

@@ -20,6 +20,12 @@ module "hub_network" {
 
   virtual_network_peerings = var.virtual_network_peerings
 
+  # The hub workspace (WEBAUTH) is serverless-only and does not require subnets
+  workspace_subnets = {
+    create          = false
+    add_to_ip_group = false
+  }
+
   extra_subnets = {
     AzureFirewallSubnet = {
       name     = "AzureFirewallSubnet"

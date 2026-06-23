@@ -1,6 +1,6 @@
 # Define subnets using cidrsubnet function
 locals {
-  workspace_subnets = toset(["container", "host"])
+  workspace_subnets = var.workspace_subnets.create ? toset(["container", "host"]) : toset([])
   subnets = concat(
     var.workspace_subnets.create ? [
       for subnet in local.workspace_subnets :
