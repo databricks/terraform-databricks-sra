@@ -35,6 +35,7 @@ module "hub" {
   is_unity_catalog_enabled = true
   tags                     = var.tags
   resource_group_name      = azurerm_resource_group.hub[0].name
+  force_destroy            = var.metastore_force_destroy
 }
 
 module "serverless_workspace" {

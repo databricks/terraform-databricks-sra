@@ -5,7 +5,7 @@ resource "databricks_metastore" "this" {
   name = "uc-metastore-${var.resource_suffix}"
   # owner         = "uc admins"
   region        = var.location
-  force_destroy = true
+  force_destroy = var.force_destroy
 }
 
 resource "databricks_group" "this" {
