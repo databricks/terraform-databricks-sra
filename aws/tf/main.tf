@@ -32,8 +32,10 @@ module "network_policy" {
     databricks = databricks.mws
   }
 
-  databricks_account_id = var.databricks_account_id
-  resource_prefix       = var.resource_prefix
+  context_based_ingress_ip_acl  = var.context_based_ingress_ip_acl
+  databricks_account_id         = var.databricks_account_id
+  enable_security_analysis_tool = var.enable_security_analysis_tool
+  resource_prefix               = var.resource_prefix
 }
 
 # Create Databricks Workspace
