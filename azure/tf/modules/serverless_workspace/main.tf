@@ -113,23 +113,3 @@ resource "databricks_workspace_network_option" "this" {
   network_policy_id = var.network_policy_id
   workspace_id      = azapi_resource.this.output.properties.workspaceId
 }
-
-resource "databricks_disable_legacy_dbfs_setting" "this" {
-  disable_legacy_dbfs {
-    value = true
-  }
-
-  provider_config {
-    workspace_id = azapi_resource.this.output.properties.workspaceId
-  }
-}
-
-resource "databricks_disable_legacy_access_setting" "this" {
-  disable_legacy_access {
-    value = true
-  }
-
-  provider_config {
-    workspace_id = azapi_resource.this.output.properties.workspaceId
-  }
-}
