@@ -33,6 +33,10 @@ resource "databricks_external_location" "external_location" {
   provider_config {
     workspace_id = var.workspace_id
   }
+
+  lifecycle {
+    ignore_changes = [effective_file_event_queue]
+  }
 }
 
 resource "databricks_catalog" "catalog" {
