@@ -135,16 +135,6 @@ resource "databricks_workspace_network_option" "this" {
   workspace_id      = azurerm_databricks_workspace.this.workspace_id
 }
 
-resource "databricks_disable_legacy_dbfs_setting" "this" {
-  disable_legacy_dbfs {
-    value = true
-  }
-
-  provider_config {
-    workspace_id = azurerm_databricks_workspace.this.workspace_id
-  }
-}
-
 resource "databricks_disable_legacy_access_setting" "this" {
   disable_legacy_access {
     value = true
