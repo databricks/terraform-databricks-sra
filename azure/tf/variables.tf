@@ -52,6 +52,10 @@ variable "hub_resource_suffix" {
     condition     = var.create_hub ? length(var.hub_resource_suffix) > 0 : true
     error_message = "hub_resource_suffix is required if create_hub is true"
   }
+  validation {
+    condition     = !strcontains(var.hub_resource_suffix, "-")
+    error_message = "hub_resource_suffix cannot contain dashes (-)."
+  }
 }
 
 # ------------------------------------------------------------------
