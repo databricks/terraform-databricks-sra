@@ -43,7 +43,6 @@ module "serverless_workspace" {
   count  = var.create_hub ? 1 : 0
 
   provisioner_principal_id = data.azurerm_client_config.current.object_id
-  databricks_account_id    = var.databricks_account_id
   location                 = var.location
 
   private_endpoint_subnet_id = module.hub[0].network_configuration.private_endpoint_subnet_id
@@ -58,14 +57,12 @@ module "serverless_workspace" {
   # Account level settings
   # Note that these do not allow for supplying var.existing_... variables since the webauth workspace is only created when create_hub is true
   ncc_id            = module.hub[0].ncc_id
-  ncc_name          = module.hub[0].ncc_name
   network_policy_id = module.hub[0].hub_network_policy_id
   metastore_id      = module.hub[0].metastore_id
 
   # KMS Settings — serverless-only, so managed-disk CMK is not applicable.
   is_kms_enabled          = var.cmk_enabled
   managed_services_key_id = local.cmk_managed_services_key_id
-  key_vault_id            = local.cmk_keyvault_id
 
   depends_on = [module.hub]
 }
