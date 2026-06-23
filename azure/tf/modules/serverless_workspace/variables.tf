@@ -45,11 +45,6 @@ variable "provisioner_principal_id" {
   description = "Principal ID of the user/SP running this terraform; granted Contributor on the workspace"
 }
 
-variable "databricks_account_id" {
-  type        = string
-  description = "Databricks account ID"
-}
-
 variable "metastore_id" {
   type        = string
   description = "(Required) The ID of the metastore to associate with the Databricks workspace"
@@ -58,11 +53,6 @@ variable "metastore_id" {
 variable "ncc_id" {
   type        = string
   description = "ID of the NCC to bind to this workspace (serverless egress)"
-}
-
-variable "ncc_name" {
-  type        = string
-  description = "Name of the NCC bound to this workspace"
 }
 
 variable "network_policy_id" {
@@ -74,12 +64,6 @@ variable "is_kms_enabled" {
   type        = bool
   description = "(Optional) Enable customer-managed key encryption for the managed services key. Managed disk CMK is not applicable to a serverless-only workspace."
   default     = false
-}
-
-variable "key_vault_id" {
-  type        = string
-  description = "(Optional) ID of the Azure Key Vault containing the managed services CMK. Required when is_kms_enabled is true."
-  default     = null
 }
 
 variable "managed_services_key_id" {
