@@ -23,6 +23,18 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
         {
           destination               = "files.pythonhosted.org"
           internet_destination_type = "DNS_NAME"
+        },
+        {
+          destination               = "release-assets.githubusercontent.com"
+          internet_destination_type = "DNS_NAME"
+        },
+        {
+          destination               = "github.com"
+          internet_destination_type = "DNS_NAME"
+        },
+        {
+          destination               = "raw.githubusercontent.com"
+          internet_destination_type = "DNS_NAME"
         }
       ] : []
     }
