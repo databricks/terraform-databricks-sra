@@ -6,6 +6,7 @@ locals {
 
 resource "aws_kms_key" "workspace_storage" {
   description = "KMS key for databricks workspace storage"
+  enable_key_rotation = true
   policy = jsonencode({
     Version : "2012-10-17",
     "Id" : "key-policy-workspace-storage",
@@ -78,6 +79,7 @@ resource "aws_kms_alias" "workspace_storage_key_alias" {
 
 resource "aws_kms_key" "managed_services" {
   description = "KMS key for managed services"
+  enable_key_rotation = true
   policy = jsonencode({ Version : "2012-10-17",
     "Id" : "key-policy-managed-services",
     Statement : [
