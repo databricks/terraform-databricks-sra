@@ -1,11 +1,16 @@
 # EXPLANATION: The customer-managed keys for workspace and managed services
 
 locals {
-  cmk_admin_value = var.cmk_admin_arn == null ? "arn:${local.computed_aws_partition}:iam::${var.aws_account_id}:root" : var.cmk_admin_arn
+  # Null when no CMK admin ARN or AWS account is provided (serverless-only deployments); every consumer
+  # of this local is skipped in that mode.
+  cmk_admin_value = var.cmk_admin_arn != null ? var.cmk_admin_arn : (
+    var.aws_account_id != null ? "arn:${local.computed_aws_partition}:iam::${var.aws_account_id}:root" : null
+  )
 }
 
 resource "aws_kms_key" "workspace_storage" {
-  description = "KMS key for databricks workspace storage"
+  count               = local.is_serverless ? 0 : 1
+  description         = "KMS key for databricks workspace storage"
   enable_key_rotation = true
   policy = jsonencode({
     Version : "2012-10-17",
@@ -44,7 +49,7 @@ resource "aws_kms_key" "workspace_storage" {
         "Sid" : "Allow Databricks to use KMS key for EBS",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : aws_iam_role.cross_account_role.arn
+          "AWS" : aws_iam_role.cross_account_role[0].arn
         },
         "Action" : [
           "kms:Decrypt",
@@ -71,14 +76,16 @@ resource "aws_kms_key" "workspace_storage" {
 
 
 resource "aws_kms_alias" "workspace_storage_key_alias" {
+  count         = local.is_serverless ? 0 : 1
   name          = "alias/${var.resource_prefix}-workspace-storage-key"
-  target_key_id = aws_kms_key.workspace_storage.id
+  target_key_id = aws_kms_key.workspace_storage[0].id
 }
 
 # CMK for Managed Services
 
 resource "aws_kms_key" "managed_services" {
-  description = "KMS key for managed services"
+  count               = local.is_serverless ? 0 : 1
+  description         = "KMS key for managed services"
   enable_key_rotation = true
   policy = jsonencode({ Version : "2012-10-17",
     "Id" : "key-policy-managed-services",
@@ -120,6 +127,27 @@ resource "aws_kms_key" "managed_services" {
 }
 
 resource "aws_kms_alias" "managed_services_key_alias" {
+  count         = local.is_serverless ? 0 : 1
   name          = "alias/${var.resource_prefix}-managed-services-key"
-  target_key_id = aws_kms_key.managed_services.key_id
+  target_key_id = aws_kms_key.managed_services[0].key_id
+}
+# Preserve state across count addition for the serverless workspace variant
+moved {
+  from = aws_kms_key.workspace_storage
+  to   = aws_kms_key.workspace_storage[0]
+}
+
+moved {
+  from = aws_kms_alias.workspace_storage_key_alias
+  to   = aws_kms_alias.workspace_storage_key_alias[0]
+}
+
+moved {
+  from = aws_kms_key.managed_services
+  to   = aws_kms_key.managed_services[0]
+}
+
+moved {
+  from = aws_kms_alias.managed_services_key_alias
+  to   = aws_kms_alias.managed_services_key_alias[0]
 }

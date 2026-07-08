@@ -3,38 +3,37 @@
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# AWS Variables
-# -----------------------------------------------------------------------------
-
-# AWS account ID where resources will be deployed
-aws_account_id = ""
-
-# AWS region for deployment
-region = ""
-
-# -----------------------------------------------------------------------------
-# Databricks Variables
+# Required Variables (all compute modes)
 # -----------------------------------------------------------------------------
 
 # Admin user email for workspace and catalog management
 admin_user = ""
 
+# Workspace compute mode: "HYBRID" (classic + serverless compute with a customer-managed VPC) or
+# "SERVERLESS" (serverless-only workspace). With "SERVERLESS", no AWS resources are created and no AWS
+# account or credentials are required: the customer VPC, PrivateLink endpoints, cross-account role,
+# root S3 bucket, workspace CMKs, workspace catalog storage, and S3 audit log delivery are all skipped
+# (the Hybrid Compute Mode variables below are ignored). The network policy, network connectivity
+# configuration, and Unity Catalog metastore resources still apply; the workspace uses the auto-created
+# workspace catalog on Databricks default storage, and audit events are available via system tables.
+# NOTE: "SERVERLESS" is not available in GovCloud regions.
+compute_mode = "HYBRID"
+
 # Databricks account ID
 databricks_account_id = ""
 
-# -----------------------------------------------------------------------------
-# Resource Configuration
-# -----------------------------------------------------------------------------
+# AWS region for deployment
+region = ""
 
 # Prefix used for naming and tagging resources (e.g., S3 buckets, IAM roles)
 resource_prefix = ""
 
-# Optional human-readable name shown in the Databricks UI. Defaults to resource_prefix if unset.
-# workspace_display_name = ""
+# -----------------------------------------------------------------------------
+# Hybrid Compute Mode (required when compute_mode = "HYBRID", ignored for "SERVERLESS")
+# -----------------------------------------------------------------------------
 
-# -----------------------------------------------------------------------------
-# Network Configuration
-# -----------------------------------------------------------------------------
+# AWS account ID where resources will be deployed
+aws_account_id = ""
 
 # Network type: "custom" or "isolated" (see README.md for more information)
 network_configuration = "isolated"
@@ -50,11 +49,6 @@ sg_egress_ports          = [443, 2443, 5432, 6666, 8443, 8444, 8445, 8446, 8447,
 # Set to true only if you want SRA to create a new Service Direct VPC endpoint for this workspace.
 # Unavailable in GovCloud regions.
 create_service_direct_vpce = false
-
-# Optional list of IP addresses/CIDRs used to limit access to the workspace based on IPs.
-# Added to the network policy as ingress rules. Leave empty ([]) to apply no IP-based ingress restriction.
-# NOTE: Verify that all IPs are correct before enabling this feature to prevent a lockout scenario.
-context_based_ingress_ip_acl = []
 
 # CUSTOM NETWORK CONFIGURATION
 # Uncomment and configure the following variables for custom networking:
@@ -83,17 +77,38 @@ context_based_ingress_ip_acl = []
 # If audit log delivery is already configured
 audit_log_delivery_exists = false
 
-# If a regional metastore exists
-metastore_exists = false
+# Disable legacy features (e.g. Hive Metastore, DBFS, no-isolation shared clusters) for newly created workspaces at the account level.
+# NOTE: This affects ALL new workspaces created in the Databricks account, not just this deployment.
+# Legacy settings on this deployment's workspace are always disabled, regardless of this flag.
+disable_legacy_features_at_account_level = false
+
+# Automatic Cluster Update Setting
+# https://docs.databricks.com/aws/en/admin/clusters/automatic-cluster-update
+# NOTE: Automatic cluster update is automatically enabled when the compliance security profile is enabled.
+enable_automatic_cluster_update = false
+
+# Compliance Security Profile Setting
+# Standards: https://docs.databricks.com/aws/en/security/privacy/security-profile#compliance-security-profile-overview
+# NOTE: If you add HIPAA, it is your responsibility before you process PHI data to have a BAA agreement with Databricks.
+enable_compliance_security_profile = false
+
+# Companion to enable_compliance_security_profile: necessary if and only if you do not set default
+# compliance settings at the account level.
+# Available compliance standards found here: https://pkg.go.dev/github.com/databricks/databricks-sdk-go/service/settings#ComplianceStandard
+compliance_standards = ["Standard_A", "Standard_B"]
+
+# Enhanced Security Monitoring Setting
+# https://docs.databricks.com/aws/en/security/privacy/enhanced-security-monitoring
+# NOTE: Enhanced security monitoring is automatically enabled when the compliance security profile is enabled.
+enable_enhanced_security_monitoring = false
 
 # Enable the security analysis tool (review configurations + credentials in main.tf and the official SAT documentation prior to enabling)
 # SAT documentation can be found here: https://databricks-industry-solutions.github.io/security-analysis-tool/
 # Enabling this will add pypi.org and files.pythonhosted.org to the network policy egress allow list so SAT can install its dependencies.
 enable_security_analysis_tool = false
 
-# Optional name for the Unity Catalog metastore created by this deployment.
-# If left blank, defaults to "${var.region}-unity-catalog".
-# custom_metastore_name = ""
+# If a regional metastore exists
+metastore_exists = false
 
 # -----------------------------------------------------------------------------
 # Optional Configuration
@@ -102,17 +117,35 @@ enable_security_analysis_tool = false
 # CMK Admin ARN (required for non-root account CMK usage)
 # cmk_admin_arn = ""
 
-# Compliance Security Profile Setting
-# Standards: https://docs.databricks.com/aws/en/security/privacy/security-profile#compliance-security-profile-overview
-# NOTE: If you add HIPAA, it is your responsibility before you process PHI data to have a BAA agreement with Databricks.
-enable_compliance_security_profile = false
+# Optional list of IP addresses/CIDRs used to limit access to the workspace based on IPs.
+# Added to the network policy as ingress rules. Leave empty ([]) to apply no IP-based ingress restriction.
+# NOTE: Verify that all IPs are correct before enabling this feature to prevent a lockout scenario.
+context_based_ingress_ip_acl = []
 
-# NOTE: This variable is necessary if and only if you do not set default compliance settings at the account level.
-# Available compliance standards found here: https://pkg.go.dev/github.com/databricks/databricks-sdk-go/service/settings#ComplianceStandard
-compliance_standards = [ "Standard_A", "Standard_B" ]
-
-# Deployment name for the workspace (must be enabled by Databricks representative)
-deployment_name = null
+# Optional name for the Unity Catalog metastore created by this deployment.
+# If left blank, defaults to "${var.region}-unity-catalog".
+# custom_metastore_name = ""
 
 # If deploying to govcloud, is deployment "civilian" or "dod" shard
 databricks_gov_shard = null
+
+# Deployment name for the workspace (the customer-prefix must be enabled by a Databricks representative).
+# This becomes part of the workspace's subdomain in a custom FQDN: customer-prefix-<deployment_name>.cloud.databricks.<tld>
+# If left null, the workspace gets an auto-generated FQDN that looks like dbc-<random-id>.cloud.databricks.<tld>
+deployment_name = null
+
+# Optional private endpoint rules for serverless egress to your AWS resources over PrivateLink.
+# Each rule targets either a VPC endpoint service (endpoint_service + optional domain_names for private DNS)
+# or AWS resources such as S3 buckets (resource_names). Leave empty ([]) to create no rules.
+# NOTE: Rules targeting your own VPC endpoint service must be accepted on the endpoint service side before they become established.
+# https://docs.databricks.com/aws/en/security/network/serverless-network-security/pl-to-internal-network
+serverless_private_endpoint_rules = []
+# serverless_private_endpoint_rules = [
+#   {
+#     endpoint_service = "com.amazonaws.vpce.us-east-1.vpce-svc-xxxxxxxxxxxxxxxxx"
+#     domain_names     = ["mydb.example.internal"]
+#   },
+# ]
+
+# Optional human-readable name shown in the Databricks UI. Defaults to resource_prefix if unset.
+# workspace_display_name = ""

@@ -1,6 +1,14 @@
 locals {
-  warehouse_id   = var.warehouse_id == "" ? databricks_sql_endpoint.this[0].id : data.databricks_sql_warehouse.this[0].id
-  data_source_id = var.warehouse_id == "" ? databricks_sql_endpoint.this[0].data_source_id : data.databricks_sql_warehouse.this[0].data_source_id
+  # Maps the comparison operators in queries_and_alerts.json to the databricks_alert condition enum.
+  alert_op_map = {
+    "!=" = "NOT_EQUAL"
+    "<"  = "LESS_THAN"
+    "<=" = "LESS_THAN_OR_EQUAL"
+    "==" = "EQUAL"
+    ">"  = "GREATER_THAN"
+    ">=" = "GREATER_THAN_OR_EQUAL"
+  }
+  warehouse_id = var.warehouse_id == "" ? databricks_sql_endpoint.this[0].id : data.databricks_sql_warehouse.this[0].id
 }
 
 resource "databricks_sql_endpoint" "this" {
@@ -17,32 +25,39 @@ data "databricks_sql_warehouse" "this" {
   id    = var.warehouse_id
 }
 
-resource "databricks_sql_query" "query" {
-  for_each       = local.queries
-  data_source_id = local.data_source_id
-  name           = local.data_map[each.value].name
-  query          = local.data_map[each.value].query
-  description    = local.data_map[each.value].description
-  parent         = "folders/${databricks_directory.this[local.data_map[each.value].parent].object_id}"
+resource "databricks_query" "query" {
+  for_each     = local.queries
+  warehouse_id = local.warehouse_id
+  display_name = local.data_map[each.value].name
+  query_text   = local.data_map[each.value].query
+  description  = local.data_map[each.value].description
+  parent_path  = trimsuffix(databricks_directory.this[local.data_map[each.value].parent].path, "/")
 
   tags = [
     "system-tables",
   ]
 }
 
-resource "databricks_sql_alert" "alert" {
-  for_each = local.alerts
-  query_id = databricks_sql_query.query[each.value].id
-  name     = local.data_map[each.value].alert.name
-  parent   = "folders/${databricks_directory.this[local.data_map[each.value].alert.parent].object_id}"
-  rearm    = local.data_map[each.value].alert.rearm
+resource "databricks_alert" "alert" {
+  for_each             = local.alerts
+  query_id             = databricks_query.query[each.value].id
+  display_name         = local.data_map[each.value].alert.name
+  parent_path          = trimsuffix(databricks_directory.this[local.data_map[each.value].alert.parent].path, "/")
+  seconds_to_retrigger = local.data_map[each.value].alert.rearm
+  custom_body          = local.data_map[each.value].alert.options.custom_body
+  custom_subject       = local.data_map[each.value].alert.options.custom_subject
 
-  options {
-    column         = local.data_map[each.value].alert.options.column
-    op             = local.data_map[each.value].alert.options.op
-    value          = local.data_map[each.value].alert.options.value
-    muted          = local.data_map[each.value].alert.options.muted
-    custom_body    = local.data_map[each.value].alert.options.custom_body
-    custom_subject = local.data_map[each.value].alert.options.custom_subject
+  condition {
+    op = local.alert_op_map[local.data_map[each.value].alert.options.op]
+    operand {
+      column {
+        name = local.data_map[each.value].alert.options.column
+      }
+    }
+    threshold {
+      value {
+        double_value = tonumber(local.data_map[each.value].alert.options.value)
+      }
+    }
   }
 }

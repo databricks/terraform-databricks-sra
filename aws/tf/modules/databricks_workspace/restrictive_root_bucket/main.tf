@@ -1,12 +1,5 @@
 # EXPLANATION: Creates a restrictive root bucket policy
 
-locals {
-  # Compute the correct Databricks account ID based on GovCloud shard
-  databricks_aws_account_id = var.databricks_gov_shard == "civilian" ? "044793339203" : (
-    var.databricks_gov_shard == "dod" ? "170661010020" : "414351767826"
-  )
-}
-
 # Restrictive Bucket Policy
 resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
   bucket = var.root_s3_bucket
@@ -17,7 +10,7 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
         Sid    = "Grant Databricks Read Access",
         Effect = "Allow",
         Principal = {
-          AWS = "arn:${var.aws_partition}:iam::${local.databricks_aws_account_id}:root"
+          AWS = "arn:${var.aws_partition}:iam::${var.databricks_aws_account_id}:root"
         },
         Action = [
           "s3:GetObject",
@@ -39,7 +32,7 @@ resource "aws_s3_bucket_policy" "databricks_bucket_restrictive_policy" {
         Sid    = "Grant Databricks Write Access",
         Effect = "Allow",
         Principal = {
-          AWS = "arn:${var.aws_partition}:iam::${local.databricks_aws_account_id}:root"
+          AWS = "arn:${var.aws_partition}:iam::${var.databricks_aws_account_id}:root"
         },
         Action = [
           "s3:PutObject",

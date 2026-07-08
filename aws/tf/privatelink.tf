@@ -1,7 +1,7 @@
 # Security group for privatelink - skipped in custom operation mode
 
 resource "aws_security_group" "privatelink" {
-  count  = var.network_configuration != "custom" ? 1 : 0
+  count  = var.network_configuration != "custom" && !local.is_serverless ? 1 : 0
   name   = "${var.resource_prefix}-privatelink-sg"
   vpc_id = module.vpc[0].vpc_id
 
@@ -74,7 +74,7 @@ resource "aws_security_group" "privatelink" {
 
 # Restrictive S3 endpoint policy:
 data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
-  count = var.network_configuration != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" && !local.is_serverless ? 1 : 0
 
   statement {
     sid    = "Grant access to Workspace Root Bucket"
@@ -251,7 +251,7 @@ data "aws_iam_policy_document" "s3_vpc_endpoint_policy" {
 
 # Restrictive STS endpoint policy:
 data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
-  count = var.network_configuration != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" && !local.is_serverless ? 1 : 0
 
   statement {
     actions = [
@@ -291,7 +291,7 @@ data "aws_iam_policy_document" "sts_vpc_endpoint_policy" {
 
 # Restrictive Kinesis endpoint policy:
 data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
-  count = var.network_configuration != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" && !local.is_serverless ? 1 : 0
   statement {
     actions = [
       "kinesis:PutRecord",
@@ -310,7 +310,7 @@ data "aws_iam_policy_document" "kinesis_vpc_endpoint_policy" {
 
 # VPC endpoint creation - Skipped in custom operation mode
 module "vpc_endpoints" {
-  count = var.network_configuration != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" && !local.is_serverless ? 1 : 0
 
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
   version = "3.11.0"
@@ -365,7 +365,7 @@ moved {
 
 # Databricks REST endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "general_access" {
-  count = var.network_configuration != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" && !local.is_serverless ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
   service_name        = var.databricks_gov_shard == "dod" ? var.general_access_config[var.region].secondary_endpoint : var.general_access_config[var.region].primary_endpoint
@@ -381,7 +381,7 @@ resource "aws_vpc_endpoint" "general_access" {
 
 # Databricks SCC endpoint - skipped in custom operation mode
 resource "aws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
-  count = var.network_configuration != "custom" ? 1 : 0
+  count = var.network_configuration != "custom" && !local.is_serverless ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
   service_name        = var.databricks_gov_shard == "dod" ? var.scc_relay_config[var.region].secondary_endpoint : var.scc_relay_config[var.region].primary_endpoint
@@ -397,12 +397,12 @@ resource "aws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
 
 # Look up AZ IDs for intra subnets to filter for service-direct limited AZ regions
 data "aws_subnet" "intra" {
-  count = var.network_configuration != "custom" ? length(module.vpc[0].intra_subnets) : 0
+  count = var.network_configuration != "custom" && !local.is_serverless ? length(module.vpc[0].intra_subnets) : 0
   id    = module.vpc[0].intra_subnets[count.index]
 }
 
 locals {
-  service_direct_subnets = var.network_configuration != "custom" && contains(keys(var.service_direct_config), var.region) ? (
+  service_direct_subnets = var.network_configuration != "custom" && !local.is_serverless && contains(keys(var.service_direct_config), var.region) ? (
     contains(keys(var.service_direct_limited_az_regions), var.region) ? [
       for s in data.aws_subnet.intra : s.id
       if contains(var.service_direct_limited_az_regions[var.region], s.availability_zone_id)
@@ -412,7 +412,7 @@ locals {
 
 # Databricks Service Direct endpoint - opt-in via var.create_service_direct_vpce, skipped in custom operation mode and unavailable in GovCloud
 resource "aws_vpc_endpoint" "service_direct" {
-  count = var.create_service_direct_vpce && var.network_configuration != "custom" && contains(keys(var.service_direct_config), var.region) ? 1 : 0
+  count = var.create_service_direct_vpce && var.network_configuration != "custom" && !local.is_serverless && contains(keys(var.service_direct_config), var.region) ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
   service_name        = var.service_direct_config[var.region].primary_endpoint

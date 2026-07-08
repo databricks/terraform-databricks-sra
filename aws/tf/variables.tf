@@ -1,6 +1,11 @@
 variable "admin_user" {
   description = "Email of the admin user for the workspace and workspace catalog."
   type        = string
+
+  validation {
+    condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", var.admin_user))
+    error_message = "admin_user must be a valid email address."
+  }
 }
 
 variable "artifact_storage_bucket" {
@@ -34,9 +39,10 @@ variable "audit_log_delivery_exists" {
 }
 
 variable "aws_account_id" {
-  description = "ID of the AWS account."
+  description = "ID of the AWS account. Not required when compute_mode is SERVERLESS, which creates no AWS resources."
   type        = string
   sensitive   = true
+  default     = null
 }
 
 variable "aws_partition" {
@@ -60,6 +66,22 @@ variable "compliance_standards" {
   description = "List of compliance standards."
   type        = list(string)
   nullable    = true
+
+  validation {
+    condition     = alltrue([for standard in coalesce(var.compliance_standards, []) : can(regex("^[A-Z0-9_]+$", standard))])
+    error_message = "compliance_standards entries must be uppercase standard identifiers such as HIPAA or PCI_DSS. Valid values: https://pkg.go.dev/github.com/databricks/databricks-sdk-go/service/settings#ComplianceStandard"
+  }
+}
+
+variable "compute_mode" {
+  description = "Workspace compute mode. HYBRID deploys the classic customer-managed VPC workspace with serverless available alongside. SERVERLESS deploys a serverless-only workspace: the customer VPC, PrivateLink endpoints, cross-account role, root S3 bucket, and workspace CMKs are skipped; the network policy, network connectivity configuration, and Unity Catalog resources still apply."
+  type        = string
+  default     = "HYBRID"
+
+  validation {
+    condition     = contains(["HYBRID", "SERVERLESS"], var.compute_mode)
+    error_message = "Valid values for var: compute_mode are (HYBRID, SERVERLESS)."
+  }
 }
 
 variable "context_based_ingress_ip_acl" {
@@ -170,8 +192,29 @@ variable "deployment_name" {
   nullable    = true
 }
 
+variable "disable_legacy_features_at_account_level" {
+  description = "Flag to disable legacy features (e.g. Hive Metastore, DBFS, no-isolation shared clusters) for newly created workspaces at the account level. Affects all new workspaces in the Databricks account, not just this deployment."
+  type        = bool
+  sensitive   = true
+  default     = false
+}
+
+variable "enable_automatic_cluster_update" {
+  description = "Flag to enable automatic cluster update. Automatically enabled when the compliance security profile is enabled."
+  type        = bool
+  sensitive   = true
+  default     = false
+}
+
 variable "enable_compliance_security_profile" {
   description = "Flag to enable the compliance security profile."
+  type        = bool
+  sensitive   = true
+  default     = false
+}
+
+variable "enable_enhanced_security_monitoring" {
+  description = "Flag to enable enhanced security monitoring. Automatically enabled when the compliance security profile is enabled."
   type        = bool
   sensitive   = true
   default     = false
@@ -366,6 +409,10 @@ variable "region" {
   description = "AWS region code. (e.g. us-east-1)"
   type        = string
   validation {
+    condition     = var.region != "us-gov-east-1"
+    error_message = "us-gov-east-1 is not supported. Databricks on AWS GovCloud is only available in us-gov-west-1."
+  }
+  validation {
     condition     = contains(["ap-northeast-1", "ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-southeast-3", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "eu-west-3", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2", "us-gov-west-1"], var.region)
     error_message = "Valid values for var: region are (ap-northeast-1, ap-northeast-2, ap-south-1, ap-southeast-1, ap-southeast-2, ap-southeast-3, ca-central-1, eu-central-1, eu-west-1, eu-west-2, eu-west-3, sa-east-1, us-east-1, us-east-2, us-west-1, us-west-2, us-gov-west-1)."
   }
@@ -451,7 +498,7 @@ variable "resource_prefix" {
 
   validation {
     condition     = can(regex("^[a-z0-9-]{1,26}$", var.resource_prefix))
-    error_message = "Invalid resource prefix. Allowed 40 characters containing only a-z, 0-9, -"
+    error_message = "Invalid resource prefix. Allowed 1-26 characters containing only a-z, 0-9, -"
   }
 }
 
@@ -527,6 +574,16 @@ variable "scc_relay_config" {
       region_type        = "govcloud"
     }
   }
+}
+
+variable "serverless_private_endpoint_rules" {
+  description = "Optional private endpoint rules for serverless egress to customer AWS resources over PrivateLink, added to the network connectivity configuration. Each rule targets either a VPC endpoint service (endpoint_service, with optional domain_names for private DNS) or AWS resources such as S3 buckets (resource_names). Rules targeting your own VPC endpoint service must be accepted on the endpoint service side before they become established."
+  type = list(object({
+    domain_names     = optional(list(string))
+    endpoint_service = optional(string)
+    resource_names   = optional(list(string))
+  }))
+  default = []
 }
 
 # Service Direct PrivateLink Endpoint configuration
@@ -741,6 +798,10 @@ locals {
   computed_aws_partition = var.aws_partition != null ? var.aws_partition : (
     var.region == "us-gov-west-1" ? "aws-us-gov" : "aws"
   )
+
+  # Serverless-only workspaces skip the customer-managed VPC, PrivateLink endpoints,
+  # cross-account role, root S3 bucket, and workspace CMKs
+  is_serverless = var.compute_mode == "SERVERLESS"
 
   # Computed Databricks provider host based on GovCloud shard
   computed_databricks_provider_host = var.databricks_provider_host != null ? var.databricks_provider_host : (

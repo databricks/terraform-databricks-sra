@@ -1,18 +1,17 @@
-variable "databricks_account_id" {
-  type        = string
-  description = "ID of the Databricks account."
-}
-
 variable "aws_partition" {
   type        = string
   description = "AWS partition to use for ARNs and policies"
   default     = "aws"
 }
 
-variable "databricks_gov_shard" {
+variable "databricks_account_id" {
   type        = string
-  description = "Databricks GovCloud shard type (civilian or dod). Only applicable for us-gov-west-1 region."
-  default     = null
+  description = "ID of the Databricks account."
+}
+
+variable "databricks_aws_account_id" {
+  type        = string
+  description = "AWS account ID of the Databricks control plane for the target shard (commercial or GovCloud)."
 }
 
 variable "region_name" {

@@ -9,7 +9,7 @@ resource "databricks_job" "this" {
       sql_task {
         warehouse_id = local.warehouse_id
         alert {
-          alert_id = databricks_sql_alert.alert[task.value].id
+          alert_id = databricks_alert.alert[task.value].id
 
           dynamic "subscriptions" {
             for_each = var.alert_emails
