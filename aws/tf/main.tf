@@ -95,6 +95,14 @@ module "databricks_mws_workspace" {
   depends_on = [module.unity_catalog_metastore_creation, module.network_connectivity_configuration, module.network_policy, module.disable_legacy_features]
 }
 
+# Wait for the newly created workspace to become fully available. Workspace-level settings applied
+# immediately after creation can intermittently fail to find the workspace by its ID.
+resource "time_sleep" "wait_for_workspace" {
+  create_duration = "60s"
+
+  depends_on = [module.databricks_mws_workspace]
+}
+
 # Unity Catalog Assignment
 module "unity_catalog_metastore_assignment" {
   source = "./modules/databricks_account/unity_catalog_metastore_assignment"
@@ -183,6 +191,8 @@ module "disable_legacy_settings" {
   providers = {
     databricks = databricks.created_workspace
   }
+
+  depends_on = [time_sleep.wait_for_workspace]
 }
 
 # Enable Automatic Cluster Update on the Databricks Workspace.
@@ -194,6 +204,8 @@ module "automatic_cluster_update" {
   providers = {
     databricks = databricks.created_workspace
   }
+
+  depends_on = [time_sleep.wait_for_workspace]
 }
 
 # Enable Enhanced Security Monitoring (ESM) on the Databricks Workspace.
@@ -205,6 +217,8 @@ module "enhanced_security_monitoring" {
   providers = {
     databricks = databricks.created_workspace
   }
+
+  depends_on = [time_sleep.wait_for_workspace]
 }
 
 # Enable Compliance Security Profile (CSP) on the Databricks Workspace.
@@ -217,6 +231,8 @@ module "compliance_security_profile" {
   }
 
   compliance_standards = var.compliance_standards
+
+  depends_on = [time_sleep.wait_for_workspace]
 }
 
 # Create Cluster (skipped for serverless-only workspaces)
