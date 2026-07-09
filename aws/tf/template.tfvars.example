@@ -22,6 +22,14 @@ compute_mode = "HYBRID"
 # Databricks account ID
 databricks_account_id = ""
 
+# If deploying to govcloud, is deployment "civilian" or "dod" shard
+databricks_gov_shard = null
+
+# Deployment name for the workspace (the customer-prefix must be enabled by a Databricks representative).
+# This becomes part of the workspace's subdomain in a custom FQDN: customer-prefix-<deployment_name>.cloud.databricks.<tld>
+# If left null, the workspace gets an auto-generated FQDN that looks like dbc-<random-id>.cloud.databricks.<tld>
+deployment_name = null
+
 # AWS region for deployment
 region = ""
 
@@ -125,14 +133,6 @@ context_based_ingress_ip_acl = []
 # Optional name for the Unity Catalog metastore created by this deployment.
 # If left blank, defaults to "${var.region}-unity-catalog".
 # custom_metastore_name = ""
-
-# If deploying to govcloud, is deployment "civilian" or "dod" shard
-databricks_gov_shard = null
-
-# Deployment name for the workspace (the customer-prefix must be enabled by a Databricks representative).
-# This becomes part of the workspace's subdomain in a custom FQDN: customer-prefix-<deployment_name>.cloud.databricks.<tld>
-# If left null, the workspace gets an auto-generated FQDN that looks like dbc-<random-id>.cloud.databricks.<tld>
-deployment_name = null
 
 # Optional private endpoint rules for serverless egress to your AWS resources over PrivateLink.
 # Each rule targets either a VPC endpoint service (endpoint_service + optional domain_names for private DNS)
