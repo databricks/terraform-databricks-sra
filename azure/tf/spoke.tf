@@ -1,5 +1,24 @@
 locals {
   resource_group_name = var.create_workspace_resource_group ? azurerm_resource_group.spoke[0].name : var.existing_resource_group_name
+
+  # Unity Catalog backing storage account: leading chars from sanitized resource_suffix + fixed-length random suffix.
+  # Azure storage names allow at most 24 lowercase letters/digits; hyphens and other chars are stripped from the suffix first.
+  catalog_storage_random_len       = 16
+  catalog_storage_sanitized_suffix = replace(lower(var.resource_suffix), "/[^a-z0-9]/", "")
+  catalog_storage_prefix_max_len   = 24 - local.catalog_storage_random_len
+  spoke_catalog_storage_account_name = substr(
+    "${substr(local.catalog_storage_sanitized_suffix, 0, local.catalog_storage_prefix_max_len)}${random_string.catalog_storage_entropy.result}",
+    0,
+    24,
+  )
+}
+
+resource "random_string" "catalog_storage_entropy" {
+  length  = local.catalog_storage_random_len
+  lower   = true
+  numeric = true
+  special = false
+  upper   = false
 }
 
 resource "azurerm_resource_group" "spoke" {
@@ -100,7 +119,9 @@ module "spoke_catalog" {
   ncc_id                = module.spoke_workspace.ncc_id
   ncc_name              = module.spoke_workspace.ncc_name
 
-  force_destroy = var.catalog_force_destroy
+  storage_account_name   = local.spoke_catalog_storage_account_name
+  storage_container_name = var.catalog_storage_container_name
+  force_destroy          = var.catalog_force_destroy
 
   providers = {
     databricks.workspace = databricks.spoke

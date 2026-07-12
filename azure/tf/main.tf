@@ -117,7 +117,8 @@ module "hub_catalog" {
   ncc_id                = module.hub[0].ncc_id
   ncc_name              = module.hub[0].ncc_name
 
-  force_destroy = var.sat_force_destroy
+  storage_container_name = var.catalog_storage_container_name
+  force_destroy          = var.sat_force_destroy
 
   providers = {
     databricks.workspace = databricks.hub
