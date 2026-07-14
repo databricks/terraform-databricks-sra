@@ -84,6 +84,19 @@ Choose from two network configurations for your workspaces: **isolated** or **cu
 
 - **Restrictive Network Policy**: [Network policies](https://docs.databricks.com/aws/en/security/network/serverless-network-security/manage-network-policies) provide egress controls for serverless compute. A restrictive network policy is implemented on the workspace, allowing outbound traffic only to required data buckets.
 
+- **Serverless Private Connectivity**: [Private endpoint rules](https://docs.databricks.com/aws/en/security/network/serverless-network-security/pl-to-internal-network) let serverless compute reach resources in your AWS account (e.g. a VPC endpoint service in front of a database, or S3 buckets) over PrivateLink instead of the public network. No rules are created by default — in-region S3 access is already private through the network connectivity configuration's managed gateway endpoints. Add rules with the *serverless_private_endpoint_rules* variable; rules complement the network policy (the policy controls what egress is allowed, the rule provides the private path).
+   - **NOTE**: A rule targeting your own VPC endpoint service stays pending until you accept the connection request on the endpoint service in AWS.
+
+### Serverless-Only Workspace (optional)
+
+Set `compute_mode = "SERVERLESS"` to deploy a serverless-only workspace instead of the classic customer-managed VPC deployment. Serverless workspaces run entirely on Databricks-managed compute and storage, and this variant creates **no AWS resources at all** — no AWS account or AWS credentials are required. The customer VPC, PrivateLink endpoints, cross-account IAM role, workspace root S3 bucket, workspace customer-managed keys, workspace catalog storage, and S3 audit log delivery are not created. The restrictive network policy, network connectivity configuration, and Unity Catalog metastore resources still apply.
+
+Notes for serverless-only deployments:
+- The workspace uses its auto-created workspace catalog backed by Databricks default storage instead of the customer-managed isolated catalog.
+- Audit events should be monitored via [system tables](https://docs.databricks.com/en/admin/system-tables/index.html) (see the `system_tables_audit_log` customization) since S3 audit log delivery requires a customer-owned bucket. Off-platform audit log delivery is available with `compute_mode = "HYBRID"`.
+- Classic-compute features (the example cluster, enhanced security monitoring, and automatic cluster update) are skipped or not applicable.
+- Serverless-only workspaces are not available in GovCloud regions; deployments to `us-gov-west-1` must use `compute_mode = "HYBRID"`.
+
 ### Optional Naming Overrides
 
 By default the workspace and Unity Catalog metastore are named from `resource_prefix` and `region`. Two optional tfvars let you override those names without changing `resource_prefix`:

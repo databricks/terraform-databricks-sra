@@ -1,12 +1,16 @@
 terraform {
   required_providers {
-    databricks = {
-      source  = "databricks/databricks"
-      version = "~> 1.84"
-    }
     aws = {
       source  = "hashicorp/aws"
       version = ">= 5.76, <7.0"
+    }
+    databricks = {
+      source  = "databricks/databricks"
+      version = "~> 1.121"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">=0.12.1"
     }
   }
   required_version = "~>1.3"
@@ -17,8 +21,17 @@ terraform {
 # export AWS_SECRET_ACCESS_KEY=SECRET_KEY
 # export AWS_SESSION_TOKEN=SESSION_TOKEN
 
+# Serverless-only deployments (compute_mode = "SERVERLESS") create no AWS resources and require no AWS
+# account or credentials. The placeholder credentials and skip flags below apply only in that mode and
+# prevent the provider from attempting credential resolution; in HYBRID mode they are unset and the
+# normal AWS credential chain is used.
 provider "aws" {
-  region = var.region
+  region                      = var.region
+  access_key                  = local.is_serverless ? "serverless-placeholder" : null
+  secret_key                  = local.is_serverless ? "serverless-placeholder" : null
+  skip_credentials_validation = local.is_serverless
+  skip_requesting_account_id  = local.is_serverless
+  skip_metadata_api_check     = local.is_serverless
   default_tags {
     tags = {
       Resource = var.resource_prefix

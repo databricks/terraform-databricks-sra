@@ -13,7 +13,8 @@ locals {
 
 # Unity Catalog KMS
 resource "aws_kms_key" "catalog_storage" {
-  description = "KMS key for Databricks catalog storage ${var.workspace_id}"
+  description         = "KMS key for Databricks catalog storage ${var.workspace_id}"
+  enable_key_rotation = true
   policy = jsonencode({
     Version : "2012-10-17",
     "Id" : "key-policy-catalog-storage-${var.workspace_id}",

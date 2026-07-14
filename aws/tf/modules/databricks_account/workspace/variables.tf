@@ -37,12 +37,23 @@ variable "service_direct_mws_vpce_id" {
 }
 
 variable "bucket_name" {
-  description = "Name of the root S3 bucket for the workspace."
+  description = "Name of the root S3 bucket for the workspace. Not used when compute_mode is SERVERLESS."
   type        = string
 }
 
+variable "compute_mode" {
+  description = "Workspace compute mode. When SERVERLESS, the workspace is created without credentials, storage, network, private access settings, or customer-managed key configurations."
+  type        = string
+  default     = "HYBRID"
+
+  validation {
+    condition     = contains(["HYBRID", "SERVERLESS"], var.compute_mode)
+    error_message = "Valid values for var: compute_mode are (HYBRID, SERVERLESS)."
+  }
+}
+
 variable "cross_account_role_arn" {
-  description = "AWS ARN of the cross-account role."
+  description = "AWS ARN of the cross-account role. Not used when compute_mode is SERVERLESS."
   type        = string
 }
 

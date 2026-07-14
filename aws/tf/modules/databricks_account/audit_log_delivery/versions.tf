@@ -2,7 +2,7 @@ terraform {
   required_providers {
     databricks = {
       source  = "databricks/databricks"
-      version = ">=1.84.0"
+      version = ">=1.121.0"
     }
     time = {
       source  = "hashicorp/time"
@@ -13,5 +13,5 @@ terraform {
       version = ">=5.76.0"
     }
   }
-  required_version = ">=1.0"
+  required_version = "~>1.3"
 }

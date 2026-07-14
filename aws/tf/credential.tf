@@ -7,6 +7,7 @@ data "databricks_aws_assume_role_policy" "this" {
 }
 
 resource "aws_iam_role" "cross_account_role" {
+  count              = local.is_serverless ? 0 : 1
   name               = "${var.resource_prefix}-cross-account"
   assume_role_policy = data.databricks_aws_assume_role_policy.this.json
   tags = {
@@ -16,8 +17,9 @@ resource "aws_iam_role" "cross_account_role" {
 }
 
 resource "aws_iam_role_policy" "cross_account" {
-  name = "${var.resource_prefix}-crossaccount-policy"
-  role = aws_iam_role.cross_account_role.id
+  count = local.is_serverless ? 0 : 1
+  name  = "${var.resource_prefix}-crossaccount-policy"
+  role  = aws_iam_role.cross_account_role[0].id
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -278,4 +280,14 @@ resource "aws_iam_role_policy" "cross_account" {
   depends_on = [
     module.vpc, aws_security_group.sg
   ]
+}
+# Preserve state across count addition for the serverless workspace variant
+moved {
+  from = aws_iam_role.cross_account_role
+  to   = aws_iam_role.cross_account_role[0]
+}
+
+moved {
+  from = aws_iam_role_policy.cross_account
+  to   = aws_iam_role_policy.cross_account[0]
 }
