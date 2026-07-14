@@ -103,7 +103,7 @@ enable_compliance_security_profile = false
 # Companion to enable_compliance_security_profile: necessary if and only if you do not set default
 # compliance settings at the account level.
 # Available compliance standards found here: https://pkg.go.dev/github.com/databricks/databricks-sdk-go/service/settings#ComplianceStandard
-compliance_standards = ["Standard_A", "Standard_B"]
+compliance_standards = ["STANDARD_A", "STANDARD_B"]
 
 # Enhanced Security Monitoring Setting
 # https://docs.databricks.com/aws/en/security/privacy/enhanced-security-monitoring
