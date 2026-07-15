@@ -1,0 +1,37 @@
+# =============================================================================
+# Example configuration: serverless PrivateLink to S3 via an interface endpoint
+# =============================================================================
+
+# AWS region for deployment. Determines the environment: commercial (e.g.
+# us-east-1) or GovCloud (us-gov-west-1), and thus both the S3 service name and
+# which Databricks serverless private-connectivity role is allowlisted.
+region = ""
+
+# GovCloud shard: "civilian" or "dod". Required when region is us-gov-west-1;
+# leave null (or omit) for commercial regions.
+databricks_gov_shard = null
+
+# Prefix used for naming and tagging resources.
+resource_prefix = ""
+
+# VPC where the S3 interface endpoint, NLB, and target group are created.
+vpc_id = ""
+
+# Subnets (one per AZ) for the internal NLB. Use at least two AZs and align the
+# AZs with s3_endpoint_subnet_ids.
+nlb_subnet_ids = ["", ""]
+
+# Subnets (one per AZ) the S3 interface endpoint places its ENIs in.
+s3_endpoint_subnet_ids = ["", ""]
+
+# Security groups on the S3 interface endpoint. Must allow inbound TCP 443 from
+# the NLB subnets / VPC CIDR so the NLB can reach the endpoint ENIs.
+s3_endpoint_security_group_ids = [""]
+
+# Optional: override the allowlisted principals. Defaults to the Databricks
+# serverless private-connectivity role for the selected shard. Use ["*"] for the
+# simplified allow-all approach from the Databricks docs.
+# allowed_principals = ["*"]
+
+# Require manual acceptance of connection requests (recommended).
+acceptance_required = true
