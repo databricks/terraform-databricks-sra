@@ -40,7 +40,7 @@ variable "brokers" {
 }
 
 variable "databricks_gov_shard" {
-  description = "GovCloud shard: \"civilian\" or \"dod\". Only used when region is us-gov-west-1, where it selects the Databricks serverless private-connectivity role allowlisted on the VPC endpoint service. Leave null for commercial regions."
+  description = "GovCloud shard: \"civilian\" or \"dod\". Required when region is us-gov-west-1, where it selects the Databricks serverless private-connectivity role allowlisted on the VPC endpoint service. Defaults to null; ignored for commercial regions."
   type        = string
   default     = null
 
@@ -51,7 +51,7 @@ variable "databricks_gov_shard" {
 
   validation {
     condition     = var.region != "us-gov-west-1" || contains(["civilian", "dod"], coalesce(var.databricks_gov_shard, "unset"))
-    error_message = "databricks_gov_shard must be \"civilian\" or \"dod\" when region is us-gov-west-1."
+    error_message = "databricks_gov_shard must be set to \"civilian\" or \"dod\" when region is us-gov-west-1."
   }
 }
 

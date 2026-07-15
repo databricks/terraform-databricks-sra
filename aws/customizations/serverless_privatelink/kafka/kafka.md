@@ -19,7 +19,7 @@ The allowlisted principal is selected automatically from `region` and `databrick
 | AWS GovCloud (Civilian) | `region = us-gov-west-1`, `databricks_gov_shard = civilian` | `arn:aws-us-gov:iam::347038500609:role/private-connectivity-role-us-gov-west-1` |
 | AWS GovCloud (DoD) | `region = us-gov-west-1`, `databricks_gov_shard = dod` | `arn:aws-us-gov:iam::347034940029:role/private-connectivity-role-us-gov-west-1` |
 
-`databricks_gov_shard` is required only for `us-gov-west-1`; leave it null for commercial regions. Set `allowed_principals = ["*"]` to use the simplified allow-all approach from the docs instead.
+`databricks_gov_shard` defaults to `null` and is ignored for commercial regions, but is **required** when `region = us-gov-west-1` — Terraform errors out at plan time if it is unset there, so a GovCloud deployment can't silently allowlist the wrong role. Set `allowed_principals = ["*"]` to use the simplified allow-all approach from the docs instead.
 
 ## Usage
 

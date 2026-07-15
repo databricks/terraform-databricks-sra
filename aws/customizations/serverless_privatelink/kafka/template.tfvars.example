@@ -7,9 +7,9 @@
 # private-connectivity role is allowlisted on the VPC endpoint service.
 region = "us-gov-west-1"
 
-# GovCloud shard: "civilian" or "dod". Required only when region is
-# us-gov-west-1; leave null (or omit) for commercial regions.
-databricks_gov_shard = "dod"
+# GovCloud shard: "civilian" or "dod". Required when region is us-gov-west-1;
+# leave null (or omit) for commercial regions.
+databricks_gov_shard = null
 
 # Prefix used for naming and tagging resources.
 resource_prefix = ""
