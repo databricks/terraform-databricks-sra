@@ -37,6 +37,13 @@ variable "brokers" {
     condition     = length(distinct([for b in var.brokers : b.name])) == length(var.brokers)
     error_message = "Each broker must have a unique name."
   }
+
+  # Target group names are "<resource_prefix>-<broker.name>". With resource_prefix capped at 18,
+  # a broker name <= 13 keeps the combined name within the 32-char AWS target group name limit.
+  validation {
+    condition     = alltrue([for b in var.brokers : length(b.name) <= 13])
+    error_message = "Each broker name must be <= 13 characters to keep \"<resource_prefix>-<broker.name>\" within the 32-char AWS target group name limit."
+  }
 }
 
 variable "databricks_gov_shard" {

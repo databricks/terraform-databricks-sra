@@ -114,5 +114,6 @@ Each broker must advertise itself on the private DNS name of the Databricks-side
 
 ## Notes
 
+- The broker security groups must allow inbound traffic on each broker's configured port from the NLB subnet CIDRs (an internal NLB sources traffic from its nodes' private IPs in `nlb_subnet_ids`). Without this the target groups report unhealthy and the connection silently fails.
 - Use at least two AZs in `nlb_subnet_ids`; for cross-region serverless the endpoint service must span at least two AZs.
 - The `time` provider workarounds and gov-shard account/partition logic in the main SRA config are intentionally not duplicated here — this customization only creates AWS resources and needs no Databricks provider.

@@ -111,5 +111,6 @@ If you'd rather keep the two loosely coupled, skip steps 1–6 and just use the 
 ## Notes
 
 - **RDS private IPs are not stable.** RDS resolves its endpoint DNS name to a private IP that can change on failover, scaling, or maintenance. This customization targets a fixed IP (`db_ip_address`) for simplicity; if the IP moves, re-resolve and re-apply, or front the database with a stable Route 53 record and target that. For Aurora, point at the cluster (writer) endpoint's current IP.
+- The RDS instance's security group must allow inbound traffic on the database's port (`db_port`) from the NLB subnet CIDRs (an internal NLB sources traffic from its nodes' private IPs in `nlb_subnet_ids`). Without this the target group reports unhealthy and the connection silently fails.
 - Use at least two AZs in `nlb_subnet_ids`; for cross-region serverless the endpoint service must span at least two AZs.
 - The `time` provider workarounds and gov-shard account/partition logic in the main SRA config are intentionally not duplicated here — this customization only creates AWS resources and needs no Databricks provider.
