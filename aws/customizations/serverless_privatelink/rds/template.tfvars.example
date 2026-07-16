@@ -27,10 +27,10 @@ db_ip_address = "10.0.1.20"
 
 # Port the RDS engine listens on (5432 PostgreSQL, 3306 MySQL, 1433 SQL Server,
 # 1521 Oracle).
-db_port = 5432
+db_port = 3306
 
 # Optional: port the NLB advertises to serverless compute. Defaults to db_port.
-# nlb_port = 5432
+# nlb_port = 3306
 
 # Optional: override the allowlisted principals. Defaults to the Databricks
 # serverless private-connectivity role for the selected shard. Use ["*"] for the

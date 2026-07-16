@@ -79,7 +79,7 @@ variable "rds_ip_address" {
 variable "rds_port" {
   description = "Port the RDS engine listens on (e.g. 5432 PostgreSQL, 3306 MySQL, 1433 SQL Server, 1521 Oracle)."
   type        = number
-  default     = 5432
+  default     = 3306
 }
 ```
 4. Create a new file `rds_privatelink.tf`

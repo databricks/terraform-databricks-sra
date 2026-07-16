@@ -38,7 +38,7 @@ variable "db_ip_address" {
 variable "db_port" {
   description = "Port the RDS engine listens on (e.g. 5432 PostgreSQL, 3306 MySQL/Aurora MySQL, 1433 SQL Server, 1521 Oracle)."
   type        = number
-  default     = 5432
+  default     = 3306
 }
 
 variable "health_check_interval" {
