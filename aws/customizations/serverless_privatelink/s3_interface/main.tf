@@ -70,21 +70,21 @@ data "aws_network_interface" "s3" {
 # -----------------------------------------------------------------------------
 
 resource "aws_lb" "s3" {
-  name                             = "${var.resource_prefix}-s3-nlb"
+  name                             = "sra-s3-nlb"
   internal                         = true
   load_balancer_type               = "network"
   subnets                          = var.nlb_subnet_ids
   enable_cross_zone_load_balancing = true
 
   tags = {
-    Name    = "${var.resource_prefix}-s3-nlb"
+    Name    = "sra-s3-nlb"
     Project = var.resource_prefix
   }
 }
 
 # IP target group: TLS passthrough (TCP) to the S3 interface endpoint ENIs on 443.
 resource "aws_lb_target_group" "s3" {
-  name        = "${var.resource_prefix}-s3-tg"
+  name        = "sra-s3-tg"
   port        = 443
   protocol    = "TCP"
   target_type = "ip"
@@ -99,7 +99,7 @@ resource "aws_lb_target_group" "s3" {
   }
 
   tags = {
-    Name    = "${var.resource_prefix}-s3-tg"
+    Name    = "sra-s3-tg"
     Project = var.resource_prefix
   }
 }

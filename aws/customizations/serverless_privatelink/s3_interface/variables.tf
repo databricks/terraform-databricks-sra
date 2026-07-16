@@ -52,13 +52,8 @@ variable "region" {
 }
 
 variable "resource_prefix" {
-  description = "Prefix used for naming and tagging resources. Kept short because the NLB and target group names are \"<resource_prefix>-s3-nlb\"/\"<resource_prefix>-s3-tg\" and AWS caps load balancer and target group names at 32 characters."
+  description = "Prefix used for tagging resources (Project tag). The NLB and target group names use a fixed \"sra-\" prefix to stay within the 32-char AWS name limit, so this value can be any length."
   type        = string
-
-  validation {
-    condition     = length(var.resource_prefix) <= 24
-    error_message = "resource_prefix must be <= 24 characters to stay within the 32-char AWS load balancer/target group name limit."
-  }
 }
 
 variable "s3_endpoint_security_group_ids" {

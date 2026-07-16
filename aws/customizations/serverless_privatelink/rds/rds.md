@@ -51,8 +51,18 @@ terraform apply -var-file=terraform.tfvars
 If you want this managed alongside the rest of your deployment instead of as a separate root, fold it into `aws/tf` as a module. This keeps a single `terraform apply` and lets the endpoint service flow straight into the NCC. Because the main config is region- and shard-aware, the module inherits `region` and `databricks_gov_shard` from the existing root variables — no duplicate environment toggle.
 
 1. Create a new directory `modules/serverless_privatelink_to_rds`
-2. Copy `main.tf`, `variables.tf`, and `outputs.tf` from `customizations/serverless_privatelink/rds` into the new directory. Do **not** copy `versions.tf` — the AWS provider and `terraform {}` block already exist in `aws/tf` and a module must not redeclare them.
-3. Add the following variables to `variables.tf`:
+2. Copy `main.tf`, `variables.tf`, and `outputs.tf` from `customizations/serverless_privatelink/rds` into the new directory. Do **not** copy `versions.tf` as-is — it declares a `provider "aws"` block, and a child module that receives its provider from the root (and uses `count`) must not contain one. Instead, create a `versions.tf` in the module directory containing only the provider requirement, so Terraform can resolve the `aws` provider you pass in (this silences the "Reference to undefined provider" warning):
+```hcl
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.76, <7.0"
+    }
+  }
+}
+```
+3. Add the following variables to `aws/tf/variables.tf`:
 ```hcl
 variable "enable_rds_privatelink" {
   description = "Create the internal NLB and VPC endpoint service fronting an internal RDS instance for serverless PrivateLink."
@@ -97,6 +107,7 @@ module "serverless_privatelink_to_rds" {
   private_endpoint_rules = concat(
     var.serverless_private_endpoint_rules,
     var.enable_rds_privatelink ? [{
+      key              = "rds" # static for_each key: endpoint_service is computed and unknown at plan time
       endpoint_service = module.serverless_privatelink_to_rds[0].vpc_endpoint_service_name
       domain_names     = ["mydb.example.internal"] # private DNS clients use to reach the database
     }] : [],

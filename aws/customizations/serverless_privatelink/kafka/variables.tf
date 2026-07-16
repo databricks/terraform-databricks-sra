@@ -38,11 +38,11 @@ variable "brokers" {
     error_message = "Each broker must have a unique name."
   }
 
-  # Target group names are "<resource_prefix>-<broker.name>". With resource_prefix capped at 18,
-  # a broker name <= 13 keeps the combined name within the 32-char AWS target group name limit.
+  # Target group names are "sra-<broker.name>", so a broker name <= 28 keeps the
+  # combined name within the 32-char AWS target group name limit.
   validation {
-    condition     = alltrue([for b in var.brokers : length(b.name) <= 13])
-    error_message = "Each broker name must be <= 13 characters to keep \"<resource_prefix>-<broker.name>\" within the 32-char AWS target group name limit."
+    condition     = alltrue([for b in var.brokers : length(b.name) <= 28])
+    error_message = "Each broker name must be <= 28 characters to keep \"sra-<broker.name>\" within the 32-char AWS target group name limit."
   }
 }
 
@@ -84,13 +84,8 @@ variable "region" {
 }
 
 variable "resource_prefix" {
-  description = "Prefix used for naming and tagging resources. Kept short because target group names are \"<resource_prefix>-<broker.name>\" and AWS caps load balancer and target group names at 32 characters."
+  description = "Prefix used for tagging resources (Project tag). The NLB and target group names use a fixed \"sra-\" prefix to stay within the 32-char AWS name limit, so this value can be any length."
   type        = string
-
-  validation {
-    condition     = length(var.resource_prefix) <= 18
-    error_message = "resource_prefix must be <= 18 characters to leave room for the \"-<broker.name>\" suffix within the 32-char AWS target group name limit."
-  }
 }
 
 variable "vpc_id" {

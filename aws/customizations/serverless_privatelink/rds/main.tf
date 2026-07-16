@@ -39,21 +39,21 @@ locals {
 # -----------------------------------------------------------------------------
 
 resource "aws_lb" "rds" {
-  name                             = "${var.resource_prefix}-rds-nlb"
+  name                             = "sra-rds-nlb"
   internal                         = true
   load_balancer_type               = "network"
   subnets                          = var.nlb_subnet_ids
   enable_cross_zone_load_balancing = true
 
   tags = {
-    Name    = "${var.resource_prefix}-rds-nlb"
+    Name    = "sra-rds-nlb"
     Project = var.resource_prefix
   }
 }
 
 # IP target group: TCP to the RDS endpoint's private IP and port.
 resource "aws_lb_target_group" "rds" {
-  name        = "${var.resource_prefix}-rds-tg"
+  name        = "sra-rds-tg"
   port        = var.db_port
   protocol    = "TCP"
   target_type = "ip"
@@ -68,7 +68,7 @@ resource "aws_lb_target_group" "rds" {
   }
 
   tags = {
-    Name    = "${var.resource_prefix}-rds-tg"
+    Name    = "sra-rds-tg"
     Project = var.resource_prefix
   }
 }

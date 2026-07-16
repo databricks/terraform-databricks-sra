@@ -577,8 +577,9 @@ variable "scc_relay_config" {
 }
 
 variable "serverless_private_endpoint_rules" {
-  description = "Optional private endpoint rules for serverless egress to customer AWS resources over PrivateLink, added to the network connectivity configuration. Each rule targets either a VPC endpoint service (endpoint_service, with optional domain_names for private DNS) or AWS resources such as S3 buckets (resource_names). Rules targeting your own VPC endpoint service must be accepted on the endpoint service side before they become established."
+  description = "Optional private endpoint rules for serverless egress to customer AWS resources over PrivateLink, added to the network connectivity configuration. Each rule targets either a VPC endpoint service (endpoint_service, with optional domain_names for private DNS) or AWS resources such as S3 buckets (resource_names). Rules targeting your own VPC endpoint service must be accepted on the endpoint service side before they become established. Set key to a static, plan-time-known identifier when endpoint_service is a computed value (e.g. a VPC endpoint service created in the same apply); otherwise it defaults to the endpoint_service / resource_names value."
   type = list(object({
+    key              = optional(string)
     domain_names     = optional(list(string))
     endpoint_service = optional(string)
     resource_names   = optional(list(string))

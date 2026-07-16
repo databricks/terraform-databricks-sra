@@ -39,14 +39,14 @@ locals {
 # -----------------------------------------------------------------------------
 
 resource "aws_lb" "kafka" {
-  name                             = "${var.resource_prefix}-kafka-nlb"
+  name                             = "sra-kafka-nlb"
   internal                         = true
   load_balancer_type               = "network"
   subnets                          = var.nlb_subnet_ids
   enable_cross_zone_load_balancing = true
 
   tags = {
-    Name    = "${var.resource_prefix}-kafka-nlb"
+    Name    = "sra-kafka-nlb"
     Project = var.resource_prefix
   }
 }
@@ -55,7 +55,7 @@ resource "aws_lb" "kafka" {
 resource "aws_lb_target_group" "kafka" {
   for_each = local.brokers_by_name
 
-  name        = "${var.resource_prefix}-${each.value.name}"
+  name        = "sra-${each.value.name}"
   port        = each.value.port
   protocol    = "TCP"
   target_type = "ip"
@@ -70,7 +70,7 @@ resource "aws_lb_target_group" "kafka" {
   }
 
   tags = {
-    Name    = "${var.resource_prefix}-${each.value.name}"
+    Name    = "sra-${each.value.name}"
     Project = var.resource_prefix
   }
 }
