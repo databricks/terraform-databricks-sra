@@ -1,0 +1,41 @@
+# =============================================================================
+# Example configuration: serverless PrivateLink to an internal RDS instance
+# =============================================================================
+
+# AWS region for deployment. Determines the environment: commercial (e.g.
+# us-east-1) or GovCloud (us-gov-west-1), and thus which Databricks serverless
+# private-connectivity role is allowlisted on the VPC endpoint service.
+region = ""
+
+# GovCloud shard: "civilian" or "dod". Required when region is us-gov-west-1;
+# leave null (or omit) for commercial regions.
+databricks_gov_shard = null
+
+# Prefix used for naming and tagging resources.
+resource_prefix = ""
+
+# VPC that can reach the RDS instance and where the NLB is created.
+vpc_id = ""
+
+# Subnets (one per AZ) for the internal NLB. Use at least two AZs.
+nlb_subnet_ids = ["", ""]
+
+# Private IP of the RDS endpoint the NLB forwards to. Resolve your RDS endpoint
+# DNS name to its private IP. NOTE: RDS private IPs can change on failover; re-
+# resolve and re-apply if it moves, or front a stable Route 53 record.
+db_ip_address = "10.0.1.20"
+
+# Port the RDS engine listens on (5432 PostgreSQL, 3306 MySQL, 1433 SQL Server,
+# 1521 Oracle).
+db_port = 3306
+
+# Optional: port the NLB advertises to serverless compute. Defaults to db_port.
+# nlb_port = 3306
+
+# Optional: override the allowlisted principals. Defaults to the Databricks
+# serverless private-connectivity role for the selected shard. Use ["*"] for the
+# simplified allow-all approach from the Databricks docs.
+# allowed_principals = ["*"]
+
+# Require manual acceptance of connection requests (recommended).
+acceptance_required = true

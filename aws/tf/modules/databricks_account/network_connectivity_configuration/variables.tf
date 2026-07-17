@@ -1,6 +1,7 @@
 variable "private_endpoint_rules" {
-  description = "Optional private endpoint rules for serverless egress to customer AWS resources over PrivateLink. Each rule targets either a VPC endpoint service (endpoint_service, with optional domain_names for private DNS) or AWS resources such as S3 buckets (resource_names)."
+  description = "Optional private endpoint rules for serverless egress to customer AWS resources over PrivateLink. Each rule targets either a VPC endpoint service (endpoint_service, with optional domain_names for private DNS) or AWS resources such as S3 buckets (resource_names). Set key to a static, plan-time-known identifier when endpoint_service is a computed value (e.g. a VPC endpoint service created in the same apply); otherwise it defaults to the endpoint_service / resource_names value."
   type = list(object({
+    key              = optional(string)
     domain_names     = optional(list(string))
     endpoint_service = optional(string)
     resource_names   = optional(list(string))
