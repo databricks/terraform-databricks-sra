@@ -67,7 +67,12 @@ resource "databricks_mws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
 
 # Service Direct VPC Endpoint Configuration
 resource "databricks_mws_vpc_endpoint" "service_direct" {
-  count               = var.service_direct_mws_vpce_id == null && length(var.service_direct) > 0 && !local.is_serverless ? 1 : 0
+  # NOTE: count here intentionally uses a plain boolean (service_direct_enabled), not
+  # length(var.service_direct), so this resource's existence is resolvable during `terraform import`
+  # and other partial-state operations without requiring temporary edits to service_direct's
+  # resource-derived value. service_direct_enabled is computed in the root module to be true exactly
+  # when service_direct resolves to a non-empty list.
+  count               = var.service_direct_mws_vpce_id == null && var.service_direct_enabled ? 1 : 0
   account_id          = var.databricks_account_id
   aws_vpc_endpoint_id = var.service_direct[0]
   vpc_endpoint_name   = "${var.resource_prefix}-vpce-service-direct-${var.vpc_id}"

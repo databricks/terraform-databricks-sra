@@ -30,6 +30,12 @@ variable "service_direct" {
   default     = []
 }
 
+variable "service_direct_enabled" {
+  description = "Plain boolean indicating whether a Service Direct VPC endpoint should be associated with this workspace. Decoupled from `service_direct` (the actual endpoint ID list) so that `count` on databricks_mws_vpc_endpoint.service_direct can be statically resolved without depending on another resource's computed attributes."
+  type        = bool
+  default     = false
+}
+
 variable "service_direct_mws_vpce_id" {
   description = "Pre-registered Databricks MWS VPC endpoint ID for the service direct endpoint. If set, registration of the AWS VPC endpoint is skipped."
   type        = string

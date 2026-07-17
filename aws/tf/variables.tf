@@ -793,16 +793,18 @@ variable "workspace_display_name" {
   nullable    = true
 }
 
-# Combined locals block for all computed values
+# Combined locals block for all computed values, ordered alphabetically
 locals {
+  # Compute the correct AWS partition for assume role policies
+  # Different partitions based on region and GovCloud shard type
+  assume_role_partition = var.region == "us-gov-west-1" ? (
+    var.databricks_gov_shard == "dod" ? "aws-us-gov-dod" : "aws-us-gov"
+  ) : "aws"
+
   # Computed AWS partition based on region
   computed_aws_partition = var.aws_partition != null ? var.aws_partition : (
     var.region == "us-gov-west-1" ? "aws-us-gov" : "aws"
   )
-
-  # Serverless-only workspaces skip the customer-managed VPC, PrivateLink endpoints,
-  # cross-account role, root S3 bucket, and workspace CMKs
-  is_serverless = var.compute_mode == "SERVERLESS"
 
   # Computed Databricks provider host based on GovCloud shard
   computed_databricks_provider_host = var.databricks_provider_host != null ? var.databricks_provider_host : (
@@ -811,24 +813,33 @@ locals {
     )
   )
 
+  # Compute the correct Databricks account ID for artifact buckets
+  # Both GovCloud civilian and DoD shards use the same account ID for artifact buckets
+  databricks_artifact_and_sample_data_account_id = var.databricks_gov_shard == "civilian" || var.databricks_gov_shard == "dod" ? "282567162347" : "414351767826"
+
   # Compute the correct Databricks account ID based on GovCloud shard
   databricks_aws_account_id = var.databricks_gov_shard == "civilian" ? "044793339203" : (
     var.databricks_gov_shard == "dod" ? "170661010020" : "414351767826"
   )
 
-  # Compute the correct Databricks account ID for artifact buckets
-  # Both GovCloud civilian and DoD shards use the same account ID for artifact buckets
-  databricks_artifact_and_sample_data_account_id = var.databricks_gov_shard == "civilian" || var.databricks_gov_shard == "dod" ? "282567162347" : "414351767826"
-
   # Compute the correct Databricks account ID for EC2 images
   # GovCloud regions use a different account ID for AMIs
   databricks_ec2_image_account_id = var.region == "us-gov-west-1" ? "044732911619" : "601306020600"
 
-  # Compute the correct AWS partition for assume role policies
-  # Different partitions based on region and GovCloud shard type
-  assume_role_partition = var.region == "us-gov-west-1" ? (
-    var.databricks_gov_shard == "dod" ? "aws-us-gov-dod" : "aws-us-gov"
-  ) : "aws"
+  # Serverless-only workspaces skip the customer-managed VPC, PrivateLink endpoints,
+  # cross-account role, root S3 bucket, and workspace CMKs
+  is_serverless = var.compute_mode == "SERVERLESS"
+
+  # Whether a Service Direct VPC endpoint should be associated with the workspace, expressed purely from
+  # plain variables (no resource-derived values). Mirrors exactly when the module's service_direct argument
+  # resolves to a non-empty list, and is passed to the workspace module as service_direct_enabled so the
+  # module's count is statically resolvable during terraform import and other partial-state operations
+  # without temporarily editing service_direct to [].
+  service_direct_enabled = !local.is_serverless && var.custom_service_direct_mws_vpce_id == null && (
+    var.custom_service_direct_vpce_id != null || (
+      var.create_service_direct_vpce && var.network_configuration != "custom" && contains(keys(var.service_direct_config), var.region)
+    )
+  )
 
   # Compute the correct Unity Catalog IAM ARN based on region and GovCloud shard type
   unity_catalog_iam_arn = var.region == "us-gov-west-1" ? (

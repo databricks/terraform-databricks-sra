@@ -74,6 +74,7 @@ module "databricks_mws_workspace" {
   scc_tunnel_dataplane_relay_access = local.is_serverless || var.custom_scc_relay_mws_vpce_id != null ? null : (var.custom_scc_relay_vpce_id != null ? var.custom_scc_relay_vpce_id : aws_vpc_endpoint.scc_tunnel_dataplane_relay_access[0].id)
   scc_relay_mws_vpce_id             = var.custom_scc_relay_mws_vpce_id
   service_direct                    = local.is_serverless || var.custom_service_direct_mws_vpce_id != null ? [] : (var.custom_service_direct_vpce_id != null ? [var.custom_service_direct_vpce_id] : aws_vpc_endpoint.service_direct[*].id)
+  service_direct_enabled            = local.service_direct_enabled
   service_direct_mws_vpce_id        = var.custom_service_direct_mws_vpce_id
 
   # Cross-Account Role (skipped for serverless-only workspaces)
