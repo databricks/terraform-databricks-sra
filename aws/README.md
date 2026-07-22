@@ -21,9 +21,10 @@ This architecture includes specific functionalities that may affect certain use 
 
 Terraform customizations are available to support the baseline deployment of the Security Reference Architecture (SRA). These customizations are organized by provider:
 
-- **Workspace**: Databricks workspace provider.
+- **Workspace**: Databricks workspace provider (e.g. admin configurations, IP access lists, the Security Analysis Tool, audit log alerting, read-only external locations).
+- **AWS**: AWS provider customer-side infrastructure (e.g. Serverless PrivateLink to Git, Kafka, RDS, or S3 — an internal NLB and VPC endpoint service that lets serverless compute reach resources in your network).
 
-These extensions can be found in the top-level customization folder.
+These extensions can be found in the top-level [customizations](customizations/customizations.md) folder.
 
 ## SRA Component Breakdown and Description
 
@@ -33,10 +34,10 @@ Various `.tf` scripts contain direct links to the Databricks Terraform documenta
 
 ### Network Configuration
 
-Choose from two network configurations for your workspaces: **isolated** or **custom**.
+The `network_configuration` variable applies to `HYBRID` workspaces only; serverless-only workspaces (`compute_mode = "SERVERLESS"`) create no customer VPC and ignore it. For `HYBRID`, choose from two network configurations for your workspaces: **isolated** or **custom**.
 
 - **Isolated (Default)**: Opting for 'isolated' prevents any traffic to the public internet, limiting traffic to AWS private endpoints for AWS services or the Databricks control plane.
-   - **NOTE**: A Unity Catalog-only configuration is required for any clusters running without access to the public internet. Please see the official documentation [here](https://docs.databricks.com/aws/en/data-governance/unity-catalog/disable-hms).
+   - **NOTE**: SRA disables legacy Hive metastore access on the workspace (`disable_legacy_access = true`), so all data access goes through Unity Catalog. This is required anyway for clusters with no public internet access (the isolated default), which can't reach the legacy built-in metastore.
 
 - **Custom**: Selecting 'custom' allows you to specify your own VPC ID, subnet IDs, security group IDs, and PrivateLink endpoint IDs. This mode is recommended when networking assets are created in different pipelines or pre-assigned by a centralized infrastructure team.
     - **Bring AWS PrivateLink endpoint IDs**: Set `custom_general_access_vpce_id`, `custom_scc_relay_vpce_id`, and (optionally) `custom_service_direct_vpce_id`. SRA will register them with Databricks on your behalf.
@@ -140,15 +141,16 @@ This section provides additional security recommendations to help maintain a str
 
 1. Clone this repository.
 2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads).
-3. Decide which [operation mode](https://github.com/databricks/terraform-databricks-sra/tree/main/aws/tf#operation-mode) you'd like to use.
-4. Fill out `main.tf`.
-5. Fill out `template.tfvars.example` and rename the file to `template.tfvars` by removing `.example`.
-6. Configure the [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration) and [Databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authentication) provider authentication.
-7. Change directory into `tf`.
-8. Run `terraform init`.
-9. Run `terraform validate`.
-10. From the `tf` directory, run `terraform plan -var-file ../example.tfvars`.
-11. Run `terraform apply -var-file ../example.tfvars`.
+3. Decide which compute mode you'd like to use: `HYBRID` (classic customer-managed VPC workspace, with serverless available alongside) or `SERVERLESS` (serverless-only, no AWS resources created). See [Serverless-Only Workspace](#serverless-only-workspace-optional) above. `SERVERLESS` is not available in GovCloud.
+4. For `HYBRID`, decide which network configuration you'd like to use: `isolated` or `custom`. See [Network Configuration](#network-configuration) above.
+5. Change directory into `tf`.
+6. Copy the example tfvars to an environment-specific file, keeping the `.example` untouched as a reference: `cp template.tfvars.example dev.tfvars` (repeat for other environments, e.g. `prod.tfvars`). Fill out your new `dev.tfvars`.
+7. Configure the [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration) and [Databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authentication) provider authentication.
+8. (Optional) Use a per-environment [Terraform workspace](https://developer.hashicorp.com/terraform/language/state/workspaces) to keep separate state for each `.tfvars` file: `terraform workspace new dev`.
+9. Run `terraform init`.
+10. Run `terraform validate`.
+11. Run `terraform plan -var-file=dev.tfvars`.
+12. Run `terraform apply -var-file=dev.tfvars`.
 
 ---
 
