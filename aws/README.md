@@ -110,7 +110,7 @@ By default the workspace and Unity Catalog metastore are named from `resource_pr
 ## Critical Next Steps
 
 - **Implement a Front-End Mitigation Strategy**:
-    - [IP Access Lists](https://docs.databricks.com/en/security/network/front-end/ip-access-list.html): The Terraform code for enabling IP access lists can be found in the customization folder.
+    - **IP-based ingress restriction**: Restrict workspace access to a set of IPs/CIDRs by setting the `context_based_ingress_ip_acl` variable, which adds allow rules to the workspace [network policy](https://docs.databricks.com/aws/en/security/network/serverless-network-security/manage-network-policies) (context-based ingress). Leave it empty to apply no restriction. **NOTE:** Verify all IPs are correct before enabling to avoid a lockout.
     - [Front-End PrivateLink](https://docs.databricks.com/en/security/network/classic/privatelink.html#step-5-configure-internal-dns-to-redirect-user-requests-to-the-web-application-front-end).
 
 - **Implement Single Sign-On, Multi-Factor Authentication, and SCIM Provisioning**: Most enterprise deployments enable [Single Sign-On (SSO)](https://docs.databricks.com/administration-guide/users-groups/single-sign-on/index.html) and multi-factor authentication (MFA). For user management, we recommend integrating [SCIM (System for Cross-domain Identity Management)](https://docs.databricks.com/dev-tools/api/latest/scim/index.html) with your account console.
