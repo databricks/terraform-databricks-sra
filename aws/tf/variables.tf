@@ -773,7 +773,7 @@ variable "system_table_bucket_config" {
     }
     "us-gov-west-1" = {
       primary_bucket   = "system-tables-prod-us-gov-west-1-gov-uc-metastore-bucket"
-      secondary_bucket = "system-tables-prod-us-dod-west-1-gov-uc-metastore-bucket"
+      secondary_bucket = "system-tables-prod-us-gov-west-1-dod-uc-metastore-bucket"
       region_type      = "govcloud"
     }
   }
