@@ -148,15 +148,15 @@ module "log_delivery" {
 # Databricks Workspace Modules
 # =============================================================================
 
-# Creates a Workspace Isolated Catalog (skipped for serverless-only workspaces, which use the
-# auto-created workspace catalog backed by Databricks default storage)
+# Creates a Workspace Isolated Catalog. In SERVERLESS mode the catalog uses Databricks default storage
+# and the customer-managed AWS storage (KMS, IAM, S3, storage credential, external location) is skipped.
 module "unity_catalog_catalog_creation" {
-  count  = local.is_serverless ? 0 : 1
   source = "./modules/databricks_workspace/unity_catalog_catalog_creation"
   providers = {
     databricks = databricks.created_workspace
   }
 
+  is_serverless                = local.is_serverless
   aws_account_id               = var.aws_account_id
   aws_iam_partition            = local.computed_aws_partition
   aws_assume_partition         = local.assume_role_partition
@@ -272,8 +272,7 @@ module "security_analysis_tool" {
   use_sp_auth = true
 
   # Databricks Variables
-  # For serverless-only workspaces, SAT uses the auto-created workspace catalog (named after the workspace).
-  analysis_schema_name = replace(local.is_serverless ? "${coalesce(var.workspace_display_name, var.resource_prefix)}.SAT" : "${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}.SAT", "-", "_")
+  analysis_schema_name = replace("${var.resource_prefix}-catalog-${module.databricks_mws_workspace.workspace_id}.SAT", "-", "_")
   workspace_id         = module.databricks_mws_workspace.workspace_id
 
   # Configuration Variables
@@ -300,7 +299,9 @@ moved {
   to   = module.cluster_configuration[0]
 }
 
+# The catalog module now always runs (AWS storage is gated inside it via is_serverless), so its
+# address is no longer indexed. Migrate state from the previously-counted address.
 moved {
-  from = module.unity_catalog_catalog_creation
-  to   = module.unity_catalog_catalog_creation[0]
+  from = module.unity_catalog_catalog_creation[0]
+  to   = module.unity_catalog_catalog_creation
 }

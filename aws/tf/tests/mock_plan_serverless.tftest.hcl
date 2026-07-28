@@ -81,14 +81,11 @@ variables {
 # ---------------
 # Tests
 # ---------------
-# Serverless-only workspaces create no AWS resources; this plan must succeed with a null aws_account_id.
+# Serverless-only workspaces create no customer-managed AWS storage; the plan must succeed with a null
+# aws_account_id (proving no AWS resource references it). The workspace catalog is still created, using
+# Databricks default storage instead of a customer-managed S3 bucket.
 run "plan_test" {
   command = plan
-
-  assert {
-    condition     = output.catalog_name == null
-    error_message = "Serverless-only workspaces must not create the customer-managed workspace catalog."
-  }
 }
 
 # NOTE: The rejection of compute_mode = "SERVERLESS" in GovCloud is enforced by a precondition on
