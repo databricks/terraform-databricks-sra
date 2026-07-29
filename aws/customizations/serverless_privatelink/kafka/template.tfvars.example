@@ -51,3 +51,28 @@ brokers = [
 
 # Require manual acceptance of connection requests (recommended).
 acceptance_required = true
+
+# ---------------------------------------------------------------------------
+# NCC private endpoint rule (Databricks side, not an input to this module).
+# After apply, register the vpc_endpoint_service_name output on the root SRA
+# serverless_private_endpoint_rules variable. domain_names must list every
+# FQDN the client connects to (see kafka.md):
+#
+#   # All brokers advertise the same hostname, differing only by nlb_port:
+#   serverless_private_endpoint_rules = [{
+#     endpoint_service = "com.amazonaws.vpce.<region>.vpce-svc-xxxxxxxx"
+#     domain_names     = ["kafka.example.internal"]
+#   }]
+#
+#   # Brokers advertise distinct per-broker hostnames (e.g. Confluent) — list
+#   # the bootstrap FQDN plus every broker FQDN:
+#   serverless_private_endpoint_rules = [{
+#     endpoint_service = "com.amazonaws.vpce.<region>.vpce-svc-xxxxxxxx"
+#     domain_names = [
+#       "bootstrap.kafka.example.internal",
+#       "broker-0.kafka.example.internal",
+#       "broker-1.kafka.example.internal",
+#       "broker-2.kafka.example.internal",
+#     ]
+#   }]
+# ---------------------------------------------------------------------------

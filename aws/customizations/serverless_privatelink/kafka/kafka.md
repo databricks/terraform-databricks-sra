@@ -44,6 +44,8 @@ terraform apply -var-file=terraform.tfvars
    ]
    ```
    That creates the NCC private endpoint rule (step 3–4). The rule stays **PENDING** until accepted.
+
+   > `domain_names` must contain every FQDN the client connects to, not just the bootstrap name. Serverless does not support DNS chasing/redirect, and a domain is only allowlisted in the egress network policy if it is listed here. If all brokers advertise the same hostname (differing only by port), one entry covers them. If brokers advertise distinct per-broker hostnames, list the bootstrap FQDN and every broker FQDN — up to 100 per rule.
 3. Because `acceptance_required = true`, accept the connection request on this VPC endpoint service (step 5). It then transitions to established/available (steps 6–7).
 
 ## Integrating into the main SRA config (`aws/tf`)
@@ -80,6 +82,12 @@ variable "kafka_brokers" {
   }))
   default = []
 }
+
+variable "kafka_domain_names" {
+  description = "FQDNs registered on the NCC private endpoint rule for Kafka. Must include every hostname the client connects to: the bootstrap FQDN plus, if brokers advertise distinct per-broker hostnames (e.g. Confluent), every broker FQDN. When all brokers share one advertised hostname (differing only by port), a single entry suffices."
+  type        = list(string)
+  default     = []
+}
 ```
 4. Create a new file `kafka_privatelink.tf`
 5. Add the following code block into `kafka_privatelink.tf`:
@@ -107,7 +115,11 @@ module "serverless_privatelink_to_kafka" {
     var.enable_kafka_privatelink ? [{
       key              = "kafka" # static for_each key: endpoint_service is computed and unknown at plan time
       endpoint_service = module.serverless_privatelink_to_kafka[0].vpc_endpoint_service_name
-      domain_names     = ["kafka.example.internal"] # private DNS clients use to reach the brokers
+      # Every hostname the client reaches, so each is resolved to the endpoint and
+      # allowlisted in the egress policy. When all brokers share one advertised
+      # hostname (differing only by port), this is a single name; when brokers
+      # advertise distinct per-broker hostnames (e.g. Confluent), list them all.
+      domain_names = var.kafka_domain_names
     }] : [],
   )
 ```
@@ -119,7 +131,10 @@ If you'd rather keep the two loosely coupled, skip steps 1–6 and just use the 
 
 ## Kafka `advertised.listeners`
 
-Each broker must advertise itself on the private DNS name of the Databricks-side endpoint **and its assigned `nlb_port`**, so that after bootstrap, clients reconnect to the right broker through the NLB. Keep the `nlb_port` values here in sync with each broker's `advertised.listeners` configuration.
+After bootstrap, the client reconnects to each broker using the `host:port` that broker advertises. For serverless to reach it, the advertised host must resolve to the endpoint and the advertised port must be the broker's `nlb_port`.
+
+- **If you control `advertised.listeners`:** advertise every broker on the same endpoint private DNS name, differing only by `nlb_port`. One `domain_names` entry then covers all brokers. Keep the `nlb_port` values in sync with each broker's `advertised.listeners`.
+- **If you cannot change `advertised.listeners` (e.g. Confluent):** set each broker's `nlb_port` to the port it advertises, and register every advertised broker hostname (plus bootstrap) in `domain_names`. This works only when brokers advertise distinct hostnames on **distinct ports**, since the NLB demultiplexes by port. If brokers advertise distinct hostnames on the **same** port, a layer-4 NLB cannot distinguish them — use the [`dbx_proxy`](../dbx_proxy) customization in this folder, which routes at Layer 7 (SNI/host).
 
 ## Notes
 
