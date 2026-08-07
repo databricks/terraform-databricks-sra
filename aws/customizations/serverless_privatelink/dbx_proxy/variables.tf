@@ -2,7 +2,7 @@
 # Variables
 #
 # These map to the databricks-solutions/dbx-proxy AWS module inputs (pinned to
-# commit b95878a in main.tf). See that module's terraform/aws/README.md for full details.
+# release v0.1.8 in main.tf). See that module's terraform/aws/README.md for full details.
 # =============================================================================
 
 variable "allowed_principals" {

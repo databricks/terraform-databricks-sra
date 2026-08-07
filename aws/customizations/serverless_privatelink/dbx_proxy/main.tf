@@ -39,10 +39,8 @@ locals {
 }
 
 module "dbx_proxy" {
-  # Pinned to the merge commit of databricks-solutions/dbx-proxy#7 (allowed_principals, ami_id,
-  # max_instance_lifetime). No release tag contains these yet; switch to a version tag (e.g. v0.1.8)
-  # once one is cut.
-  source = "git::https://github.com/databricks-solutions/dbx-proxy.git//terraform/aws?ref=b95878a01ed9e68c55b15aedaa7de4b52fc44dcd"
+  # Pinned to the dbx-proxy v0.1.8 release.
+  source = "git::https://github.com/databricks-solutions/dbx-proxy.git//terraform/aws?ref=v0.1.8"
 
   # Naming / tagging
   prefix = var.prefix

@@ -1,6 +1,6 @@
 # Serverless PrivateLink via dbx-proxy (multi-backend / L7)
 
-Terraform **customization** for **steps 1 and 2** of [Configure private connectivity from serverless compute to your internal network](https://docs.databricks.com/aws/en/security/network/serverless-network-security/pl-to-internal-network), using the [databricks-solutions/dbx-proxy](https://github.com/databricks-solutions/dbx-proxy) module (pinned to commit `b95878a`, the merge of [#7](https://github.com/databricks-solutions/dbx-proxy/pull/7); switch to a version tag once one is cut).
+Terraform **customization** for **steps 1 and 2** of [Configure private connectivity from serverless compute to your internal network](https://docs.databricks.com/aws/en/security/network/serverless-network-security/pl-to-internal-network), using the [databricks-solutions/dbx-proxy](https://github.com/databricks-solutions/dbx-proxy) module pinned to release [`v0.1.8`](https://github.com/databricks-solutions/dbx-proxy/releases/tag/v0.1.8).
 
 This is the **multi-backend / Layer 7** option. The other modules in this folder (`rds`, `kafka`, `git`, `s3_interface`) each front a single TCP backend with an NLB and a VPC endpoint service. `dbx-proxy` generalizes that: an internal NLB fronts a fleet of [HAProxy](https://www.haproxy.org/) instances (an EC2 autoscaling group) that can route to **multiple** backends and can route at **Layer 7** (SNI / HTTP host) as well as Layer 4 (TCP), all behind one VPC endpoint service.
 
@@ -14,7 +14,7 @@ You can run this **standalone** or **fold it into the main SRA config** — see 
 
 ## How this differs from the other modules in this folder
 
-- **It wraps an external module.** `main.tf` sources `databricks-solutions/dbx-proxy//terraform/aws` pinned to commit `b95878a`. The variables here map onto that module's inputs; see its [`terraform/aws/README.md`](https://github.com/databricks-solutions/dbx-proxy/tree/main/terraform/aws) for full detail. `terraform init` fetches it over Git, so network access to GitHub is required.
+- **It wraps an external module.** `main.tf` sources `databricks-solutions/dbx-proxy//terraform/aws` pinned to release `v0.1.8`. The variables here map onto that module's inputs; see its [`terraform/aws/README.md`](https://github.com/databricks-solutions/dbx-proxy/tree/v0.1.8/terraform/aws) for full detail. `terraform init` fetches it over Git, so network access to GitHub is required.
 - **It runs compute.** Unlike the NLB-only modules, dbx-proxy provisions an EC2 autoscaling group running the dbx-proxy container, IAM instance profile, and (in bootstrap mode) optionally a VPC/subnets/NAT. That is a larger footprint and lifecycle to own.
 - **It cannot be toggled with `count`.** The upstream module declares its own `provider "aws"` block, so any module that sources it may **not** use `count`, `for_each`, or `depends_on` (Terraform rejects these on modules with local provider configurations). This is why the fold-in below adds the module unconditionally rather than behind an `enable_*` flag. See [Making it optional](#making-it-optional).
 
