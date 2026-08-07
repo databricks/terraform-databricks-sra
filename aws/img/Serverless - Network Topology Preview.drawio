@@ -1,0 +1,52 @@
+<mxfile host="Electron" agent="terraform-databricks-sra" version="29.0.3">
+  <diagram id="serverless" name="SERVERLESS">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="account" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#232f3e;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1120" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="account-label" value="Databricks Account" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fillColor=#ffffff;strokeColor=none;fontColor=#232f3e;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="48" width="220" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="serverless-boundary" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#4D27AA;dashed=1;dashPattern=4 4;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="95" width="1060" height="535" as="geometry" />
+        </mxCell>
+        <mxCell id="serverless-label" value="Serverless networking components" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fillColor=#ffffff;strokeColor=none;fontColor=#4D27AA;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="85" width="230" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="workspace" value="&lt;b&gt;Workspace&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Databricks-managed serverless workloads&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffd9d9;strokeColor=#3a414a;fontColor=#3a414a;fontSize=22;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="110" y="180" width="300" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="policy" value="&lt;b&gt;Databricks account network policy&lt;/b&gt;&lt;br&gt;Assigned to workspace&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;Restricts serverless ingress and egress&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf5ff;strokeColor=#3a414a;fontColor=#3a414a;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="110" y="430" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ncc" value="Account-level&lt;br&gt;&lt;b&gt;Network Connectivity Configuration (NCC)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf5ff;strokeColor=#3a414a;fontColor=#3a414a;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="480" y="205" width="190" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="seg" value="Account-level&lt;br&gt;&lt;b&gt;Serverless Egress Gateway&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:11px&quot;&gt;No outbound connectivity to the internet&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf5ff;strokeColor=#3a414a;fontColor=#3a414a;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="750" y="205" width="190" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="destinations" value="&lt;b&gt;Approved destinations&lt;/b&gt;&lt;br&gt;FQDN, storage,&lt;br&gt;private endpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9e6a5;strokeColor=#d6b656;fontColor=#3a414a;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="205" width="100" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="private-rules" value="&lt;b&gt;NCC private endpoint rules&lt;/b&gt;&lt;br&gt;Endpoint service or resource name" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9e6a5;strokeColor=#d6b656;fontColor=#3a414a;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="480" y="420" width="190" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="customer" value="&lt;b&gt;Customer resource / endpoint&lt;/b&gt;&lt;br&gt;Owner approval required" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#248814;fontColor=#3a414a;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="750" y="420" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="workspace-ncc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#1071e5;strokeWidth=2;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="410" y="257" as="sourcePoint" /><mxPoint x="480" y="257" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ncc-seg" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#1071e5;strokeWidth=2;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="670" y="257" as="sourcePoint" /><mxPoint x="750" y="257" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="seg-destinations" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#1071e5;strokeWidth=2;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="940" y="257" as="sourcePoint" /><mxPoint x="1010" y="257" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="policy-workspace" value="governs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;endArrow=block;endFill=1;strokeColor=#3a414a;fontSize=10;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="260" y="430" as="sourcePoint" /><mxPoint x="260" y="370" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ncc-rules" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#4D27AA;strokeWidth=2;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="575" y="310" as="sourcePoint" /><mxPoint x="575" y="420" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="rules-customer" value="approval" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeColor=#248814;fontSize=10;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="670" y="465" as="sourcePoint" /><mxPoint x="750" y="465" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="note" value="Serverless-only deployment: no customer-managed workspace VPC, classic compute subnets, or classic PrivateLink endpoint services." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#3a414a;fontSize=12;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="110" y="560" width="1000" height="45" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
