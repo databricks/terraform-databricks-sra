@@ -1,6 +1,7 @@
 variable "aws_account_id" {
   type        = string
-  description = "ID of the AWS account."
+  description = "ID of the AWS account. Not required when is_serverless is true."
+  default     = null
 }
 
 variable "aws_iam_partition" {
@@ -22,8 +23,15 @@ variable "unity_catalog_iam_arn" {
 }
 
 variable "cmk_admin_arn" {
-  description = "Amazon Resource Name (ARN) of the CMK admin."
+  description = "Amazon Resource Name (ARN) of the CMK admin. Not required when is_serverless is true."
   type        = string
+  default     = null
+}
+
+variable "is_serverless" {
+  description = "When true, the workspace catalog uses Databricks default storage and the customer-managed AWS storage (KMS, IAM, S3, storage credential, external location) is skipped."
+  type        = bool
+  default     = false
 }
 
 variable "resource_prefix" {

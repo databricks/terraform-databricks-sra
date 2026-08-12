@@ -68,3 +68,6 @@ gcp/modules/service_account/*.json
 
 # Claude Code personal/local settings
 .claude/settings.local.json
+
+# Isaac Review local state
+.isaac/

@@ -82,8 +82,11 @@ create_service_direct_vpce = false
 # Feature Flags
 # -----------------------------------------------------------------------------
 
-# If audit log delivery is already configured
-audit_log_delivery_exists = false
+# If audit log delivery is not already configured toggle to false.
+# This should only be done one time per account.
+# This is the legacy mode of log delivery, which has been replaced by system tables.
+# Does not work on aws-govcloud.
+audit_log_delivery_exists = true
 
 # Disable legacy features (e.g. Hive Metastore, DBFS, no-isolation shared clusters) for newly created workspaces at the account level.
 # NOTE: This affects ALL new workspaces created in the Databricks account, not just this deployment.
@@ -115,8 +118,11 @@ enable_enhanced_security_monitoring = false
 # Enabling this will add pypi.org and files.pythonhosted.org to the network policy egress allow list so SAT can install its dependencies.
 enable_security_analysis_tool = false
 
-# If a regional metastore exists
-metastore_exists = false
+# Create a regional metastore if one doesn't exist manually in the UI.
+# If you want to create a metastore and have it a part of this workspace state file toggle to false.
+# We default to true so you don't accidentally destroy your metastore with a tf destroy of this workspace.
+
+metastore_exists = true
 
 # -----------------------------------------------------------------------------
 # Optional Configuration

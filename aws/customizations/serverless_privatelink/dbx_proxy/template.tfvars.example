@@ -1,0 +1,97 @@
+# =============================================================================
+# Example configuration: serverless PrivateLink via dbx-proxy (multi-backend / L7)
+# =============================================================================
+
+# AWS region for deployment. Determines the environment: commercial (e.g.
+# us-east-1) or GovCloud (us-gov-west-1), and thus which Databricks serverless
+# private-connectivity role is allowlisted on the VPC endpoint service.
+region = ""
+
+# GovCloud shard: "civilian" or "dod". Required when region is us-gov-west-1;
+# leave null (or omit) for commercial regions.
+databricks_gov_shard = null
+
+# Prefix used for the Project tag on resources.
+resource_prefix = ""
+
+# Optional prefix for the dbx-proxy AWS resource names. When null, dbx-proxy
+# generates one.
+# prefix = ""
+
+# Deployment mode:
+#   "bootstrap"  - create (or use) a VPC and stand up a new NLB + endpoint service.
+#   "proxy-only" - attach listeners/target groups to an existing NLB (set nlb_arn).
+deployment_mode = "bootstrap"
+
+# BOOTSTRAP NETWORKING (deployment_mode = "bootstrap")
+# Option 1 - let dbx-proxy create a new VPC + subnets:
+vpc_cidr        = "10.0.0.0/16"
+subnet_cidrs    = ["10.0.1.0/24", "10.0.2.0/24"]
+nat_subnet_cidr = "10.0.0.0/24"
+# A NAT + Internet Gateway is created so instances can pull the container image.
+enable_nat_gateway = true
+# Option 2 - use an existing VPC and subnets instead:
+# vpc_id     = ""
+# subnet_ids = ["", ""]
+
+# PROXY-ONLY NETWORKING (deployment_mode = "proxy-only")
+# Required when deployment_mode = "proxy-only":
+# vpc_id     = ""
+# subnet_ids = ["", ""]
+# nlb_arn    = ""
+
+# Proxy fleet sizing.
+instance_type = "t4g.medium"
+min_capacity  = 1
+max_capacity  = 1
+
+# dbx-proxy container image version and health-check port.
+dbx_proxy_image_version = "0.1.5"
+dbx_proxy_health_port   = 8080
+
+# Optional: override the allowlisted principals on the VPC endpoint service. Defaults
+# to the Databricks serverless private-connectivity role for the selected region and
+# GovCloud shard. Use ["*"] for the simplified allow-all approach from the docs.
+# allowed_principals = ["*"]
+
+# Listener / routing definition. Each listener is a frontend port with routes to
+# one or more backend destinations. mode = "tcp" (L4) or "http" (L7, SNI/host).
+dbx_proxy_listener = [
+  # Example: L4 TCP passthrough to an internal Postgres.
+  {
+    name = "postgres"
+    mode = "tcp"
+    port = 5432
+    routes = [
+      {
+        name    = "postgres"
+        domains = []
+        destinations = [
+          {
+            name = "db"
+            host = "db.internal.example.com"
+            port = 5432
+          }
+        ]
+      }
+    ]
+  },
+  # Example: L7 HTTPS with SNI-based routing to two internal apps.
+  # {
+  #   name = "https"
+  #   mode = "http"
+  #   port = 443
+  #   routes = [
+  #     {
+  #       name    = "app-a"
+  #       domains = ["app-a.internal.example.com"]
+  #       destinations = [{ name = "app-a", host = "10.0.10.11", port = 8443 }]
+  #     },
+  #     {
+  #       name    = "app-b"
+  #       domains = ["app-b.internal.example.com"]
+  #       destinations = [{ name = "app-b", host = "10.0.10.12", port = 8443 }]
+  #     },
+  #   ]
+  # },
+]
