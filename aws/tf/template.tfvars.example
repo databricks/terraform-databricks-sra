@@ -136,6 +136,11 @@ metastore_exists = true
 # NOTE: Verify that all IPs are correct before enabling this feature to prevent a lockout scenario.
 context_based_ingress_ip_acl = []
 
+# Optional list of source workspace IDs allowed to reach this workspace over the account network policy's
+# cross-workspace ingress. Cross-workspace access defaults to RESTRICTED_ACCESS (required by the API);
+# leave empty ([]) to permit no cross-workspace ingress.
+cross_workspace_ingress_allowed_workspace_ids = []
+
 # Optional name for the Unity Catalog metastore created by this deployment.
 # If left blank, defaults to "${var.region}-unity-catalog".
 # custom_metastore_name = ""

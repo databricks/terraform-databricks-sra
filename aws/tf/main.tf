@@ -33,11 +33,12 @@ module "network_policy" {
     databricks = databricks.mws
   }
 
-  context_based_ingress_ip_acl  = var.context_based_ingress_ip_acl
-  databricks_account_id         = var.databricks_account_id
-  enable_security_analysis_tool = var.enable_security_analysis_tool
-  region                        = var.region
-  resource_prefix               = var.resource_prefix
+  context_based_ingress_ip_acl                  = var.context_based_ingress_ip_acl
+  cross_workspace_ingress_allowed_workspace_ids = var.cross_workspace_ingress_allowed_workspace_ids
+  databricks_account_id                         = var.databricks_account_id
+  enable_security_analysis_tool                 = var.enable_security_analysis_tool
+  region                                        = var.region
+  resource_prefix                               = var.resource_prefix
 }
 
 # Disable legacy features like Hive Metastore, DBFS, and no-isolation shared clusters for newly created workspaces at the account level.

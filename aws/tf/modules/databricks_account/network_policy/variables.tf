@@ -4,6 +4,12 @@ variable "context_based_ingress_ip_acl" {
   default     = []
 }
 
+variable "cross_workspace_ingress_allowed_workspace_ids" {
+  description = "Optional list of source workspace IDs allowed to reach this workspace over the account network policy's cross-workspace ingress. Cross-workspace access defaults to RESTRICTED_ACCESS; leave empty to permit no cross-workspace ingress."
+  type        = list(number)
+  default     = []
+}
+
 variable "databricks_account_id" {
   description = "ID of the Databricks account."
   type        = string
