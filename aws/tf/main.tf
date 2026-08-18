@@ -259,7 +259,7 @@ module "cluster_configuration" {
 # =============================================================================
 
 module "security_analysis_tool" {
-  count  = var.enable_security_analysis_tool && var.region != "us-gov-west-1" ? 1 : 0
+  count  = var.enable_security_analysis_tool ? 1 : 0
   source = "./modules/security_analysis_tool"
 
   providers = {
