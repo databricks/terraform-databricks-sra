@@ -132,10 +132,10 @@ module "user_assignment" {
   depends_on = [module.unity_catalog_metastore_assignment, module.databricks_mws_workspace]
 }
 
-# Audit Log Delivery (skipped for GovCloud, where the feature is unavailable, and serverless-only
-# workspaces, which have no customer S3 bucket; monitor audit events via system tables instead)
+# Audit Log Delivery (skipped for serverless-only workspaces, which have no customer S3 bucket;
+# monitor audit events via system tables instead)
 module "log_delivery" {
-  count  = var.audit_log_delivery_exists || local.is_serverless || var.region == "us-gov-west-1" ? 0 : 1
+  count  = var.audit_log_delivery_exists || local.is_serverless ? 0 : 1
   source = "./modules/databricks_account/audit_log_delivery"
   providers = {
     databricks = databricks.mws
