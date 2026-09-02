@@ -51,6 +51,13 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
     private_access = var.region == "us-gov-west-1" ? null : {
       restriction_mode = "ALLOW_ALL_REGISTERED_ENDPOINTS"
     }
+    # The API now populates cross_workspace_access server-side when unset (defaulting to
+    # LEGACY_MODE), which the provider likewise reports as an inconsistent result after apply.
+    # Set it explicitly to match, for the same reason as private_access above.
+    cross_workspace_access = {
+      restriction_mode = "LEGACY_MODE"
+    }
+
     public_access = {
       restriction_mode = length(var.context_based_ingress_ip_acl) > 0 ? "RESTRICTED_ACCESS" : "FULL_ACCESS"
       allow_rules = length(var.context_based_ingress_ip_acl) > 0 ? [
