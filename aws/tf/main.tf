@@ -33,11 +33,12 @@ module "network_policy" {
     databricks = databricks.mws
   }
 
-  context_based_ingress_ip_acl  = var.context_based_ingress_ip_acl
-  databricks_account_id         = var.databricks_account_id
-  enable_security_analysis_tool = var.enable_security_analysis_tool
-  region                        = var.region
-  resource_prefix               = var.resource_prefix
+  context_based_ingress_ip_acl                  = var.context_based_ingress_ip_acl
+  cross_workspace_ingress_allowed_workspace_ids = var.cross_workspace_ingress_allowed_workspace_ids
+  databricks_account_id                         = var.databricks_account_id
+  enable_security_analysis_tool                 = var.enable_security_analysis_tool
+  region                                        = var.region
+  resource_prefix                               = var.resource_prefix
 }
 
 # Disable legacy features like Hive Metastore, DBFS, and no-isolation shared clusters for newly created workspaces at the account level.
@@ -131,10 +132,10 @@ module "user_assignment" {
   depends_on = [module.unity_catalog_metastore_assignment, module.databricks_mws_workspace]
 }
 
-# Audit Log Delivery (skipped for GovCloud, where the feature is unavailable, and serverless-only
-# workspaces, which have no customer S3 bucket; monitor audit events via system tables instead)
+# Audit Log Delivery (skipped for serverless-only workspaces, which have no customer S3 bucket;
+# monitor audit events via system tables instead)
 module "log_delivery" {
-  count  = var.audit_log_delivery_exists || local.is_serverless || var.region == "us-gov-west-1" ? 0 : 1
+  count  = var.audit_log_delivery_exists || local.is_serverless ? 0 : 1
   source = "./modules/databricks_account/audit_log_delivery"
   providers = {
     databricks = databricks.mws
@@ -258,7 +259,7 @@ module "cluster_configuration" {
 # =============================================================================
 
 module "security_analysis_tool" {
-  count  = var.enable_security_analysis_tool && var.region != "us-gov-west-1" ? 1 : 0
+  count  = var.enable_security_analysis_tool ? 1 : 0
   source = "./modules/security_analysis_tool"
 
   providers = {

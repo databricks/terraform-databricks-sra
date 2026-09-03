@@ -59,10 +59,54 @@ resource "aws_iam_role" "log_delivery" {
   }
 }
 
+# Inline Role Policy
+# Grants the log delivery role explicit S3 permissions on the bucket, matching Databricks' documented
+# log delivery credential setup. Required in addition to the bucket policy. Object-level statements are
+# scoped to the delivery_path_prefix ("audit-logs") used by databricks_mws_log_delivery below.
+resource "aws_iam_role_policy" "log_delivery" {
+  name = "${var.resource_prefix}-audit-log-delivery-inline"
+  role = aws_iam_role.log_delivery.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "GetBucketLocation"
+        Effect   = "Allow"
+        Action   = ["s3:GetBucketLocation"]
+        Resource = aws_s3_bucket.log_delivery.arn
+      },
+      {
+        Sid    = "ObjectAccess"
+        Effect = "Allow"
+        Action = [
+          "s3:AbortMultipartUpload",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:ListMultipartUploadParts",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+        ]
+        Resource = [
+          "${aws_s3_bucket.log_delivery.arn}/audit-logs/",
+          "${aws_s3_bucket.log_delivery.arn}/audit-logs/*",
+        ]
+      },
+      {
+        Sid      = "ListBucket"
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket", "s3:ListBucketMultipartUploads"]
+        Resource = aws_s3_bucket.log_delivery.arn
+      },
+    ]
+  })
+}
+
 # Wait for Role
 resource "time_sleep" "wait" {
   depends_on = [
-    aws_iam_role.log_delivery
+    aws_iam_role.log_delivery,
+    aws_iam_role_policy.log_delivery
   ]
   create_duration = "10s"
 }
