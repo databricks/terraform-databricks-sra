@@ -267,7 +267,7 @@ variable "general_access_config" {
       primary_endpoint = "com.amazonaws.vpce.ap-southeast-2.vpce-svc-0b87155ddd6954974"
     }
     "ap-southeast-3" = {
-      primary_endpoint = "com.amazonaws.vpce.ap-southeast-3.vpce-svc-07a698e7e9ccfd04a"
+      primary_endpoint = "com.amazonaws.vpce.ap-southeast-3.vpce-svc-0fec4092997affd53"
     }
     "ca-central-1" = {
       primary_endpoint = "com.amazonaws.vpce.ca-central-1.vpce-svc-0205f197ec0e28d65"
