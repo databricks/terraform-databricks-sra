@@ -61,10 +61,12 @@ terraform.rc
 !**/*.tftest.hcl
 
 # Google Cloud Service Account Keys
-gcp/modules/workspace_deployment/fslakehouse-9b0f57986dbf.json
 gcp/modules/service_account/*.json
 **/service_account/*.json
 .cursorignore
+
+# Generated credential-helper files (service_account module local-exec output)
+**/service_account/set_credentials.sh
 
 # Claude Code personal/local settings
 .claude/settings.local.json
