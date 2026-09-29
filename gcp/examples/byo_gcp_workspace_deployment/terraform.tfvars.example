@@ -14,7 +14,6 @@ harden_network = false #Required. If set to true, firewalls rules will be added 
 use_psc = true #Required. If set to true, the backend Private Service Connect will be used. If set to false, the Private Service Connect will not be used and the workspace will requires Internet Access (example through Cloud NAT) to be functional.
 use_existing_psc_eps = true #Required. If set to true, the existing PSC Endpoints will be used. If set to false, new PSC Endpoints will be created.
 use_existing_databricks_vpc_eps = true #Required. If set to true, the existing registered Databricks VPC Endpoints for PSC will be used. If PSC endpoints have already been registered / used by other workspaces, existing Databricks VPC endpoints must be used since a PSC cannot be registered more than once. If set to false, new Databricks VPC Endpoints for PSC will be created.
-google_pe_subnet = "<google-pe-subnet-name>" #Required if use_existing_psc_eps is false. Update this with the PSC Subnet Name to be createdin GCP.
 
 workspace_pe = "<databricks-workspace-ep>" #Required if use_existing_psc_eps is false. Update this with the PSC Endpoint Name to be created in GCP.
 workspace_pe_ip_name = "<ws-ep-ip>" #Required if use_existing_psc_eps is false. Update this with the PSC Endpoint IP Name to be created in GCP.

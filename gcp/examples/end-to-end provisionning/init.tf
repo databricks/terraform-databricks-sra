@@ -18,6 +18,10 @@ terraform {
       source  = "hashicorp/google"
       version = ">=5.43.1"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.5"
+    }
   }
 }
 
@@ -27,9 +31,6 @@ provider "google" {
   region  = var.google_region
 }
 
-# Databricks provider for account operations.
-provider "databricks" {
-  alias      = "accounts"
-  host       = "https://accounts.gcp.databricks.com"
-  account_id = var.databricks_account_id
-}
+# NOTE: the workspace_deployment module self-configures its own databricks
+# providers (accounts + workspace) from the variables passed in the module
+# block, so no root-level databricks provider is declared or passed here.
