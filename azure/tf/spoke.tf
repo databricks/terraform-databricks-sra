@@ -73,6 +73,8 @@ resource "databricks_disable_legacy_access_setting" "spoke" {
   disable_legacy_access {
     value = true
   }
+
+  depends_on = [module.spoke_workspace]
 }
 
 
@@ -120,13 +122,18 @@ resource "azurerm_ip_group" "spoke" {
   }
 }
 
+# Regional service tags for the spoke network rules (same pattern as modules/hub/firewall.tf)
+data "azurerm_network_service_tags" "spoke" {
+  for_each = var.create_spoke_firewall_rules ? toset(["Sql", "Storage", "EventHub"]) : toset([])
+
+  location        = var.location
+  service         = each.key
+  location_filter = var.location
+}
+
 locals {
   # Service tags scoped to the deployment region (same pattern as modules/hub/locals.tf)
-  spoke_fw_service_tags = {
-    "sql"      = "Sql.${title(var.location)}",
-    "storage"  = "Storage.${title(var.location)}",
-    "eventhub" = "EventHub.${title(var.location)}"
-  }
+  spoke_fw_service_tags = { for service, tag in data.azurerm_network_service_tags.spoke : lower(service) => tag.name }
 
   # Application rules (same pattern as modules/hub/firewall.tf)
   spoke_fw_application_rules = var.create_spoke_firewall_rules ? [

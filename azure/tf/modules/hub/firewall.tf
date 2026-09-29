@@ -68,6 +68,17 @@ resource "azurerm_firewall_policy" "this" {
   tags                = var.tags
 }
 
+# Look up the regional service tags used by the network rules below. The tag names come from Azure's service tags API
+# rather than being constructed from var.location, so they are correct in every cloud and region. The plan fails if a
+# tag does not exist in the region.
+data "azurerm_network_service_tags" "this" {
+  for_each = var.is_firewall_enabled ? toset(["Sql", "Storage", "EventHub"]) : toset([])
+
+  location        = var.location
+  service         = each.key
+  location_filter = var.location
+}
+
 # Define a firewall policy rule collection group resource
 resource "azurerm_firewall_policy_rule_collection_group" "this" {
   count = var.is_firewall_enabled ? 1 : 0
