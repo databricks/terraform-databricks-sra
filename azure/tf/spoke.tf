@@ -26,6 +26,11 @@ module "spoke_network" {
   ipgroup_id               = var.create_hub ? module.hub[0].ipgroup_id : (var.create_spoke_firewall_rules ? azurerm_ip_group.spoke[0].id : null)
   virtual_network_peerings = var.create_hub ? { hub = { remote_virtual_network_id = module.hub[0].vnet_id } } : { hub = { remote_virtual_network_id = var.existing_hub_vnet.vnet_id } }
   encryption_enabled       = var.workspace_vnet.encryption_enabled || try(var.workspace_security_compliance.compliance_security_profile_enabled, false) == true
+  private_dns_zone_names = {
+    backend = local.private_dns_zone_names.backend
+    dfs     = local.private_dns_zone_names.dfs
+    blob    = local.private_dns_zone_names.blob
+  }
   workspace_subnets = {
     new_bits        = var.workspace_vnet.new_bits
     add_to_ip_group = var.create_hub || var.create_spoke_firewall_rules
@@ -57,12 +62,26 @@ module "spoke_workspace" {
   network_policy_id        = var.create_hub ? module.hub[0].network_policy_id : (var.create_spoke_network_policy ? databricks_account_network_policy.spoke[0].network_policy_id : var.existing_network_policy_id)
   metastore_id             = var.create_hub ? module.hub[0].metastore_id : var.databricks_metastore_id
   provisioner_principal_id = data.azurerm_client_config.current.object_id
-  databricks_account_id    = var.databricks_account_id
+}
+
+# Runs against the workspace-scoped provider (host = workspace_url, which carries the correct .usgov
+# segment on Evergreen) rather than provider_config { workspace_id }, whose SDK-side host derivation
+# hardcodes .databricks.azure.us and fails DNS resolution in Azure US Gov.
+resource "databricks_disable_legacy_access_setting" "spoke" {
+  provider = databricks.spoke_workspace
+
+  disable_legacy_access {
+    value = true
+  }
 }
 
 
 module "spoke_catalog" {
   source = "./modules/catalog"
+
+  providers = {
+    databricks.workspace = databricks.spoke_workspace
+  }
 
   catalog_name         = module.spoke_workspace.resource_suffix
   is_default_namespace = true
@@ -76,11 +95,9 @@ module "spoke_catalog" {
   tags                = module.spoke_workspace.tags
 
   # Account parameters
-  databricks_account_id = var.databricks_account_id
-  metastore_id          = var.create_hub ? module.hub[0].metastore_id : var.databricks_metastore_id
-  ncc_id                = module.spoke_workspace.ncc_id
-  ncc_name              = module.spoke_workspace.ncc_name
-  workspace_id          = module.spoke_workspace.workspace_id
+  metastore_id = var.create_hub ? module.hub[0].metastore_id : var.databricks_metastore_id
+  ncc_id       = module.spoke_workspace.ncc_id
+  ncc_name     = module.spoke_workspace.ncc_name
 
   force_destroy = var.catalog_force_destroy
 }

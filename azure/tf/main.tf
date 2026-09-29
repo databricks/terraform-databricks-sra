@@ -21,6 +21,7 @@ module "hub" {
   # Network configuration
   vnet_cidr                = var.hub_vnet_cidr
   virtual_network_peerings = var.workspace_vnet != null ? { spoke = { remote_virtual_network_id = module.spoke_network[0].vnet_id } } : {}
+  private_dns_zone_names   = local.private_dns_zone_names
 
   # Account configuration
   databricks_account_id    = var.databricks_account_id
@@ -40,7 +41,10 @@ module "hub" {
 
 module "serverless_workspace" {
   source = "./modules/serverless_workspace"
-  count  = var.create_hub ? 1 : 0
+  # Serverless workspaces require Default Storage, which is not yet available in Azure Government
+  # regions (e.g. usgovvirginia returns "Region ... doesn't support Default Storage yet"). Skip the
+  # serverless hub workspace there until the region supports it.
+  count = var.create_hub && var.azure_environment != "usgovernment" ? 1 : 0
 
   provisioner_principal_id = data.azurerm_client_config.current.object_id
   location                 = var.location
@@ -73,6 +77,10 @@ module "hub_catalog" {
   # This catalog is only created if SAT is enabled. If SAT is provisioned in a spoke, this can be manually removed.
   count = var.sat_configuration.enabled && var.create_hub ? 1 : 0
 
+  providers = {
+    databricks.workspace = databricks.hub_workspace
+  }
+
   catalog_name         = var.sat_configuration.catalog_name
   is_default_namespace = true
 
@@ -85,11 +93,9 @@ module "hub_catalog" {
   tags                = module.hub[0].tags
 
   # Account level settings
-  databricks_account_id = var.databricks_account_id
-  metastore_id          = module.hub[0].metastore_id
-  ncc_id                = module.hub[0].ncc_id
-  ncc_name              = module.hub[0].ncc_name
-  workspace_id          = module.serverless_workspace[0].workspace_id
+  metastore_id = module.hub[0].metastore_id
+  ncc_id       = module.hub[0].ncc_id
+  ncc_name     = module.hub[0].ncc_name
 
   force_destroy = var.sat_force_destroy
 }

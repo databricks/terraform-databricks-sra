@@ -26,3 +26,6 @@ workspace_vnet = {
 # }
 
 subscription_id = "ffffffff-ffff-ffff-ffff-ffffffffffff"
+
+# Optional: Azure Government. See template_azure_gov.example.tfvars
+# azure_environment = "usgovernment"

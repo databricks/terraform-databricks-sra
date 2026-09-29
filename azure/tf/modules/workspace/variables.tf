@@ -90,11 +90,6 @@ variable "provisioner_principal_id" {
   description = "Principal ID of the user running this terraform"
 }
 
-variable "databricks_account_id" {
-  type        = string
-  description = "Databricks account ID"
-}
-
 variable "dns_zone_ids" {
   type = object({
     backend = string

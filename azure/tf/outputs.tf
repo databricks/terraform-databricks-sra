@@ -10,7 +10,7 @@ output "hub_resource_group_name" {
 
 output "hub_workspace_info" {
   description = "URLs for the one (or more) deployed Databricks Workspaces"
-  value       = var.create_hub ? [azurerm_resource_group.hub[0].name, module.serverless_workspace[0].workspace_url] : null
+  value       = var.create_hub ? [azurerm_resource_group.hub[0].name, length(module.serverless_workspace) > 0 ? module.serverless_workspace[0].workspace_url : null] : null
 }
 
 output "spoke_workspace_info" {

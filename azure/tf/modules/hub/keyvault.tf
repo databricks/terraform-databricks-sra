@@ -105,7 +105,7 @@ resource "azurerm_key_vault_access_policy" "databricks" {
 resource "azurerm_private_dns_zone" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
-  name                = "privatelink.vaultcore.azure.net"
+  name                = var.private_dns_zone_names.key_vault
   resource_group_name = var.resource_group_name
 
   tags = var.tags

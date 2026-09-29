@@ -257,3 +257,94 @@ run "plan_test_custom_subnet_sizing" {
     }
   }
 }
+
+# Azure Government requires only azure_environment — every endpoint derives from it.
+run "plan_test_azure_gov" {
+  state_key = "azure_gov"
+  command   = plan
+  variables {
+    azure_environment = "usgovernment"
+    location          = "usgovvirginia"
+    resource_suffix   = "gov"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = local.databricks_account_host == "https://accounts.usgov.databricks.azure.us"
+    error_message = "Azure Government account console host was not derived from azure_environment"
+  }
+
+  assert {
+    condition = local.private_dns_zone_names == {
+      backend   = "privatelink.usgov.databricks.azure.us"
+      dfs       = "privatelink.dfs.core.usgovcloudapi.net"
+      blob      = "privatelink.blob.core.usgovcloudapi.net"
+      key_vault = "privatelink.vaultcore.usgovcloudapi.net"
+    }
+    error_message = "Azure Government private DNS zone names were not derived from azure_environment"
+  }
+}
+
+# The Commercial defaults must stay byte-identical to the values that were previously hardcoded.
+run "plan_test_azure_public_defaults" {
+  state_key = "azure_public_defaults"
+  command   = plan
+  variables {
+    resource_suffix = "pub"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = local.databricks_account_host == "https://accounts.azuredatabricks.net"
+    error_message = "Azure Commercial account console host changed"
+  }
+
+  assert {
+    condition = local.private_dns_zone_names == {
+      backend   = "privatelink.azuredatabricks.net"
+      dfs       = "privatelink.dfs.core.windows.net"
+      blob      = "privatelink.blob.core.windows.net"
+      key_vault = "privatelink.vaultcore.azure.net"
+    }
+    error_message = "Azure Commercial private DNS zone names changed"
+  }
+}
+
+# SAT depends on the serverless hub workspace, which is skipped in Azure Government.
+run "plan_test_azure_gov_sat_rejected" {
+  state_key       = "azure_gov_sat_rejected"
+  command         = plan
+  expect_failures = [var.sat_configuration]
+  variables {
+    azure_environment = "usgovernment"
+    location          = "usgovvirginia"
+    allowed_fqdns     = ["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"]
+    sat_configuration = {
+      enabled = true
+    }
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+}
+
+# An unsupported cloud must be rejected.
+run "plan_test_azure_environment_invalid" {
+  state_key       = "azure_environment_invalid"
+  command         = plan
+  expect_failures = [var.azure_environment]
+  variables {
+    azure_environment = "usgovernmentl5"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+}

@@ -1,3 +1,7 @@
+# These resources target the hub workspace through provider_config { workspace_id }. That works in Azure
+# Commercial but not in Azure Government, where the SDK derives the wrong workspace host (see
+# providers.tf). SAT is currently rejected in Government (see sat_configuration validation), so
+# enabling it there requires switching these to a workspace-scoped provider with an explicit host.
 resource "databricks_secret" "client_secret" {
   key          = "client-secret"
   string_value = var.service_principal_client_secret
@@ -40,6 +44,10 @@ resource "databricks_secret" "client_id" {
 
 data "databricks_group" "admins" {
   display_name = "admins"
+
+  provider_config {
+    workspace_id = var.workspace_id
+  }
 }
 
 resource "databricks_service_principal" "sp" {

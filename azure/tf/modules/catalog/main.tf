@@ -12,27 +12,23 @@ module "naming" {
 }
 
 resource "databricks_storage_credential" "unity_catalog" {
+  provider = databricks.workspace
+
   name          = "cred-${var.resource_suffix}"
   metastore_id  = var.metastore_id
   force_destroy = var.force_destroy
   azure_managed_identity {
     access_connector_id = azurerm_databricks_access_connector.unity_catalog.id
   }
-
-  provider_config {
-    workspace_id = var.workspace_id
-  }
 }
 
 resource "databricks_external_location" "external_location" {
+  provider = databricks.workspace
+
   credential_name = databricks_storage_credential.unity_catalog.name
   name            = azurerm_storage_account.unity_catalog.name
   force_destroy   = var.force_destroy
   url             = local.uc_abfss_url
-
-  provider_config {
-    workspace_id = var.workspace_id
-  }
 
   lifecycle {
     ignore_changes = [effective_file_event_queue]
@@ -40,24 +36,20 @@ resource "databricks_external_location" "external_location" {
 }
 
 resource "databricks_catalog" "catalog" {
+  provider = databricks.workspace
+
   name           = var.catalog_name
   storage_root   = databricks_external_location.external_location.url
   force_destroy  = var.force_destroy
   isolation_mode = var.catalog_isolation_mode
-
-  provider_config {
-    workspace_id = var.workspace_id
-  }
 }
 
 resource "databricks_default_namespace_setting" "this" {
+  provider = databricks.workspace
+
   count = var.is_default_namespace ? 1 : 0
 
   namespace {
     value = databricks_catalog.catalog.name
-  }
-
-  provider_config {
-    workspace_id = var.workspace_id
   }
 }
