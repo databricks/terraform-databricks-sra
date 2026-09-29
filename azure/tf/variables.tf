@@ -1,3 +1,14 @@
+variable "azure_environment" {
+  type        = string
+  description = "(Optional) The Azure cloud environment to deploy into. Sets environment on the azurerm, azapi, and azuread providers, azure_environment on the databricks providers, and derives the private DNS zone names"
+  default     = "public"
+
+  validation {
+    condition     = contains(["public", "usgovernment"], var.azure_environment)
+    error_message = "azure_environment must be one of: public, usgovernment."
+  }
+}
+
 variable "databricks_account_id" {
   type        = string
   description = "(Required) The Databricks account ID target for account-level operations"
@@ -264,6 +275,12 @@ variable "sat_configuration" {
   })
   default     = {}
   description = "(Optional) Configuration for the SAT customization"
+
+  # SAT runs in the serverless hub workspace, which is not created in Azure Government (see main.tf).
+  validation {
+    condition     = !(var.sat_configuration.enabled && var.azure_environment == "usgovernment")
+    error_message = "SAT is not yet supported when azure_environment is usgovernment because the serverless hub workspace it runs in is not created there."
+  }
 }
 
 variable "sat_service_principal" {

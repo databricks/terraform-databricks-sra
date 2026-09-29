@@ -96,3 +96,13 @@ variable "virtual_network_peerings" {
   description = "(Optional) Map of virtual network peers"
   default     = {}
 }
+
+variable "private_dns_zone_names" {
+  type = object({
+    backend = optional(string, "privatelink.azuredatabricks.net")
+    dfs     = optional(string, "privatelink.dfs.core.windows.net")
+    blob    = optional(string, "privatelink.blob.core.windows.net")
+  })
+  description = "(Optional) Names of the private DNS zones created for the Databricks backend, DBFS DFS, and DBFS blob private endpoints. Defaults to the Azure Commercial zone names"
+  default     = {}
+}

@@ -134,13 +134,3 @@ resource "databricks_workspace_network_option" "this" {
   network_policy_id = var.network_policy_id
   workspace_id      = azurerm_databricks_workspace.this.workspace_id
 }
-
-resource "databricks_disable_legacy_access_setting" "this" {
-  disable_legacy_access {
-    value = true
-  }
-
-  provider_config {
-    workspace_id = azurerm_databricks_workspace.this.workspace_id
-  }
-}

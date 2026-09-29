@@ -1,6 +1,6 @@
 # Define a private DNS zone resource for the backend
 resource "azurerm_private_dns_zone" "backend" {
-  name                = "privatelink.azuredatabricks.net"
+  name                = var.private_dns_zone_names.backend
   resource_group_name = var.resource_group_name
 
   tags = var.tags
@@ -18,7 +18,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "backend" {
 
 # Define a private DNS zone for the dbfs_dfs resource
 resource "azurerm_private_dns_zone" "dbfs_dfs" {
-  name                = "privatelink.dfs.core.windows.net"
+  name                = var.private_dns_zone_names.dfs
   resource_group_name = var.resource_group_name
 
   tags = var.tags
@@ -36,7 +36,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dbfs_dfs" {
 
 # Define a private DNS zone for the dbfs_blob resource
 resource "azurerm_private_dns_zone" "dbfs_blob" {
-  name                = "privatelink.blob.core.windows.net"
+  name                = var.private_dns_zone_names.blob
   resource_group_name = var.resource_group_name
 
   tags = var.tags

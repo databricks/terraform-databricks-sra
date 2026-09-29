@@ -84,6 +84,7 @@ resource "databricks_permission_assignment" "sat_workspace_admin" {
   permissions  = ["ADMIN"]
   principal_id = module.sat[0].service_principal_id
 
+  # provider_config does not work in Azure Government; see the note at the top of modules/sat/main.tf.
   provider_config {
     workspace_id = local.sat_workspace.workspace_id
   }

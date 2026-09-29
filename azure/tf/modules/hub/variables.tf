@@ -92,3 +92,14 @@ variable "force_destroy" {
   description = "(Optional) Run a force destroy on the metastore if it is not empty. ONLY WORKS IF SET WHEN METASTORE IS CREATED"
   default     = false
 }
+
+variable "private_dns_zone_names" {
+  type = object({
+    backend   = optional(string, "privatelink.azuredatabricks.net")
+    dfs       = optional(string, "privatelink.dfs.core.windows.net")
+    blob      = optional(string, "privatelink.blob.core.windows.net")
+    key_vault = optional(string, "privatelink.vaultcore.azure.net")
+  })
+  description = "(Optional) Names of the private DNS zones created in the hub for the Databricks backend, DBFS DFS, DBFS blob, and Key Vault private endpoints. Defaults to the Azure Commercial zone names"
+  default     = {}
+}

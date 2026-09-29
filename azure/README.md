@@ -45,6 +45,39 @@ To fix this error, log in to the newly created spoke workspace by clicking on th
 portal. This must be done as the user who is running this Terraform, or the user running this Terraform must be granted
 workspace admin after the first user launches the workspace.
 
+## Azure Government Deployments
+
+`azure_environment = "usgovernment"` is the only Government-specific setting required. It sets
+`environment` on the `azurerm`, `azapi`, and `azuread` providers, `azure_environment` on both
+`databricks` providers, and derives the Databricks account console host along with every private DNS
+zone name. The default, `public`, is Azure Commercial and is unchanged from previous releases.
+
+The values derived for each cloud are defined in `tf/locals.tf`:
+
+| | `public` | `usgovernment` |
+| --- | --- | --- |
+| Account console host | `https://accounts.azuredatabricks.net` | `https://accounts.usgov.databricks.azure.us` |
+| Databricks backend zone | `privatelink.azuredatabricks.net` | `privatelink.usgov.databricks.azure.us` |
+| DBFS DFS zone | `privatelink.dfs.core.windows.net` | `privatelink.dfs.core.usgovcloudapi.net` |
+| DBFS blob zone | `privatelink.blob.core.windows.net` | `privatelink.blob.core.usgovcloudapi.net` |
+| Key Vault zone | `privatelink.vaultcore.azure.net` | `privatelink.vaultcore.usgovcloudapi.net` |
+
+These are fixed per cloud rather than configurable: Azure mandates the private DNS zone name for each
+resource type, and each cloud has a single Databricks account console. To bring your own DNS zones,
+set `create_workspace_vnet = false` and supply `existing_workspace_vnet.dns_zone_ids` — SRA then
+creates no zones of its own.
+
+See `tf/template_azure_gov.example.tfvars` for a complete starting point. Your Azure CLI session must
+be logged into the Government cloud before running Terraform:
+
+```shell
+az cloud set --name AzureUSGovernment
+az login
+```
+
+The `ARM_TENANT_ID` guidance above still applies. Note that because the environment is set in the
+Terraform configuration, the `ARM_ENVIRONMENT` environment variable has no effect.
+
 # Introduction
 
 Databricks has worked with thousands of customers to securely deploy the Databricks platform with appropriate security features to meet their architecture requirements.

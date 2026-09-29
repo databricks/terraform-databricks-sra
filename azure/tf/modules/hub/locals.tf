@@ -21,15 +21,11 @@ locals {
 
   # We use this to make sure that if we provision the 10th NCC in a region, that it does not cause subsequent terraform
   # plans/applies to fail due to the precondition on the NCC resource.
-  ncc_name             = "ncc-${var.location}-${var.resource_suffix}"
-  current_ncc_count    = length([for k in(data.databricks_mws_network_connectivity_configs.this.names == null ? [] : data.databricks_mws_network_connectivity_configs.this.names) : k if k != local.ncc_name])
-  ncc_region_limit     = 10
-  title_cased_location = title(var.location)
+  ncc_name          = "ncc-${var.location}-${var.resource_suffix}"
+  current_ncc_count = length([for k in(data.databricks_mws_network_connectivity_configs.this.names == null ? [] : data.databricks_mws_network_connectivity_configs.this.names) : k if k != local.ncc_name])
+  ncc_region_limit  = 10
 
-  # Define a map to store service tags with their corresponding values
-  service_tags = {
-    "sql"      = "Sql.${local.title_cased_location}",
-    "storage"  = "Storage.${local.title_cased_location}",
-    "eventhub" = "EventHub.${local.title_cased_location}"
-  }
+  # Regional service tag names exactly as Azure publishes them (e.g. Sql.EastUS, Sql.USGovVirginia), keyed by lowercase
+  # service name. Empty when the firewall is disabled.
+  service_tags = { for service, tag in data.azurerm_network_service_tags.this : lower(service) => tag.name }
 }

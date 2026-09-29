@@ -61,11 +61,6 @@ variable "metastore_id" {
   description = "(Required) The ID of the metastore to associate with the Databricks workspace"
 }
 
-variable "workspace_id" {
-  type        = string
-  description = "(Required) Workspace ID of the Databricks workspace this catalog belongs to"
-}
-
 variable "catalog_name" {
   type        = string
   description = "(Required) Name of the catalog to create"
@@ -91,11 +86,6 @@ variable "catalog_isolation_mode" {
 variable "ncc_name" {
   type        = string
   description = "Name of the NCC to use for this workspace"
-}
-
-variable "databricks_account_id" {
-  type        = string
-  description = "Databricks account ID"
 }
 
 variable "is_default_namespace" {
