@@ -313,7 +313,7 @@ module "vpc_endpoints" {
   count = var.network_configuration != "custom" && !local.is_serverless ? 1 : 0
 
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "3.11.0"
+  version = "6.7.3"
 
   vpc_id             = module.vpc[0].vpc_id
   security_group_ids = [aws_security_group.privatelink[0].id]
@@ -395,9 +395,10 @@ resource "aws_vpc_endpoint" "scc_tunnel_dataplane_relay_access" {
   }
 }
 
-# Look up AZ IDs for intra subnets to filter for service-direct limited AZ regions
+# Look up AZ IDs for intra subnets to filter for service-direct limited AZ regions. Only needed when the
+# Service Direct endpoint is created in one of those regions.
 data "aws_subnet" "intra" {
-  count = var.network_configuration != "custom" && !local.is_serverless ? length(module.vpc[0].intra_subnets) : 0
+  count = var.create_service_direct_vpce && var.network_configuration != "custom" && !local.is_serverless && contains(keys(var.service_direct_limited_az_regions), var.region) ? length(module.vpc[0].intra_subnets) : 0
   id    = module.vpc[0].intra_subnets[count.index]
 }
 

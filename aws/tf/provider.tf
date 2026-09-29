@@ -2,18 +2,19 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.76, <7.0"
+      version = ">= 6.28, < 7.0"
     }
     databricks = {
       source  = "databricks/databricks"
-      version = "~> 1.121"
+      version = ">= 1.121, < 2.0"
     }
     time = {
       source  = "hashicorp/time"
-      version = ">=0.12.1"
+      version = ">= 0.12.1, < 1.0"
     }
   }
-  required_version = "~>1.3"
+  # 1.9 is the minimum for variable validations that reference other variables (see network_configuration)
+  required_version = ">= 1.9, < 2.0"
 }
 
 # Authenticate using environment variables: https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html

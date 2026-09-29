@@ -9,7 +9,6 @@ resource "databricks_ai_gateway_model_provider_service" "bedrock" {
   model_provider_service_id = var.bedrock_provider_service.id
   parent                    = local.parent
   comment                   = var.bedrock_provider_service.comment
-  owner                     = var.owner
 
   config = {
     allow_all_targets = var.bedrock_provider_service.allow_all_targets
@@ -40,7 +39,6 @@ resource "databricks_ai_gateway_model_service" "this" {
   model_service_id = var.model_service.id
   parent           = local.parent
   comment          = var.model_service.comment
-  owner            = var.owner
 
   config = {
     rate_limits = var.model_service.rate_limits
@@ -98,7 +96,6 @@ resource "databricks_ai_gateway_mcp_service" "this" {
   mcp_service_id = var.mcp_service.id
   parent         = local.parent
   comment        = var.mcp_service.comment
-  owner          = var.owner
 
   config = {
     include_tool_selectors = var.mcp_service.include_tool_selectors

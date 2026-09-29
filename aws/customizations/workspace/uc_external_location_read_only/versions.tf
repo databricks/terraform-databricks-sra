@@ -1,13 +1,17 @@
 terraform {
   required_providers {
-    databricks = {
-      source  = "databricks/databricks"
-      version = ">=1.121.0"
-    }
     aws = {
       source  = "hashicorp/aws"
-      version = ">=5.76.0"
+      version = ">= 6.28, < 7.0"
+    }
+    databricks = {
+      source  = "databricks/databricks"
+      version = ">= 1.121, < 2.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = ">= 0.12.1, < 1.0"
     }
   }
-  required_version = "~>1.3"
+  required_version = ">= 1.9, < 2.0"
 }

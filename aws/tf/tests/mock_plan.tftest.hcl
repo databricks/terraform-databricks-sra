@@ -87,7 +87,8 @@ run "plan_test" {
 
 # Plans with the optional security features enabled, since the default run leaves them all off:
 # automatic cluster update, compliance security profile, enhanced security monitoring, account-level
-# disable of legacy features, IP-based ingress restriction, and serverless private endpoint rules.
+# disable of legacy features, IP-based ingress restriction, the security analysis tool, and serverless private
+# endpoint rules.
 run "plan_test_full_features" {
   command = plan
 
@@ -98,6 +99,7 @@ run "plan_test_full_features" {
     enable_automatic_cluster_update               = true
     enable_compliance_security_profile            = true
     enable_enhanced_security_monitoring           = true
+    enable_security_analysis_tool                 = true
     serverless_private_endpoint_rules = [
       {
         endpoint_service = "com.amazonaws.vpce.us-west-2.vpce-svc-0123456789abcdef0"
@@ -108,5 +110,129 @@ run "plan_test_full_features" {
       },
     ]
   }
+}
+
+# Plans a custom network that brings its own VPC, subnets, security group, and AWS VPC endpoints.
+run "plan_test_custom_network" {
+  command = plan
+
+  variables {
+    custom_general_access_vpce_id = "vpce-0abcd1234efgh5678"
+    custom_private_subnet_ids     = ["subnet-0abcd1234efgh5678", "subnet-1abcd1234efgh5678"]
+    custom_scc_relay_vpce_id      = "vpce-1abcd1234efgh5678"
+    custom_sg_id                  = "sg-0abcd1234efgh5678"
+    custom_vpc_id                 = "vpc-0abcd1234efgh5678"
+    network_configuration         = "custom"
+  }
+}
+
+# Plans a custom network whose endpoints are already registered with Databricks, so the Databricks-side
+# VPC endpoint IDs are supplied in place of the AWS VPC endpoint IDs.
+run "plan_test_custom_network_registered_endpoints" {
+  command = plan
+
+  variables {
+    custom_general_access_mws_vpce_id = "11111111-2222-3333-4444-555555555555"
+    custom_private_subnet_ids         = ["subnet-0abcd1234efgh5678", "subnet-1abcd1234efgh5678"]
+    custom_scc_relay_mws_vpce_id      = "66666666-7777-8888-9999-000000000000"
+    custom_sg_id                      = "sg-0abcd1234efgh5678"
+    custom_vpc_id                     = "vpc-0abcd1234efgh5678"
+    network_configuration             = "custom"
+  }
+}
+
+# Plans a Service Direct endpoint in us-west-2, where Service Direct supports only some AZs, so the intra subnets
+# are looked up to filter by AZ. The filtered subnet IDs are only known at apply, since the subnets are created in
+# the same plan.
+run "plan_test_service_direct_limited_az_region" {
+  command = plan
+
+  variables {
+    create_service_direct_vpce = true
+  }
+
+  assert {
+    condition     = length(aws_vpc_endpoint.service_direct) == 1 && length(data.aws_subnet.intra) == 2
+    error_message = "The Service Direct endpoint must be created and the intra subnets looked up in a limited-AZ region."
+  }
+}
+
+# Plans a Service Direct endpoint in us-east-2, which supports every AZ, so no subnet lookup is needed.
+run "plan_test_service_direct_all_az_region" {
+  command = plan
+
+  variables {
+    create_service_direct_vpce = true
+    region                     = "us-east-2"
+  }
+
+  assert {
+    condition     = length(aws_vpc_endpoint.service_direct) == 1 && length(data.aws_subnet.intra) == 0
+    error_message = "The Service Direct endpoint must be created without looking up subnet AZs in an all-AZ region."
+  }
+}
+
+# The default plan leaves Service Direct off, so the subnet AZ lookup must not run.
+run "plan_test_service_direct_off_skips_subnet_lookup" {
+  command = plan
+
+  assert {
+    condition     = length(aws_vpc_endpoint.service_direct) == 0 && length(data.aws_subnet.intra) == 0
+    error_message = "The intra subnet AZ lookup must be skipped when Service Direct is off."
+  }
+}
+
+# A custom network with none of its required inputs must be rejected by the network_configuration validations
+# rather than failing later on missing VPC, security group, or endpoint resources.
+run "custom_network_missing_inputs_rejected" {
+  command = plan
+
+  variables {
+    network_configuration = "custom"
+  }
+
+  expect_failures = [
+    var.network_configuration,
+  ]
+}
+
+# HYBRID mode creates AWS resources whose ARNs embed the account ID, so a missing aws_account_id must be
+# rejected by its validation rather than failing later on null values in IAM policy templates.
+run "hybrid_missing_aws_account_id_rejected" {
+  command = plan
+
+  variables {
+    aws_account_id = null
+  }
+
+  expect_failures = [
+    var.aws_account_id,
+  ]
+}
+
+# An empty aws_account_id (as left in template.tfvars.example) counts as missing in HYBRID mode.
+run "hybrid_empty_aws_account_id_rejected" {
+  command = plan
+
+  variables {
+    aws_account_id = ""
+  }
+
+  expect_failures = [
+    var.aws_account_id,
+  ]
+}
+
+# An aws_account_id that is not a 12-digit ID (here, a pasted ARN) must be rejected before it reaches IAM ARNs.
+run "malformed_aws_account_id_rejected" {
+  command = plan
+
+  variables {
+    aws_account_id = "arn:aws:iam::123456789012:root"
+  }
+
+  expect_failures = [
+    var.aws_account_id,
+  ]
 }
 # ---------------

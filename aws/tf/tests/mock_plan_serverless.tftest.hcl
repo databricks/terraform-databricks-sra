@@ -88,6 +88,15 @@ run "plan_test" {
   command = plan
 }
 
+# The empty aws_account_id left in template.tfvars.example must still be accepted in SERVERLESS mode.
+run "plan_test_empty_aws_account_id" {
+  command = plan
+
+  variables {
+    aws_account_id = ""
+  }
+}
+
 # NOTE: The rejection of compute_mode = "SERVERLESS" in GovCloud is enforced by a precondition on
 # databricks_mws_workspaces inside the workspace module. terraform test expect_failures can only
 # reference root-module checkable objects, so that combination cannot be asserted here.

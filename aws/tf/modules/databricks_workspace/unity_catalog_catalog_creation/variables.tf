@@ -4,22 +4,16 @@ variable "aws_account_id" {
   default     = null
 }
 
-variable "aws_iam_partition" {
-  type        = string
-  description = "AWS partition to use for IAM ARNs and policies"
-  default     = "aws"
-}
-
 variable "aws_assume_partition" {
   type        = string
   description = "AWS partition to use for assume role policies"
   default     = "aws"
 }
 
-variable "unity_catalog_iam_arn" {
+variable "aws_iam_partition" {
   type        = string
-  description = "Unity Catalog IAM ARN for the master role"
-  default     = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
+  description = "AWS partition to use for IAM ARNs and policies"
+  default     = "aws"
 }
 
 variable "cmk_admin_arn" {
@@ -42,6 +36,12 @@ variable "resource_prefix" {
 variable "uc_catalog_name" {
   description = "UC catalog name isolated to the workspace."
   type        = string
+}
+
+variable "unity_catalog_iam_arn" {
+  type        = string
+  description = "Unity Catalog IAM ARN for the master role"
+  default     = "arn:aws:iam::414351767826:role/unity-catalog-prod-UCMasterRole-14S5ZJVKOTYTL"
 }
 
 variable "user_workspace_catalog_admin" {

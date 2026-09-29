@@ -8,14 +8,11 @@ locals {
 }
 
 # Wait on Credential Due to Race Condition
-# https://kb.databricks.com/en_US/terraform/failed-credential-validation-checks-error-with-terraform 
-resource "null_resource" "previous" {
-  count = local.is_serverless ? 0 : 1
-}
-
+# https://kb.databricks.com/en_US/terraform/failed-credential-validation-checks-error-with-terraform
+# The root module's depends_on on this module includes the cross-account IAM role policy, so the timer starts only
+# after the role and policy exist, giving IAM time to propagate before the credential is validated.
 resource "time_sleep" "wait_30_seconds" {
-  count      = local.is_serverless ? 0 : 1
-  depends_on = [null_resource.previous]
+  count = local.is_serverless ? 0 : 1
 
   create_duration = "30s"
 }
@@ -161,9 +158,14 @@ resource "databricks_mws_ncc_binding" "ncc_binding" {
   workspace_id                   = databricks_mws_workspaces.workspace.workspace_id
 }
 # Preserve state across count addition for the serverless workspace variant
-moved {
+# null_resource.previous was an empty placeholder dependency for the wait above. Drop it from state without
+# destroying anything.
+removed {
   from = null_resource.previous
-  to   = null_resource.previous[0]
+
+  lifecycle {
+    destroy = false
+  }
 }
 
 moved {

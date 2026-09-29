@@ -26,9 +26,9 @@ variable "artifact_storage_bucket" {
     "sa-east-1"      = ["databricks-prod-artifacts-sa-east-1"]
     "us-east-1"      = ["databricks-prod-artifacts-us-east-1"]
     "us-east-2"      = ["databricks-prod-artifacts-us-east-2"]
+    "us-gov-west-1"  = ["databricks-prod-artifacts-us-gov-west-1"]
     "us-west-1"      = ["databricks-prod-artifacts-us-west-2"]
     "us-west-2"      = ["databricks-prod-artifacts-us-west-2", "databricks-update-oregon"]
-    "us-gov-west-1"  = ["databricks-prod-artifacts-us-gov-west-1"]
   }
 }
 
@@ -41,8 +41,18 @@ variable "audit_log_delivery_exists" {
 variable "aws_account_id" {
   description = "ID of the AWS account. Not required when compute_mode is SERVERLESS, which creates no AWS resources."
   type        = string
-  sensitive   = true
   default     = null
+
+  # An empty string (as left in template.tfvars.example) is treated the same as unset.
+  validation {
+    condition     = var.compute_mode == "SERVERLESS" || !(var.aws_account_id == null || var.aws_account_id == "")
+    error_message = "aws_account_id is required when compute_mode is \"HYBRID\"."
+  }
+
+  validation {
+    condition     = var.aws_account_id == null || var.aws_account_id == "" || can(regex("^[0-9]{12}$", var.aws_account_id))
+    error_message = "aws_account_id must be a 12-digit AWS account ID."
+  }
 }
 
 variable "aws_partition" {
@@ -166,7 +176,6 @@ variable "custom_vpc_id" {
 variable "databricks_account_id" {
   description = "ID of the Databricks account."
   type        = string
-  sensitive   = true
 }
 
 variable "databricks_gov_shard" {
@@ -201,35 +210,30 @@ variable "deployment_name" {
 variable "disable_legacy_features_at_account_level" {
   description = "Flag to disable legacy features (e.g. Hive Metastore, DBFS, no-isolation shared clusters) for newly created workspaces at the account level. Affects all new workspaces in the Databricks account, not just this deployment."
   type        = bool
-  sensitive   = true
   default     = false
 }
 
 variable "enable_automatic_cluster_update" {
   description = "Flag to enable automatic cluster update. Automatically enabled when the compliance security profile is enabled."
   type        = bool
-  sensitive   = true
   default     = false
 }
 
 variable "enable_compliance_security_profile" {
   description = "Flag to enable the compliance security profile."
   type        = bool
-  sensitive   = true
   default     = false
 }
 
 variable "enable_enhanced_security_monitoring" {
   description = "Flag to enable enhanced security monitoring. Automatically enabled when the compliance security profile is enabled."
   type        = bool
-  sensitive   = true
   default     = false
 }
 
 variable "enable_security_analysis_tool" {
   description = "Flag to enable the security analysis tool."
   type        = bool
-  sensitive   = true
   default     = false
 }
 
@@ -293,16 +297,16 @@ variable "general_access_config" {
     "us-east-2" = {
       primary_endpoint = "com.amazonaws.vpce.us-east-2.vpce-svc-041dc2b4d7796b8d3"
     }
-    "us-west-2" = {
-      primary_endpoint = "com.amazonaws.vpce.us-west-2.vpce-svc-0129f463fcfbc46c5"
-    }
-    "us-west-1" = {
-      primary_endpoint = "com.amazonaws.vpce.us-west-1.vpce-svc-09bb6ca26208063f2"
-    }
     "us-gov-west-1" = {
       primary_endpoint   = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-0f25e28401cbc9418"
       secondary_endpoint = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-08fddf710780b2a54"
       region_type        = "govcloud"
+    }
+    "us-west-1" = {
+      primary_endpoint = "com.amazonaws.vpce.us-west-1.vpce-svc-09bb6ca26208063f2"
+    }
+    "us-west-2" = {
+      primary_endpoint = "com.amazonaws.vpce.us-west-2.vpce-svc-0129f463fcfbc46c5"
     }
   }
 }
@@ -367,16 +371,16 @@ variable "log_storage_bucket_config" {
     "us-east-2" = {
       primary_bucket = "databricks-prod-storage-ohio"
     }
+    "us-gov-west-1" = {
+      primary_bucket   = "databricks-prod-storage-pendleton"
+      secondary_bucket = "databricks-prod-storage-pendleton-dod"
+      region_type      = "govcloud"
+    }
     "us-west-1" = {
       primary_bucket = "databricks-prod-storage-oregon"
     }
     "us-west-2" = {
       primary_bucket = "databricks-prod-storage-oregon"
-    }
-    "us-gov-west-1" = {
-      primary_bucket   = "databricks-prod-storage-pendleton"
-      secondary_bucket = "databricks-prod-storage-pendleton-dod"
-      region_type      = "govcloud"
     }
   }
 }
@@ -394,6 +398,33 @@ variable "network_configuration" {
   validation {
     condition     = contains(["custom", "isolated"], var.network_configuration)
     error_message = "Invalid network configuration. Allowed values are: custom, isolated."
+  }
+
+  # Custom networking brings its own VPC, subnets, security group, and PrivateLink endpoints. These checks
+  # apply only to HYBRID mode, since SERVERLESS creates no customer network.
+  validation {
+    condition     = var.compute_mode == "SERVERLESS" || var.network_configuration != "custom" || var.custom_vpc_id != null
+    error_message = "custom_vpc_id is required when network_configuration is \"custom\"."
+  }
+
+  validation {
+    condition     = var.compute_mode == "SERVERLESS" || var.network_configuration != "custom" || length(coalesce(var.custom_private_subnet_ids, [])) > 0
+    error_message = "custom_private_subnet_ids must contain at least one subnet ID when network_configuration is \"custom\"."
+  }
+
+  validation {
+    condition     = var.compute_mode == "SERVERLESS" || var.network_configuration != "custom" || var.custom_sg_id != null
+    error_message = "custom_sg_id is required when network_configuration is \"custom\"."
+  }
+
+  validation {
+    condition     = var.compute_mode == "SERVERLESS" || var.network_configuration != "custom" || var.custom_general_access_vpce_id != null || var.custom_general_access_mws_vpce_id != null
+    error_message = "custom_general_access_vpce_id or custom_general_access_mws_vpce_id is required when network_configuration is \"custom\"."
+  }
+
+  validation {
+    condition     = var.compute_mode == "SERVERLESS" || var.network_configuration != "custom" || var.custom_scc_relay_vpce_id != null || var.custom_scc_relay_mws_vpce_id != null
+    error_message = "custom_scc_relay_vpce_id or custom_scc_relay_mws_vpce_id is required when network_configuration is \"custom\"."
   }
 }
 
@@ -419,8 +450,8 @@ variable "region" {
     error_message = "us-gov-east-1 is not supported. Databricks on AWS GovCloud is only available in us-gov-west-1."
   }
   validation {
-    condition     = contains(["ap-northeast-1", "ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-southeast-3", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "eu-west-3", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2", "us-gov-west-1"], var.region)
-    error_message = "Valid values for var: region are (ap-northeast-1, ap-northeast-2, ap-south-1, ap-southeast-1, ap-southeast-2, ap-southeast-3, ca-central-1, eu-central-1, eu-west-1, eu-west-2, eu-west-3, sa-east-1, us-east-1, us-east-2, us-west-1, us-west-2, us-gov-west-1)."
+    condition     = contains(["ap-northeast-1", "ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-southeast-3", "ca-central-1", "eu-central-1", "eu-west-1", "eu-west-2", "eu-west-3", "sa-east-1", "us-east-1", "us-east-2", "us-gov-west-1", "us-west-1", "us-west-2"], var.region)
+    error_message = "Valid values for var: region are (ap-northeast-1, ap-northeast-2, ap-south-1, ap-southeast-1, ap-southeast-2, ap-southeast-3, ca-central-1, eu-central-1, eu-west-1, eu-west-2, eu-west-3, sa-east-1, us-east-1, us-east-2, us-gov-west-1, us-west-1, us-west-2)."
   }
 }
 
@@ -484,16 +515,16 @@ variable "region_name_config" {
     "us-east-2" = {
       primary_name = "ohio"
     }
-    "us-west-2" = {
-      primary_name = "oregon"
-    }
-    "us-west-1" = {
-      primary_name = "oregon"
-    }
     "us-gov-west-1" = {
       primary_name   = "pendleton"
       secondary_name = "pendleton-dod"
       region_type    = "govcloud"
+    }
+    "us-west-1" = {
+      primary_name = "oregon"
+    }
+    "us-west-2" = {
+      primary_name = "oregon"
     }
   }
 }
@@ -568,16 +599,16 @@ variable "scc_relay_config" {
     "us-east-2" = {
       primary_endpoint = "com.amazonaws.vpce.us-east-2.vpce-svc-090a8fab0d73e39a6"
     }
-    "us-west-2" = {
-      primary_endpoint = "com.amazonaws.vpce.us-west-2.vpce-svc-0158114c0c730c3bb"
-    }
-    "us-west-1" = {
-      primary_endpoint = "com.amazonaws.vpce.us-west-1.vpce-svc-04cb91f9372b792fe"
-    }
     "us-gov-west-1" = {
       primary_endpoint   = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-05f27abef1a1a3faa"
       secondary_endpoint = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-05c210a2feea23ad7"
       region_type        = "govcloud"
+    }
+    "us-west-1" = {
+      primary_endpoint = "com.amazonaws.vpce.us-west-1.vpce-svc-04cb91f9372b792fe"
+    }
+    "us-west-2" = {
+      primary_endpoint = "com.amazonaws.vpce.us-west-2.vpce-svc-0158114c0c730c3bb"
     }
   }
 }
@@ -705,9 +736,9 @@ variable "shared_datasets_bucket" {
     "sa-east-1"      = "databricks-datasets-saopaulo"
     "us-east-1"      = "databricks-datasets-virginia"
     "us-east-2"      = "databricks-datasets-ohio"
+    "us-gov-west-1"  = "databricks-datasets-pendleton"
     "us-west-1"      = "databricks-datasets-oregon"
     "us-west-2"      = "databricks-datasets-oregon"
-    "us-gov-west-1"  = "databricks-datasets-pendleton"
   }
 }
 
@@ -771,16 +802,16 @@ variable "system_table_bucket_config" {
     "us-east-2" = {
       primary_bucket = "system-tables-prod-us-east-2-uc-metastore-bucket"
     }
+    "us-gov-west-1" = {
+      primary_bucket   = "system-tables-prod-us-gov-west-1-gov-uc-metastore-bucket"
+      secondary_bucket = "system-tables-prod-us-gov-west-1-dod-uc-metastore-bucket"
+      region_type      = "govcloud"
+    }
     "us-west-1" = {
       primary_bucket = "system-tables-prod-us-west-1-uc-metastore-bucket"
     }
     "us-west-2" = {
       primary_bucket = "system-tables-prod-us-west-2-uc-metastore-bucket"
-    }
-    "us-gov-west-1" = {
-      primary_bucket   = "system-tables-prod-us-gov-west-1-gov-uc-metastore-bucket"
-      secondary_bucket = "system-tables-prod-us-gov-west-1-dod-uc-metastore-bucket"
-      region_type      = "govcloud"
     }
   }
 }
