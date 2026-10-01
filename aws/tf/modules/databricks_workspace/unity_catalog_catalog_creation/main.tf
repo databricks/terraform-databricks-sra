@@ -2,14 +2,11 @@
 # storage credential, external location) is skipped and the workspace catalog uses Databricks default
 # storage. In HYBRID mode the full customer-managed catalog storage is provisioned.
 
-resource "null_resource" "previous" {
-  count = var.is_serverless ? 0 : 1
-}
-
-# Wait to prevent race condition between IAM role and external location validation
+# Wait to prevent race condition between IAM role and external location validation. The timer starts once the
+# role and its policy attachment exist, so IAM has time to propagate before the external location is validated.
 resource "time_sleep" "wait_60_seconds" {
   count           = var.is_serverless ? 0 : 1
-  depends_on      = [null_resource.previous]
+  depends_on      = [aws_iam_role.unity_catalog, aws_iam_policy_attachment.unity_catalog_attach]
   create_duration = "60s"
 }
 
@@ -207,9 +204,14 @@ resource "databricks_grant" "workspace_catalog" {
 # The AWS-backed resources are now count-gated on is_serverless. Migrate existing (HYBRID) state from
 # the previously un-counted addresses to index [0]. Combined with the module-level moved block in the
 # root configuration, existing deployments migrate without destroy/recreate.
-moved {
+# null_resource.previous was an empty placeholder dependency for the wait above. Drop it from state without
+# destroying anything.
+removed {
   from = null_resource.previous
-  to   = null_resource.previous[0]
+
+  lifecycle {
+    destroy = false
+  }
 }
 
 moved {

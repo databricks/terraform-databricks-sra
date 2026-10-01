@@ -95,7 +95,9 @@ module "databricks_mws_workspace" {
   network_connectivity_configuration_id = module.network_connectivity_configuration.ncc_id
   network_policy_id                     = module.network_policy.network_policy_id
 
-  depends_on = [module.unity_catalog_metastore_creation, module.network_connectivity_configuration, module.network_policy, module.disable_legacy_features]
+  # aws_iam_role_policy.cross_account makes the module's credential wait start only after the cross-account role and
+  # its policy exist.
+  depends_on = [aws_iam_role_policy.cross_account, module.disable_legacy_features, module.network_connectivity_configuration, module.network_policy, module.unity_catalog_metastore_creation]
 }
 
 # Wait for the newly created workspace to become fully available. Workspace-level settings applied
@@ -172,7 +174,7 @@ module "unity_catalog_catalog_creation" {
   depends_on = [module.unity_catalog_metastore_assignment]
 }
 
-# Restrictive Root Buckt Policy
+# Restrictive Root Bucket Policy
 module "restrictive_root_bucket" {
   count  = local.is_serverless ? 0 : 1
   source = "./modules/databricks_workspace/restrictive_root_bucket"
@@ -185,7 +187,7 @@ module "restrictive_root_bucket" {
   aws_partition             = local.computed_aws_partition
   workspace_id              = module.databricks_mws_workspace.workspace_id
   region_name               = var.databricks_gov_shard == "dod" ? var.region_name_config[var.region].secondary_name : var.region_name_config[var.region].primary_name
-  root_s3_bucket            = "${var.resource_prefix}-workspace-root-storage"
+  root_s3_bucket            = aws_s3_bucket.root_storage_bucket[0].id
 }
 
 # Disable legacy settings like Hive Metastore, Disables Databricks Runtime prior to 13.3 LTS, DBFS, DBFS Mounts,etc.
@@ -268,8 +270,6 @@ module "security_analysis_tool" {
 
   # Authentication Variables
   databricks_account_id = var.databricks_account_id
-  client_id             = null # Provide Workspace Admin ID
-  client_secret         = null # Provide Workspace Admin Secret
 
   use_sp_auth = true
 

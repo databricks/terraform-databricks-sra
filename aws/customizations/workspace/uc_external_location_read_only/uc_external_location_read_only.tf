@@ -1,14 +1,13 @@
-resource "null_resource" "previous" {}
-
+// Wait for the IAM role and policy to propagate before creating the external location
 resource "time_sleep" "wait_60_seconds" {
-  depends_on = [null_resource.previous]
+  depends_on = [aws_iam_role_policy.storage_credential_policy]
 
   create_duration = "60s"
 }
 
-// Storage Credential
+// Storage Credential (created before the role, which needs its external ID)
 resource "databricks_storage_credential" "external" {
-  name = aws_iam_role.storage_credential_role.name
+  name = "${var.resource_prefix}-storage-credential-example"
   aws_iam_role {
     role_arn = "arn:aws:iam::${var.aws_account_id}:role/${var.resource_prefix}-storage-credential-example"
   }

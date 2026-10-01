@@ -1,0 +1,37 @@
+# This workflow is used for testing the aws customizations. Each customization is a standalone root module, so each
+# is initialized, validated, and tested separately.
+
+name: AWS Customizations Tests
+on:
+  push:
+    paths:
+      - 'aws/customizations/**'
+      - 'aws/tf/.tflint.hcl'
+      - '.github/workflows/aws-customizations-test.yml'
+  pull_request:
+    paths:
+      - 'aws/customizations/**'
+      - 'aws/tf/.tflint.hcl'
+      - '.github/workflows/aws-customizations-test.yml'
+jobs:
+  test-aws-customizations:
+    strategy:
+      fail-fast: false
+      matrix:
+        customization:
+          - serverless_privatelink/dbx_proxy
+          - serverless_privatelink/git
+          - serverless_privatelink/kafka
+          - serverless_privatelink/rds
+          - serverless_privatelink/s3_interface
+          - workspace/admin_configuration
+          - workspace/ai_gateway_rate_limits
+          - workspace/solution_accelerators/system_tables_audit_log
+          - workspace/uc_ai_gateway
+          - workspace/uc_external_location_read_only
+    uses: ./.github/workflows/terraform-ruw.yml
+    with:
+      terraform_fmt_check: true
+      terraform_validate_enabled: true
+      tflint_args: "--config=$GITHUB_WORKSPACE/aws/tf/.tflint.hcl"
+      working_directory: aws/customizations/${{ matrix.customization }}

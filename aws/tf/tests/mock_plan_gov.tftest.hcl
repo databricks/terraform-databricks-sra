@@ -62,7 +62,7 @@ variables {
   firewall_subnets_cidr             = ["10.0.7.0/24", "10.0.8.0/24"]
   region                            = "us-gov-west-1"
   resource_prefix                   = "my-resource-prefix"
-  sg_egress_ports                   = ["443", "80"]
+  sg_egress_ports                   = ["443", "6666", "80"]
   admin_user                        = "workspace-admin-user@example.com"
   vpc_cidr_range                    = "10.0.0.0/16"
   databricks_gov_shard              = "civilian"
@@ -75,5 +75,10 @@ variables {
 # This runs a plan command on the module directly
 run "plan_test" {
   command = plan
+
+  assert {
+    condition     = !contains([for rule in aws_security_group.sg[0].egress : rule.from_port], 6666)
+    error_message = "Port 6666 (SCC relay) must be filtered from the workspace security group egress rules in GovCloud."
+  }
 }
 # ---------------

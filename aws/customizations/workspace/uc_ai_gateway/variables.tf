@@ -95,12 +95,6 @@ variable "model_service" {
   }
 }
 
-variable "owner" {
-  description = "Optional owner assigned to each enabled UC AI Gateway securable."
-  type        = string
-  default     = null
-}
-
 variable "schema_name" {
   description = "Unity Catalog schema containing the AI Gateway securables."
   type        = string

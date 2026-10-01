@@ -113,8 +113,11 @@ compliance_standards = ["STANDARD_A", "STANDARD_B"]
 # NOTE: Enhanced security monitoring is automatically enabled when the compliance security profile is enabled.
 enable_enhanced_security_monitoring = false
 
-# Enable the security analysis tool (review configurations + credentials in main.tf and the official SAT documentation prior to enabling)
+# Enable the security analysis tool (review the configuration in main.tf and the official SAT documentation prior to enabling)
 # SAT documentation can be found here: https://databricks-industry-solutions.github.io/security-analysis-tool/
+# The SAT service principal credentials are not managed by Terraform. After the first apply, add them to the SAT secret scope:
+#   databricks secrets put-secret sat_scope client-id
+#   databricks secrets put-secret sat_scope client-secret
 # Enabling this will add pypi.org and files.pythonhosted.org to the network policy egress allow list so SAT can install its dependencies.
 enable_security_analysis_tool = false
 

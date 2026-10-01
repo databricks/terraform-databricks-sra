@@ -52,7 +52,6 @@ module "uc_ai_gateway" {
       requests       = 60
     }]
   }
-  owner       = var.admin_user
   schema_name = "ai_gateway"
 }
 ```
@@ -74,5 +73,9 @@ mcp_service = {
   }]
 }
 ```
+
+### Ownership
+
+Starting with provider 1.132.0, the AI Gateway resources no longer accept an `owner` argument, so the model-provider, model, and MCP services are owned by the identity that runs Terraform. Use `databricks_grants` to give other principals access.
 
 The provider resources and API are Public Beta. Keep this customization opt-in until Databricks promotes the feature and its Terraform state behavior has proven stable.
