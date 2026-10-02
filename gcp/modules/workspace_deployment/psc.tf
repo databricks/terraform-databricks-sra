@@ -7,6 +7,13 @@ resource "google_compute_subnetwork" "backend_pe_subnetwork" {
 
   private_ip_google_access = true
 
+  # VPC flow logs for network visibility / auditing.
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+
   depends_on = [google_compute_network.dbx_private_vpc]
 }
 
