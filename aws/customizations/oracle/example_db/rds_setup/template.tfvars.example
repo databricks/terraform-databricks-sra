@@ -1,0 +1,31 @@
+# =============================================================================
+# Example configuration: test Amazon RDS for Oracle instance (testing only)
+# =============================================================================
+
+# AWS region for deployment (e.g. us-east-1 or us-gov-west-1).
+region = ""
+
+# Prefix used for naming and tagging resources.
+resource_prefix = ""
+
+# VPC and private subnets (at least two AZs) for the RDS instance. Use the
+# Databricks workspace VPC, or a VPC reachable from it.
+vpc_id     = ""
+subnet_ids = ["", ""]
+
+# CIDRs allowed to reach the Oracle listeners (1521 native, 2484 TLS). Include the
+# subnet CIDRs of Databricks classic compute and of the serverless PrivateLink NLB.
+allowed_cidr_blocks = ["10.0.0.0/16"]
+
+# Optional: security groups allowed to reach the Oracle listeners (e.g. the
+# Databricks classic-compute security group).
+# allowed_security_group_ids = ["sg-xxxxxxxxxxxxxxxxx"]
+
+# Optional overrides.
+# oracle_edition       = "oracle-se2"
+# major_engine_version = "19"
+# engine_version       = null
+# instance_class       = "db.m5.large"
+# db_name              = "ORCL"
+# master_username      = "oracleadmin"
+# tls_port             = 2484
