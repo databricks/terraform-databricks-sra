@@ -19,6 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         customization:
+          - oracle
+          - oracle/example_db/rds_setup
           - serverless_privatelink/dbx_proxy
           - serverless_privatelink/git
           - serverless_privatelink/kafka
