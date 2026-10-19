@@ -29,6 +29,22 @@ mock_provider "databricks" {
     }
   }
 
+  # Default to an account without disable_legacy_features enabled. Runs override this to cover accounts where it is.
+  mock_data "databricks_account_setting_v2" {
+    defaults = {
+      effective_boolean_val = {
+        value = false
+      }
+    }
+  }
+
+  # Default to an account where this deployment's workspace does not exist yet (a new deployment).
+  mock_data "databricks_mws_workspaces" {
+    defaults = {
+      ids = {}
+    }
+  }
+
 }
 # ---------------
 
@@ -83,6 +99,79 @@ variables {
 # This runs a plan command on the module directly
 run "plan_test" {
   command = plan
+}
+
+# New workspace, account setting off: the workspace-level legacy settings are managed.
+run "legacy_settings_new_workspace_account_off" {
+  command = plan
+
+  assert {
+    condition     = length(module.disable_legacy_settings) == 1
+    error_message = "Workspace-level legacy settings should be managed when the account setting is off."
+  }
+}
+
+# New workspace, account setting already enabled (e.g. by another deployment): the workspace settings are locked, so
+# managing them would make terraform destroy fail.
+run "legacy_settings_new_workspace_account_on" {
+  command = plan
+
+  override_data {
+    target = data.databricks_account_setting_v2.disable_legacy_features
+    values = {
+      effective_boolean_val = {
+        value = true
+      }
+    }
+  }
+
+  assert {
+    condition     = length(module.disable_legacy_settings) == 0
+    error_message = "Workspace-level legacy settings should be skipped when the account setting is already enabled."
+  }
+}
+
+# New workspace, account setting enabled by this deployment: same as above.
+run "legacy_settings_new_workspace_enabled_by_this_deployment" {
+  command = plan
+
+  variables {
+    disable_legacy_features_at_account_level = true
+  }
+
+  assert {
+    condition     = length(module.disable_legacy_features) == 1 && length(module.disable_legacy_settings) == 0
+    error_message = "Workspace-level legacy settings should be skipped when this deployment enables the account setting."
+  }
+}
+
+# Existing workspace, account setting enabled later: the workspace settings stay managed, since removing them from a
+# workspace that predates the account setting would re-enable legacy access.
+run "legacy_settings_existing_workspace_account_on" {
+  command = plan
+
+  override_data {
+    target = data.databricks_account_setting_v2.disable_legacy_features
+    values = {
+      effective_boolean_val = {
+        value = true
+      }
+    }
+  }
+
+  override_data {
+    target = data.databricks_mws_workspaces.all
+    values = {
+      ids = {
+        "my-databricks-dev" = 1234567890123456
+      }
+    }
+  }
+
+  assert {
+    condition     = length(module.disable_legacy_settings) == 1
+    error_message = "Workspace-level legacy settings should stay managed for an existing workspace."
+  }
 }
 
 # Plans with the optional security features enabled, since the default run leaves them all off:
