@@ -53,8 +53,8 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
     }
     # The API now populates cross_workspace_access server-side when unset (defaulting to
     # LEGACY_MODE), which the provider likewise reports as an inconsistent result after apply.
-    # Set it explicitly to match, for the same reason as private_access above.
-    cross_workspace_access = {
+    # Set it explicitly except in GovCloud West, where this setting is unsupported.
+    cross_workspace_access = var.region == "us-gov-west-1" ? null : {
       restriction_mode = "LEGACY_MODE"
     }
 
