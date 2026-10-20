@@ -28,12 +28,6 @@ variable "workspace_name" {
   default = "sra-deployed-ws"
 }
 
-variable "databricks_google_service_account_key" {
-  # Base64 encoded service account key for the Google service account
-  # This is optional and can be used if you want to authenticate using a key file
-  default = ""
-}
-
 ##### NAMING VARIABLES #####
 variable "resource_prefix" {
   # Prefix applied to resource names. Final format: <prefix>-<resource>-<deployment_suffix>
@@ -81,11 +75,6 @@ variable "use_existing_PSC_EP" {
   default = false
 }
 
-variable "google_pe_subnet" {
-  # Name of the subnet to be used for the PSC endpoints
-  default = "databricks-pe-subnet"
-}
-
 variable "google_pe_subnet_ip_cidr_range" {
   # CIDR range for private endpoint subnet
   default = "10.3.0.0/24"
@@ -116,12 +105,6 @@ variable "harden_network" {
   default = true
 }
 
-variable "hive_metastore_ip" {
-  # For the value of the regional Hive Metastore IP, refer to the Databricks documentation:
-  # https://docs.gcp.databricks.com/en/resources/ip-domain-region.html
-  default = "34.76.244.202" # Value for europe-west1 region
-}
-
 variable "databricks_control_plane_ips" {
   # Regional control-plane IPs used in the egress firewall rule (non-PSC mode only).
   # Look up the IPs for your region at:
@@ -131,7 +114,8 @@ variable "databricks_control_plane_ips" {
   description = "Databricks control-plane IPs for your region. Required when harden_network = true and use_psc = false. See https://docs.databricks.com/gcp/en/resources/ip-domain-region"
 }
 
-# Users can connect to workspace only from these IP addresses
+# Users can connect to workspace only from these IP addresses (via the workspace
+# IP access list). Default allows all; set specific CIDRs to restrict access.
 variable "ip_addresses" {
   # List of allowed IP addresses
   type    = list(string)
@@ -199,6 +183,20 @@ variable "use_frontend_psc" {
   description = "Set to true to enable frontend Private Service Connect (PSC) for the workspace."
 }
 
+variable "public_access_enabled" {
+  # Controls the public_access_enabled flag on the workspace's private access
+  # settings (only relevant when use_psc or use_frontend_psc is set).
+  #
+  # Defaults to true to preserve reachability: this template configures back-end
+  # PSC only and does NOT provision front-end PSC, so disabling public access
+  # without a separate front-end private connection would lock users out of the
+  # workspace UI/API. Set to false ONLY when front-end private connectivity is
+  # in place, to make the workspace private-only.
+  type        = bool
+  default     = true
+  description = "Whether the workspace is reachable over the public internet. Set to false for a private-only workspace once front-end private connectivity exists."
+}
+
 variable "use_existing_databricks_vpc_eps" {
   # Flag to use existing Databricks VPC Endpoints for PSC
   default = false
@@ -264,28 +262,6 @@ variable "skip_user_lookup" {
   description = "Skip user lookup data sources (useful for destroy operations)."
 }
 
-variable "admin_user_email" {
-  # Legacy: email address of the admin user to be added to the workspace.
-  # Prefer resource_owner going forward.
-  type        = string
-  default     = ""
-  description = "Legacy admin user email. Prefer var.resource_owner."
-}
-
-variable "can_create_workspaces" {
-  # Flag indicating whether the service account has permission to create workspaces
-  type        = bool
-  default     = true
-  description = "Flag indicating the service account is ready to create workspaces."
-}
-
-variable "create_admin_user" {
-  # Legacy flag to create an admin user in the workspace
-  type        = bool
-  default     = false
-  description = "Legacy flag to create the admin user in the workspace."
-}
-
 ##### METASTORE VARIABLES #####
 variable "regional_metastore_id" {
   # ID of the regional Unity Catalog metastore
@@ -305,9 +281,28 @@ variable "default_catalog_name" {
   EOT
 }
 
-variable "provision_regional_metastore" {
-  # Flag to provision a regional metastore
-  default = false
+##### WORKSPACE SETTINGS #####
+variable "manage_workspace_settings" {
+  type        = bool
+  default     = true
+  description = <<-EOT
+    Apply workspace-level settings (databricks_workspace_conf + IP access list).
+    When true, the module also grants the provisioning service account workspace
+    ADMIN so the workspace-scoped provider is authorized to apply them. Set to
+    false if you manage these separately or the provisioning identity is not a
+    databricks_user in the account.
+  EOT
+}
+
+variable "workspace_conf" {
+  type = map(string)
+  default = {
+    enableIpAccessLists    = "true"
+    enableVerboseAuditLogs = "true"
+    enableDbfsFileBrowser  = "false"
+    maxTokenLifetimeDays   = "90"
+  }
+  description = "Workspace configuration (custom_config) applied via databricks_workspace_conf. Override to customize the default workspace hardening."
 }
 
 ##### SERVERLESS / COMPUTE MODE #####

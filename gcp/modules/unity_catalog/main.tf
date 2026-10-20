@@ -11,16 +11,54 @@ locals {
 
 
 
+# Access-log sink for the Unity Catalog buckets below. Hardened, and exempt from
+# its own access-logging check to avoid a self-referential logging loop.
+resource "google_storage_bucket" "logs" {
+  #checkov:skip=CKV_GCP_62:This bucket is the access-log sink; it does not need its own access logs.
+  name                        = "${local.prefix}-logs"
+  location                    = var.location
+  force_destroy               = true
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  versioning {
+    enabled = true
+  }
+}
+
+# Cloud Storage delivers access logs as the cloud-storage-analytics group;
+# grant it permission to write log objects into the log bucket.
+resource "google_storage_bucket_iam_member" "log_writer" {
+  bucket = google_storage_bucket.logs.name
+  role   = "roles/storage.objectCreator"
+  member = "group:cloud-storage-analytics@google.com"
+}
+
 resource "google_storage_bucket" "unity_metastore" {
-  name          = "${local.prefix}-metastore"
-  location      = var.location
-  force_destroy = true
+  name                        = "${local.prefix}-metastore"
+  location                    = var.location
+  force_destroy               = true
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  versioning {
+    enabled = true
+  }
+  logging {
+    log_bucket = google_storage_bucket.logs.name
+  }
 }
 
 resource "google_storage_bucket" "ext_bucket" {
-  name          = "${local.prefix}-ext"
-  location      = var.location
-  force_destroy = true
+  name                        = "${local.prefix}-ext"
+  location                    = var.location
+  force_destroy               = true
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  versioning {
+    enabled = true
+  }
+  logging {
+    log_bucket = google_storage_bucket.logs.name
+  }
 }
 
 resource "databricks_metastore" "this" {
@@ -61,8 +99,10 @@ resource "databricks_metastore_assignment" "this" {
   count        = length(var.databricks_workspace_ids)
   workspace_id = var.databricks_workspace_ids[count.index]
   metastore_id = databricks_metastore.this.id
-
-  default_catalog_name = "hive_metastore"
+  # NOTE: default_catalog_name on this resource is deprecated. Modern Unity
+  # Catalog assigns a per-workspace default catalog automatically; manage it
+  # explicitly with databricks_default_namespace_setting if a specific default
+  # is required (see the workspace_deployment module for that pattern).
 }
 
 resource "databricks_metastore_assignment" "external" {
@@ -71,8 +111,7 @@ resource "databricks_metastore_assignment" "external" {
   count        = length(var.databricks_workspace_ids_for_existing_metastore)
   workspace_id = var.databricks_workspace_ids_for_existing_metastore[count.index]
   metastore_id = var.existing_metastore_id
-
-  default_catalog_name = "hive_metastore"
+  # NOTE: default_catalog_name on this resource is deprecated (see above).
 }
 
 //Storage credentials

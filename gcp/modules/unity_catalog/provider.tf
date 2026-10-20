@@ -1,13 +1,16 @@
 terraform {
   required_providers {
     databricks = {
-      source = "databricks/databricks"
+      source  = "databricks/databricks"
+      version = ">=1.113.0"
     }
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
+      version = ">=5.43.1"
     }
     random = {
-      source = "hashicorp/random"
+      source  = "hashicorp/random"
+      version = "~> 3.5"
     }
   }
 }
@@ -21,15 +24,8 @@ provider "databricks" {
   alias                  = "workspace"
   host                   = var.databricks_workspace_url
   google_service_account = var.databricks_google_service_account
-  version                = "1.18.0"
 }
 
-// initialize provider in "MWS" mode for account-level resources
-provider "databricks" {
-  alias                  = "mws"
-  host                   = "https://accounts.staging.gcp.databricks.com"
-  account_id             = var.databricks_account_id
-  google_service_account = var.databricks_google_service_account
-  version                = "1.18.0"
-}
-
+# NOTE: the previous "mws" (account-level) provider was removed — it was unused
+# by any resource in this module and pointed at a staging control-plane host. All
+# resources here use the workspace-scoped provider above.

@@ -1,11 +1,14 @@
 terraform {
   # Note: no backend block here. This module is intended to be consumed from a
   # root configuration (e.g. gcp/examples/*) that declares its own backend.
+  #
+  # This module self-configures its databricks providers (accounts + workspace)
+  # below, so it does NOT declare configuration_aliases. Callers therefore must
+  # NOT pass a `providers = { databricks.accounts = ... }` mapping.
   required_providers {
     databricks = {
-      source                = "databricks/databricks"
-      version               = ">=1.113.0"
-      configuration_aliases = [databricks.accounts]
+      source  = "databricks/databricks"
+      version = ">=1.113.0"
     }
     google = {
       source  = "hashicorp/google"

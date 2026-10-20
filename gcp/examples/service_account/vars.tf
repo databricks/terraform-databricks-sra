@@ -1,4 +1,8 @@
-variable "prefix" {}
+variable "sa_name" {
+  type        = string
+  default     = "databricks-workspace-creator"
+  description = "Name of the Google service account to create for Databricks provisioning."
+}
 
 variable "project" {
   type    = string
