@@ -52,6 +52,9 @@ The `network_configuration` variable applies to `HYBRID` workspaces only; server
     - [Unity Catalog - Workspace Catalog](https://docs.databricks.com/en/catalogs/create-catalog.html)
     - [Audit Log Delivery Bucket](https://docs.databricks.com/aws/en/admin/account-settings-e2/audit-aws-storage)
 
+- **CloudTrail S3 Data Events**: A dedicated [CloudTrail trail](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html#cloudtrail-object-level-tracking) and log bucket record S3 object-level events (e.g. `GetObject`, `PutObject`, `DeleteObject`) for the workspace root bucket. Logging for the workspace catalog and audit log delivery buckets is opt-in through the *cloudtrail_s3_data_events* variable. The log bucket is encrypted with a dedicated CMK; set *existing_log_bucket_name* to deliver to a bucket you already manage instead.
+    - **NOTE**: CloudTrail data events are billed per event. The trail records data events only; management events are left to your existing trails.
+
 - **IAM Roles**: Three IAM roles are created to support the following functionalities:
     - [Classic Compute (EC2) Provisioning](https://docs.databricks.com/en/admin/account-settings-e2/credentials.html)
     - [Data Access for Unity Catalog - Workspace Catalog](https://docs.databricks.com/en/connect/unity-catalog/cloud-storage/storage-credentials.html#step-1-create-an-iam-role)
@@ -67,10 +70,11 @@ The `network_configuration` variable applies to `HYBRID` workspaces only; server
 
 - **Scoped-down IAM Policy for the Databricks cross-account role**: A [cross-account role](https://docs.databricks.com/administration-guide/account-api/iam-role.html) is needed for users, jobs, and other third-party tools to spin up Databricks clusters within the customer's classic compute plane. This role can be scoped down to function only within the classic compute plane's VPC, subnets, and security group.
 
-- **AWS KMS Keys**: Three AWS KMS keys are created to support the following functionalities:
+- **AWS KMS Keys**: Four AWS KMS keys are created to support the following functionalities:
     - [Workspace Storage](https://docs.databricks.com/en/security/keys/customer-managed-keys.html#customer-managed-keys-for-workspace-storage)
     - [Managed Services](https://docs.databricks.com/en/security/keys/customer-managed-keys.html#customer-managed-keys-for-managed-services)
     - [Unity Catalog - Workspace Catalog](https://docs.databricks.com/en/connect/unity-catalog/cloud-storage/manage-external-locations.html#configure-an-encryption-algorithm-on-an-external-location)
+    - [CloudTrail Log Files](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/encrypting-cloudtrail-log-files-with-aws-kms.html) (skipped when you bring your own CloudTrail log bucket)
 
 ### Core Databricks Components
 

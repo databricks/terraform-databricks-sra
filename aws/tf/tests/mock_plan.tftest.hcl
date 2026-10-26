@@ -271,6 +271,118 @@ run "plan_test_service_direct_off_skips_subnet_lookup" {
   }
 }
 
+# The default plan logs S3 data events for the workspace root bucket only.
+run "cloudtrail_default_root_bucket_only" {
+  command = plan
+
+  assert {
+    condition     = length(aws_cloudtrail.s3_data_events) == 1 && length(aws_s3_bucket.cloudtrail) == 1
+    error_message = "The CloudTrail trail and log bucket must be created by default."
+  }
+
+  assert {
+    condition     = local.cloudtrail_logged_bucket_names == tolist(["my-databricks-dev-workspace-root-storage"])
+    error_message = "Only the workspace root bucket must be logged by default."
+  }
+
+  assert {
+    condition     = length(aws_kms_key.cloudtrail) == 1 && anytrue([for rule in aws_s3_bucket_server_side_encryption_configuration.cloudtrail[0].rule : rule.apply_server_side_encryption_by_default[0].sse_algorithm == "aws:kms"])
+    error_message = "The CloudTrail log bucket must be encrypted with a dedicated CMK."
+  }
+}
+
+# Opting in to every bucket logs all three when this deployment creates the audit log delivery bucket.
+run "cloudtrail_all_buckets" {
+  command = plan
+
+  variables {
+    cloudtrail_s3_data_events = {
+      audit_log_delivery_bucket = true
+      catalog_bucket            = true
+    }
+  }
+
+  assert {
+    condition     = length(aws_cloudtrail.s3_data_events) == 1 && local.cloudtrail_audit_log_delivery_bucket
+    error_message = "The audit log delivery bucket must be logged when this deployment creates it."
+  }
+}
+
+# The audit log delivery bucket is not created when audit log delivery already exists, so it cannot be logged.
+run "cloudtrail_audit_log_delivery_exists" {
+  command = plan
+
+  variables {
+    audit_log_delivery_exists = true
+    cloudtrail_s3_data_events = {
+      audit_log_delivery_bucket = true
+      workspace_root_bucket     = false
+    }
+  }
+
+  assert {
+    condition     = length(aws_cloudtrail.s3_data_events) == 0 && length(aws_s3_bucket.cloudtrail) == 0
+    error_message = "The CloudTrail trail must be skipped when the only selected bucket is not created."
+  }
+
+  expect_failures = [
+    check.cloudtrail_audit_log_delivery_bucket,
+  ]
+}
+
+# A customer-managed log bucket replaces the created log bucket and CMK.
+run "cloudtrail_existing_log_bucket" {
+  command = plan
+
+  variables {
+    cloudtrail_s3_data_events = {
+      existing_kms_key_arn     = "arn:aws:kms:us-west-2:123456789012:key/11111111-2222-3333-4444-555555555555"
+      existing_log_bucket_name = "central-cloudtrail-logs"
+    }
+  }
+
+  assert {
+    condition     = length(aws_s3_bucket.cloudtrail) == 0 && length(aws_kms_key.cloudtrail) == 0
+    error_message = "The CloudTrail log bucket and CMK must be skipped when an existing log bucket is provided."
+  }
+
+  assert {
+    condition     = aws_cloudtrail.s3_data_events[0].s3_bucket_name == "central-cloudtrail-logs" && aws_cloudtrail.s3_data_events[0].kms_key_id == "arn:aws:kms:us-west-2:123456789012:key/11111111-2222-3333-4444-555555555555"
+    error_message = "The trail must deliver to the existing log bucket with the existing KMS key."
+  }
+}
+
+# An existing KMS key without an existing log bucket must be rejected, since the created log bucket uses its own CMK.
+run "cloudtrail_existing_kms_key_without_bucket_rejected" {
+  command = plan
+
+  variables {
+    cloudtrail_s3_data_events = {
+      existing_kms_key_arn = "arn:aws:kms:us-west-2:123456789012:key/11111111-2222-3333-4444-555555555555"
+    }
+  }
+
+  expect_failures = [
+    var.cloudtrail_s3_data_events,
+  ]
+}
+
+# Turning off every bucket skips the trail and its log bucket.
+run "cloudtrail_disabled" {
+  command = plan
+
+  variables {
+    cloudtrail_s3_data_events = {
+      workspace_root_bucket = false
+    }
+  }
+
+  assert {
+    condition     = length(aws_cloudtrail.s3_data_events) == 0 && length(aws_s3_bucket.cloudtrail) == 0
+    error_message = "The CloudTrail trail and log bucket must be skipped when no bucket is selected."
+  }
+}
+
 # A custom network with none of its required inputs must be rejected by the network_configuration validations
 # rather than failing later on missing VPC, security group, or endpoint resources.
 run "custom_network_missing_inputs_rejected" {
