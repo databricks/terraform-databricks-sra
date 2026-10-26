@@ -86,6 +86,11 @@ variables {
 # Databricks default storage instead of a customer-managed S3 bucket.
 run "plan_test" {
   command = plan
+
+  assert {
+    condition     = length(aws_cloudtrail.s3_data_events) == 0 && length(aws_s3_bucket.cloudtrail) == 0
+    error_message = "The CloudTrail trail and log bucket must be skipped in SERVERLESS mode, which creates no AWS resources."
+  }
 }
 
 # The empty aws_account_id left in template.tfvars.example must still be accepted in SERVERLESS mode.

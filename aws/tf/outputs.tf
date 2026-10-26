@@ -3,6 +3,11 @@ output "catalog_name" {
   value       = module.unity_catalog_catalog_creation.catalog_name
 }
 
+output "cloudtrail_arn" {
+  description = "ARN of the CloudTrail trail logging S3 data events. Null when no bucket is logged."
+  value       = one(aws_cloudtrail.s3_data_events[*].arn)
+}
+
 output "metastore_id" {
   description = "ID of the Unity Catalog metastore assigned to the workspace, whether created by this deployment or pre-existing."
   value       = module.unity_catalog_metastore_creation.metastore_id

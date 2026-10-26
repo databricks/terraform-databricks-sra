@@ -66,6 +66,24 @@ variable "aws_partition" {
   }
 }
 
+variable "cloudtrail_s3_data_events" {
+  description = "Buckets whose S3 object-level (data) events are logged to a dedicated CloudTrail trail. The workspace root bucket is logged by default; the workspace catalog and audit log delivery buckets are opt-in. The audit log delivery bucket is only logged when this deployment creates it (audit_log_delivery_exists = false). By default a KMS-encrypted log bucket is created; set existing_log_bucket_name (and optionally existing_kms_key_arn) to deliver to a bucket you manage, whose bucket and key policies must allow the trail arn:<partition>:cloudtrail:<region>:<aws_account_id>:trail/<resource_prefix>-s3-data-events. Ignored when compute_mode is SERVERLESS, which creates none of these buckets."
+  type = object({
+    audit_log_delivery_bucket = optional(bool, false)
+    catalog_bucket            = optional(bool, false)
+    existing_kms_key_arn      = optional(string)
+    existing_log_bucket_name  = optional(string)
+    workspace_root_bucket     = optional(bool, true)
+  })
+  default  = {}
+  nullable = false
+
+  validation {
+    condition     = var.cloudtrail_s3_data_events.existing_kms_key_arn == null || var.cloudtrail_s3_data_events.existing_log_bucket_name != null
+    error_message = "cloudtrail_s3_data_events.existing_kms_key_arn requires existing_log_bucket_name. Without an existing log bucket, a CloudTrail CMK is created."
+  }
+}
+
 variable "cmk_admin_arn" {
   description = "Amazon Resource Name (ARN) of the CMK admin."
   type        = string
