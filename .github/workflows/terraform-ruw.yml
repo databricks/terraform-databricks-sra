@@ -104,13 +104,58 @@ jobs:
           tflint_version: ${{ inputs.tflint_version }}
       - name: Init TFLint
         # tflint_args is passed so --init installs the plugins declared in a --config file outside the working directory
-        run: tflint --init ${{ inputs.tflint_args }}
+        # Inputs are handed to the shell as environment variables, never expanded into the script text. The string is
+        # split into words (honouring quotes) by xargs, which does no variable, command or glob expansion.
+        shell: bash
+        run: |
+          set -euo pipefail
+          parsed="$(printf '%s' "$TFLINT_ARGS" | xargs -r printf '%s\n')"
+          extra_args=()
+          if [ -n "$parsed" ]; then mapfile -t extra_args <<< "$parsed"; fi
+          tflint --init "${extra_args[@]}"
         env:
           # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
           GITHUB_TOKEN: ${{ github.token }}
+          TFLINT_ARGS: ${{ inputs.tflint_args }}
         working-directory: ${{ inputs.working_directory }}
       - name: Run TFLint
-        run: ${{ inputs.tflint_env }} tflint -f compact --minimum-failure-severity=${{ inputs.tflint_minimum_failure_severity }} --recursive ${{ inputs.tflint_args }}
+        # See "Init TFLint" for why inputs are passed through env. Beyond that:
+        #  - tflint_minimum_failure_severity is checked against an allow-list
+        #  - tflint_env entries must be NAME=value and may not override variables that change how the shell, the
+        #    dynamic linker or the runner behave
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "$TFLINT_MIN_SEVERITY" in
+            error|warning|notice) ;;
+            *) echo "::error::tflint_minimum_failure_severity must be one of: error, warning, notice"; exit 1 ;;
+          esac
+
+          parsed="$(printf '%s' "$TFLINT_ARGS" | xargs -r printf '%s\n')"
+          extra_args=()
+          if [ -n "$parsed" ]; then mapfile -t extra_args <<< "$parsed"; fi
+
+          parsed_env="$(printf '%s' "$TFLINT_ENV" | xargs -r printf '%s\n')"
+          env_assignments=()
+          if [ -n "$parsed_env" ]; then
+            mapfile -t env_assignments <<< "$parsed_env"
+            for entry in "${env_assignments[@]}"; do
+              if [[ ! "$entry" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+                echo "::error::tflint_env entries must look like NAME=value"; exit 1
+              fi
+              case "${entry%%=*}" in
+                PATH|IFS|BASH_ENV|ENV|LD_*|DYLD_*|GITHUB_*|RUNNER_*)
+                  echo "::error::tflint_env may not set PATH, IFS, BASH_ENV, ENV, LD_*, DYLD_*, GITHUB_* or RUNNER_* variables"; exit 1 ;;
+              esac
+            done
+          fi
+
+          env "${env_assignments[@]}" tflint -f compact --minimum-failure-severity="$TFLINT_MIN_SEVERITY" --recursive "${extra_args[@]}"
+        env:
+          TFLINT_ARGS: ${{ inputs.tflint_args }}
+          TFLINT_ENV: ${{ inputs.tflint_env }}
+          TFLINT_MIN_SEVERITY: ${{ inputs.tflint_minimum_failure_severity }}
         working-directory: ${{ inputs.working_directory }}
 
   # Terraform fmt job
@@ -170,5 +215,15 @@ jobs:
         run: terraform validate
         working-directory: ${{ inputs.working_directory }}
       - name: terraform test
-        run: terraform test ${{ inputs.terraform_test_args }}
+        # terraform_test_args is passed through env and split into words by xargs (quotes honoured, nothing expanded),
+        # so it can only ever supply arguments to terraform, never shell syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          parsed="$(printf '%s' "$TERRAFORM_TEST_ARGS" | xargs -r printf '%s\n')"
+          test_args=()
+          if [ -n "$parsed" ]; then mapfile -t test_args <<< "$parsed"; fi
+          terraform test "${test_args[@]}"
+        env:
+          TERRAFORM_TEST_ARGS: ${{ inputs.terraform_test_args }}
         working-directory: ${{ inputs.working_directory }}
