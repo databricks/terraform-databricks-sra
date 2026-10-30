@@ -23,6 +23,11 @@ output "network_policy_id" {
   value       = module.network_policy.network_policy_id
 }
 
+output "private_network_gateway_name" {
+  description = "Canonical resource name of the private network gateway (accounts/<account_id>/network-connectivity-configs/<ncc_id>/private-network-gateways/<gateway_id>). Null when enable_private_network_gateway is false or the region is GovCloud."
+  value       = module.network_connectivity_configuration.private_network_gateway_name
+}
+
 output "vpc_id" {
   description = "ID of the classic compute plane VPC (created or custom). Null for SERVERLESS workspaces, which have no customer VPC."
   value       = local.is_serverless ? null : (var.custom_vpc_id != null ? var.custom_vpc_id : module.vpc[0].vpc_id)

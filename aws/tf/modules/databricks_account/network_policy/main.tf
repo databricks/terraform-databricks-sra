@@ -15,7 +15,8 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
         enforcement_mode = "ENFORCED"
       }
       # When the Security Analysis Tool is enabled, allow list PyPI so SAT can install its dependencies.
-      allowed_internet_destinations = var.enable_security_analysis_tool ? [
+      # A private network gateway in ALL_TRAFFIC mode also needs every intended destination allowed here.
+      allowed_internet_destinations = concat(var.enable_security_analysis_tool ? [
         {
           destination               = "pypi.org"
           internet_destination_type = "DNS_NAME"
@@ -36,7 +37,12 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
           destination               = "raw.githubusercontent.com"
           internet_destination_type = "DNS_NAME"
         }
-      ] : []
+        ] : [], [
+        for destination in var.private_network_gateway_destinations : {
+          destination               = destination
+          internet_destination_type = "DNS_NAME"
+        }
+      ])
     }
   }
 

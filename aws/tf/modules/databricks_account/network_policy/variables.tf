@@ -21,6 +21,12 @@ variable "enable_security_analysis_tool" {
   default     = false
 }
 
+variable "private_network_gateway_destinations" {
+  description = "DNS names reached through a private network gateway in ALL_TRAFFIC mode, added to the egress allow list. Leave empty otherwise."
+  type        = list(string)
+  default     = []
+}
+
 variable "region" {
   description = "AWS region code."
   type        = string

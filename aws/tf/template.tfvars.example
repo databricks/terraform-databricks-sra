@@ -85,7 +85,6 @@ create_service_direct_vpce = false
 # If audit log delivery is not already configured toggle to false.
 # This should only be done one time per account.
 # This is the legacy mode of log delivery, which has been replaced by system tables.
-# Does not work on aws-govcloud.
 audit_log_delivery_exists = true
 
 # Log S3 object-level (data) events for the Databricks buckets to a dedicated CloudTrail trail and log bucket.
@@ -128,6 +127,12 @@ compliance_standards = ["STANDARD_A", "STANDARD_B"]
 # NOTE: Enhanced security monitoring is automatically enabled when the compliance security profile is enabled.
 enable_enhanced_security_monitoring = false
 
+# Private Network Gateway (Private Preview - contact your Databricks representative to enable it for your account)
+# https://docs.databricks.com/aws/en/security/network/serverless-network-security/private-network-gateway
+# Lets serverless compute reach resources in your VPC and its connected networks. Configure it with
+# private_network_gateway under Optional Configuration. Ignored in GovCloud regions.
+enable_private_network_gateway = true
+
 # Enable the security analysis tool (review the configuration in main.tf and the official SAT documentation prior to enabling)
 # SAT documentation can be found here: https://databricks-industry-solutions.github.io/security-analysis-tool/
 # The SAT service principal credentials are not managed by Terraform. After the first apply, add them to the SAT secret scope:
@@ -139,7 +144,6 @@ enable_security_analysis_tool = false
 # Create a regional metastore if one doesn't exist manually in the UI.
 # If you want to create a metastore and have it a part of this workspace state file toggle to false.
 # We default to true so you don't accidentally destroy your metastore with a tf destroy of this workspace.
-
 metastore_exists = true
 
 # -----------------------------------------------------------------------------
@@ -162,6 +166,33 @@ cross_workspace_ingress_allowed_workspace_ids = []
 # Optional name for the Unity Catalog metastore created by this deployment.
 # If left blank, defaults to "${var.region}-unity-catalog".
 # custom_metastore_name = ""
+
+# Private network gateway settings. Only read when enable_private_network_gateway = true (outside GovCloud); otherwise
+# they are ignored, so this block can stay filled in while the gateway is off. Leave a field null to use its default.
+# https://docs.databricks.com/aws/en/security/network/serverless-network-security/private-network-gateway/configure-private-network-gateway
+private_network_gateway = {
+  # ALL MODES
+  traffic_mode = "SPECIFIC_DESTINATIONS" # or "ALL_TRAFFIC" to route all serverless egress through the gateway
+  # Used by both traffic modes: SPECIFIC_DESTINATIONS routes these DNS names through the gateway; ALL_TRAFFIC adds them
+  # to the network policy's egress allow list. Required for SPECIFIC_DESTINATIONS.
+  destinations = ["mydb.example.internal"]
+
+  # HYBRID (ISOLATED | CUSTOM)
+  # Ignored when security_group_ids is set, since SRA only creates the security group when security_group_ids is null.
+  egress_ports       = ["443"] # outbound ports on the security group SRA creates: "443", "8000-8100", or "0-65535" for all
+  egress_cidr_blocks = null    # outbound CIDRs on that security group, defaults to the VPC CIDR
+
+  # HYBRID + ISOLATED ONLY
+  subnet_cidr          = "10.0.28.192/28" # SRA creates the gateway subnet (a /28 is enough)
+  availability_zone_id = null             # zone ID (e.g. use1-az1), defaults to the first zone the gateway supports
+
+  # HYBRID + CUSTOM | SERVERLESS
+  subnet_id = null # existing gateway subnet
+
+  # SERVERLESS (REQUIRED)
+  security_group_ids     = null # existing security groups; when null in hybrid, SRA creates one
+  cross_account_role_arn = null # existing IAM role from the setup guide; when null in hybrid, SRA creates it
+}
 
 # Optional private endpoint rules for serverless egress to your AWS resources over PrivateLink.
 # Each rule targets either a VPC endpoint service (endpoint_service + optional domain_names for private DNS)

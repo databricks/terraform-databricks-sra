@@ -81,4 +81,26 @@ run "plan_test" {
     error_message = "Port 6666 (SCC relay) must be filtered from the workspace security group egress rules in GovCloud."
   }
 }
+
+# The private network gateway is not available in GovCloud, so enabling it creates nothing and only warns.
+run "png_ignored" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      subnet_cidr  = "10.0.9.0/28"
+    }
+  }
+
+  expect_failures = [
+    check.private_network_gateway_govcloud,
+  ]
+
+  assert {
+    condition     = length(aws_subnet.png) == 0 && length(aws_security_group.png) == 0 && length(aws_iam_role.png) == 0
+    error_message = "No private network gateway resources may be created in GovCloud."
+  }
+}
 # ---------------
