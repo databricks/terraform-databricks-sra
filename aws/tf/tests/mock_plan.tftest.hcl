@@ -13,7 +13,15 @@ mock_provider "aws" {
   # generate for mocked tests. Not using this will cause the data block to create an empty list of strings.
   mock_data "aws_availability_zones" {
     defaults = {
-      names = ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      names    = ["us-west-2a", "us-west-2b", "us-west-2c", "us-west-2d"]
+      zone_ids = ["usw2-az2", "usw2-az1", "usw2-az3", "usw2-az4"]
+    }
+  }
+  # Existing subnets default to a zone the private network gateway supports in us-west-2. Runs override this to cover
+  # subnets in unsupported zones.
+  mock_data "aws_subnet" {
+    defaults = {
+      availability_zone_id = "usw2-az1"
     }
   }
 }
@@ -383,6 +391,102 @@ run "cloudtrail_disabled" {
   }
 }
 
+# The private network gateway is off by default and creates no AWS resources.
+run "png_disabled_by_default" {
+  command = plan
+
+  assert {
+    condition     = length(aws_subnet.png) == 0 && length(aws_security_group.png) == 0 && length(aws_iam_role.png) == 0
+    error_message = "No private network gateway resources may be created unless enable_private_network_gateway is true."
+  }
+}
+
+# On the isolated network SRA creates the gateway subnet, security group, and cross-account role.
+run "png_isolated_network" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      subnet_cidr  = "10.0.9.0/28"
+    }
+  }
+
+  assert {
+    condition     = length(aws_subnet.png) == 1 && length(aws_security_group.png) == 1 && length(aws_iam_role.png) == 1 && length(time_sleep.png_role_propagation) == 1
+    error_message = "The gateway subnet, security group, and cross-account role must be created on the isolated network."
+  }
+
+  assert {
+    condition     = aws_subnet.png[0].availability_zone_id == "usw2-az2"
+    error_message = "The gateway subnet must default to the region's first zone when the region has no zone restrictions."
+  }
+
+  assert {
+    condition     = one(aws_security_group.png[0].egress).cidr_blocks == tolist(["10.0.0.0/16"])
+    error_message = "The gateway security group must default its outbound rules to the VPC CIDR."
+  }
+}
+
+# On a custom network the customer provides the subnet; SRA creates the security group in custom_vpc_id, with
+# outbound rules defaulting to that VPC's CIDR.
+run "png_custom_network" {
+  command = plan
+
+  variables {
+    custom_general_access_vpce_id  = "vpce-0abcd1234efgh5678"
+    custom_private_subnet_ids      = ["subnet-0abcd1234efgh5678", "subnet-1abcd1234efgh5678"]
+    custom_scc_relay_vpce_id       = "vpce-1abcd1234efgh5678"
+    custom_sg_id                   = "sg-0abcd1234efgh5678"
+    custom_vpc_id                  = "vpc-0abcd1234efgh5678"
+    enable_private_network_gateway = true
+    network_configuration          = "custom"
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      subnet_id    = "subnet-2abcd1234efgh5678"
+    }
+  }
+
+  override_data {
+    target = data.aws_vpc.png[0]
+    values = {
+      cidr_block = "172.16.0.0/16"
+    }
+  }
+
+  assert {
+    condition     = length(aws_subnet.png) == 0 && length(aws_security_group.png) == 1 && length(aws_iam_role.png) == 1
+    error_message = "On a custom network only the gateway security group and cross-account role may be created."
+  }
+
+  assert {
+    condition     = one(aws_security_group.png[0].egress).cidr_blocks == tolist(["172.16.0.0/16"])
+    error_message = "The gateway security group must default its outbound rules to the custom VPC CIDR."
+  }
+}
+
+# ALL_TRAFFIC mode, with every gateway input brought by the customer, creates no AWS resources.
+run "png_all_traffic_customer_resources" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      cross_account_role_arn = "arn:aws:iam::123456789012:role/my-png-role"
+      destinations           = ["db.internal.example.com"]
+      security_group_ids     = ["sg-2abcd1234efgh5678"]
+      subnet_id              = "subnet-2abcd1234efgh5678"
+      traffic_mode           = "ALL_TRAFFIC"
+    }
+  }
+
+  assert {
+    condition     = length(aws_subnet.png) == 0 && length(aws_security_group.png) == 0 && length(aws_iam_role.png) == 0
+    error_message = "No private network gateway AWS resources may be created when the customer provides all of them."
+  }
+}
+
 # A custom network with none of its required inputs must be rejected by the network_configuration validations
 # rather than failing later on missing VPC, security group, or endpoint resources.
 run "custom_network_missing_inputs_rejected" {
@@ -437,3 +541,251 @@ run "malformed_aws_account_id_rejected" {
   ]
 }
 # ---------------
+
+# SPECIFIC_DESTINATIONS (the default traffic mode) routes nothing without destinations, so an empty list is rejected.
+run "png_specific_destinations_without_destinations_rejected" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      subnet_cidr = "10.0.9.0/28"
+    }
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}
+
+# The isolated network needs a CIDR for the gateway subnet SRA creates, or an existing subnet ID.
+run "png_isolated_network_without_subnet_rejected" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+    }
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}
+
+# SRA does not create subnets in a custom VPC, so the gateway subnet ID is required.
+run "png_custom_network_without_subnet_id_rejected" {
+  command = plan
+
+  variables {
+    custom_general_access_vpce_id  = "vpce-0abcd1234efgh5678"
+    custom_private_subnet_ids      = ["subnet-0abcd1234efgh5678", "subnet-1abcd1234efgh5678"]
+    custom_scc_relay_vpce_id       = "vpce-1abcd1234efgh5678"
+    custom_sg_id                   = "sg-0abcd1234efgh5678"
+    custom_vpc_id                  = "vpc-0abcd1234efgh5678"
+    enable_private_network_gateway = true
+    network_configuration          = "custom"
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      subnet_cidr  = "10.0.9.0/28"
+    }
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}
+
+# While the gateway is disabled its settings are ignored, even incomplete or invalid ones, so they can stay in tfvars.
+run "png_disabled_ignores_config" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = false
+    private_network_gateway = {
+      traffic_mode = "NOT_A_MODE"
+    }
+  }
+
+  assert {
+    condition     = length(aws_subnet.png) == 0 && length(aws_security_group.png) == 0 && length(aws_iam_role.png) == 0
+    error_message = "No private network gateway resources may be created while enable_private_network_gateway is false."
+  }
+}
+
+# Enabling the gateway without any settings is rejected.
+run "png_enabled_without_config_rejected" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway        = null
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}
+
+# Egress ports accept single ports and inclusive ranges, so "0-65535" opens every TCP port.
+run "png_egress_port_ranges" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      egress_ports = ["443", "5432", "8000-8100", "0-65535"]
+      subnet_cidr  = "10.0.9.0/28"
+    }
+  }
+
+  assert {
+    condition     = toset([for rule in aws_security_group.png[0].egress : "${rule.from_port}-${rule.to_port}"]) == toset(["443-443", "5432-5432", "8000-8100", "0-65535"])
+    error_message = "Each egress_ports entry must become one TCP rule covering its port or range."
+  }
+}
+
+# Port ranges must be well formed, ascending, and within 0-65535.
+run "png_invalid_egress_ports_rejected" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      egress_ports = ["8100-8000", "70000", "*"]
+      subnet_cidr  = "10.0.9.0/28"
+    }
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}
+
+# In a region with zone restrictions the gateway subnet defaults to the first available zone that is supported,
+# skipping unsupported zones that come first (usw2-az2 here).
+run "png_default_zone_skips_unsupported" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      subnet_cidr  = "10.0.9.0/28"
+    }
+    private_network_gateway_supported_az_ids = {
+      "us-west-2" = ["usw2-az1", "usw2-az3"]
+    }
+  }
+
+  assert {
+    condition     = aws_subnet.png[0].availability_zone_id == "usw2-az1"
+    error_message = "The gateway subnet must default to the first available zone the gateway supports."
+  }
+}
+
+# An explicitly chosen zone the gateway does not support is rejected at plan time.
+run "png_unsupported_zone_rejected" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      availability_zone_id = "usw2-az2"
+      destinations         = ["db.internal.example.com"]
+      subnet_cidr          = "10.0.9.0/28"
+    }
+    private_network_gateway_supported_az_ids = {
+      "us-west-2" = ["usw2-az1", "usw2-az3"]
+    }
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}
+
+# An existing gateway subnet in an unsupported zone is flagged at plan time.
+run "png_existing_subnet_unsupported_zone_flagged" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      subnet_id    = "subnet-2abcd1234efgh5678"
+    }
+    private_network_gateway_supported_az_ids = {
+      "us-west-2" = ["usw2-az1", "usw2-az3"]
+    }
+  }
+
+  override_data {
+    target = data.aws_subnet.png_existing[0]
+    values = {
+      availability_zone_id = "usw2-az2"
+    }
+  }
+
+  expect_failures = [
+    check.private_network_gateway_subnet_zone,
+  ]
+}
+
+# In ALL_TRAFFIC mode allow_all_egress opens the network policy to FULL_ACCESS egress, without listing destinations.
+run "png_all_traffic_allow_all_egress" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      allow_all_egress = true
+      subnet_cidr      = "10.0.9.0/28"
+      traffic_mode     = "ALL_TRAFFIC"
+    }
+  }
+
+  assert {
+    condition     = local.png_allow_all_egress
+    error_message = "allow_all_egress must open the network policy to FULL_ACCESS egress in ALL_TRAFFIC mode."
+  }
+}
+
+# While the gateway is disabled, allow_all_egress is ignored and the network policy stays restricted.
+run "png_disabled_allow_all_egress_ignored" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = false
+    private_network_gateway = {
+      allow_all_egress = true
+      traffic_mode     = "ALL_TRAFFIC"
+    }
+  }
+
+  assert {
+    condition     = !local.png_allow_all_egress
+    error_message = "allow_all_egress must be ignored while enable_private_network_gateway is false."
+  }
+}
+
+# allow_all_egress only applies to ALL_TRAFFIC, so it is rejected with SPECIFIC_DESTINATIONS.
+run "png_allow_all_egress_specific_destinations_rejected" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      allow_all_egress = true
+      destinations     = ["db.internal.example.com"]
+      subnet_cidr      = "10.0.9.0/28"
+    }
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}

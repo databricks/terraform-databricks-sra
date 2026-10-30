@@ -118,3 +118,41 @@ run "unsupported_region_rejected" {
     var.region,
   ]
 }
+
+# In SERVERLESS mode the customer provides the gateway subnet, security group, and role, so SRA still creates no AWS
+# resources and needs no aws_account_id.
+run "png_customer_resources" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      cross_account_role_arn = "arn:aws:iam::123456789012:role/my-png-role"
+      destinations           = ["db.internal.example.com"]
+      security_group_ids     = ["sg-2abcd1234efgh5678"]
+      subnet_id              = "subnet-2abcd1234efgh5678"
+    }
+  }
+
+  assert {
+    condition     = length(aws_subnet.png) == 0 && length(aws_security_group.png) == 0 && length(aws_iam_role.png) == 0
+    error_message = "No private network gateway AWS resources may be created in SERVERLESS mode."
+  }
+}
+
+# Without the customer-provided gateway inputs SERVERLESS mode has nothing to build the gateway from.
+run "png_missing_customer_resources_rejected" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      destinations = ["db.internal.example.com"]
+      subnet_cidr  = "10.0.9.0/28"
+    }
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}
