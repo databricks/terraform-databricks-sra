@@ -734,3 +734,58 @@ run "png_existing_subnet_unsupported_zone_flagged" {
     check.private_network_gateway_subnet_zone,
   ]
 }
+
+# In ALL_TRAFFIC mode allow_all_egress opens the network policy to FULL_ACCESS egress, without listing destinations.
+run "png_all_traffic_allow_all_egress" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      allow_all_egress = true
+      subnet_cidr      = "10.0.9.0/28"
+      traffic_mode     = "ALL_TRAFFIC"
+    }
+  }
+
+  assert {
+    condition     = local.png_allow_all_egress
+    error_message = "allow_all_egress must open the network policy to FULL_ACCESS egress in ALL_TRAFFIC mode."
+  }
+}
+
+# While the gateway is disabled, allow_all_egress is ignored and the network policy stays restricted.
+run "png_disabled_allow_all_egress_ignored" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = false
+    private_network_gateway = {
+      allow_all_egress = true
+      traffic_mode     = "ALL_TRAFFIC"
+    }
+  }
+
+  assert {
+    condition     = !local.png_allow_all_egress
+    error_message = "allow_all_egress must be ignored while enable_private_network_gateway is false."
+  }
+}
+
+# allow_all_egress only applies to ALL_TRAFFIC, so it is rejected with SPECIFIC_DESTINATIONS.
+run "png_allow_all_egress_specific_destinations_rejected" {
+  command = plan
+
+  variables {
+    enable_private_network_gateway = true
+    private_network_gateway = {
+      allow_all_egress = true
+      destinations     = ["db.internal.example.com"]
+      subnet_cidr      = "10.0.9.0/28"
+    }
+  }
+
+  expect_failures = [
+    var.private_network_gateway,
+  ]
+}

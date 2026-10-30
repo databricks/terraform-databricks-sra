@@ -31,6 +31,9 @@ locals {
     for zone_id in data.aws_availability_zones.available[0].zone_ids : zone_id if local.png_supported_az_ids == null ? true : contains(local.png_supported_az_ids, zone_id)
   ][0], "")) : null
 
+  # Only an enabled gateway in ALL_TRAFFIC mode may open the network policy to FULL_ACCESS egress.
+  png_allow_all_egress = local.png != null ? local.png.traffic_mode == "ALL_TRAFFIC" && local.png.allow_all_egress : false
+
   png_vpc_id = local.is_serverless ? null : (var.network_configuration == "custom" ? var.custom_vpc_id : module.vpc[0].vpc_id)
 
   # Settings passed to the gateway, or null when it is disabled. The role ARN is read from the wait below so the gateway

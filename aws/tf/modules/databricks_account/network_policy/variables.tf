@@ -21,6 +21,12 @@ variable "enable_security_analysis_tool" {
   default     = false
 }
 
+variable "full_egress_access" {
+  description = "Flag to set the egress restriction mode to FULL_ACCESS instead of RESTRICTED_ACCESS, allowing all serverless egress destinations. Only set for a private network gateway in ALL_TRAFFIC mode with allow_all_egress."
+  type        = bool
+  default     = false
+}
+
 variable "private_network_gateway_destinations" {
   description = "DNS names reached through a private network gateway in ALL_TRAFFIC mode, added to the egress allow list. Leave empty otherwise."
   type        = list(string)

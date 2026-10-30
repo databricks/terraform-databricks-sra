@@ -39,6 +39,7 @@ module "network_policy" {
   cross_workspace_ingress_allowed_workspace_ids = var.cross_workspace_ingress_allowed_workspace_ids
   databricks_account_id                         = var.databricks_account_id
   enable_security_analysis_tool                 = var.enable_security_analysis_tool
+  full_egress_access                            = local.png_allow_all_egress
   private_network_gateway_destinations          = local.png_gateway != null ? (local.png_gateway.traffic_mode == "ALL_TRAFFIC" ? local.png_gateway.destinations : []) : []
   region                                        = var.region
   resource_prefix                               = var.resource_prefix

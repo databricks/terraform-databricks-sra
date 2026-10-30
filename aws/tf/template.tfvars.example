@@ -131,7 +131,8 @@ enable_enhanced_security_monitoring = false
 # https://docs.databricks.com/aws/en/security/network/serverless-network-security/private-network-gateway
 # Lets serverless compute reach resources in your VPC and its connected networks. Configure it with
 # private_network_gateway under Optional Configuration. Ignored in GovCloud regions.
-enable_private_network_gateway = true
+# Will be default enabled to true upon public preview.
+enable_private_network_gateway = false
 
 # Enable the security analysis tool (review the configuration in main.tf and the official SAT documentation prior to enabling)
 # SAT documentation can be found here: https://databricks-industry-solutions.github.io/security-analysis-tool/
@@ -176,6 +177,9 @@ private_network_gateway = {
   # Used by both traffic modes: SPECIFIC_DESTINATIONS routes these DNS names through the gateway; ALL_TRAFFIC adds them
   # to the network policy's egress allow list. Required for SPECIFIC_DESTINATIONS.
   destinations = ["mydb.example.internal"]
+  # ALL_TRAFFIC only: true switches the network policy's egress to FULL_ACCESS, so destinations need not be listed and
+  # all egress filtering is left to your network behind the gateway (e.g. a firewall).
+  allow_all_egress = false
 
   # HYBRID (ISOLATED | CUSTOM)
   # Ignored when security_group_ids is set, since SRA only creates the security group when security_group_ids is null.

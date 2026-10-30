@@ -463,6 +463,11 @@ variable "private_network_gateway" {
     private endpoint rules and the S3/DynamoDB gateway endpoints), and destinations are added to the network policy's
     allowed egress destinations instead.
 
+    allow_all_egress: ALL_TRAFFIC only. Switches the network policy's egress from RESTRICTED_ACCESS to FULL_ACCESS, so
+    every destination is allowed without listing it in destinations. Egress filtering is then left entirely to the
+    customer network behind the gateway (e.g. a firewall), and to private endpoint rules and S3/DynamoDB gateway
+    endpoints, which bypass the gateway.
+
     The gateway needs one subnet in one Availability Zone, a security group, and a cross-account IAM role that
     Databricks assumes to manage the gateway network interface:
       - HYBRID, isolated network: SRA creates the subnet in its VPC from subnet_cidr, plus the security group and role,
@@ -479,6 +484,7 @@ variable "private_network_gateway" {
     port ("443") or an inclusive range ("8000-8100"); use "0-65535" for all ports.
   EOT
   type = object({
+    allow_all_egress       = optional(bool, false)
     availability_zone_id   = optional(string)
     cross_account_role_arn = optional(string)
     destinations           = optional(list(string), [])
@@ -502,6 +508,11 @@ variable "private_network_gateway" {
   validation {
     condition     = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null ? contains(["ALL_TRAFFIC", "SPECIFIC_DESTINATIONS"], var.private_network_gateway.traffic_mode) : true
     error_message = "private_network_gateway.traffic_mode must be ALL_TRAFFIC or SPECIFIC_DESTINATIONS."
+  }
+
+  validation {
+    condition     = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null ? !var.private_network_gateway.allow_all_egress || var.private_network_gateway.traffic_mode == "ALL_TRAFFIC" : true
+    error_message = "private_network_gateway.allow_all_egress requires traffic_mode = \"ALL_TRAFFIC\"."
   }
 
   validation {
