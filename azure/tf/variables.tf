@@ -121,7 +121,7 @@ variable "resource_suffix" {
 
 variable "create_workspace_vnet" {
   type        = bool
-  description = "(Optional) Whether to create SRA-managed workspace VNET. If false, workspace_vnet must be provided."
+  description = "(Optional) Whether to create SRA-managed workspace VNET. If true, workspace_vnet must be provided; if false, existing_workspace_vnet must be provided."
   default     = true
 }
 
