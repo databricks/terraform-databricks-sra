@@ -3,6 +3,11 @@ output "storage_account_id" {
   value       = azurerm_storage_account.unity_catalog.id
 }
 
+output "storage_account_name" {
+  description = "Name of the Azure Storage Account for this catalog"
+  value       = azurerm_storage_account.unity_catalog.name
+}
+
 output "external_location_id" {
   description = "ID of the Databricks external location"
   value       = databricks_external_location.external_location.id

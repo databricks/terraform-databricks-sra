@@ -8,7 +8,10 @@ locals {
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "~>0.4"
-  suffix  = [var.resource_suffix]
+  # The naming module joins suffix elements with "-" for names that allow dashes and with "" for names that do not
+  # (e.g. storage accounts), but it does not strip dashes from within an element. Splitting on "-" lets a dashed
+  # resource_suffix produce a valid storage account name while leaving dashed names (and undashed suffixes) unchanged.
+  suffix = split("-", var.resource_suffix)
 }
 
 resource "databricks_storage_credential" "unity_catalog" {

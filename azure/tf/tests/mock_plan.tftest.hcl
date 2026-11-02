@@ -316,6 +316,45 @@ run "plan_test_azure_public_defaults" {
   }
 }
 
+# Dashed suffixes must still yield valid (dash-free) storage account names for the hub (SAT) and spoke catalogs.
+run "plan_test_dashed_resource_suffixes" {
+  state_key = "dashed_resource_suffixes"
+  command   = plan
+  variables {
+    hub_resource_suffix = "sra-hub"
+    resource_suffix     = "dbx-dev"
+    allowed_fqdns       = ["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"]
+    sat_configuration = {
+      enabled = true
+    }
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = module.spoke_catalog.storage_account_name == "stdbxdevuc"
+    error_message = "Spoke catalog storage account name must have dashes stripped from resource_suffix"
+  }
+
+  assert {
+    condition     = module.hub_catalog[0].storage_account_name == "stsrahubsatuc"
+    error_message = "Hub (SAT) catalog storage account name must have dashes stripped from hub_resource_suffix"
+  }
+}
+
+# Undashed suffixes must produce the same storage account names as before the dash fix.
+run "plan_test_undashed_storage_names_unchanged" {
+  state_key = "undashed_storage_names_unchanged"
+  command   = plan
+
+  assert {
+    condition     = module.spoke_catalog.storage_account_name == "stspokeuc"
+    error_message = "Spoke catalog storage account name changed for an undashed resource_suffix"
+  }
+}
+
 # SAT depends on the serverless hub workspace, which is skipped in Azure Government.
 run "plan_test_azure_gov_sat_rejected" {
   state_key       = "azure_gov_sat_rejected"
