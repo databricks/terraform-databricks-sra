@@ -259,4 +259,6 @@ resource "databricks_account_network_policy" "spoke" {
       }
     }
   }
+  ingress         = local.network_policy_ingress
+  ingress_dry_run = local.network_policy_ingress_dry_run
 }

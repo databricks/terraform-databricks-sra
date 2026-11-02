@@ -45,6 +45,14 @@ existing_hub_vnet = {
 existing_ncc_id   = "ncc-00000000-0000-0000-0000-000000000000"
 existing_ncc_name = "ncc-westus2-myhub"
 
+# Optional: Context-based ingress control on the SRA-created spoke network policy (requires create_spoke_network_policy = true)
+# Start with dry_run = true and review system.access.inbound_network before enforcing
+# workspace_ingress_control = {
+#   enabled           = true
+#   dry_run           = true
+#   allowed_ip_ranges = ["203.0.113.0/24"]
+# }
+
 # Network egress configuration
 allowed_fqdns    = []
 hub_allowed_urls = []

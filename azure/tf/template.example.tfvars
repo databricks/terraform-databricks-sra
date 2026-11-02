@@ -25,6 +25,14 @@ workspace_vnet = {
 #   automatic_cluster_update_enabled      = true
 # }
 
+# Optional: Context-based ingress control - restrict public workspace access to these IP ranges
+# Start with dry_run = true and review system.access.inbound_network before enforcing
+# workspace_ingress_control = {
+#   enabled           = true
+#   dry_run           = true
+#   allowed_ip_ranges = ["203.0.113.0/24"]
+# }
+
 subscription_id = "ffffffff-ffff-ffff-ffff-ffffffffffff"
 
 # Optional: Azure Government. See template_azure_gov.example.tfvars

@@ -420,3 +420,160 @@ run "plan_test_azure_environment_invalid" {
     }
   }
 }
+
+# Context-based ingress control is off by default, so SRA-managed network policies get no ingress configuration.
+run "plan_test_ingress_control_default_off" {
+  state_key = "ingress_control_default_off"
+  command   = plan
+
+  assert {
+    condition     = local.network_policy_ingress == null && local.network_policy_ingress_dry_run == null
+    error_message = "Ingress control must not be configured unless workspace_ingress_control.enabled is true"
+  }
+}
+
+# Enforced ingress restricts public access on the hub-managed network policies to the allowed IP ranges.
+run "plan_test_ingress_control_enforced" {
+  state_key = "ingress_control_enforced"
+  command   = plan
+  variables {
+    resource_suffix = "ingress"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+    workspace_ingress_control = {
+      enabled           = true
+      allowed_ip_ranges = ["203.0.113.0/24", "198.51.100.10"]
+    }
+  }
+
+  assert {
+    condition     = local.network_policy_ingress.public_access.restriction_mode == "RESTRICTED_ACCESS"
+    error_message = "Enforced ingress must restrict public access"
+  }
+
+  assert {
+    condition     = local.network_policy_ingress.public_access.allow_rules[0].origin.included_ip_ranges.ip_ranges == tolist(["203.0.113.0/24", "198.51.100.10"])
+    error_message = "Enforced ingress must allow only the configured IP ranges"
+  }
+
+  assert {
+    condition     = local.network_policy_ingress_dry_run == null
+    error_message = "Dry run ingress must not be set when dry_run is false"
+  }
+}
+
+# Dry run ingress on the BYO-hub spoke policy writes the rules to ingress_dry_run and leaves ingress unset.
+run "plan_test_ingress_control_dry_run_byo_hub" {
+  state_key = "ingress_control_dry_run_byo_hub"
+  command   = plan
+  variables {
+    create_hub                  = false
+    create_spoke_network_policy = true
+    databricks_metastore_id     = "00000000-0000-0000-0000-000000000000"
+    resource_suffix             = "ingressbyo"
+    workspace_vnet = {
+      cidr     = "10.0.2.0/24"
+      new_bits = null
+    }
+    existing_ncc_id   = "mock-ncc-id"
+    existing_ncc_name = "mock-ncc"
+    existing_cmk_ids = {
+      key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
+      managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+      managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+    }
+    existing_hub_vnet = {
+      route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
+      vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
+    }
+    workspace_ingress_control = {
+      enabled           = true
+      dry_run           = true
+      allowed_ip_ranges = ["203.0.113.0/24"]
+    }
+  }
+
+  assert {
+    condition     = databricks_account_network_policy.spoke[0].ingress == null
+    error_message = "Dry run must not enforce ingress on the spoke network policy"
+  }
+
+  assert {
+    condition     = databricks_account_network_policy.spoke[0].ingress_dry_run.public_access.allow_rules[0].origin.included_ip_ranges.ip_ranges == tolist(["203.0.113.0/24"])
+    error_message = "Dry run must apply the configured IP ranges to ingress_dry_run on the spoke network policy"
+  }
+}
+
+# Enabling ingress control without any allowed IP ranges would deny all public access, so it is rejected.
+run "plan_test_ingress_control_requires_ip_ranges" {
+  state_key       = "ingress_control_requires_ip_ranges"
+  command         = plan
+  expect_failures = [var.workspace_ingress_control]
+  variables {
+    workspace_ingress_control = {
+      enabled = true
+    }
+  }
+}
+
+# Only IPv4 addresses and CIDRs are supported by context-based ingress.
+run "plan_test_ingress_control_rejects_invalid_ranges" {
+  state_key       = "ingress_control_rejects_invalid_ranges"
+  command         = plan
+  expect_failures = [var.workspace_ingress_control]
+  variables {
+    workspace_ingress_control = {
+      enabled           = true
+      allowed_ip_ranges = ["2001:db8::/32", "not-an-ip"]
+    }
+  }
+}
+
+# Context-based ingress control is not available in Azure Government.
+run "plan_test_ingress_control_rejected_in_gov" {
+  state_key       = "ingress_control_rejected_in_gov"
+  command         = plan
+  expect_failures = [var.workspace_ingress_control]
+  variables {
+    azure_environment = "usgovernment"
+    location          = "usgovvirginia"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+    workspace_ingress_control = {
+      enabled           = true
+      allowed_ip_ranges = ["203.0.113.0/24"]
+    }
+  }
+}
+
+# BYO hub with an existing network policy has no SRA-managed policy to attach ingress rules to, so it is rejected.
+run "plan_test_ingress_control_rejected_with_existing_policy" {
+  state_key       = "ingress_control_rejected_with_existing_policy"
+  command         = plan
+  expect_failures = [var.workspace_ingress_control]
+  variables {
+    create_hub                 = false
+    databricks_metastore_id    = "00000000-0000-0000-0000-000000000000"
+    resource_suffix            = "ingressexisting"
+    existing_ncc_id            = "mock-ncc-id"
+    existing_ncc_name          = "mock-ncc"
+    existing_network_policy_id = "mock-policy-id"
+    existing_cmk_ids = {
+      key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
+      managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+      managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+    }
+    existing_hub_vnet = {
+      route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
+      vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
+    }
+    workspace_ingress_control = {
+      enabled           = true
+      allowed_ip_ranges = ["203.0.113.0/24"]
+    }
+  }
+}

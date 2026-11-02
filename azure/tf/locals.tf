@@ -32,3 +32,40 @@ locals {
     key_vault = "privatelink.${local.azure_cloud.key_vault}"
   }
 }
+
+# Context-based ingress policy shared by every SRA-managed network policy. Only public access is governed: it is
+# restricted to the allowed IP ranges for all users, service principals, and destinations. Private and
+# cross-workspace access are left unset, so existing private connectivity behavior is unchanged. When dry_run is
+# true the same policy is written to ingress_dry_run instead, which logs would-be denials without blocking.
+locals {
+  workspace_ingress_policy = var.workspace_ingress_control.enabled ? {
+    public_access = {
+      restriction_mode = "RESTRICTED_ACCESS"
+      allow_rules = [
+        {
+          label = "sra-allowed-ip-ranges"
+          origin = {
+            included_ip_ranges = {
+              ip_ranges = var.workspace_ingress_control.allowed_ip_ranges
+            }
+          }
+          destination = {
+            all_destinations = true
+          }
+        }
+      ]
+    }
+    # Not managed by SRA. These are the defaults the API reports when only public_access is sent; they are set
+    # explicitly because the provider does not treat them as computed and otherwise fails the apply with
+    # "Provider produced inconsistent result after apply" (observed on databricks provider 1.140.0).
+    private_access = {
+      restriction_mode = "ALLOW_ALL_REGISTERED_ENDPOINTS"
+    }
+    cross_workspace_access = {
+      restriction_mode = "LEGACY_MODE"
+    }
+  } : null
+
+  network_policy_ingress         = var.workspace_ingress_control.dry_run ? null : local.workspace_ingress_policy
+  network_policy_ingress_dry_run = var.workspace_ingress_control.dry_run ? local.workspace_ingress_policy : null
+}

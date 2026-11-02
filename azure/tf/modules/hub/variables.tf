@@ -103,3 +103,15 @@ variable "private_dns_zone_names" {
   description = "(Optional) Names of the private DNS zones created in the hub for the Databricks backend, DBFS DFS, DBFS blob, and Key Vault private endpoints. Defaults to the Azure Commercial zone names"
   default     = {}
 }
+
+variable "network_policy_ingress" {
+  type        = any
+  description = "(Optional) Context-based ingress policy applied to the hub and spoke network policies. Built by the root module from workspace_ingress_control; null leaves ingress unmanaged."
+  default     = null
+}
+
+variable "network_policy_ingress_dry_run" {
+  type        = any
+  description = "(Optional) Context-based ingress policy applied in dry run mode to the hub and spoke network policies. Built by the root module from workspace_ingress_control; null disables dry run."
+  default     = null
+}

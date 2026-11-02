@@ -37,6 +37,10 @@ module "hub" {
   tags                     = var.tags
   resource_group_name      = azurerm_resource_group.hub[0].name
   force_destroy            = var.metastore_force_destroy
+
+  # Context-based ingress control
+  network_policy_ingress         = local.network_policy_ingress
+  network_policy_ingress_dry_run = local.network_policy_ingress_dry_run
 }
 
 module "serverless_workspace" {

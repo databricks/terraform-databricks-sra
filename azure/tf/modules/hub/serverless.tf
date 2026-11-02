@@ -27,6 +27,8 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
       }
     }
   }
+  ingress         = var.network_policy_ingress
+  ingress_dry_run = var.network_policy_ingress_dry_run
 }
 
 resource "databricks_account_network_policy" "hub_policy" {
@@ -41,4 +43,6 @@ resource "databricks_account_network_policy" "hub_policy" {
       }
     }
   }
+  ingress         = var.network_policy_ingress
+  ingress_dry_run = var.network_policy_ingress_dry_run
 }

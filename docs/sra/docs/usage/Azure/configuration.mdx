@@ -418,6 +418,59 @@ Allowed egress destinations are sourced from `allowed_fqdns`
 
 ---
 
+## Context-Based Ingress Control
+
+[Context-based ingress control](https://learn.microsoft.com/en-us/azure/databricks/security/network/front-end/context-based-ingress) restricts which network sources can reach your workspaces. SRA uses it to limit **public** access to a set of allowed IP ranges.
+
+### workspace_ingress_control
+
+**Type:** `object`
+**Default:** `{}` (disabled)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `enabled` | bool | `false` | Restrict public access to the workspaces governed by SRA-managed network policies |
+| `dry_run` | bool | `false` | Log would-be denials without blocking requests |
+| `allowed_ip_ranges` | list(string) | `[]` | Public IPv4 addresses or CIDR ranges allowed to reach the workspaces. Required when `enabled = true` |
+
+```hcl
+workspace_ingress_control = {
+  enabled           = true
+  dry_run           = true # Recommended until you have reviewed the denial logs
+  allowed_ip_ranges = ["203.0.113.0/24", "198.51.100.10"]
+}
+```
+
+When enabled, SRA adds a public access rule to each network policy it manages:
+- The spoke network policy (`np-<hub_resource_suffix>-restrictive` when `create_hub = true`, or `np-<resource_suffix>-restrictive` when `create_spoke_network_policy = true`)
+- The hub webauth workspace network policy (`np-<hub_resource_suffix>-hub`)
+
+All of these policies share the same `allowed_ip_ranges`. The rule applies to all users, service principals, and destinations (workspace UI, APIs, Apps, and Lakebase). Private access and cross-workspace access are not changed. Because SRA does not modify a network policy you provide with `existing_network_policy_id`, enabling ingress control in that configuration is a validation error. Configure ingress on that policy directly instead.
+
+With `dry_run = true`, the rules are applied in dry run mode. Requests that would be denied are logged to the `system.access.inbound_network` system table with access type `DRY_RUN_DENIAL`, but they are not blocked. Review these logs before you set `dry_run = false`.
+
+<Admonition type="warning" title="Avoid locking yourself out">
+
+When enforced, any public request from outside `allowed_ip_ranges` is denied. This includes:
+- Users who log in through the hub webauth workspace
+- The machine or CI/CD runner that runs Terraform against the workspaces
+
+Include every network that needs public access, start with `dry_run = true`, and review the denial logs before you enforce the policy.
+
+</Admonition>
+
+<Admonition type="info" title="Requirements and Limitations">
+
+- Context-based ingress control requires the Premium tier
+- It is not available in Azure Government (`azure_environment = "usgovernment"`), Azure West India, or Azure China. Use workspace IP access lists instead
+- Only public IPv4 addresses and CIDR ranges are supported. Private IP ranges are rejected by Databricks
+- If workspace IP access lists are also configured, a request must be allowed by both the IP access list and the ingress policy
+- Public ingress rules are only evaluated when the workspace allows public network access
+
+</Admonition>
+
+---
+
 ## Security Analysis Tool (SAT)
 
 Configure the Security Analysis Tool for continuous security monitoring.
