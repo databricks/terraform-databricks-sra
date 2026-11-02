@@ -2,6 +2,7 @@
 create_hub              = false
 create_workspace_vnet   = true
 databricks_metastore_id = "00000000-0000-0000-0000-000000000000"
+databricks_account_id   = ""
 
 # Basic configuration
 location        = "westus2"
@@ -41,8 +42,8 @@ existing_hub_vnet = {
 # Optional: Create a Databricks network policy for spoke serverless compute
 # existing_ncc_id must still be provided (NCC is a shared regional resource managed by the hub).
 # create_spoke_network_policy = true
-# existing_ncc_id   = "ncc-00000000-0000-0000-0000-000000000000"
-# existing_ncc_name = "ncc-westus2-myhub"
+existing_ncc_id   = "ncc-00000000-0000-0000-0000-000000000000"
+existing_ncc_name = "ncc-westus2-myhub"
 
 # Network egress configuration
 allowed_fqdns    = []
