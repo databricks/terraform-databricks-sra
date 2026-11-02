@@ -344,6 +344,39 @@ run "plan_test_dashed_resource_suffixes" {
   }
 }
 
+# Long suffixes must be truncated to Azure/Databricks name limits rather than failing the plan.
+run "plan_test_long_resource_suffixes" {
+  state_key = "long_resource_suffixes"
+  command   = plan
+  variables {
+    hub_resource_suffix = "abcdefghijklmnopqrstuvwxyz0123"
+    resource_suffix     = "zyxwvutsrqponmlkjihgfedcba9876"
+    allowed_fqdns       = ["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"]
+    sat_configuration = {
+      enabled = true
+    }
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = length(module.spoke_catalog.storage_account_name) <= 24 && endswith(module.spoke_catalog.storage_account_name, "uc")
+    error_message = "Spoke catalog storage account name must be at most 24 characters and keep the uc suffix"
+  }
+
+  assert {
+    condition     = length(module.hub_catalog[0].storage_account_name) <= 24 && endswith(module.hub_catalog[0].storage_account_name, "uc")
+    error_message = "Hub (SAT) catalog storage account name must be at most 24 characters and keep the uc suffix"
+  }
+
+  assert {
+    condition     = length(module.hub[0].ncc_name) <= 30 && !endswith(module.hub[0].ncc_name, "-")
+    error_message = "NCC name must be at most 30 characters and must not end with a dash"
+  }
+}
+
 # Undashed suffixes must produce the same storage account names as before the dash fix.
 run "plan_test_undashed_storage_names_unchanged" {
   state_key = "undashed_storage_names_unchanged"

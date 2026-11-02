@@ -1,7 +1,8 @@
 resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
-  name                     = module.naming.key_vault.name_unique
+  # name_unique is truncated to 24 characters, which can leave a trailing dash (invalid) for long suffixes.
+  name                     = replace(module.naming.key_vault.name_unique, "/-+$/", "")
   location                 = var.location
   resource_group_name      = var.resource_group_name
   tenant_id                = var.client_config.tenant_id
