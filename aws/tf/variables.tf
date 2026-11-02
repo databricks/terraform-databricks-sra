@@ -249,6 +249,12 @@ variable "enable_enhanced_security_monitoring" {
   default     = false
 }
 
+variable "enable_private_network_gateway" {
+  description = "Flag to create a private network gateway (Private Preview) in the network connectivity configuration, so serverless compute can reach resources in a customer VPC and its connected networks. Configure it with private_network_gateway. Ignored in GovCloud regions, where the gateway is not available."
+  type        = bool
+  default     = false
+}
+
 variable "enable_security_analysis_tool" {
   description = "Flag to enable the security analysis tool."
   type        = bool
@@ -443,6 +449,138 @@ variable "network_configuration" {
   validation {
     condition     = var.compute_mode == "SERVERLESS" || var.network_configuration != "custom" || var.custom_scc_relay_vpce_id != null || var.custom_scc_relay_mws_vpce_id != null
     error_message = "custom_scc_relay_vpce_id or custom_scc_relay_mws_vpce_id is required when network_configuration is \"custom\"."
+  }
+}
+
+variable "private_network_gateway" {
+  description = <<-EOT
+    Private network gateway configuration. Only read when enable_private_network_gateway is true (and the region is not
+    GovCloud); otherwise it is ignored, so it can stay filled in while the gateway is turned off.
+    https://docs.databricks.com/aws/en/security/network/serverless-network-security/private-network-gateway
+
+    traffic_mode: SPECIFIC_DESTINATIONS routes only the DNS names in destinations through the gateway, and serverless
+    egress control allows them automatically. ALL_TRAFFIC routes all serverless egress through the gateway (except
+    private endpoint rules and the S3/DynamoDB gateway endpoints), and destinations are added to the network policy's
+    allowed egress destinations instead.
+
+    allow_all_egress: ALL_TRAFFIC only. Switches the network policy's egress from RESTRICTED_ACCESS to FULL_ACCESS, so
+    every destination is allowed without listing it in destinations. Egress filtering is then left entirely to the
+    customer network behind the gateway (e.g. a firewall), and to private endpoint rules and S3/DynamoDB gateway
+    endpoints, which bypass the gateway.
+
+    The gateway needs one subnet in one Availability Zone, a security group, and a cross-account IAM role that
+    Databricks assumes to manage the gateway network interface:
+      - HYBRID, isolated network: SRA creates the subnet in its VPC from subnet_cidr, plus the security group and role,
+        unless their IDs/ARN are provided. The subnet goes in availability_zone_id (a zone ID such as use1-az1, not a
+        zone name), defaulting to the region's first zone listed in private_network_gateway_supported_az_ids.
+      - HYBRID, custom network: provide subnet_id. SRA creates the security group in custom_vpc_id and the role, unless
+        security_group_ids / cross_account_role_arn are provided.
+      - SERVERLESS: SRA creates no AWS resources, so subnet_id, security_group_ids, and cross_account_role_arn are all
+        required. The role must trust arn:aws:iam::414351767826:role/png-management-role with the Databricks account
+        ID as the external ID, and carry the permissions in the setup guide.
+
+    The security group SRA creates has no inbound rules and allows outbound TCP on egress_ports to egress_cidr_blocks
+    (defaulting to the VPC CIDR). Both are ignored when security_group_ids is set. Each egress_ports entry is a single
+    port ("443") or an inclusive range ("8000-8100"); use "0-65535" for all ports.
+  EOT
+  type = object({
+    allow_all_egress       = optional(bool, false)
+    availability_zone_id   = optional(string)
+    cross_account_role_arn = optional(string)
+    destinations           = optional(list(string), [])
+    egress_cidr_blocks     = optional(list(string))
+    egress_ports           = optional(list(string), ["443"])
+    security_group_ids     = optional(list(string))
+    subnet_cidr            = optional(string)
+    subnet_id              = optional(string)
+    traffic_mode           = optional(string, "SPECIFIC_DESTINATIONS")
+  })
+  default  = null
+  nullable = true
+
+  # Every validation below only applies when the gateway is enabled outside GovCloud. The conditionals short-circuit,
+  # so a null or partially filled object is accepted while enable_private_network_gateway is false.
+  validation {
+    condition     = !var.enable_private_network_gateway || var.region == "us-gov-west-1" || var.private_network_gateway != null
+    error_message = "private_network_gateway must be set when enable_private_network_gateway is true."
+  }
+
+  validation {
+    condition     = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null ? contains(["ALL_TRAFFIC", "SPECIFIC_DESTINATIONS"], var.private_network_gateway.traffic_mode) : true
+    error_message = "private_network_gateway.traffic_mode must be ALL_TRAFFIC or SPECIFIC_DESTINATIONS."
+  }
+
+  validation {
+    condition     = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null ? !var.private_network_gateway.allow_all_egress || var.private_network_gateway.traffic_mode == "ALL_TRAFFIC" : true
+    error_message = "private_network_gateway.allow_all_egress requires traffic_mode = \"ALL_TRAFFIC\"."
+  }
+
+  validation {
+    condition     = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null ? var.private_network_gateway.traffic_mode != "SPECIFIC_DESTINATIONS" || length(var.private_network_gateway.destinations) > 0 : true
+    error_message = "private_network_gateway.destinations must contain at least one DNS name when traffic_mode is SPECIFIC_DESTINATIONS."
+  }
+
+  validation {
+    condition = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null ? alltrue([
+      for port in var.private_network_gateway.egress_ports : can(regex("^[0-9]+(-[0-9]+)?$", port)) && try(
+        tonumber(split("-", port)[0]) <= tonumber(split("-", port)[length(split("-", port)) - 1]) && tonumber(split("-", port)[length(split("-", port)) - 1]) <= 65535,
+        false
+      )
+    ]) : true
+    error_message = "Each private_network_gateway.egress_ports entry must be a port (\"443\") or an ascending range (\"8000-8100\") between 0 and 65535."
+  }
+
+  validation {
+    condition = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null ? (
+      var.private_network_gateway.availability_zone_id == null || !contains(keys(var.private_network_gateway_supported_az_ids), var.region) || contains(lookup(var.private_network_gateway_supported_az_ids, var.region, []), coalesce(var.private_network_gateway.availability_zone_id, "-"))
+    ) : true
+    error_message = "private_network_gateway.availability_zone_id is not a zone the private network gateway supports in this region. See private_network_gateway_supported_az_ids."
+  }
+
+  validation {
+    condition     = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null ? length(var.private_network_gateway.destinations) <= 100 : true
+    error_message = "private_network_gateway.destinations supports at most 100 destinations."
+  }
+
+  validation {
+    condition = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null && var.compute_mode == "SERVERLESS" ? (
+      var.private_network_gateway.subnet_id != null && length(coalesce(var.private_network_gateway.security_group_ids, [])) > 0 && var.private_network_gateway.cross_account_role_arn != null
+    ) : true
+    error_message = "private_network_gateway.subnet_id, security_group_ids, and cross_account_role_arn are required when compute_mode is SERVERLESS, since SRA creates no AWS resources in that mode."
+  }
+
+  validation {
+    condition     = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null && var.compute_mode != "SERVERLESS" && var.network_configuration == "custom" ? var.private_network_gateway.subnet_id != null : true
+    error_message = "private_network_gateway.subnet_id is required when network_configuration is \"custom\"."
+  }
+
+  validation {
+    condition     = var.enable_private_network_gateway && var.region != "us-gov-west-1" && var.private_network_gateway != null && var.compute_mode != "SERVERLESS" && var.network_configuration != "custom" ? var.private_network_gateway.subnet_id != null || var.private_network_gateway.subnet_cidr != null : true
+    error_message = "private_network_gateway.subnet_cidr (or an existing subnet_id) is required when network_configuration is \"isolated\"."
+  }
+}
+
+variable "private_network_gateway_supported_az_ids" {
+  description = "Regions where the private network gateway (Private Preview) supports only some Availability Zones. Maps region to the supported AZ IDs (zone IDs such as use1-az1, which are the same in every AWS account, unlike zone names). Used to place the gateway subnet SRA creates and to reject unsupported zones at plan time. Regions not listed are not restricted."
+  type        = map(list(string))
+  default = {
+    "ap-northeast-1" = ["apne1-az1", "apne1-az2", "apne1-az4"]
+    "ap-northeast-2" = ["apne2-az1", "apne2-az2", "apne2-az3"]
+    "ap-south-1"     = ["aps1-az1", "aps1-az2", "aps1-az3"]
+    "ap-southeast-1" = ["apse1-az1", "apse1-az2", "apse1-az3"]
+    "ap-southeast-2" = ["apse2-az1", "apse2-az2", "apse2-az3"]
+    "ap-southeast-3" = ["apse3-az1", "apse3-az2", "apse3-az3"]
+    "ca-central-1"   = ["cac1-az1", "cac1-az2", "cac1-az4"]
+    "eu-central-1"   = ["euc1-az1", "euc1-az2", "euc1-az3"]
+    "eu-north-1"     = ["eun1-az1", "eun1-az2", "eun1-az3"]
+    "eu-west-1"      = ["euw1-az1", "euw1-az2", "euw1-az3"]
+    "eu-west-2"      = ["euw2-az1", "euw2-az2", "euw2-az3"]
+    "eu-west-3"      = ["euw3-az1", "euw3-az2", "euw3-az3"]
+    "sa-east-1"      = ["sae1-az1", "sae1-az2", "sae1-az3"]
+    "us-east-1"      = ["use1-az1", "use1-az4", "use1-az6"]
+    "us-east-2"      = ["use2-az1", "use2-az2", "use2-az3"]
+    "us-west-1"      = ["usw1-az1", "usw1-az3"]
+    "us-west-2"      = ["usw2-az1", "usw2-az2", "usw2-az3"]
   }
 }
 

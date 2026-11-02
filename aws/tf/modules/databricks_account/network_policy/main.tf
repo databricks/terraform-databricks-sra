@@ -10,12 +10,15 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
 
   egress = {
     network_access = {
-      restriction_mode = "RESTRICTED_ACCESS"
+      # FULL_ACCESS is only used for a private network gateway in ALL_TRAFFIC mode with allow_all_egress, where egress
+      # filtering is left to the customer network behind the gateway. The allow list only applies to RESTRICTED_ACCESS.
+      restriction_mode = var.full_egress_access ? "FULL_ACCESS" : "RESTRICTED_ACCESS"
       policy_enforcement = {
         enforcement_mode = "ENFORCED"
       }
       # When the Security Analysis Tool is enabled, allow list PyPI so SAT can install its dependencies.
-      allowed_internet_destinations = var.enable_security_analysis_tool ? [
+      # A private network gateway in ALL_TRAFFIC mode also needs every intended destination allowed here.
+      allowed_internet_destinations = var.full_egress_access ? [] : concat(var.enable_security_analysis_tool ? [
         {
           destination               = "pypi.org"
           internet_destination_type = "DNS_NAME"
@@ -36,7 +39,12 @@ resource "databricks_account_network_policy" "restrictive_network_policy" {
           destination               = "raw.githubusercontent.com"
           internet_destination_type = "DNS_NAME"
         }
-      ] : []
+        ] : [], [
+        for destination in var.private_network_gateway_destinations : {
+          destination               = destination
+          internet_destination_type = "DNS_NAME"
+        }
+      ])
     }
   }
 
