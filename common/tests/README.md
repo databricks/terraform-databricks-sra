@@ -72,6 +72,10 @@ Cloud suites in `aws/tf/tests` and `azure/tf/tests` use `.tftest.hcl` files to o
 - `test_initializer/`
   - Reads the local Terraform state from the cloud directory (path is resolved at test runtime) and exposes its outputs to the test. This provides values like workspace host and catalog name without duplicating data sources here.
 
+- `auth_profile/`
+  - Creates an ephemeral Databricks CLI auth profile for the bundle commands by running `databricks auth login -p <auth_profile_name> --host <host>`, and deletes it (`databricks auth logout --delete`) on cleanup.
+  - `databricks auth login` is an interactive OAuth flow: a browser window opens and the login must be completed before the test continues. The suite cannot run unattended.
+
 - `classic_cluster/`
   - Provisions a small autoscaling classic cluster suitable for test jobs.
   - Outputs: `cluster_id`, `node_type_id`, `spark_version`.
@@ -133,3 +137,7 @@ Notes:
   - Ensure you have applied the cloud root (`aws/tf` or `azure/tf`) and that the state includes outputs such as workspace host and catalog name.
 - Databricks command not found:
   - Install/upgrade the Databricks CLI to a version that supports bundles and ensure it’s on your `PATH`.
+- The test appears to hang on the `auth_profile` run:
+  - It is waiting for the browser login started by `databricks auth login`. Complete the login in the browser window that opened.
+- `workspace_id mismatch: the provider is configured with workspace_id ... but the host resolves to workspace ...`:
+  - A `DATABRICKS_WORKSPACE_ID` environment variable is set for a different workspace. Unset it (for example, `env -u DATABRICKS_WORKSPACE_ID terraform test`).
