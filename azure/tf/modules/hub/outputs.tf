@@ -88,3 +88,12 @@ output "firewall_policy_id" {
   description = "Firewall policy ID"
   value       = length(azurerm_firewall_policy.this) > 0 ? azurerm_firewall_policy.this[0].id : null
 }
+
+output "service_direct" {
+  description = "Service Direct private endpoint details (private IP, DNS record name, and Databricks endpoint ID), or null when not enabled"
+  value = var.is_service_direct_enabled ? {
+    private_ip_address = azurerm_private_endpoint.service_direct[0].private_service_connection[0].private_ip_address
+    dns_record_name    = local.service_direct_dns_record_name
+    endpoint_id        = databricks_endpoint.service_direct[0].endpoint_id
+  } : null
+}

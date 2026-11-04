@@ -115,3 +115,9 @@ variable "network_policy_ingress_dry_run" {
   description = "(Optional) Context-based ingress policy applied in dry run mode to the hub and spoke network policies. Built by the root module from workspace_ingress_control; null disables dry run."
   default     = null
 }
+
+variable "is_service_direct_enabled" {
+  type        = bool
+  description = "(Optional) Create and register a Service Direct private endpoint (inbound Private Link for performance-intensive services) in the hub privatelink subnet"
+  default     = false
+}

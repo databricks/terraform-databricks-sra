@@ -69,3 +69,15 @@ locals {
   network_policy_ingress         = var.workspace_ingress_control.dry_run ? null : local.workspace_ingress_policy
   network_policy_ingress_dry_run = var.workspace_ingress_control.dry_run ? local.workspace_ingress_policy : null
 }
+
+# Azure regions with a Databricks Private Link Service for performance-intensive services (Service Direct). Source:
+# https://learn.microsoft.com/en-us/azure/databricks/resources/ip-domain-region#service-direct-resource-ids
+locals {
+  service_direct_regions = [
+    "australiacentral", "australiaeast", "australiasoutheast", "brazilsouth", "canadacentral", "canadaeast",
+    "centralindia", "centralus", "eastasia", "eastus", "eastus2", "francecentral", "germanywestcentral", "japaneast",
+    "japanwest", "koreacentral", "mexicocentral", "northcentralus", "northeurope", "norwayeast", "qatarcentral",
+    "southafricanorth", "southcentralus", "southeastasia", "southindia", "swedencentral", "switzerlandnorth",
+    "uaenorth", "uksouth", "ukwest", "westcentralus", "westeurope", "westindia", "westus", "westus2", "westus3",
+  ]
+}

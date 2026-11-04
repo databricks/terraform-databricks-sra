@@ -390,3 +390,27 @@ variable "workspace_ingress_control" {
     error_message = "Context-based ingress control is not available in Azure Government. Use workspace IP access lists instead."
   }
 }
+
+# ------------------------------------------------------------------
+# Service Direct (inbound Private Link for performance-intensive services such as Lakebase Autoscaling and Zerobus
+# Ingest). Requires the "Private Connectivity for Performance-Intensive Services" account preview.
+variable "create_service_direct_private_endpoint" {
+  type        = bool
+  description = "(Optional) Create a Service Direct private endpoint in the hub, register it with the Databricks account, and publish <region>.service-direct in the hub and spoke privatelink.azuredatabricks.net zones. Requires create_hub = true and the 'Private Connectivity for Performance-Intensive Services' account preview. Not available in Azure Government."
+  default     = false
+
+  validation {
+    condition     = !var.create_service_direct_private_endpoint || var.create_hub
+    error_message = "create_service_direct_private_endpoint requires create_hub = true, because the Service Direct private endpoint is created in the hub VNet."
+  }
+
+  validation {
+    condition     = !(var.create_service_direct_private_endpoint && var.azure_environment == "usgovernment")
+    error_message = "Service Direct private endpoints are not available in Azure Government."
+  }
+
+  validation {
+    condition     = !var.create_service_direct_private_endpoint || var.azure_environment == "usgovernment" || contains(local.service_direct_regions, var.location)
+    error_message = "Service Direct private endpoints are not available in this location. See the supported regions at https://learn.microsoft.com/en-us/azure/databricks/resources/ip-domain-region#service-direct-resource-ids"
+  }
+}

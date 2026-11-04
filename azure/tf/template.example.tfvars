@@ -33,6 +33,10 @@ workspace_vnet = {
 #   allowed_ip_ranges = ["203.0.113.0/24"]
 # }
 
+# Optional: Service Direct Private Link for performance-intensive services (Lakebase Autoscaling, Zerobus Ingest)
+# Requires the "Private Connectivity for Performance-Intensive Services" account preview
+# create_service_direct_private_endpoint = true
+
 subscription_id = "ffffffff-ffff-ffff-ffff-ffffffffffff"
 
 # Optional: Azure Government. See template_azure_gov.example.tfvars

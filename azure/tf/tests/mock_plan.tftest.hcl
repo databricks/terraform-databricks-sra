@@ -577,3 +577,93 @@ run "plan_test_ingress_control_rejected_with_existing_policy" {
     }
   }
 }
+
+# Service Direct is off by default.
+run "plan_test_service_direct_default_off" {
+  state_key = "service_direct_default_off"
+  command   = plan
+
+  assert {
+    condition     = module.hub[0].service_direct == null && length(azurerm_private_dns_a_record.spoke_service_direct) == 0
+    error_message = "Service Direct resources must not be created unless create_service_direct_private_endpoint is true"
+  }
+}
+
+# Service Direct creates the hub private endpoint and publishes <region>.service-direct in the hub and spoke zones.
+run "plan_test_service_direct_enabled" {
+  state_key = "service_direct_enabled"
+  command   = plan
+  variables {
+    resource_suffix                        = "sd"
+    create_service_direct_private_endpoint = true
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = module.hub[0].service_direct.dns_record_name == "eastus2.service-direct"
+    error_message = "Hub Service Direct DNS record must be named <region>.service-direct"
+  }
+
+  assert {
+    condition     = azurerm_private_dns_a_record.spoke_service_direct[0].name == "eastus2.service-direct"
+    error_message = "Spoke zone must publish the hub Service Direct DNS record"
+  }
+}
+
+# The Service Direct private endpoint lives in the hub VNet, so it requires create_hub = true.
+run "plan_test_service_direct_requires_hub" {
+  state_key       = "service_direct_requires_hub"
+  command         = plan
+  expect_failures = [var.create_service_direct_private_endpoint]
+  variables {
+    create_hub                             = false
+    create_service_direct_private_endpoint = true
+    databricks_metastore_id                = "00000000-0000-0000-0000-000000000000"
+    existing_ncc_id                        = "mock-ncc-id"
+    existing_ncc_name                      = "mock-ncc"
+    existing_network_policy_id             = "mock-policy-id"
+    existing_cmk_ids = {
+      key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
+      managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+      managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+    }
+    existing_hub_vnet = {
+      route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
+      vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
+    }
+  }
+}
+
+# Service Direct is not available in Azure Government.
+run "plan_test_service_direct_rejected_in_gov" {
+  state_key       = "service_direct_rejected_in_gov"
+  command         = plan
+  expect_failures = [var.create_service_direct_private_endpoint]
+  variables {
+    azure_environment                      = "usgovernment"
+    location                               = "usgovvirginia"
+    create_service_direct_private_endpoint = true
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+}
+
+# Regions without a Service Direct Private Link Service are rejected.
+run "plan_test_service_direct_rejected_unsupported_region" {
+  state_key       = "service_direct_rejected_unsupported_region"
+  command         = plan
+  expect_failures = [var.create_service_direct_private_endpoint]
+  variables {
+    location                               = "brazilsoutheast"
+    create_service_direct_private_endpoint = true
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+}

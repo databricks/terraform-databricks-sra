@@ -471,6 +471,47 @@ Include every network that needs public access, start with `dry_run = true`, and
 
 ---
 
+## Service Direct Private Link
+
+[Inbound Private Link for performance-intensive services](https://learn.microsoft.com/en-us/azure/databricks/security/network/front-end/service-direct-privatelink) (Service Direct) gives clients in your network private access to services such as Lakebase Autoscaling and Zerobus Ingest.
+
+### create_service_direct_private_endpoint
+
+**Type:** `bool`
+**Default:** `false`
+**Only valid when:** `create_hub = true`
+
+When `true`, SRA:
+1. Creates a private endpoint in the hub `privatelink` subnet. The endpoint connects to the Databricks Private Link Service for your region (target sub-resource `service_direct`).
+2. Registers the private endpoint with your Databricks account (`databricks_endpoint`). This approves the pending private endpoint connection.
+3. Adds an A record for `<region>.service-direct` to the `privatelink.azuredatabricks.net` private DNS zone in the hub. The record is also added to the spoke zone, so spoke compute resolves the hub endpoint over VNet peering. For a BYO spoke network, the spoke record is added to the zone in `existing_workspace_vnet.dns_zone_ids.backend`.
+
+```hcl
+create_service_direct_private_endpoint = true
+```
+
+Clients outside the hub and spoke VNets, such as on-premises networks, must resolve `<region>.service-direct.privatelink.azuredatabricks.net` through the hub private DNS zone and route to the hub VNet.
+
+<Admonition type="warning" title="Enable the account preview first">
+
+Before you apply, an account admin must turn on **Private Connectivity for Performance-Intensive Services** from the account console **Previews** page. Without this preview, the endpoint cannot be registered.
+
+</Admonition>
+
+<Admonition type="info" title="Requirements and Limitations">
+
+- Requires the Premium tier
+- Requires `create_hub = true`
+- Not available in Azure Government. Only regions with a Service Direct Private Link Service are supported. See [Private Link Service Resource IDs](https://learn.microsoft.com/en-us/azure/databricks/resources/ip-domain-region#service-direct-resource-ids)
+- A Service Direct endpoint only serves workspaces in the same region
+- Each account is limited to 20 Service Direct endpoints per region and 100 per account
+- If you also enable [context-based ingress control](#context-based-ingress-control), the SRA-managed network policies allow access from all registered private endpoints, including this one
+- For a BYO spoke network, the DNS zone in `existing_workspace_vnet.dns_zone_ids.backend` must be in the same subscription as the deployment
+
+</Admonition>
+
+---
+
 ## Security Analysis Tool (SAT)
 
 Configure the Security Analysis Tool for continuous security monitoring.

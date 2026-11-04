@@ -41,6 +41,9 @@ module "hub" {
   # Context-based ingress control
   network_policy_ingress         = local.network_policy_ingress
   network_policy_ingress_dry_run = local.network_policy_ingress_dry_run
+
+  # Service Direct (inbound Private Link for performance-intensive services)
+  is_service_direct_enabled = var.create_service_direct_private_endpoint
 }
 
 module "serverless_workspace" {
