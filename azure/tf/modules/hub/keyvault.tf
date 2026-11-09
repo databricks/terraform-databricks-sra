@@ -2,11 +2,12 @@ resource "azurerm_key_vault" "this" {
   count = var.is_kms_enabled ? 1 : 0
 
   # name_unique is truncated to 24 characters, which can leave a trailing dash (invalid) for long suffixes.
-  name                     = replace(module.naming.key_vault.name_unique, "/-+$/", "")
-  location                 = var.location
-  resource_group_name      = var.resource_group_name
-  tenant_id                = var.client_config.tenant_id
-  purge_protection_enabled = true
+  name                       = replace(module.naming.key_vault.name_unique, "/-+$/", "")
+  location                   = var.location
+  resource_group_name        = var.resource_group_name
+  tenant_id                  = var.client_config.tenant_id
+  purge_protection_enabled   = true
+  rbac_authorization_enabled = false
 
   sku_name                   = "premium"
   soft_delete_retention_days = 7
@@ -138,10 +139,9 @@ resource "azurerm_private_endpoint" "key_vault" {
 resource "azurerm_private_dns_zone_virtual_network_link" "key_vault" {
   count = var.is_kms_enabled ? 1 : 0
 
-  name                  = "${var.resource_suffix}-keyvault-vnetlink"
-  resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.key_vault[0].name
-  virtual_network_id    = module.hub_network.vnet_id
+  name                = "${var.resource_suffix}-keyvault-vnetlink"
+  private_dns_zone_id = azurerm_private_dns_zone.key_vault[0].id
+  virtual_network_id  = module.hub_network.vnet_id
 
   tags = var.tags
 }

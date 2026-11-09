@@ -274,8 +274,7 @@ resource "azurerm_private_dns_a_record" "spoke_service_direct" {
   count = var.create_service_direct_private_endpoint ? 1 : 0
 
   name                = module.hub[0].service_direct.dns_record_name
-  zone_name           = provider::azurerm::parse_resource_id(local.spoke_backend_dns_zone_id).resource_name
-  resource_group_name = provider::azurerm::parse_resource_id(local.spoke_backend_dns_zone_id).resource_group_name
+  private_dns_zone_id = local.spoke_backend_dns_zone_id
   ttl                 = 300
   records             = [module.hub[0].service_direct.private_ip_address]
 

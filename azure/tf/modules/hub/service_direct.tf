@@ -55,8 +55,7 @@ resource "azurerm_private_dns_a_record" "service_direct" {
   count = var.is_service_direct_enabled ? 1 : 0
 
   name                = local.service_direct_dns_record_name
-  zone_name           = var.private_dns_zone_names.backend
-  resource_group_name = var.resource_group_name
+  private_dns_zone_id = module.hub_network.dns_zone_ids.backend
   ttl                 = 300
   records             = [azurerm_private_endpoint.service_direct[0].private_service_connection[0].private_ip_address]
 
