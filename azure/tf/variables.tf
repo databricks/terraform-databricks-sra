@@ -209,7 +209,7 @@ variable "existing_cmk_ids" {
     managed_disk_key_id     = string
     managed_services_key_id = string
   })
-  description = "(Optional) Existing CMK IDs - required when create_hub is false and cmk_enabled is true"
+  description = "(Optional) Existing CMK IDs - required when create_hub is false and cmk_enabled is true. The key vault must use the Azure RBAC permission model: SRA grants each spoke workspace access to the keys with role assignments, which vaults using access policies ignore."
   default     = null
 
   validation {

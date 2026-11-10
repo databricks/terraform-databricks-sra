@@ -88,35 +88,43 @@ resource "azurerm_databricks_workspace_root_dbfs_customer_managed_key" "this" {
   workspace_id     = azurerm_databricks_workspace.this.id
   key_vault_key_id = var.managed_disk_key_id
 
-  depends_on = [azurerm_key_vault_access_policy.dbstorage]
+  depends_on = [time_sleep.key_vault_rbac]
 }
 
-resource "azurerm_key_vault_access_policy" "dbstorage" {
+# The workspace's DBFS storage account identity (root DBFS CMK) and managed disk identity (managed disk CMK) wrap and
+# unwrap the customer-managed key. Access is granted with Azure RBAC, so the key vault, whether created by SRA or supplied
+# through existing_cmk_ids, must use the Azure RBAC permission model.
+resource "azurerm_role_assignment" "dbstorage" {
   count = var.is_kms_enabled ? 1 : 0
 
-  key_vault_id = var.key_vault_id
-  tenant_id    = azurerm_databricks_workspace.this.storage_account_identity[0].tenant_id
-  object_id    = azurerm_databricks_workspace.this.storage_account_identity[0].principal_id
-
-  key_permissions = [
-    "Get",
-    "UnwrapKey",
-    "WrapKey",
-  ]
+  scope                = var.key_vault_id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+  principal_id         = azurerm_databricks_workspace.this.storage_account_identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+  description          = "Granted by the Databricks SRA Terraform module for the root DBFS customer-managed key."
 }
 
-resource "azurerm_key_vault_access_policy" "dbmanageddisk" {
+resource "azurerm_role_assignment" "dbmanageddisk" {
   count = var.is_kms_enabled ? 1 : 0
 
-  key_vault_id = var.key_vault_id
-  tenant_id    = azurerm_databricks_workspace.this.managed_disk_identity[0].tenant_id
-  object_id    = azurerm_databricks_workspace.this.managed_disk_identity[0].principal_id
+  scope                = var.key_vault_id
+  role_definition_name = "Key Vault Crypto Service Encryption User"
+  principal_id         = azurerm_databricks_workspace.this.managed_disk_identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+  description          = "Granted by the Databricks SRA Terraform module for the managed disk customer-managed key."
+}
 
-  key_permissions = [
-    "Get",
-    "UnwrapKey",
-    "WrapKey",
-  ]
+# Role assignments take time to reach the Key Vault data plane, so the root DBFS CMK configuration waits on this. The
+# managed disk key is only used when clusters start, so no Terraform resource depends on that assignment directly.
+resource "time_sleep" "key_vault_rbac" {
+  count = var.is_kms_enabled ? 1 : 0
+
+  create_duration = "60s"
+
+  triggers = {
+    dbstorage     = azurerm_role_assignment.dbstorage[0].id
+    dbmanageddisk = azurerm_role_assignment.dbmanageddisk[0].id
+  }
 }
 
 # Define a Databricks metastore assignment

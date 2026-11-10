@@ -667,3 +667,75 @@ run "plan_test_service_direct_rejected_unsupported_region" {
     }
   }
 }
+
+# The SRA-created key vault uses the Azure RBAC permission model, and every principal that needs the customer-managed keys
+# is granted access with a role assignment rather than an access policy.
+run "plan_test_key_vault_rbac" {
+  state_key = "key_vault_rbac"
+  command   = plan
+  variables {
+    resource_suffix = "kvrbac"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = module.hub[0].key_vault_rbac.rbac_authorization_enabled == true
+    error_message = "The hub key vault must use the Azure RBAC permission model"
+  }
+
+  assert {
+    condition     = module.hub[0].key_vault_rbac.role_assignments.terraform == "Key Vault Crypto Officer"
+    error_message = "The Terraform principal must be granted Key Vault Crypto Officer on the hub key vault"
+  }
+
+  assert {
+    condition     = module.hub[0].key_vault_rbac.role_assignments.databricks == "Key Vault Crypto Service Encryption User"
+    error_message = "The AzureDatabricks application must be granted Key Vault Crypto Service Encryption User on the hub key vault"
+  }
+
+  assert {
+    condition = alltrue([
+      module.spoke_workspace.key_vault_role_assignments.dbstorage.role == "Key Vault Crypto Service Encryption User",
+      module.spoke_workspace.key_vault_role_assignments.dbmanageddisk.role == "Key Vault Crypto Service Encryption User",
+    ])
+    error_message = "The spoke DBFS storage and managed disk identities must be granted Key Vault Crypto Service Encryption User"
+  }
+}
+
+# With a bring-your-own hub, the spoke identities are granted access on the key vault supplied in existing_cmk_ids.
+run "plan_test_byo_hub_key_vault_rbac" {
+  state_key = "byo_hub_key_vault_rbac"
+  command   = plan
+  variables {
+    create_hub                 = false
+    databricks_metastore_id    = "00000000-0000-0000-0000-000000000000"
+    resource_suffix            = "kvrbacbyo"
+    existing_ncc_id            = "mock-ncc-id"
+    existing_ncc_name          = "mock-ncc"
+    existing_network_policy_id = "mock-policy-id"
+    workspace_vnet = {
+      cidr     = "10.0.2.0/24"
+      new_bits = null
+    }
+    existing_cmk_ids = {
+      key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
+      managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+      managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+    }
+    existing_hub_vnet = {
+      route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
+      vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
+    }
+  }
+
+  assert {
+    condition = alltrue([
+      module.spoke_workspace.key_vault_role_assignments.dbstorage.scope == "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv",
+      module.spoke_workspace.key_vault_role_assignments.dbmanageddisk.scope == "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv",
+    ])
+    error_message = "Spoke key vault role assignments must be scoped to the existing_cmk_ids key vault"
+  }
+}

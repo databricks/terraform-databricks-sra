@@ -97,3 +97,14 @@ output "service_direct" {
     endpoint_id        = databricks_endpoint.service_direct[0].endpoint_id
   } : null
 }
+
+output "key_vault_rbac" {
+  description = "Access model of the CMK key vault: whether Azure RBAC is enabled, and the role granted for each purpose. Null when CMK is disabled."
+  value = var.is_kms_enabled ? {
+    rbac_authorization_enabled = azurerm_key_vault.this[0].rbac_authorization_enabled
+    role_assignments = {
+      terraform  = azurerm_role_assignment.key_vault_terraform[0].role_definition_name
+      databricks = azurerm_role_assignment.key_vault_databricks[0].role_definition_name
+    }
+  } : null
+}

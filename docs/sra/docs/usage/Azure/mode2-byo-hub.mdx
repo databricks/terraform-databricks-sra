@@ -155,6 +155,9 @@ If `cmk_enabled = true` (default), you must provide `existing_cmk_ids`. Alternat
 cmk_enabled = false
 ```
 
+The key vault must use the Azure RBAC permission model, and some permissions must be granted before you deploy. See
+the Key Vault requirements under [`existing_cmk_ids`](./configuration.mdx#existing_cmk_ids).
+
 </Admonition>
 
 <Admonition type="warning" title="SAT Not Available">
