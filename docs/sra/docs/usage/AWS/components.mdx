@@ -6,47 +6,86 @@ import Admonition from '@theme/Admonition';
 
 # SRA Components Breakdown
 
-This section outlines the core components of the **Security Reference Architeture (SRA)**. Several `.tf` scripts contain direct links to the Databricks Terraform documention.
+This section outlines the core components of the **Security Reference Architecture (SRA)**. Several `.tf` scripts contain direct links to the Databricks Terraform documentation.
 The full Databricks Terraform Provider Documentation can be found [here](https://registry.terraform.io/providers/databricks/databricks/latest/docs).
 
-## Network Configuration 
+## Compute Mode
 
-Two network configurations are available for workspaces: `Isolated` or `Custom`:
+The `compute_mode` variable selects the workspace type:
+* **HYBRID (Default)**: A classic workspace in a customer-managed VPC, with serverless compute available alongside it. All components on this page apply.
+* **SERVERLESS**: A serverless-only workspace. See [Serverless-Only Workspace](#serverless-only-workspace-optional) below.
+
+## Network Configuration
+
+The `network_configuration` variable applies to `HYBRID` workspaces only; serverless-only workspaces create no customer VPC and ignore it. Two network configurations are available: `isolated` or `custom`:
 * **Isolated (Default)**: Restricts all traffic from reaching the public internet. Communication is limited to AWS PrivateLink endpoints for AWS services and the Databricks control plane.
-    > **Note**: A Unity Catalog–only configuration is required for clusters running without internet access. Read the [offical documentation](https://docs.databricks.com/aws/en/data-governance/unity-catalog/disable-hms) for details.
+    > **Note**: SRA disables legacy Hive metastore access on the workspace (`disable_legacy_access = true`), so all data access goes through Unity Catalog. This is required anyway for clusters with no public internet access, which can't reach the legacy built-in metastore. Read the [official documentation](https://docs.databricks.com/aws/en/data-governance/unity-catalog/disable-hms) for details.
 * **Custom**: Enables specification of a VPC ID, subnet IDs, security group IDs, and Databricks PrivateLink endpoint IDs. This option is recommended when networking assets are provisioned in separate pipelines or pre-assigned by a centralized infrastructure team.
     * **Bring AWS PrivateLink endpoint IDs**: Set `custom_general_access_vpce_id`, `custom_scc_relay_vpce_id`, and (optionally) `custom_service_direct_vpce_id`. SRA will register them with Databricks on your behalf.
     * **Bring already-registered Databricks MWS endpoint IDs**: Set `custom_general_access_mws_vpce_id`, `custom_scc_relay_mws_vpce_id`, and (optionally) `custom_service_direct_mws_vpce_id`. Use this path when the VPC endpoints have already been registered with the Databricks account (e.g., for sharing across multiple workspaces in the same VPC). SRA skips the registration step and wires these IDs straight into the workspace network configuration.
 
 ## Core AWS Components
-* **Customer Managed VPC**: A [customer-managed VPC](https://docs.databricks.com/aws/en/security/network/classic/customer-managed-vpc) provides full control over network configurations to meet organizational cloud security and governance standards. 
+* **Customer Managed VPC**: A [customer-managed VPC](https://docs.databricks.com/aws/en/security/network/classic/customer-managed-vpc) provides full control over network configurations to meet organizational cloud security and governance standards.
 * **S3 Buckets**: Three S3 buckets are created to support the following functionalities:
-    * [Workspace Root Bucket](https://docs.databricks.com/aws/en/admin/account-settings-e2/storage)
+    * [Workspace Root Bucket](https://docs.databricks.com/aws/en/admin/account-settings-e2/storage), with a restrictive bucket policy scoped to the workspace.
     * [Unity Catalog - Workspace Catalog](https://docs.databricks.com/aws/en/catalogs/create-catalog)
     * [Audit Log Delivery Bucket](https://docs.databricks.com/aws/en/admin/account-settings-e2/audit-aws-storage)
+* **CloudTrail S3 Data Events**: A dedicated [CloudTrail trail](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html#cloudtrail-object-level-tracking) and log bucket record S3 object-level events (e.g. `GetObject`, `PutObject`, `DeleteObject`) for the workspace root bucket. Logging for the workspace catalog and audit log delivery buckets is opt-in through the `cloudtrail_s3_data_events` variable. The log bucket is encrypted with a dedicated KMS key; set `existing_log_bucket_name` to deliver to a bucket you already manage instead.
+    > **NOTE**: CloudTrail data events are billed per event. The trail records data events only; management events are left to your existing trails.
 * **IAM Roles**: Three IAM roles are created to support the following functionalities:
     * [Classic Compute (EC2) Provisioning](https://docs.databricks.com/aws/en/admin/account-settings-e2/credentials)
     * [Data Access for Unity Catalog - Workspace Catalog](https://docs.databricks.com/aws/en/connect/unity-catalog/cloud-storage#storage-credentials)
     * [Audit Log Delivery](https://docs.databricks.com/aws/en/admin/account-settings-e2/audit-aws-credentials)
 * **Scoped-down IAM Policy for the Databricks Cross-Account Role**: A [cross-account role](https://docs.databricks.com/aws/en/admin/account-settings-e2/credentials) is required for clusters provisioned within the classic compute plane. The role is scoped to the VPC, subnets, and security group associated with the deployment.
-* **AWS VPC Endpoints for S3 Gateway, STS, and Kinesis**: AWS PrivateLink is used to connect the VPC to AWS services without traversing public IP addresses. [S3 Gateway, STS, and Kinesis endpoints](https://docs.databricks.com/aws/en/security/network/classic/privatelink#step-5-add-vpc-endpoints-for-other-aws-services) are best practices for enterprise Databricks deployments. Additional endpoints such as those for AWS DynamoDB and AWS Glue can be configured based on your use cases. 
-    > **NOTE**: In the `Isolated` network mode, restrictive VPC endpoint policies are applied for S3, STS, and Kinesis. These **must** be updated if additional access is required through the classic compute plane.
-* **Back-end AWS PrivateLink Connectivity**: Ensures private communication between the classic compute plane and the Databricks control plane ([Back-end PrivateLink](https://docs.databricks.com/aws/en/security/network/classic/privatelink#overview)) via Databricks-specific interface VPC endpoints. Front-end PrivateLink, which keeps user traffic on the AWS backbone, is available but **not** included in these templates.
+* **AWS VPC Endpoints for S3 Gateway, STS, and Kinesis**: AWS PrivateLink is used to connect the VPC to AWS services without traversing public IP addresses. [S3 Gateway, STS, and Kinesis endpoints](https://docs.databricks.com/aws/en/security/network/classic/privatelink#step-5-add-vpc-endpoints-for-other-aws-services) are best practices for enterprise Databricks deployments. Additional endpoints such as those for AWS DynamoDB and AWS Glue can be configured based on your use cases.
+    > **NOTE**: In the `isolated` network mode, restrictive VPC endpoint policies are applied for S3, STS, and Kinesis. These **must** be updated if additional access is required through the classic compute plane.
+* **Back-end AWS PrivateLink Connectivity**: Ensures private communication between the classic compute plane and the Databricks control plane ([Back-end PrivateLink](https://docs.databricks.com/aws/en/security/network/classic/privatelink#overview)) via Databricks-specific interface VPC endpoints.
 * **Service Direct (opt-in)**: A front-end PrivateLink interface VPC endpoint that enables clients to reach the workspace UI/API privately. Service Direct endpoints are commonly shared across workspaces in the same VPC, so SRA does not create one by default. Set `create_service_direct_vpce = true` to have SRA create and register a new Service Direct endpoint for this deployment. Not available in GovCloud regions.
-* **AWS KMS Keys**: Three AWS KMS Keys are created for:
+* **AWS KMS Keys**: Four AWS KMS keys are created for:
     * [Workspace Storage](https://docs.databricks.com/aws/en/security/keys/customer-managed-keys#customer-managed-keys-for-workspace-storage)
     * [Managed Services](https://docs.databricks.com/aws/en/security/keys/customer-managed-keys#customer-managed-keys-for-managed-services)
     * [Unity Catalog - Workspace Catalog](https://docs.databricks.com/aws/en/connect/unity-catalog/cloud-storage/manage-external-locations#configure-an-encryption-algorithm-on-an-external-location)
+    * [CloudTrail Log Files](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/encrypting-cloudtrail-log-files-with-aws-kms.html) (skipped when you bring your own CloudTrail log bucket)
 
 ## Core Databricks Components
-* **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog) is a unified governance solution for data and AI assets such as files, tables, and machine learning models. Unity Catalog enforces fine-grained access controls, centralized policy management, auditing, and lineage tracking—all integrated into the Databricks workflow.
+* **Unity Catalog**: [Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog) is a unified governance solution for data and AI assets such as files, tables, and machine learning models. Unity Catalog enforces fine-grained access controls, centralized policy management, auditing, and lineage tracking—all integrated into the Databricks workflow. SRA creates (or reuses, with `metastore_exists = true`) the regional metastore, assigns it to the workspace, and creates an isolated workspace catalog.
 * **System Table Schemas**: [System Tables](https://docs.databricks.com/aws/en/admin/system-tables) provide operational visibility across access, compute, Lakeflow, query, serving, and storage logs. These tables are located within the `system` catalog in Unity Catalog.
 * **Audit Log Delivery**: Enables low-latency delivery of Databricks audit logs to an S3 bucket within the customer's AWS account. [Audit Logs](https://docs.databricks.com/aws/en/admin/account-settings/audit-log-delivery) capture both workspace-level and account-level events, with an option to enable verbose logging for more detailed event data.
     >**NOTE**: Audit log delivery can only be configured twice per account. Once enabled, set `audit_log_delivery_exists = true` for subsequent runs.
+* **Workspace Admin Assignment**: The user set in `admin_user` is assigned as a workspace admin.
+* **Disabled Legacy Settings**: Legacy Hive metastore access and legacy DBFS access are disabled on the workspace. Set `disable_legacy_features_at_account_level = true` to also disable legacy features (Hive metastore, DBFS, no-isolation shared clusters) for every **new** workspace in the Databricks account, not just this deployment.
 * **Network Connectivity Configuration**: Serverless network connectivity is managed with [network connectivity configurations (NCC)](https://docs.databricks.com/aws/en/security/network/serverless-network-security/#what-is-a-network-connectivity-configuration-ncc), which are account-level regional constructs that are used to manage private endpoints creation and firewall enablement at scale. An NCC is created and attached to the workspace, which contains a list of stable IP addresses, which will be used by the serverless compute in that workspace to connect to customer cloud resources.
-* **Restrictive Network Policy**: [Network Policies](https://docs.databricks.com/aws/en/security/network/serverless-network-security/manage-network-policies) implement egress controls for serverless compute by enforcing a restrictive network policy that permits outbound traffic only to required data buckets.
+* **Restrictive Network Policy**: [Network Policies](https://docs.databricks.com/aws/en/security/network/serverless-network-security/manage-network-policies) implement egress controls for serverless compute by enforcing a restrictive network policy that permits outbound traffic only to required data buckets. The same policy controls ingress:
+    * **IP-based ingress (optional)**: Set `context_based_ingress_ip_acl` to a list of IPs/CIDRs to restrict workspace access to them. Leave it empty to apply no restriction.
+        >**NOTE**: Verify all IPs are correct before enabling to avoid a lockout.
+    * **Cross-workspace ingress**: Restricted by default. Set `cross_workspace_ingress_allowed_workspace_ids` to allow specific source workspaces.
+* **Serverless Private Connectivity (optional)**: [Private endpoint rules](https://docs.databricks.com/aws/en/security/network/serverless-network-security/pl-to-internal-network) let serverless compute reach resources in your AWS account (e.g. a VPC endpoint service in front of a database, or S3 buckets) over PrivateLink instead of the public network. No rules are created by default — in-region S3 access is already private through the NCC's managed gateway endpoints. Add rules with the `serverless_private_endpoint_rules` variable; rules complement the network policy (the policy controls what egress is allowed, the rule provides the private path).
+    >**NOTE**: A rule targeting your own VPC endpoint service stays pending until you accept the connection request on the endpoint service in AWS.
+* **Private Network Gateway (optional, Private Preview)**: A [private network gateway](https://docs.databricks.com/aws/en/security/network/serverless-network-security/private-network-gateway) lets serverless compute reach resources in your VPC and its connected networks (e.g. on-premises over Direct Connect or VPN) through one Databricks-managed network interface, without a private endpoint rule per resource. Set `enable_private_network_gateway = true` and configure `private_network_gateway`.
+    * In `SPECIFIC_DESTINATIONS` mode, only the listed DNS names are routed through the gateway. In `ALL_TRAFFIC` mode, all serverless egress is, and the destinations are added to the network policy instead. Private endpoint rules and the S3/DynamoDB gateway endpoints still take precedence over the gateway.
+    * In `ALL_TRAFFIC` mode, setting `allow_all_egress = true` switches the network policy's egress from restricted to full access, so destinations need not be listed; egress filtering is then left to your network behind the gateway.
+    * In `HYBRID` mode, SRA creates the gateway subnet (isolated network only), security group, and cross-account IAM role in the workspace VPC, unless you provide existing ones. In `SERVERLESS` mode, SRA creates no AWS resources, so you provide the subnet, security group, and role.
+    >**NOTE**: The private preview supports one subnet in one Availability Zone, and only some regions and zones. The zones SRA knows to be supported are listed by AZ ID in `private_network_gateway_supported_az_ids`; the gateway subnet defaults to the first of them, and unsupported zones are rejected at plan time. Changing the subnet, security group, or role replaces the gateway. Not available in GovCloud regions; enabling it there is ignored with a warning.
 * **Example Classic Cluster**: Includes a sample cluster and associated cluster policy to illustrate secure configuration patterns.
     >**NOTE**: Deploying this example creates a cluster within the Databricks workspace, including the underlying AWS EC2 instance.
+
+## Optional Security Features
+
+These are off by default and enabled with a flag:
+* **Compliance Security Profile**: Set `enable_compliance_security_profile = true` and list the standards in `compliance_standards` (e.g. `HIPAA`, `PCI_DSS`). Enabling the [compliance security profile](https://docs.databricks.com/aws/en/security/privacy/security-profile) also turns on enhanced security monitoring and automatic cluster update.
+* **Enhanced Security Monitoring**: Set `enable_enhanced_security_monitoring = true` to enable [enhanced security monitoring](https://docs.databricks.com/aws/en/security/privacy/enhanced-security-monitoring) on its own.
+* **Automatic Cluster Update**: Set `enable_automatic_cluster_update = true` to enable [automatic cluster update](https://docs.databricks.com/aws/en/admin/clusters/automatic-cluster-update) on its own.
+* **Security Analysis Tool**: Set `enable_security_analysis_tool = true` to deploy the [Security Analysis Tool (SAT)](https://github.com/databricks-industry-solutions/security-analysis-tool) to the workspace. The network policy then allows the PyPI and GitHub domains SAT needs to install its dependencies.
+
+## Serverless-Only Workspace (optional)
+
+Set `compute_mode = "SERVERLESS"` to deploy a serverless-only workspace instead of the classic customer-managed VPC deployment. Serverless workspaces run entirely on Databricks-managed compute and storage, and this variant creates **no AWS resources at all** — no AWS account or AWS credentials are required. The customer VPC, PrivateLink endpoints, cross-account IAM role, workspace root S3 bucket, workspace KMS keys, workspace catalog storage, CloudTrail logging, and S3 audit log delivery are not created. The restrictive network policy, network connectivity configuration, and Unity Catalog metastore resources still apply.
+
+Notes for serverless-only deployments:
+* The workspace uses its auto-created workspace catalog backed by Databricks default storage instead of the customer-managed isolated catalog.
+* Audit events should be monitored via [system tables](https://docs.databricks.com/aws/en/admin/system-tables) (see the `system_tables_audit_log` customization) since S3 audit log delivery requires a customer-owned bucket. Off-platform audit log delivery is available with `compute_mode = "HYBRID"`.
+* Classic-compute features (the example cluster, enhanced security monitoring, and automatic cluster update) are skipped or not applicable.
+* Serverless-only workspaces are not available in GovCloud regions; deployments to `us-gov-west-1` must use `compute_mode = "HYBRID"`.
 
 ## Optional Naming Overrides
 

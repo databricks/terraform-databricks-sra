@@ -35,7 +35,30 @@ This architecture emphasizes:
 The **AWS** implementation of the **Security Reference Architecture (SRA)** includes:
     * Configurable **networking patterns** (isolated or custom).
     * Core **AWS** components such as VPCs and privatelink endpoints, IAM roles, S3 buckets, and KMS keys.
-    * Core **Databricks** components including Unity Catalog, system tables, audit log delivery, and network connectivty configurations and network policies for serverless compute. 
+    * Core **Databricks** components including Unity Catalog, system tables, audit log delivery, and network connectivity configurations and network policies for serverless compute.
+
+## AWS GovCloud
+
+The same templates deploy to [AWS GovCloud (US)](https://docs.databricks.com/aws/en/security/privacy/gov-cloud) for U.S. government agencies and contractors with FedRAMP High or DoD IL5 requirements. There is no separate GovCloud template. Set two variables in your `.tfvars` in addition to the [Getting Started](./gettingstarted.mdx) steps:
+
+* **Region**: Set `region` to `us-gov-west-1`. This is the only GovCloud region Databricks supports; `us-gov-east-1` is rejected at plan time.
+* **GovCloud Shard**: Set `databricks_gov_shard` to `civilian` (most agency workloads) or `dod` (Department of Defense).
+    >**NOTE**: The `dod` shard is restricted to customers with a `.mil` email address.
+
+Leave `databricks_gov_shard` unset (`null`) for commercial regions.
+
+From those two values, SRA selects the GovCloud-specific settings for you:
+* The `aws-us-gov` ARN partition for IAM, S3, and KMS policies.
+* The Databricks account host: `https://accounts.cloud.databricks.us` for `civilian`, or `https://accounts-dod.cloud.databricks.mil` for `dod`.
+* The shard's PrivateLink endpoint services and Databricks-owned buckets (system tables, log storage, artifacts).
+* Security group rules without port 6666, which GovCloud secure cluster connectivity does not use.
+
+Some features are not available in GovCloud:
+* **Serverless-only workspaces**: `compute_mode = "SERVERLESS"` fails at plan time; use `compute_mode = "HYBRID"`.
+* **Service Direct**: `create_service_direct_vpce` has no effect; no endpoint is created.
+* **Private Network Gateway**: `enable_private_network_gateway` is ignored with a warning.
+
+For GovCloud compliance controls, see [Compliance Security Profile and Enhanced Security Monitoring](https://docs.databricks.com/aws/en/security/privacy/enhanced-security-compliance), which SRA can enable with `enable_compliance_security_profile` and `enable_enhanced_security_monitoring`.
 
 ## Next Steps
 
