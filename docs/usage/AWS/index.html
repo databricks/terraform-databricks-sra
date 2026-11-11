@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.9.2">
 <title data-rh="true">AWS | SRA</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://databricks.github.io/terraform-databricks-sra/docs/usage/AWS/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="AWS | SRA"><meta data-rh="true" name="description" content="Overview"><meta data-rh="true" property="og:description" content="Overview"><link data-rh="true" rel="icon" href="/terraform-databricks-sra/terraform-databricks-sra/docs/sra/src/img/primary-icon-orange-cloud-security-3291x3220-fa69bde.png"><link data-rh="true" rel="canonical" href="https://databricks.github.io/terraform-databricks-sra/docs/usage/AWS/"><link data-rh="true" rel="alternate" href="https://databricks.github.io/terraform-databricks-sra/docs/usage/AWS/" hreflang="en"><link data-rh="true" rel="alternate" href="https://databricks.github.io/terraform-databricks-sra/docs/usage/AWS/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Usage","item":"https://databricks.github.io/terraform-databricks-sra/docs/usage/"},{"@type":"ListItem","position":2,"name":"AWS","item":"https://databricks.github.io/terraform-databricks-sra/docs/usage/AWS/"}]}</script><link rel="stylesheet" href="/terraform-databricks-sra/assets/css/styles.3321ae0d.css">
-<script src="/terraform-databricks-sra/assets/js/runtime~main.5d2ac4d1.js" defer="defer"></script>
-<script src="/terraform-databricks-sra/assets/js/main.9a41086b.js" defer="defer"></script>
+<script src="/terraform-databricks-sra/assets/js/runtime~main.ca380c92.js" defer="defer"></script>
+<script src="/terraform-databricks-sra/assets/js/main.8f4feec2.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -46,13 +46,12 @@ It captures Databricks security best practices in Terraform templates, allowing 
 <ul>
 <li class="">The <code>aws-us-gov</code> ARN partition for IAM, S3, and KMS policies.</li>
 <li class="">The Databricks account host: <code>https://accounts.cloud.databricks.us</code> for <code>civilian</code>, or <code>https://accounts-dod.cloud.databricks.mil</code> for <code>dod</code>.</li>
-<li class="">The shard&#x27;s PrivateLink endpoint services and Databricks-owned buckets (system tables, log storage, artifacts).</li>
+<li class="">The shard&#x27;s PrivateLink endpoint services (workspace, secure cluster connectivity relay, and Service Direct) and Databricks-owned buckets (system tables, log storage, artifacts).</li>
 <li class="">Security group rules without port 6666, which GovCloud secure cluster connectivity does not use.</li>
 </ul>
 <p>Some features are not available in GovCloud:</p>
 <ul>
 <li class=""><strong>Serverless-only workspaces</strong>: <code>compute_mode = &quot;SERVERLESS&quot;</code> fails at plan time; use <code>compute_mode = &quot;HYBRID&quot;</code>.</li>
-<li class=""><strong>Service Direct</strong>: <code>create_service_direct_vpce</code> has no effect; no endpoint is created.</li>
 <li class=""><strong>Private Network Gateway</strong>: <code>enable_private_network_gateway</code> is ignored with a warning.</li>
 </ul>
 <p>For GovCloud compliance controls, see <a href="https://docs.databricks.com/aws/en/security/privacy/enhanced-security-compliance" target="_blank" rel="noopener noreferrer" class="">Compliance Security Profile and Enhanced Security Monitoring</a>, which SRA can enable with <code>enable_compliance_security_profile</code> and <code>enable_enhanced_security_monitoring</code>.</p>
