@@ -50,12 +50,11 @@ Leave `databricks_gov_shard` unset (`null`) for commercial regions.
 From those two values, SRA selects the GovCloud-specific settings for you:
 * The `aws-us-gov` ARN partition for IAM, S3, and KMS policies.
 * The Databricks account host: `https://accounts.cloud.databricks.us` for `civilian`, or `https://accounts-dod.cloud.databricks.mil` for `dod`.
-* The shard's PrivateLink endpoint services and Databricks-owned buckets (system tables, log storage, artifacts).
+* The shard's PrivateLink endpoint services (workspace, secure cluster connectivity relay, and Service Direct) and Databricks-owned buckets (system tables, log storage, artifacts).
 * Security group rules without port 6666, which GovCloud secure cluster connectivity does not use.
 
 Some features are not available in GovCloud:
 * **Serverless-only workspaces**: `compute_mode = "SERVERLESS"` fails at plan time; use `compute_mode = "HYBRID"`.
-* **Service Direct**: `create_service_direct_vpce` has no effect; no endpoint is created.
 * **Private Network Gateway**: `enable_private_network_gateway` is ignored with a warning.
 
 For GovCloud compliance controls, see [Compliance Security Profile and Enhanced Security Monitoring](https://docs.databricks.com/aws/en/security/privacy/enhanced-security-compliance), which SRA can enable with `enable_compliance_security_profile` and `enable_enhanced_security_monitoring`.
