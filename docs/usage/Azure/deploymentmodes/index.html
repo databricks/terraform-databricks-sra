@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.9.2">
 <title data-rh="true">Deployment Modes Overview | SRA</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://databricks.github.io/terraform-databricks-sra/docs/usage/Azure/deploymentmodes/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Deployment Modes Overview | SRA"><meta data-rh="true" name="description" content="Azure SRA supports three deployment modes to accommodate different organizational requirements and existing infrastructure."><meta data-rh="true" property="og:description" content="Azure SRA supports three deployment modes to accommodate different organizational requirements and existing infrastructure."><link data-rh="true" rel="icon" href="/terraform-databricks-sra/terraform-databricks-sra/docs/sra/src/img/primary-icon-orange-cloud-security-3291x3220-fa69bde.png"><link data-rh="true" rel="canonical" href="https://databricks.github.io/terraform-databricks-sra/docs/usage/Azure/deploymentmodes/"><link data-rh="true" rel="alternate" href="https://databricks.github.io/terraform-databricks-sra/docs/usage/Azure/deploymentmodes/" hreflang="en"><link data-rh="true" rel="alternate" href="https://databricks.github.io/terraform-databricks-sra/docs/usage/Azure/deploymentmodes/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Usage","item":"https://databricks.github.io/terraform-databricks-sra/docs/usage/"},{"@type":"ListItem","position":2,"name":"Azure","item":"https://databricks.github.io/terraform-databricks-sra/docs/usage/Azure/"},{"@type":"ListItem","position":3,"name":"Deployment Modes","item":"https://databricks.github.io/terraform-databricks-sra/docs/usage/Azure/deploymentmodes"}]}</script><link rel="stylesheet" href="/terraform-databricks-sra/assets/css/styles.3321ae0d.css">
-<script src="/terraform-databricks-sra/assets/js/runtime~main.93b9f8b1.js" defer="defer"></script>
-<script src="/terraform-databricks-sra/assets/js/main.3ed75c6f.js" defer="defer"></script>
+<script src="/terraform-databricks-sra/assets/js/runtime~main.bf2af697.js" defer="defer"></script>
+<script src="/terraform-databricks-sra/assets/js/main.d101e4ec.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -29,14 +29,16 @@
 <ul>
 <li class=""><strong>Best for:</strong> Teams with existing hub infrastructure</li>
 <li class=""><strong>SRA creates:</strong> Spoke resources only</li>
-<li class=""><strong>You provide:</strong> Hub VNET, Key Vault, metastore, NCC, network policy</li>
+<li class=""><strong>You provide:</strong> Hub VNET, Key Vault, metastore, NCC</li>
+<li class=""><strong>Optional:</strong> SRA can manage firewall rules (<code>create_spoke_firewall_rules</code>) and network policy (<code>create_spoke_network_policy</code>) on your existing hub</li>
 <li class=""><strong>Template:</strong> <code>template_byo_hub.example.tfvars</code></li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="mode-3-bring-your-own-hub--spoke"><a class="" href="/terraform-databricks-sra/docs/usage/Azure/mode3-byo-hub-spoke/">Mode 3: Bring-your-own Hub + Spoke</a><a href="#mode-3-bring-your-own-hub--spoke" class="hash-link" aria-label="Direct link to mode-3-bring-your-own-hub--spoke" title="Direct link to mode-3-bring-your-own-hub--spoke" translate="no">​</a></h3>
 <ul>
 <li class=""><strong>Best for:</strong> Organizations with fully existing infrastructure</li>
 <li class=""><strong>SRA creates:</strong> Workspace and related resources only</li>
-<li class=""><strong>You provide:</strong> Hub VNET, Key Vault, metastore, NCC, network policy, spoke VNET</li>
+<li class=""><strong>You provide:</strong> Hub VNET, Key Vault, metastore, NCC, spoke VNET</li>
+<li class=""><strong>Optional:</strong> SRA can manage firewall rules (<code>create_spoke_firewall_rules</code>) and network policy (<code>create_spoke_network_policy</code>) on your existing hub</li>
 <li class=""><strong>Template:</strong> <code>template_byo_spoke_network.example.tfvars</code></li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
