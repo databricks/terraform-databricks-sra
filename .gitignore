@@ -75,6 +75,15 @@ gcp/modules/service_account/*.json
 
 # Claude Code personal/local settings
 .claude/settings.local.json
+.claude/
+/CLAUDE.md
+
 
 # Isaac Review local state
 .isaac/
+
+# Misc. files used for local testing only
+**/*.local.*
+
+# Currently unused releaserc file
+/.releaserc

@@ -2,6 +2,7 @@
 create_hub              = false
 create_workspace_vnet   = true
 databricks_metastore_id = "00000000-0000-0000-0000-000000000000"
+databricks_account_id   = ""
 
 # Basic configuration
 location        = "westus2"
@@ -41,8 +42,16 @@ existing_hub_vnet = {
 # Optional: Create a Databricks network policy for spoke serverless compute
 # existing_ncc_id must still be provided (NCC is a shared regional resource managed by the hub).
 # create_spoke_network_policy = true
-# existing_ncc_id   = "ncc-00000000-0000-0000-0000-000000000000"
-# existing_ncc_name = "ncc-westus2-myhub"
+existing_ncc_id   = "ncc-00000000-0000-0000-0000-000000000000"
+existing_ncc_name = "ncc-westus2-myhub"
+
+# Optional: Context-based ingress control on the SRA-created spoke network policy (requires create_spoke_network_policy = true)
+# Start with dry_run = true and review system.access.inbound_network before enforcing
+# workspace_ingress_control = {
+#   enabled           = true
+#   dry_run           = true
+#   allowed_ip_ranges = ["203.0.113.0/24"]
+# }
 
 # Network egress configuration
 allowed_fqdns    = []

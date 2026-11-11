@@ -5,11 +5,33 @@
 1. Clone this Repo
 2. Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
 3. CD into `tf`
-4. Using `template.tfvars.example` as starting point, supply your variables and place in `tf` directory
-5. Run `terraform init`
-6. Run `terraform validate`
-7. From `tf` directory, run `terraform plan -var-file <YOUR_VAR_FILE>`, if edited directly, the command would be `terraform plan -var-file template.tfvars.example`
-8. Run `terraform apply -var-file <YOUR_VAR_FILE>`
+4. Register the Azure resource providers SRA uses in your subscription (see [Register Azure resource providers](#register-azure-resource-providers))
+5. Using `template.tfvars.example` as starting point, supply your variables and place in `tf` directory
+6. Run `terraform init`
+7. Run `terraform validate`
+8. From `tf` directory, run `terraform plan -var-file <YOUR_VAR_FILE>`, if edited directly, the command would be `terraform plan -var-file template.tfvars.example`
+9. Run `terraform apply -var-file <YOUR_VAR_FILE>`
+
+## Register Azure resource providers
+
+SRA requires version 5.x of the `azurerm` provider, which no longer registers Azure resource
+providers automatically. Each of the following must be registered in the target subscription before
+running `terraform apply`. If one isn't, the apply fails with a `MissingSubscriptionRegistration`
+error.
+
+- `Microsoft.Databricks`
+- `Microsoft.Network`
+- `Microsoft.Storage`
+- `Microsoft.KeyVault`
+
+Registration is a one-time, subscription-level operation that requires the
+`Microsoft.*/register/action` permission (included in the Contributor and Owner roles).
+
+If you would rather have Terraform register them, add
+`resource_providers_to_register = ["Microsoft.Databricks", "Microsoft.Network", "Microsoft.Storage", "Microsoft.KeyVault"]`
+to the `azurerm` provider block in `tf/providers.tf`. The identity running Terraform then needs the
+registration permission above on every run.
+
 
 ## Note on provider initialization with Azure CLI
 If you are using [Azure CLI Authentication](https://registry.terraform.io/providers/databricks/databricks/latest/docs#authenticating-with-azure-cli),

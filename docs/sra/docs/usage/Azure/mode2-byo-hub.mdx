@@ -73,7 +73,8 @@ You provide an existing hub infrastructure (VNET, Key Vault, metastore, NCC). SR
 
 ## Configuration
 ```hcl
-create_hub = false
+create_hub            = false
+create_workspace_vnet = true # Default - SRA creates the spoke VNET
 ```
 
 ## Required Variables
@@ -81,6 +82,8 @@ create_hub = false
 <Admonition type="warning" title="Additional Requirements">
 
 When `create_hub = false`, you must provide several additional variables from your existing hub infrastructure.
+
+Because SRA still creates the spoke VNET in this mode (`create_workspace_vnet = true`, the default), you must also provide `workspace_vnet` with the spoke CIDR. Choose a CIDR that does not overlap with your hub VNET or any other network peered to it.
 
 </Admonition>
 
@@ -92,6 +95,13 @@ create_hub = false
 location        = "westus2"
 subscription_id = "ffffffff-ffff-ffff-ffff-ffffffffffff"
 resource_suffix = "spoke"
+
+# REQUIRED: Spoke network for SRA to create (create_workspace_vnet = true is the default)
+workspace_vnet = {
+  cidr = "10.1.0.0/24"
+  # new_bits           = 2     # Optional: subnet sizing
+  # encryption_enabled = true  # Optional: force-enabled when compliance_security_profile_enabled = true
+}
 
 # REQUIRED: Existing metastore from your hub
 databricks_metastore_id = "00000000-0000-0000-0000-000000000000"
@@ -125,6 +135,7 @@ tags = {
 - `location`
 - `subscription_id`
 - `resource_suffix`
+- `workspace_vnet` (because `create_workspace_vnet = true`)
 - `databricks_metastore_id`
 - `existing_ncc_id`
 - `existing_network_policy_id` OR `create_spoke_network_policy = true`
@@ -143,6 +154,9 @@ If `cmk_enabled = true` (default), you must provide `existing_cmk_ids`. Alternat
 ```hcl
 cmk_enabled = false
 ```
+
+The key vault must use the Azure RBAC permission model, and some permissions must be granted before you deploy. See
+the Key Vault requirements under [`existing_cmk_ids`](./configuration.mdx#existing_cmk_ids).
 
 </Admonition>
 
@@ -189,6 +203,12 @@ When `create_hub = false`:
 - Must provide `existing_cmk_ids` if `cmk_enabled = true`
 - Must NOT provide `existing_cmk_ids` if `cmk_enabled = false`
 - `create_spoke_firewall_rules` requires `existing_firewall_policy_id`
+
+When `create_workspace_vnet = true` (the default for this mode):
+- Must provide `workspace_vnet`
+- Must NOT provide `existing_workspace_vnet`
+
+If you want to bring your own spoke network as well, see [Mode 3: BYO Hub + Spoke](./mode3-byo-hub-spoke.mdx).
 
 ## Next Steps
 

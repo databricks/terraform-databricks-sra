@@ -316,6 +316,78 @@ run "plan_test_azure_public_defaults" {
   }
 }
 
+# Dashed suffixes must still yield valid (dash-free) storage account names for the hub (SAT) and spoke catalogs.
+run "plan_test_dashed_resource_suffixes" {
+  state_key = "dashed_resource_suffixes"
+  command   = plan
+  variables {
+    hub_resource_suffix = "sra-hub"
+    resource_suffix     = "dbx-dev"
+    allowed_fqdns       = ["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"]
+    sat_configuration = {
+      enabled = true
+    }
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = module.spoke_catalog.storage_account_name == "stdbxdevuc"
+    error_message = "Spoke catalog storage account name must have dashes stripped from resource_suffix"
+  }
+
+  assert {
+    condition     = module.hub_catalog[0].storage_account_name == "stsrahubsatuc"
+    error_message = "Hub (SAT) catalog storage account name must have dashes stripped from hub_resource_suffix"
+  }
+}
+
+# Long suffixes must be truncated to Azure/Databricks name limits rather than failing the plan.
+run "plan_test_long_resource_suffixes" {
+  state_key = "long_resource_suffixes"
+  command   = plan
+  variables {
+    hub_resource_suffix = "abcdefghijklmnopqrstuvwxyz0123"
+    resource_suffix     = "zyxwvutsrqponmlkjihgfedcba9876"
+    allowed_fqdns       = ["management.azure.com", "login.microsoftonline.com", "python.org", "*.python.org", "pypi.org", "*.pypi.org", "pythonhosted.org", "*.pythonhosted.org"]
+    sat_configuration = {
+      enabled = true
+    }
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = length(module.spoke_catalog.storage_account_name) <= 24 && endswith(module.spoke_catalog.storage_account_name, "uc")
+    error_message = "Spoke catalog storage account name must be at most 24 characters and keep the uc suffix"
+  }
+
+  assert {
+    condition     = length(module.hub_catalog[0].storage_account_name) <= 24 && endswith(module.hub_catalog[0].storage_account_name, "uc")
+    error_message = "Hub (SAT) catalog storage account name must be at most 24 characters and keep the uc suffix"
+  }
+
+  assert {
+    condition     = length(module.hub[0].ncc_name) <= 30 && !endswith(module.hub[0].ncc_name, "-")
+    error_message = "NCC name must be at most 30 characters and must not end with a dash"
+  }
+}
+
+# Undashed suffixes must produce the same storage account names as before the dash fix.
+run "plan_test_undashed_storage_names_unchanged" {
+  state_key = "undashed_storage_names_unchanged"
+  command   = plan
+
+  assert {
+    condition     = module.spoke_catalog.storage_account_name == "stspokeuc"
+    error_message = "Spoke catalog storage account name changed for an undashed resource_suffix"
+  }
+}
+
 # SAT depends on the serverless hub workspace, which is skipped in Azure Government.
 run "plan_test_azure_gov_sat_rejected" {
   state_key       = "azure_gov_sat_rejected"
@@ -346,5 +418,324 @@ run "plan_test_azure_environment_invalid" {
       cidr     = "10.1.0.0/20"
       new_bits = null
     }
+  }
+}
+
+# Context-based ingress control is off by default, so SRA-managed network policies get no ingress configuration.
+run "plan_test_ingress_control_default_off" {
+  state_key = "ingress_control_default_off"
+  command   = plan
+
+  assert {
+    condition     = local.network_policy_ingress == null && local.network_policy_ingress_dry_run == null
+    error_message = "Ingress control must not be configured unless workspace_ingress_control.enabled is true"
+  }
+}
+
+# Enforced ingress restricts public access on the hub-managed network policies to the allowed IP ranges.
+run "plan_test_ingress_control_enforced" {
+  state_key = "ingress_control_enforced"
+  command   = plan
+  variables {
+    resource_suffix = "ingress"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+    workspace_ingress_control = {
+      enabled           = true
+      allowed_ip_ranges = ["203.0.113.0/24", "198.51.100.10"]
+    }
+  }
+
+  assert {
+    condition     = local.network_policy_ingress.public_access.restriction_mode == "RESTRICTED_ACCESS"
+    error_message = "Enforced ingress must restrict public access"
+  }
+
+  assert {
+    condition     = local.network_policy_ingress.public_access.allow_rules[0].origin.included_ip_ranges.ip_ranges == tolist(["203.0.113.0/24", "198.51.100.10"])
+    error_message = "Enforced ingress must allow only the configured IP ranges"
+  }
+
+  assert {
+    condition     = local.network_policy_ingress_dry_run == null
+    error_message = "Dry run ingress must not be set when dry_run is false"
+  }
+}
+
+# Dry run ingress on the BYO-hub spoke policy writes the rules to ingress_dry_run and leaves ingress unset.
+run "plan_test_ingress_control_dry_run_byo_hub" {
+  state_key = "ingress_control_dry_run_byo_hub"
+  command   = plan
+  variables {
+    create_hub                  = false
+    create_spoke_network_policy = true
+    databricks_metastore_id     = "00000000-0000-0000-0000-000000000000"
+    resource_suffix             = "ingressbyo"
+    workspace_vnet = {
+      cidr     = "10.0.2.0/24"
+      new_bits = null
+    }
+    existing_ncc_id   = "mock-ncc-id"
+    existing_ncc_name = "mock-ncc"
+    existing_cmk_ids = {
+      key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
+      managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+      managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+    }
+    existing_hub_vnet = {
+      route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
+      vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
+    }
+    workspace_ingress_control = {
+      enabled           = true
+      dry_run           = true
+      allowed_ip_ranges = ["203.0.113.0/24"]
+    }
+  }
+
+  assert {
+    condition     = databricks_account_network_policy.spoke[0].ingress == null
+    error_message = "Dry run must not enforce ingress on the spoke network policy"
+  }
+
+  assert {
+    condition     = databricks_account_network_policy.spoke[0].ingress_dry_run.public_access.allow_rules[0].origin.included_ip_ranges.ip_ranges == tolist(["203.0.113.0/24"])
+    error_message = "Dry run must apply the configured IP ranges to ingress_dry_run on the spoke network policy"
+  }
+}
+
+# Enabling ingress control without any allowed IP ranges would deny all public access, so it is rejected.
+run "plan_test_ingress_control_requires_ip_ranges" {
+  state_key       = "ingress_control_requires_ip_ranges"
+  command         = plan
+  expect_failures = [var.workspace_ingress_control]
+  variables {
+    workspace_ingress_control = {
+      enabled = true
+    }
+  }
+}
+
+# Only IPv4 addresses and CIDRs are supported by context-based ingress.
+run "plan_test_ingress_control_rejects_invalid_ranges" {
+  state_key       = "ingress_control_rejects_invalid_ranges"
+  command         = plan
+  expect_failures = [var.workspace_ingress_control]
+  variables {
+    workspace_ingress_control = {
+      enabled           = true
+      allowed_ip_ranges = ["2001:db8::/32", "not-an-ip"]
+    }
+  }
+}
+
+# Context-based ingress control is not available in Azure Government.
+run "plan_test_ingress_control_rejected_in_gov" {
+  state_key       = "ingress_control_rejected_in_gov"
+  command         = plan
+  expect_failures = [var.workspace_ingress_control]
+  variables {
+    azure_environment = "usgovernment"
+    location          = "usgovvirginia"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+    workspace_ingress_control = {
+      enabled           = true
+      allowed_ip_ranges = ["203.0.113.0/24"]
+    }
+  }
+}
+
+# BYO hub with an existing network policy has no SRA-managed policy to attach ingress rules to, so it is rejected.
+run "plan_test_ingress_control_rejected_with_existing_policy" {
+  state_key       = "ingress_control_rejected_with_existing_policy"
+  command         = plan
+  expect_failures = [var.workspace_ingress_control]
+  variables {
+    create_hub                 = false
+    databricks_metastore_id    = "00000000-0000-0000-0000-000000000000"
+    resource_suffix            = "ingressexisting"
+    existing_ncc_id            = "mock-ncc-id"
+    existing_ncc_name          = "mock-ncc"
+    existing_network_policy_id = "mock-policy-id"
+    existing_cmk_ids = {
+      key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
+      managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+      managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+    }
+    existing_hub_vnet = {
+      route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
+      vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
+    }
+    workspace_ingress_control = {
+      enabled           = true
+      allowed_ip_ranges = ["203.0.113.0/24"]
+    }
+  }
+}
+
+# Service Direct is off by default.
+run "plan_test_service_direct_default_off" {
+  state_key = "service_direct_default_off"
+  command   = plan
+
+  assert {
+    condition     = module.hub[0].service_direct == null && length(azurerm_private_dns_a_record.spoke_service_direct) == 0
+    error_message = "Service Direct resources must not be created unless create_service_direct_private_endpoint is true"
+  }
+}
+
+# Service Direct creates the hub private endpoint and publishes <region>.service-direct in the hub and spoke zones.
+run "plan_test_service_direct_enabled" {
+  state_key = "service_direct_enabled"
+  command   = plan
+  variables {
+    resource_suffix                        = "sd"
+    create_service_direct_private_endpoint = true
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = module.hub[0].service_direct.dns_record_name == "eastus2.service-direct"
+    error_message = "Hub Service Direct DNS record must be named <region>.service-direct"
+  }
+
+  assert {
+    condition     = azurerm_private_dns_a_record.spoke_service_direct[0].name == "eastus2.service-direct"
+    error_message = "Spoke zone must publish the hub Service Direct DNS record"
+  }
+}
+
+# The Service Direct private endpoint lives in the hub VNet, so it requires create_hub = true.
+run "plan_test_service_direct_requires_hub" {
+  state_key       = "service_direct_requires_hub"
+  command         = plan
+  expect_failures = [var.create_service_direct_private_endpoint]
+  variables {
+    create_hub                             = false
+    create_service_direct_private_endpoint = true
+    databricks_metastore_id                = "00000000-0000-0000-0000-000000000000"
+    existing_ncc_id                        = "mock-ncc-id"
+    existing_ncc_name                      = "mock-ncc"
+    existing_network_policy_id             = "mock-policy-id"
+    existing_cmk_ids = {
+      key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
+      managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+      managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+    }
+    existing_hub_vnet = {
+      route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
+      vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
+    }
+  }
+}
+
+# Service Direct is not available in Azure Government.
+run "plan_test_service_direct_rejected_in_gov" {
+  state_key       = "service_direct_rejected_in_gov"
+  command         = plan
+  expect_failures = [var.create_service_direct_private_endpoint]
+  variables {
+    azure_environment                      = "usgovernment"
+    location                               = "usgovvirginia"
+    create_service_direct_private_endpoint = true
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+}
+
+# Regions without a Service Direct Private Link Service are rejected.
+run "plan_test_service_direct_rejected_unsupported_region" {
+  state_key       = "service_direct_rejected_unsupported_region"
+  command         = plan
+  expect_failures = [var.create_service_direct_private_endpoint]
+  variables {
+    location                               = "brazilsoutheast"
+    create_service_direct_private_endpoint = true
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+}
+
+# The SRA-created key vault uses the Azure RBAC permission model, and every principal that needs the customer-managed keys
+# is granted access with a role assignment rather than an access policy.
+run "plan_test_key_vault_rbac" {
+  state_key = "key_vault_rbac"
+  command   = plan
+  variables {
+    resource_suffix = "kvrbac"
+    workspace_vnet = {
+      cidr     = "10.1.0.0/20"
+      new_bits = null
+    }
+  }
+
+  assert {
+    condition     = module.hub[0].key_vault_rbac.rbac_authorization_enabled == true
+    error_message = "The hub key vault must use the Azure RBAC permission model"
+  }
+
+  assert {
+    condition     = module.hub[0].key_vault_rbac.role_assignments.terraform == "Key Vault Crypto Officer"
+    error_message = "The Terraform principal must be granted Key Vault Crypto Officer on the hub key vault"
+  }
+
+  assert {
+    condition     = module.hub[0].key_vault_rbac.role_assignments.databricks == "Key Vault Crypto Service Encryption User"
+    error_message = "The AzureDatabricks application must be granted Key Vault Crypto Service Encryption User on the hub key vault"
+  }
+
+  assert {
+    condition = alltrue([
+      module.spoke_workspace.key_vault_role_assignments.dbstorage.role == "Key Vault Crypto Service Encryption User",
+      module.spoke_workspace.key_vault_role_assignments.dbmanageddisk.role == "Key Vault Crypto Service Encryption User",
+    ])
+    error_message = "The spoke DBFS storage and managed disk identities must be granted Key Vault Crypto Service Encryption User"
+  }
+}
+
+# With a bring-your-own hub, the spoke identities are granted access on the key vault supplied in existing_cmk_ids.
+run "plan_test_byo_hub_key_vault_rbac" {
+  state_key = "byo_hub_key_vault_rbac"
+  command   = plan
+  variables {
+    create_hub                 = false
+    databricks_metastore_id    = "00000000-0000-0000-0000-000000000000"
+    resource_suffix            = "kvrbacbyo"
+    existing_ncc_id            = "mock-ncc-id"
+    existing_ncc_name          = "mock-ncc"
+    existing_network_policy_id = "mock-policy-id"
+    workspace_vnet = {
+      cidr     = "10.0.2.0/24"
+      new_bits = null
+    }
+    existing_cmk_ids = {
+      key_vault_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv"
+      managed_disk_key_id     = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+      managed_services_key_id = "https://example-keyvault.vault.azure.net/keys/example/fdf067c93bbb4b22bff4d8b7a9a56217"
+    }
+    existing_hub_vnet = {
+      route_table_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/routeTables/rt-external"
+      vnet_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external-hub/providers/Microsoft.Network/virtualNetworks/vnet-external-hub"
+    }
+  }
+
+  assert {
+    condition = alltrue([
+      module.spoke_workspace.key_vault_role_assignments.dbstorage.scope == "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv",
+      module.spoke_workspace.key_vault_role_assignments.dbmanageddisk.scope == "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/mock-rg/providers/Microsoft.KeyVault/vaults/mock-kv",
+    ])
+    error_message = "Spoke key vault role assignments must be scoped to the existing_cmk_ids key vault"
   }
 }

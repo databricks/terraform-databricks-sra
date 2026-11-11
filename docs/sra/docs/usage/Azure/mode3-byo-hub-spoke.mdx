@@ -156,6 +156,14 @@ tags = {
 - `existing_cmk_ids` (if `cmk_enabled = true`)
 - `existing_workspace_vnet`
 
+<Admonition type="info" title="CMK Key Vault">
+
+If `cmk_enabled = true` (default), the key vault in `existing_cmk_ids` must use the Azure RBAC permission model, and
+some permissions must be granted before you deploy. See the Key Vault requirements under
+[`existing_cmk_ids`](./configuration.mdx#existing_cmk_ids).
+
+</Admonition>
+
 ## Template File
 Use `template_byo_spoke_network.example.tfvars` as your starting point.
 
