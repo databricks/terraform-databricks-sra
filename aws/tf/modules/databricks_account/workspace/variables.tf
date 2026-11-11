@@ -93,7 +93,7 @@ variable "security_group_ids" {
 }
 
 variable "service_direct" {
-  description = "List of service direct API interface AWS VPC endpoint IDs. Not available in GovCloud regions. Ignored when service_direct_mws_vpce_id is set."
+  description = "List of service direct API interface AWS VPC endpoint IDs. Ignored when service_direct_mws_vpce_id is set."
   type        = list(string)
   default     = []
 }

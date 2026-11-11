@@ -103,4 +103,33 @@ run "png_ignored" {
     error_message = "No private network gateway resources may be created in GovCloud."
   }
 }
+
+# Service Direct in GovCloud uses the civilian shard endpoint by default.
+run "service_direct_civilian" {
+  command = plan
+
+  variables {
+    create_service_direct_vpce = true
+  }
+
+  assert {
+    condition     = length(aws_vpc_endpoint.service_direct) == 1 && aws_vpc_endpoint.service_direct[0].service_name == "com.amazonaws.vpce.us-gov-west-1.vpce-svc-01664d33d7aa34a9a"
+    error_message = "The Service Direct endpoint must use the GovCloud civilian shard endpoint service."
+  }
+}
+
+# Service Direct in GovCloud uses the DoD shard endpoint when databricks_gov_shard is dod.
+run "service_direct_dod" {
+  command = plan
+
+  variables {
+    create_service_direct_vpce = true
+    databricks_gov_shard       = "dod"
+  }
+
+  assert {
+    condition     = length(aws_vpc_endpoint.service_direct) == 1 && aws_vpc_endpoint.service_direct[0].service_name == "com.amazonaws.vpce.us-gov-west-1.vpce-svc-0dd73895bb7f9cfe8"
+    error_message = "The Service Direct endpoint must use the GovCloud DoD shard endpoint service."
+  }
+}
 # ---------------
