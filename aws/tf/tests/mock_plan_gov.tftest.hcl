@@ -80,6 +80,11 @@ run "plan_test" {
     condition     = !contains([for rule in aws_security_group.sg[0].egress : rule.from_port], 6666)
     error_message = "Port 6666 (SCC relay) must be filtered from the workspace security group egress rules in GovCloud."
   }
+
+  assert {
+    condition     = module.network_policy.cross_workspace_access == null
+    error_message = "Cross-workspace access must be left unset in GovCloud, where it is not supported."
+  }
 }
 
 # The private network gateway is not available in GovCloud, so enabling it creates nothing and only warns.
