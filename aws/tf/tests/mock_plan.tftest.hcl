@@ -107,6 +107,11 @@ variables {
 # This runs a plan command on the module directly
 run "plan_test" {
   command = plan
+
+  assert {
+    condition     = module.network_policy.cross_workspace_access.restriction_mode == "RESTRICTED_ACCESS" && length(module.network_policy.cross_workspace_access.allow_rules) == 0
+    error_message = "Cross-workspace access must default to RESTRICTED_ACCESS with no allow rules."
+  }
 }
 
 # New workspace, account setting off: the workspace-level legacy settings are managed.
@@ -206,6 +211,11 @@ run "plan_test_full_features" {
         resource_names = ["my-example-bucket"]
       },
     ]
+  }
+
+  assert {
+    condition     = module.network_policy.cross_workspace_access.restriction_mode == "RESTRICTED_ACCESS" && module.network_policy.cross_workspace_access.allow_rules[0].origin.selected_workspaces.workspace_ids == tolist([1234567890123456])
+    error_message = "cross_workspace_ingress_allowed_workspace_ids must be allow-listed on the network policy's cross-workspace access."
   }
 }
 
