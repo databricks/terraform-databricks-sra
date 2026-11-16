@@ -782,19 +782,20 @@ variable "serverless_private_endpoint_rules" {
 
 # Service Direct PrivateLink Endpoint configuration
 # This variable allows mapping regions to the service-direct endpoint properties:
-# - primary_endpoint: The main endpoint service name (required)
-# - region_type: Optional region type (defaults to "commercial")
-#
-# Note: Service Direct endpoints are not available in GovCloud regions.
+# - primary_endpoint: The main endpoint service name (required). In GovCloud, the civilian shard endpoint.
+# - secondary_endpoint: An optional secondary endpoint service name. In GovCloud, the DoD shard endpoint.
+# - region_type: Optional region type (defaults to "commercial", can be "govcloud")
 #
 # Example usage:
-# var.service_direct_config["us-east-1"].primary_endpoint   # Get primary endpoint
-# var.service_direct_config["us-east-1"].region_type        # Get region type
+# var.service_direct_config["us-gov-west-1"].primary_endpoint   # Get primary endpoint
+# var.service_direct_config["us-gov-west-1"].secondary_endpoint # Get secondary endpoint (if exists)
+# var.service_direct_config["us-gov-west-1"].region_type        # Get region type
 variable "service_direct_config" {
   description = "Service Direct PrivateLink Endpoint configuration with multiple properties per region"
   type = map(object({
-    primary_endpoint = string
-    region_type      = optional(string, "commercial")
+    primary_endpoint   = string
+    secondary_endpoint = optional(string)
+    region_type        = optional(string, "commercial")
   }))
   default = {
     "ap-northeast-1" = {
@@ -841,6 +842,11 @@ variable "service_direct_config" {
     }
     "us-east-2" = {
       primary_endpoint = "com.amazonaws.vpce.us-east-2.vpce-svc-052fbd90ec8e1af31"
+    }
+    "us-gov-west-1" = {
+      primary_endpoint   = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-01664d33d7aa34a9a"
+      secondary_endpoint = "com.amazonaws.vpce.us-gov-west-1.vpce-svc-0dd73895bb7f9cfe8"
+      region_type        = "govcloud"
     }
     "us-west-1" = {
       primary_endpoint = "com.amazonaws.vpce.us-west-1.vpce-svc-070673a01d3f28066"

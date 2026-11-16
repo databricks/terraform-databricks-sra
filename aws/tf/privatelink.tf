@@ -411,12 +411,12 @@ locals {
   ) : []
 }
 
-# Databricks Service Direct endpoint - opt-in via var.create_service_direct_vpce, skipped in custom operation mode and unavailable in GovCloud
+# Databricks Service Direct endpoint - opt-in via var.create_service_direct_vpce, skipped in custom operation mode
 resource "aws_vpc_endpoint" "service_direct" {
   count = var.create_service_direct_vpce && var.network_configuration != "custom" && !local.is_serverless && contains(keys(var.service_direct_config), var.region) ? 1 : 0
 
   vpc_id              = module.vpc[0].vpc_id
-  service_name        = var.service_direct_config[var.region].primary_endpoint
+  service_name        = var.databricks_gov_shard == "dod" ? var.service_direct_config[var.region].secondary_endpoint : var.service_direct_config[var.region].primary_endpoint
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink[0].id]
   subnet_ids          = local.service_direct_subnets

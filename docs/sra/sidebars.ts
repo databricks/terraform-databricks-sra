@@ -69,7 +69,6 @@ const sidebars = {
             { type: 'doc', id: 'usage/AWS/preread', label: 'Read Before Deploying' },
             { type: 'doc', id: 'usage/AWS/components', label: 'SRA Components Breakdown' },
             { type: 'doc', id: 'usage/AWS/gettingstarted', label: 'Getting Started' },
-            { type: 'doc', id: 'usage/AWS/awsgovcloud', label: 'AWS GovCloud' },
           ],
         },
         {

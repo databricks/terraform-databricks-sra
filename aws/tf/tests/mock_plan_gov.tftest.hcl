@@ -80,6 +80,11 @@ run "plan_test" {
     condition     = !contains([for rule in aws_security_group.sg[0].egress : rule.from_port], 6666)
     error_message = "Port 6666 (SCC relay) must be filtered from the workspace security group egress rules in GovCloud."
   }
+
+  assert {
+    condition     = module.network_policy.cross_workspace_access == null
+    error_message = "Cross-workspace access must be left unset in GovCloud, where it is not supported."
+  }
 }
 
 # The private network gateway is not available in GovCloud, so enabling it creates nothing and only warns.
@@ -101,6 +106,35 @@ run "png_ignored" {
   assert {
     condition     = length(aws_subnet.png) == 0 && length(aws_security_group.png) == 0 && length(aws_iam_role.png) == 0
     error_message = "No private network gateway resources may be created in GovCloud."
+  }
+}
+
+# Service Direct in GovCloud uses the civilian shard endpoint by default.
+run "service_direct_civilian" {
+  command = plan
+
+  variables {
+    create_service_direct_vpce = true
+  }
+
+  assert {
+    condition     = length(aws_vpc_endpoint.service_direct) == 1 && aws_vpc_endpoint.service_direct[0].service_name == "com.amazonaws.vpce.us-gov-west-1.vpce-svc-01664d33d7aa34a9a"
+    error_message = "The Service Direct endpoint must use the GovCloud civilian shard endpoint service."
+  }
+}
+
+# Service Direct in GovCloud uses the DoD shard endpoint when databricks_gov_shard is dod.
+run "service_direct_dod" {
+  command = plan
+
+  variables {
+    create_service_direct_vpce = true
+    databricks_gov_shard       = "dod"
+  }
+
+  assert {
+    condition     = length(aws_vpc_endpoint.service_direct) == 1 && aws_vpc_endpoint.service_direct[0].service_name == "com.amazonaws.vpce.us-gov-west-1.vpce-svc-0dd73895bb7f9cfe8"
+    error_message = "The Service Direct endpoint must use the GovCloud DoD shard endpoint service."
   }
 }
 # ---------------
