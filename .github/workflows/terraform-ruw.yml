@@ -90,15 +90,15 @@ jobs:
     if: inputs.tflint_enabled
     runs-on: ${{ inputs.runs_on }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.4.0
         name: Checkout source code
       # A cache is configured to avoid downloading plugins on every run
-      - uses: actions/cache@v4
+      - uses: actions/cache@v4.3.0
         name: Cache TFLint Plugins
         with:
           path: ~/.tflint.d/plugins
           key: tflint-${{ runner.os }}-${{ hashFiles('**/.tflint.hcl') }}
-      - uses: terraform-linters/setup-tflint@v4
+      - uses: terraform-linters/setup-tflint@v4.1.1
         name: Setup TFLint
         with:
           tflint_version: ${{ inputs.tflint_version }}
@@ -119,9 +119,9 @@ jobs:
     runs-on: ${{ inputs.runs_on }}
     if: inputs.terraform_fmt_enabled
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.4.0
         name: Checkout source code
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3.1.2
         name: Setup Terraform
         with:
           terraform_version: ${{ inputs.terraform_version }}
@@ -141,12 +141,12 @@ jobs:
       # https://developer.hashicorp.com/terraform/cli/config/config-file#allowing-the-provider-plugin-cache-to-break-the-dependency-lock-file
       TF_PLUGIN_CACHE_MAY_BREAK_DEPENDENCY_LOCK_FILE: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.4.0
         name: Checkout source code
       # Create the cache directory
       - run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
       # Initialize the cache
-      - uses: actions/cache@v4
+      - uses: actions/cache@v4.3.0
         name: Cache Terraform Providers
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
@@ -158,7 +158,7 @@ jobs:
             terraform-providers-${{ runner.os }}-
       - name: List plugin cache contents
         run: ls -R ${{ env.TF_PLUGIN_CACHE_DIR }}
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3.1.2
         name: Setup Terraform
         with:
           terraform_version: ${{ inputs.terraform_version }}
