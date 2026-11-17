@@ -41,7 +41,7 @@ variable "location" {
 
 variable "key_vault_id" {
   type        = string
-  description = "(Required) ID of the Azure Key Vault containing the keys for CMK"
+  description = "(Required) ID of the Azure Key Vault containing the keys for CMK. The vault must use the Azure RBAC permission model, since access is granted with role assignments."
 }
 
 variable "metastore_id" {

@@ -63,10 +63,6 @@ variable "hub_resource_suffix" {
     condition     = var.create_hub ? length(var.hub_resource_suffix) > 0 : true
     error_message = "hub_resource_suffix is required if create_hub is true"
   }
-  validation {
-    condition     = !strcontains(var.hub_resource_suffix, "-")
-    error_message = "hub_resource_suffix cannot contain dashes (-)."
-  }
 }
 
 # ------------------------------------------------------------------
@@ -121,7 +117,7 @@ variable "resource_suffix" {
 
 variable "create_workspace_vnet" {
   type        = bool
-  description = "(Optional) Whether to create SRA-managed workspace VNET. If false, workspace_vnet must be provided."
+  description = "(Optional) Whether to create SRA-managed workspace VNET. If true, workspace_vnet must be provided; if false, existing_workspace_vnet must be provided."
   default     = true
 }
 
@@ -213,7 +209,7 @@ variable "existing_cmk_ids" {
     managed_disk_key_id     = string
     managed_services_key_id = string
   })
-  description = "(Optional) Existing CMK IDs - required when create_hub is false and cmk_enabled is true"
+  description = "(Optional) Existing CMK IDs - required when create_hub is false and cmk_enabled is true. The key vault must use the Azure RBAC permission model: SRA grants each spoke workspace access to the keys with role assignments, which vaults using access policies ignore."
   default     = null
 
   validation {
@@ -355,5 +351,66 @@ variable "create_spoke_network_policy" {
   validation {
     condition     = var.create_spoke_network_policy ? !var.create_hub : true
     error_message = "create_spoke_network_policy can only be true when create_hub is false. When create_hub is true, network policies are managed by the hub module."
+  }
+}
+
+# ------------------------------------------------------------------
+# Context-based ingress control
+# Restricts which public IP ranges can reach the workspaces governed by SRA-managed network policies (the spoke
+# restrictive policy, the BYO-hub spoke policy, and the hub webauth policy). Off unless enabled.
+variable "workspace_ingress_control" {
+  type = object({
+    enabled           = optional(bool, false)
+    dry_run           = optional(bool, false)
+    allowed_ip_ranges = optional(list(string), [])
+  })
+  description = "(Optional) Context-based ingress control for SRA-managed network policies. When enabled, public access to the governed workspaces is restricted to allowed_ip_ranges (public IPv4 addresses or CIDRs). Set dry_run to log would-be denials to system.access.inbound_network without blocking requests. Not available in Azure Government yet."
+  default     = {}
+
+  validation {
+    condition     = !var.workspace_ingress_control.enabled || length(var.workspace_ingress_control.allowed_ip_ranges) > 0
+    error_message = "workspace_ingress_control.allowed_ip_ranges must contain at least one IP range when enabled; otherwise all public access would be denied."
+  }
+
+  validation {
+    condition = alltrue([
+      for r in var.workspace_ingress_control.allowed_ip_ranges :
+      !strcontains(r, ":") && can(cidrhost(strcontains(r, "/") ? r : "${r}/32", 0))
+    ])
+    error_message = "workspace_ingress_control.allowed_ip_ranges must contain only IPv4 addresses or IPv4 CIDR ranges."
+  }
+
+  validation {
+    condition     = !var.workspace_ingress_control.enabled || var.create_hub || var.create_spoke_network_policy
+    error_message = "workspace_ingress_control requires an SRA-managed network policy. Set create_hub = true or create_spoke_network_policy = true, or configure ingress on the policy referenced by existing_network_policy_id directly."
+  }
+
+  validation {
+    condition     = !(var.workspace_ingress_control.enabled && var.azure_environment == "usgovernment")
+    error_message = "Context-based ingress control is not available in Azure Government. Use workspace IP access lists instead."
+  }
+}
+
+# ------------------------------------------------------------------
+# Service Direct (inbound Private Link for performance-intensive services such as Lakebase Autoscaling and Zerobus
+# Ingest). Requires the "Private Connectivity for Performance-Intensive Services" account preview.
+variable "create_service_direct_private_endpoint" {
+  type        = bool
+  description = "(Optional) Create a Service Direct private endpoint in the hub, register it with the Databricks account, and publish <region>.service-direct in the hub and spoke privatelink.azuredatabricks.net zones. Requires create_hub = true and the 'Private Connectivity for Performance-Intensive Services' account preview. Not available in Azure Government."
+  default     = false
+
+  validation {
+    condition     = !var.create_service_direct_private_endpoint || var.create_hub
+    error_message = "create_service_direct_private_endpoint requires create_hub = true, because the Service Direct private endpoint is created in the hub VNet."
+  }
+
+  validation {
+    condition     = !(var.create_service_direct_private_endpoint && var.azure_environment == "usgovernment")
+    error_message = "Service Direct private endpoints are not available in Azure Government."
+  }
+
+  validation {
+    condition     = !var.create_service_direct_private_endpoint || var.azure_environment == "usgovernment" || contains(local.service_direct_regions, var.location)
+    error_message = "Service Direct private endpoints are not available in this location. See the supported regions at https://learn.microsoft.com/en-us/azure/databricks/resources/ip-domain-region#service-direct-resource-ids"
   }
 }

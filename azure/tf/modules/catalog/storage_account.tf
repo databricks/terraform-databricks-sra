@@ -17,7 +17,7 @@ resource "azurerm_storage_account" "unity_catalog" {
   account_tier                    = "Standard"
   account_replication_type        = var.storage_account_replication_type
   is_hns_enabled                  = true
-  public_network_access_enabled   = false
+  public_network_access           = "Disabled"
   allow_nested_items_to_be_public = false
 
   network_rules {

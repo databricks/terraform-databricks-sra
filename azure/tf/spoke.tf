@@ -259,4 +259,24 @@ resource "databricks_account_network_policy" "spoke" {
       }
     }
   }
+  ingress         = local.network_policy_ingress
+  ingress_dry_run = local.network_policy_ingress_dry_run
+}
+
+# Publish the hub's Service Direct private endpoint in the spoke's privatelink.azuredatabricks.net zone so that spoke
+# compute resolves <region>.service-direct to the hub private endpoint over VNet peering. For a BYO spoke network, the
+# record is added to the zone in existing_workspace_vnet.dns_zone_ids.backend.
+locals {
+  spoke_backend_dns_zone_id = var.create_workspace_vnet ? module.spoke_network[0].dns_zone_ids.backend : var.existing_workspace_vnet.dns_zone_ids.backend
+}
+
+resource "azurerm_private_dns_a_record" "spoke_service_direct" {
+  count = var.create_service_direct_private_endpoint ? 1 : 0
+
+  name                = module.hub[0].service_direct.dns_record_name
+  private_dns_zone_id = local.spoke_backend_dns_zone_id
+  ttl                 = 300
+  records             = [module.hub[0].service_direct.private_ip_address]
+
+  tags = var.tags
 }

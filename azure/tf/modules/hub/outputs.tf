@@ -88,3 +88,23 @@ output "firewall_policy_id" {
   description = "Firewall policy ID"
   value       = length(azurerm_firewall_policy.this) > 0 ? azurerm_firewall_policy.this[0].id : null
 }
+
+output "service_direct" {
+  description = "Service Direct private endpoint details (private IP, DNS record name, and Databricks endpoint ID), or null when not enabled"
+  value = var.is_service_direct_enabled ? {
+    private_ip_address = azurerm_private_endpoint.service_direct[0].private_service_connection[0].private_ip_address
+    dns_record_name    = local.service_direct_dns_record_name
+    endpoint_id        = databricks_endpoint.service_direct[0].endpoint_id
+  } : null
+}
+
+output "key_vault_rbac" {
+  description = "Access model of the CMK key vault: whether Azure RBAC is enabled, and the role granted for each purpose. Null when CMK is disabled."
+  value = var.is_kms_enabled ? {
+    rbac_authorization_enabled = azurerm_key_vault.this[0].rbac_authorization_enabled
+    role_assignments = {
+      terraform  = azurerm_role_assignment.key_vault_terraform[0].role_definition_name
+      databricks = azurerm_role_assignment.key_vault_databricks[0].role_definition_name
+    }
+  } : null
+}

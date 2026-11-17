@@ -317,6 +317,26 @@ existing_cmk_ids = {
 - `managed_disk_key_id` - Full key URL for encrypting managed disks
 - `managed_services_key_id` - Full key URL for encrypting managed services
 
+<Admonition type="warning" title="Key Vault Requirements">
+
+SRA grants Key Vault access with Azure role assignments, so the key vault in `key_vault_id` must use the
+**Azure RBAC permission model**. Vaults that use access policies ignore role assignments, and the deployment fails
+when the workspace tries to use the keys. To switch an existing vault, see
+[Migrate to Azure role-based access control](https://learn.microsoft.com/azure/key-vault/general/rbac-migration).
+
+For each spoke workspace, SRA assigns **Key Vault Crypto Service Encryption User** on the vault to the workspace's
+DBFS storage account identity and managed disk identity. These identities are created with the workspace, so SRA must
+grant them during the deployment. The identity running Terraform therefore needs
+`Microsoft.Authorization/roleAssignments/write` on the vault. For least privilege, use the
+**Role Based Access Control Administrator** role with a condition that only allows assigning
+Key Vault Crypto Service Encryption User.
+
+SRA doesn't manage access to a vault it didn't create. Before deploying, grant the **AzureDatabricks** application
+ **Key Vault Crypto Service Encryption User** on the vault,
+which customer-managed keys for managed services require.
+
+</Admonition>
+
 <Admonition type="warning" title="Validation Rules">
 
 1. If `create_hub = false` and `cmk_enabled = true`, you **must** provide `existing_cmk_ids`
@@ -413,6 +433,100 @@ Allowed egress destinations are sourced from `allowed_fqdns`
 - `create_spoke_firewall_rules = true` requires `existing_firewall_policy_id`
 - `create_spoke_network_policy = true` requires that `existing_network_policy_id` is **not** set
 - Both flags can only be `true` when `create_hub = false`
+
+</Admonition>
+
+---
+
+## Context-Based Ingress Control
+
+[Context-based ingress control](https://learn.microsoft.com/en-us/azure/databricks/security/network/front-end/context-based-ingress) restricts which network sources can reach your workspaces. SRA uses it to limit **public** access to a set of allowed IP ranges.
+
+### workspace_ingress_control
+
+**Type:** `object`
+**Default:** `{}` (disabled)
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `enabled` | bool | `false` | Restrict public access to the workspaces governed by SRA-managed network policies |
+| `dry_run` | bool | `false` | Log would-be denials without blocking requests |
+| `allowed_ip_ranges` | list(string) | `[]` | Public IPv4 addresses or CIDR ranges allowed to reach the workspaces. Required when `enabled = true` |
+
+```hcl
+workspace_ingress_control = {
+  enabled           = true
+  dry_run           = true # Recommended until you have reviewed the denial logs
+  allowed_ip_ranges = ["203.0.113.0/24", "198.51.100.10"]
+}
+```
+
+When enabled, SRA adds a public access rule to each network policy it manages:
+- The spoke network policy (`np-<hub_resource_suffix>-restrictive` when `create_hub = true`, or `np-<resource_suffix>-restrictive` when `create_spoke_network_policy = true`)
+- The hub webauth workspace network policy (`np-<hub_resource_suffix>-hub`)
+
+All of these policies share the same `allowed_ip_ranges`. The rule applies to all users, service principals, and destinations (workspace UI, APIs, Apps, and Lakebase). Private access and cross-workspace access are not changed. Because SRA does not modify a network policy you provide with `existing_network_policy_id`, enabling ingress control in that configuration is a validation error. Configure ingress on that policy directly instead.
+
+With `dry_run = true`, the rules are applied in dry run mode. Requests that would be denied are logged to the `system.access.inbound_network` system table with access type `DRY_RUN_DENIAL`, but they are not blocked. Review these logs before you set `dry_run = false`.
+
+<Admonition type="warning" title="Avoid locking yourself out">
+
+When enforced, any public request from outside `allowed_ip_ranges` is denied. This includes:
+- Users who log in through the hub webauth workspace
+- The machine or CI/CD runner that runs Terraform against the workspaces
+
+Include every network that needs public access, start with `dry_run = true`, and review the denial logs before you enforce the policy.
+
+</Admonition>
+
+<Admonition type="info" title="Requirements and Limitations">
+
+- Context-based ingress control requires the Premium tier
+- It is not available in Azure Government (`azure_environment = "usgovernment"`), Azure West India, or Azure China. Use workspace IP access lists instead
+- Only public IPv4 addresses and CIDR ranges are supported. Private IP ranges are rejected by Databricks
+- If workspace IP access lists are also configured, a request must be allowed by both the IP access list and the ingress policy
+- Public ingress rules are only evaluated when the workspace allows public network access
+
+</Admonition>
+
+---
+
+## Service Direct Private Link
+
+[Inbound Private Link for performance-intensive services](https://learn.microsoft.com/en-us/azure/databricks/security/network/front-end/service-direct-privatelink) (Service Direct) gives clients in your network private access to services such as Lakebase Autoscaling and Zerobus Ingest.
+
+### create_service_direct_private_endpoint
+
+**Type:** `bool`
+**Default:** `false`
+**Only valid when:** `create_hub = true`
+
+When `true`, SRA:
+1. Creates a private endpoint in the hub `privatelink` subnet. The endpoint connects to the Databricks Private Link Service for your region (target sub-resource `service_direct`).
+2. Registers the private endpoint with your Databricks account (`databricks_endpoint`). This approves the pending private endpoint connection.
+3. Adds an A record for `<region>.service-direct` to the `privatelink.azuredatabricks.net` private DNS zone in the hub. The record is also added to the spoke zone, so spoke compute resolves the hub endpoint over VNet peering. For a BYO spoke network, the spoke record is added to the zone in `existing_workspace_vnet.dns_zone_ids.backend`.
+
+```hcl
+create_service_direct_private_endpoint = true
+```
+
+Clients outside the hub and spoke VNets, such as on-premises networks, must resolve `<region>.service-direct.privatelink.azuredatabricks.net` through the hub private DNS zone and route to the hub VNet.
+
+<Admonition type="warning" title="Enable the account preview first">
+
+Before you apply, an account admin must turn on **Private Connectivity for Performance-Intensive Services** from the account console **Previews** page. Without this preview, the endpoint cannot be registered.
+
+</Admonition>
+
+<Admonition type="info" title="Requirements and Limitations">
+
+- Requires the Premium tier
+- Requires `create_hub = true`
+- Not available in Azure Government. Only regions with a Service Direct Private Link Service are supported. See [Private Link Service Resource IDs](https://learn.microsoft.com/en-us/azure/databricks/resources/ip-domain-region#service-direct-resource-ids)
+- A Service Direct endpoint only serves workspaces in the same region
+- Each account is limited to 20 Service Direct endpoints per region and 100 per account
+- If you also enable [context-based ingress control](#context-based-ingress-control), the SRA-managed network policies allow access from all registered private endpoints, including this one
+- For a BYO spoke network, the DNS zone in `existing_workspace_vnet.dns_zone_ids.backend` must be in the same subscription as the deployment
 
 </Admonition>
 

@@ -67,3 +67,17 @@ output "resource_group_name" {
   description = "Name of deployed resource group"
   value       = azurerm_databricks_workspace.this.resource_group_name
 }
+
+output "key_vault_role_assignments" {
+  description = "Key Vault role assignments granted to the workspace identities for customer-managed keys (role and scope for each), or an empty map when CMK is disabled."
+  value = var.is_kms_enabled ? {
+    dbstorage = {
+      role  = azurerm_role_assignment.dbstorage[0].role_definition_name
+      scope = azurerm_role_assignment.dbstorage[0].scope
+    }
+    dbmanageddisk = {
+      role  = azurerm_role_assignment.dbmanageddisk[0].role_definition_name
+      scope = azurerm_role_assignment.dbmanageddisk[0].scope
+    }
+  } : {}
+}

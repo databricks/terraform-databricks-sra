@@ -21,7 +21,8 @@ locals {
 
   # We use this to make sure that if we provision the 10th NCC in a region, that it does not cause subsequent terraform
   # plans/applies to fail due to the precondition on the NCC resource.
-  ncc_name          = "ncc-${var.location}-${var.resource_suffix}"
+  # NCC names are limited to 30 characters; truncate (dropping any trailing dash) so long suffixes/locations still plan.
+  ncc_name          = replace(substr("ncc-${var.location}-${var.resource_suffix}", 0, 30), "/-+$/", "")
   current_ncc_count = length([for k in(data.databricks_mws_network_connectivity_configs.this.names == null ? [] : data.databricks_mws_network_connectivity_configs.this.names) : k if k != local.ncc_name])
   ncc_region_limit  = 10
 
