@@ -88,6 +88,13 @@ resource "databricks_mws_networks" "this" {
     dataplane_relay = [var.scc_relay_mws_vpce_id != null ? var.scc_relay_mws_vpce_id : databricks_mws_vpc_endpoint.scc_tunnel_dataplane_relay_access[0].vpc_endpoint_id]
     rest_api        = [var.general_access_mws_vpce_id != null ? var.general_access_mws_vpce_id : databricks_mws_vpc_endpoint.general_access[0].vpc_endpoint_id]
   }
+
+  # Every argument on this resource forces replacement, and a network configuration attached to a workspace can't be
+  # deleted. Create the replacement first so the workspace's network_id is updated in place before the old
+  # configuration is destroyed (e.g. when changing security groups or subnets on a live workspace).
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Managed Services Key Configuration

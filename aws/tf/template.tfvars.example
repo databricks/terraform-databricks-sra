@@ -65,7 +65,7 @@ create_service_direct_vpce = false
 
 # custom_vpc_id                  = ""
 # custom_private_subnet_ids      = ["", ""]
-# custom_sg_id                   = ""
+# custom_sg_id                   = ""    # Workspace (EC2 cluster) security group, NOT the VPC endpoint security group
 # custom_general_access_vpce_id  = ""
 # custom_scc_relay_vpce_id       = ""
 # custom_service_direct_vpce_id  = ""    # Optional
