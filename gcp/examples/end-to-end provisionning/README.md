@@ -35,19 +35,42 @@ The template implements a pure Terraform impersonation-based authentication flow
 ## Prerequisites
 
 1. A Google Cloud project with billing enabled
-2. A Databricks account with admin access  
+2. A Databricks account with admin access
 3. Your current user authenticated with `gcloud auth application-default login`
+4. If `admin_user` is a human user: a Databricks CLI account profile from
+   `databricks auth login --host https://accounts.gcp.databricks.com --account-id <id>`,
+   referenced via `databricks_cli_profile`
 
 ## Usage
 
 1. **Set your variables** in `terraform.tfvars`:
    ```hcl
-   google_project = "your-gcp-project-id"
-   google_region = "europe-west1" 
+   # Core identifiers
    databricks_account_id = "your-databricks-account-id"
-   workspace_name = "your-workspace-name"
-   sa_name = "databricks-workspace-creator"
-   delegate_from = []
+   google_project        = "your-gcp-project-id"
+   google_region         = "europe-west1"
+   workspace_name        = "your-workspace-name"
+   sa_name               = "sra-workspace-creator"
+
+   # Identity running Terraform. delegate_from must include it so it can
+   # impersonate the provisioning SA; admin_user bootstraps account_admin and is
+   # granted workspace admin.
+   delegate_from = ["user:you@example.com"]
+   admin_user    = "you@example.com"
+
+   # When admin_user is a human user, point this at a `databricks auth login`
+   # account profile so Terraform can bootstrap account_admin for the new SA.
+   # Leave empty if admin_user is a service account (it will be impersonated).
+   databricks_cli_profile = "ACCOUNT-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+   # PSC service attachments for your region. Look them up at:
+   # https://docs.databricks.com/gcp/en/resources/ip-domain-region
+   workspace_service_attachment = "projects/general-prod-<region>/regions/<region>/serviceAttachments/plproxy-psc-endpoint-all-ports"
+   relay_service_attachment     = "projects/prod-gcp-<region>/regions/<region>/serviceAttachments/ngrok-psc-endpoint"
+
+   # CMEK key names (created by the module)
+   keyring_name = "databricks-keyring"
+   key_name     = "databricks-key"
    ```
 
 2. **Deploy the infrastructure**:
@@ -89,9 +112,25 @@ Your GCP Identity → Creates Service Account → Grants Impersonation Rights �
 
 ## Cleanup
 
-To destroy all resources:
+Tear down in **two steps**. The workspace_deployment module impersonates the
+provisioning service account, but Terraform does not treat the SA's IAM role
+binding as a dependency of the resources that binding is used to manage. A single
+`terraform destroy` can therefore delete the role binding before the VPC/PSC
+resources it needs, causing 403 errors. Destroying the workspace module first
+(while the SA and its role are still intact), then the rest, avoids this:
+
 ```bash
+# Step 1: destroy the workspace + its GCP resources while the SA still has its role
+terraform destroy -target=module.customer_managed_vpc
+
+# Step 2: destroy everything else (service account, custom role, account admin user)
 terraform destroy
 ```
 
-This removes all created resources including the service account.
+Notes:
+- The KMS crypto key sets `prevent_destroy`. If you intend to tear the workspace
+  down, comment out that `lifecycle` block in `modules/workspace_deployment/cmek.tf`
+  first (KMS key rings/keys cannot be hard-deleted by GCP regardless).
+- The workspace's compute VMs are torn down asynchronously after the workspace is
+  deleted; if a subnet delete reports `resourceInUseByAnotherResource`, wait for
+  those VMs to clear and re-run step 1.

@@ -5,7 +5,6 @@ google_region = "<google_region>"
 ip_addresses = ["<ip_cidr_block>"]
 databricks_workspace_name = "<workspace_name>"
 account_console_url = "<account_console_url>"
-google_pe_subnet = "<google_pe_subnet>"
 key_name = "<key_name>"
 use_existing_cmek = <true_or_false>
 workspace_pe = "<workspace_pe>"

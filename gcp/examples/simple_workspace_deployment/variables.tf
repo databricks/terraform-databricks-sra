@@ -30,9 +30,6 @@ variable "cmek_resource_id" {}
 variable "workspace_pe" {}
 variable "relay_pe" {}
 
-# primary subnet providing ip addresses to PSC endpoints
-variable "google_pe_subnet" {}
-
 # Private ip address assigned to PSC endpoints
 variable "relay_pe_ip_name" {}
 variable "workspace_pe_ip_name" {}

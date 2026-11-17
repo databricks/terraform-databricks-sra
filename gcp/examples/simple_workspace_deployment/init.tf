@@ -25,8 +25,6 @@ provider "google" {
   project = var.project
 }
 
-provider "databricks" {
-  alias      = "accounts"
-  host       = var.account_console_url
-  account_id = var.databricks_account_id
-}
+# NOTE: the workspace_deployment module self-configures its own databricks
+# providers (accounts + workspace) from the variables passed in the module
+# block, so no root-level databricks provider is declared or passed here.

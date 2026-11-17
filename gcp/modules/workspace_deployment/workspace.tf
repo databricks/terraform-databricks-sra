@@ -3,7 +3,7 @@ resource "databricks_mws_private_access_settings" "pas" {
   provider                     = databricks.accounts
   private_access_settings_name = "${var.resource_prefix}-pas-${local.deployment_suffix}"
   region                       = var.google_region
-  public_access_enabled        = true
+  public_access_enabled        = var.public_access_enabled
   private_access_level         = "ACCOUNT"
 }
 
@@ -47,26 +47,26 @@ resource "databricks_mws_workspaces" "this" {
   ]
 }
 
-# Workspace-level hardening configuration.
-resource "databricks_workspace_conf" "this" {
-  count    = var.serverless_workspace_deployment ? 0 : 1
-  provider = databricks.workspace
-
-  custom_config = {
-    "enableIpAccessLists"    = "true"
-    "enableVerboseAuditLogs" = "true"
-    "enableDbfsFileBrowser"  = "false"
-    "maxTokenLifetimeDays"   = "90"
-  }
-
-  depends_on = [databricks_mws_workspaces.this]
-}
-
-# Account-level permission assignment APIs are not immediately available after
-# workspace creation. This short sleep (chained after workspace_conf) gives the
-# API time to become ready before admin assignments run.
+# Short wait after workspace creation so the account-level permission-assignment
+# APIs are ready before we grant workspace admin.
 resource "time_sleep" "wait_for_workspace_apis" {
   count           = var.serverless_workspace_deployment ? 0 : 1
   create_duration = "5s"
-  depends_on      = [databricks_workspace_conf.this]
+  depends_on      = [databricks_mws_workspaces.this]
+}
+
+# Workspace-level hardening configuration. Applied by the provisioning SA once it
+# has been granted workspace ADMIN (see provisioner_workspace_admin in
+# assign_users.tf) and AFTER the permissive IP access list exists, so turning on
+# enableIpAccessLists cannot lock anyone (including Terraform) out.
+resource "databricks_workspace_conf" "this" {
+  count    = (var.manage_workspace_settings && !var.serverless_workspace_deployment) ? 1 : 0
+  provider = databricks.workspace
+
+  custom_config = var.workspace_conf
+
+  depends_on = [
+    time_sleep.wait_for_workspace_admin,
+    databricks_ip_access_list.allowed_list,
+  ]
 }

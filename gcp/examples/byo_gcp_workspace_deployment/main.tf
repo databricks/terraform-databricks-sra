@@ -19,8 +19,6 @@ module "customer_managed_vpc" {
   existing_subnet_name = var.existing_subnet_name
 
   #PSC RESOURCES
-  google_pe_subnet = var.google_pe_subnet #Name of the subnet to be used for the PSC endpoints (GCP)
-
   use_psc                         = var.use_psc                         #Flag to enable Private Service Connect (PSC) for the workspace
   use_existing_pas                = var.use_existing_pas                #Flag to use existing private access settings or create a new one
   existing_pas_id                 = var.existing_pas_id                 #Required if use_existing_pas is true
@@ -45,6 +43,5 @@ module "customer_managed_vpc" {
   cmek_resource_id  = var.cmek_resource_id  #Resource ID for the existing Cloud KMS Key (GCP)
 
   # Flags
-  harden_network               = var.harden_network
-  provision_regional_metastore = false
+  harden_network = var.harden_network
 }

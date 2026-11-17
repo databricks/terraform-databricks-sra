@@ -17,5 +17,9 @@ resource "databricks_default_namespace_setting" "this" {
     value = var.default_catalog_name
   }
 
-  depends_on = [databricks_metastore_assignment.this]
+  # Needs the provisioning SA to hold workspace admin (workspace-scoped provider).
+  depends_on = [
+    databricks_metastore_assignment.this,
+    time_sleep.wait_for_workspace_admin,
+  ]
 }
