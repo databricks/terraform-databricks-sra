@@ -180,7 +180,7 @@ variable "custom_service_direct_vpce_id" {
 }
 
 variable "custom_sg_id" {
-  description = "Custom security group ID"
+  description = "ID of the security group attached to the workspace's EC2 cluster instances (registered on the Databricks network configuration). This is NOT the security group attached to the PrivateLink VPC endpoints."
   type        = string
   default     = null
 }
