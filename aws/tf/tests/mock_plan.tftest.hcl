@@ -289,6 +289,30 @@ run "plan_test_service_direct_off_skips_subnet_lookup" {
   }
 }
 
+# The default plan creates the example classic compute cluster.
+run "example_cluster_default" {
+  command = plan
+
+  assert {
+    condition     = length(module.cluster_configuration) == 1
+    error_message = "The example cluster must be created by default."
+  }
+}
+
+# Turning off create_example_cluster skips the example cluster.
+run "example_cluster_disabled" {
+  command = plan
+
+  variables {
+    create_example_cluster = false
+  }
+
+  assert {
+    condition     = length(module.cluster_configuration) == 0
+    error_message = "The example cluster must be skipped when create_example_cluster is false."
+  }
+}
+
 # The default plan logs S3 data events for the workspace root bucket only.
 run "cloudtrail_default_root_bucket_only" {
   command = plan
