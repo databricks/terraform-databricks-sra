@@ -67,7 +67,7 @@ The `network_configuration` variable applies to `HYBRID` workspaces only; server
     * In `HYBRID` mode, SRA creates the gateway subnet (isolated network only), security group, and cross-account IAM role in the workspace VPC, unless you provide existing ones. In `SERVERLESS` mode, SRA creates no AWS resources, so you provide the subnet, security group, and role.
     >**NOTE**: The private preview supports one subnet in one Availability Zone, and only some regions and zones. The zones SRA knows to be supported are listed by AZ ID in `private_network_gateway_supported_az_ids`; the gateway subnet defaults to the first of them, and unsupported zones are rejected at plan time. Changing the subnet, security group, or role replaces the gateway. Not available in GovCloud regions; enabling it there is ignored with a warning.
 * **Example Classic Cluster**: Includes a sample cluster and associated cluster policy to illustrate secure configuration patterns.
-    >**NOTE**: Deploying this example creates a cluster within the Databricks workspace, including the underlying AWS EC2 instance.
+    >**NOTE**: Deploying this example creates a cluster within the Databricks workspace, including the underlying AWS EC2 instance. Set `create_example_cluster = false` to skip it.
 
 ## Optional Security Features
 

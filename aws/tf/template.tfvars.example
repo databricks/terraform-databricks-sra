@@ -101,6 +101,10 @@ cloudtrail_s3_data_events = {
   # existing_log_bucket_name  = ""
 }
 
+# Create the example classic compute cluster, including its underlying EC2 instance.
+# Set to false to deploy the workspace without it. Ignored when compute_mode = "SERVERLESS".
+create_example_cluster = true
+
 # Disable legacy features (e.g. Hive Metastore, DBFS, no-isolation shared clusters) for newly created workspaces at the account level.
 # NOTE: This affects ALL new workspaces created in the Databricks account, not just this deployment.
 # Legacy settings on this deployment's workspace are always disabled, regardless of this flag.

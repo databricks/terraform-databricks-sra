@@ -118,6 +118,12 @@ variable "context_based_ingress_ip_acl" {
   default     = []
 }
 
+variable "create_example_cluster" {
+  description = "Whether to create the example classic compute cluster, including its underlying EC2 instance. Never created when compute_mode is SERVERLESS."
+  type        = bool
+  default     = true
+}
+
 variable "create_service_direct_vpce" {
   description = "Whether to create a Service Direct VPC endpoint for the workspace. Service Direct is a front-end endpoint that can be shared across workspaces in the same VPC, so customers typically reuse one rather than creating per-workspace."
   type        = bool

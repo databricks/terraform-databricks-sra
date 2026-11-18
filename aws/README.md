@@ -82,7 +82,7 @@ The `network_configuration` variable applies to `HYBRID` workspaces only; server
 
 - **System Tables Schemas**: [System Tables](https://docs.databricks.com/en/admin/system-tables/index.html) provide visibility into access, compute, Lakeflow, query, serving, and storage logs. These tables can be found within the system catalog in Unity Catalog.
 
-- **Cluster Example**: An example cluster and cluster policy. **NOTE:** This will create a cluster within your Databricks workspace, including the underlying EC2 instance.
+- **Cluster Example**: An example cluster and cluster policy. **NOTE:** This will create a cluster within your Databricks workspace, including the underlying EC2 instance. Set *create_example_cluster* = *false* to skip it.
 
 - **Audit Log Delivery**: Low-latency delivery of Databricks logs to an S3 bucket in your AWS account. [Audit logs](https://docs.databricks.com/aws/en/admin/account-settings/audit-log-delivery) contain two levels of events: workspace-level audit logs with workspace-level events, and account-level audit logs with account-level events. Additionally, you can generate more detailed events by enabling verbose audit logs. 
    - **NOTE**: Audit log delivery can only be configured twice for a single account. It's recommended that once it is configured, you set *audit_log_delivery_exists* = *true* for subsequent runs.
