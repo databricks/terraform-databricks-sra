@@ -56,6 +56,9 @@
   "engines": {
     "node": ">=18.0"
   },
+  "resolutions": {
+    "shell-quote": "1.12.0"
+  },
   "main": "index.js",
   "license": "MIT"
 }
